@@ -12,10 +12,17 @@ public class AVOWUI : MonoBehaviour {
 	
 	
 	AVOWTab selectedTab = null;
+	
+	AVOWGraph.Node secondarySelectedNode = null;
+	AVOWGraph.Node previousSecondarySelectedNode = null;
 		
 
 	public void RegisterTab(AVOWTab tab){
 		tabs.Add(tab);
+	}
+	
+	public void UnregisterTab(AVOWTab tab){
+		tabs.Remove(tab);
 	}
 	
 	// Use this for initialization
@@ -32,9 +39,11 @@ public class AVOWUI : MonoBehaviour {
 	}	
 	
 	void Start(){
-		AVOWGraph.Node node0 = AVOWGraph.singleton.AddNode ();
-		AVOWGraph.Node node1 = AVOWGraph.singleton.AddNode ();
-		AVOWGraph.Node node2 = AVOWGraph.singleton.AddNode ();
+		AVOWGraph graph = AVOWGraph.singleton;
+		
+		AVOWGraph.Node node0 = graph.AddNode ();
+		AVOWGraph.Node node1 = graph.AddNode ();
+		AVOWGraph.Node node2 = graph.AddNode ();
 		
 		GameObject[] resistors = new GameObject[3];
 		resistors[0] = GameObject.Instantiate(resistorPrefab) as GameObject;
@@ -43,12 +52,12 @@ public class AVOWUI : MonoBehaviour {
 		
 		GameObject cell = GameObject.Instantiate(cellPrefab) as GameObject;
 
-		AVOWGraph.singleton.PlaceComponent(resistors[0], node0, node1);
-		AVOWGraph.singleton.PlaceComponent(resistors[1], node1, node2);
-		AVOWGraph.singleton.PlaceComponent(resistors[2], node2, node1);
-		AVOWGraph.singleton.PlaceComponent(cell, node0, node2);
+		graph.PlaceComponent(resistors[0], node0, node1);
+		graph.PlaceComponent(resistors[1], node1, node2);
+		graph.PlaceComponent(resistors[2], node2, node1);
+		graph.PlaceComponent(cell, node0, node2);
 		
-		bool ok = AVOWGraph.singleton.ValidateGraph();
+		bool ok = graph.ValidateGraph();
 		if (!ok){
 			Debug.LogError ("built an invalid graph");
 		}
@@ -65,17 +74,21 @@ public class AVOWUI : MonoBehaviour {
 		mousePos.z = 0;
 		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
 		
-		bool  buttonClicked = (Input.GetMouseButtonDown(0) && !Input.GetKey (KeyCode.LeftControl));
+		bool  buttonPressed = (Input.GetMouseButtonDown(0) && !Input.GetKey (KeyCode.LeftControl));
+		bool  buttonReleased = (Input.GetMouseButtonUp(0) && !Input.GetKey (KeyCode.LeftControl));
 		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
 		
-		if (buttonClicked || !buttonDown) selectedTab = null;
+		if (buttonPressed || !buttonDown){
+			selectedTab = null;
+			secondarySelectedNode = null;
+		}
 		// If we do not have anything selected
 		if (selectedTab == null){
 			foreach (AVOWTab tab in tabs){
 				bool isInside = tab.IsContaining(mouseWorldPos);
 				tab.SetMouseInside(isInside);
 				if (isInside){
-					if (buttonClicked){
+					if (buttonPressed){
 						
 						selectedTab = tab;
 					}
@@ -87,7 +100,8 @@ public class AVOWUI : MonoBehaviour {
 		else{
 			foreach (AVOWTab tab in tabs){
 				tab.SetMouseInside(false);
-			}			
+			}		
+			secondarySelectedNode = null;	
 			foreach (AVOWTab tab in tabs){
 				// if we are in our select tabm then do nothing
 				if (tab == selectedTab) continue;
@@ -96,11 +110,11 @@ public class AVOWUI : MonoBehaviour {
 				// If we are inside this tab, find all the other tabs which are
 				// part of this node - as we are "inside" all of them now too
 				if (isInside){
-					AVOWGraph.Node node = tab.GetNode();
-					foreach (GameObject go in node.components){
+					secondarySelectedNode = tab.GetNode();
+					foreach (GameObject go in secondarySelectedNode.components){
 						AVOWComponent component = go.GetComponent<AVOWComponent>();
 						AVOWTab otherTab = null;
-						if (component.node0 == node){
+						if (component.node0 == secondarySelectedNode){
 							otherTab = go.transform.FindChild("LowerTab").GetComponent<AVOWTab>();
 						}
 						else{
@@ -110,11 +124,33 @@ public class AVOWUI : MonoBehaviour {
 					}
 				}
 
-			}			
-			
-			// 
+			}
 		}
-		
+		// if we have a new secondarySelectNode then need to make (or destroy) one of the components
+		if (secondarySelectedNode != previousSecondarySelectedNode){
+			AVOWGraph graph = AVOWGraph.singleton;
+			// If we were previously on a node, then we need to remove the last component we added
+			if (previousSecondarySelectedNode != null){
+				graph.RemoveLastComponent();
+			}
+			
+			// If our currently selected one is a node, then we need to create a new component
+			if (secondarySelectedNode != null){
+				// Are we trying to split a node
+				if (selectedTab.GetNode() == secondarySelectedNode){
+				}
+				// or simple put a new component accross existing nodes
+				else{
+					GameObject newComponent = GameObject.Instantiate(resistorPrefab) as GameObject;
+					newComponent.GetComponent<AVOWComponent>().resistance.Force(100);
+					newComponent.GetComponent<AVOWComponent>().resistance.Set(1);
+					
+					graph.PlaceComponent(newComponent, selectedTab.GetNode(), secondarySelectedNode);
+				}
+				
+			}
+			previousSecondarySelectedNode  = secondarySelectedNode;
+		}		
 		
 		// If we have a selected tab, then figure out if any tabs need to be disabled
 		

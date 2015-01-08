@@ -7,7 +7,8 @@ public class AVOWComponent : MonoBehaviour {
 	// Intrinsic data
 	public AVOWGraph.Node node0;
 	public AVOWGraph.Node node1;
-	public float resistance;
+	public SpringValue resistance = new SpringValue(1);
+	
 	public float voltage;
 	public enum Type{
 		kVoltageSource,
@@ -39,6 +40,7 @@ public class AVOWComponent : MonoBehaviour {
 	public int hOrder;	// components are sorted by this value when placed from left to right in diagram
 	
 	// Debug data
+	static int staticCount = 0;
 	int id;
 	
 
@@ -53,7 +55,7 @@ public class AVOWComponent : MonoBehaviour {
 		if (type != Type.kLoad){
 			Debug.LogError ("Attempting to read resistance from a non-Load type");
 		}
-		return resistance;
+		return resistance.GetValue();
 	}
 	
 	// Return the voltage from fromNode to the other node
@@ -110,8 +112,7 @@ public class AVOWComponent : MonoBehaviour {
 		}
 	}
 	
-	public void SetHOrder(int thisID){
-		id = thisID;
+	public void SetID(int thisID){
 		hOrder = thisID;
 	}
 	
@@ -126,12 +127,25 @@ public class AVOWComponent : MonoBehaviour {
 	}
 	
 	// Use this for initialization
-	void Start () {
+	void Awake () {
+		id = staticCount++;
+		
+		if (type == Type.kLoad){
+			resistance.Set (1);
+			voltage = 0;
+		}
+		else{
+			resistance.Force (0);
+			voltage = 1;
+		}
 	
 	}
 	
+
 	// Update is called once per frame
 	void Update () {
+		resistance.Update();
+		
 		float v0 = node0.voltage;
 		float v1 = node1.voltage;
 	

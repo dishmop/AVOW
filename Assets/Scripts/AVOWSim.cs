@@ -37,20 +37,20 @@ public class AVOWSim : MonoBehaviour {
 	
 	void FixedUpdate(){
 		FindLoops();
-		DebugPrintLoops();
+		//DebugPrintLoops();
 		
 		RecordLoopsInComponents();
 		SolveForCurrents();
-		DebugPrintLoopCurrents();
+		//DebugPrintLoopCurrents();
 		
 		StoreCurrentsInComponents();
-		DebugPrintComponentCurrents();
+		//DebugPrintComponentCurrents();
 		
 		CalcVoltages();
-		DebugPrintVoltages();
+		//DebugPrintVoltages();
 		
 		LayoutHOrder();
-		DebugPrintHOrder();
+		//DebugPrintHOrder();
 		
 		//AppHelper.Quit();
 	}
