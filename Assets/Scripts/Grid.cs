@@ -17,7 +17,12 @@ public class Grid : MonoBehaviour {
 	public GameObject emptyGO;
 	public GameObject[,] gridObjects = null;
 	
-	const int		kLoadSaveVersion = 1;		
+	const int		kLoadSaveVersion = 1;	
+	
+	// Useful array of offsets
+	public GridPoint[] offsets = new GridPoint[4];
+	
+	
 
 
 	public 	void Save(BinaryWriter bw){
@@ -150,6 +155,7 @@ public class Grid : MonoBehaviour {
 	void Awake(){
 		if (singleton != null) Debug.LogError ("Error assigning singleton");
 		singleton = this;
+		
 	}
 	
 	void OnDestroy(){

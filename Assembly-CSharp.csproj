@@ -46,6 +46,12 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\AVOWComponent.cs" />
+     <Compile Include="Assets\Scripts\AVOWGraph.cs" />
+     <Compile Include="Assets\Scripts\AVOWGrid.cs" />
+     <Compile Include="Assets\Scripts\AVOWSim.cs" />
+     <Compile Include="Assets\Scripts\AVOWTab.cs" />
+     <Compile Include="Assets\Scripts\AVOWUI.cs" />
      <Compile Include="Assets\Scripts\AmmeterEffect.cs" />
      <Compile Include="Assets\Scripts\AppHelper.cs" />
      <Compile Include="Assets\Scripts\AudioTimeScalar.cs" />
@@ -198,7 +204,10 @@
      <None Include="Assets\Shaders\LitSign.shader" />
      <None Include="Assets\Shaders\noiseSimplex.cginc" />
      <None Include="Assets\Tutorial_1\VertexColorLerp.shader" />
+     <None Include="Assets\Shaders\AVOWTab.shader" />
      <None Include="Assets\Scripts\alglib\gpl3.txt" />
+     <None Include="Assets\Shaders\AVOWResistance.shader" />
+     <None Include="Assets\Shaders\AVOWVoltageSource.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/4.6.0/UnityEngine.UI.dll</HintPath>
  </Reference>

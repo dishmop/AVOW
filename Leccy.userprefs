@@ -1,44 +1,23 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/GameModeManager.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Shaders/AVOWVoltageSource.shader">
     <Files>
-      <File FileName="Assets/Scripts/ServerUpload.cs" Line="126" Column="2" />
-      <File FileName="Assets/Scripts/ExtensionMethods.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/src/Zip/Compression/Streams/InflaterInputStream.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/src/SharpZipBaseException.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/LevelStartMessage.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/TelemtryListener.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/CommentLog.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/LeccyUIButton.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/SendButtonScript.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/PlaybackTime.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/CamControl.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ElementSelectPanel.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/PanelController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/LevelManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/QuitOnEsc.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AppHelper.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/GameModeManager.cs" Line="7" Column="1" />
-      <File FileName="Assets/Shaders/PlasmaBalls_new.shader" Line="1" Column="1" />
-      <File FileName="Assets/Shaders/noise-simplex_v02.shader" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Simulator.cs" Line="1" Column="1" />
-      <File FileName="Assets/Shaders/PlasmaBalls.shader" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/CircuitElementEraser.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/CircuitElementCell.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/CircuitElementWire.cs" Line="360" Column="48" />
-      <File FileName="Assets/Scripts/CircuitElement.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Telemetry.cs" Line="766" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="32" Column="1" />
+      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="21" Column="1" />
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="150" Column="59" />
+      <File FileName="Assets/Scripts/AVOWSim.cs" Line="511" Column="4" />
+      <File FileName="Assets/Scripts/AVOWTab.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ServerUpload.cs" Line="1" Column="1" />
+      <File FileName="Assets/Shaders/AVOWVoltageSource.shader" Line="1" Column="33" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
         <State>
-          <Value>useStream.writeCount</Value>
-          <Value>playbackTime</Value>
-          <Value>point</Value>
-          <Value>fileList</Value>
-          <Value>file</Value>
-          <Value>eventTypes[(int)e]</Value>
+          <Value>thisNode</Value>
+          <Value>thisNode.components.Count</Value>
+          <Value>component</Value>
+          <Value>otherNode</Value>
+          <Value>otherNode.components[0]</Value>
         </State>
       </Pad>
     </Pads>
