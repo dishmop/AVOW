@@ -36,8 +36,8 @@ public class AVOWGraph : MonoBehaviour {
 
 		newGO.transform.parent = transform;
 		AVOWComponent newComponent = newGO.GetComponent<AVOWComponent>();
-		newComponent.node0 = node0;
-		newComponent.node1 = node1;
+		newComponent.SetNode0(node0);
+		newComponent.SetNode1(node1);
 		newComponent.SetHOrder(allComponents.Count);
 
 		

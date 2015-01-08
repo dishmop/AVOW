@@ -115,7 +115,15 @@ public class AVOWComponent : MonoBehaviour {
 		hOrder = thisID;
 	}
 	
+	public void SetNode0(AVOWGraph.Node node){
+		node0 = node;
+		transform.FindChild("LowerTab").GetComponent<AVOWTab>().SetNode(node);
+	}
 
+	public void SetNode1(AVOWGraph.Node node){
+		node1 = node;
+		transform.FindChild("UpperTab").GetComponent<AVOWTab>().SetNode(node);
+	}
 	
 	// Use this for initialization
 	void Start () {
@@ -128,7 +136,7 @@ public class AVOWComponent : MonoBehaviour {
 		float v1 = node1.voltage;
 	
 		
-		border = 0.1f * (h1-h0);
+		border = 0.2f * (h1-h0);
 		tabSize = 0.2f * (v1-v0);
 
 		if (type == Type.kLoad){
@@ -147,9 +155,9 @@ public class AVOWComponent : MonoBehaviour {
 			transform.FindChild("VoltageSource").position = new Vector3(-h0, v0, 0);
 			transform.FindChild("VoltageSource").localScale = new Vector3(h0 - h1, v1-v0, 1);
 
-			transform.FindChild("UpperTab").position = new Vector3(-h0 - border, v1, -2);
+			transform.FindChild("UpperTab").position = new Vector3(h1 - border, v1, -2);
 			transform.FindChild("UpperTab").localScale = new Vector3(2 * (h1 - h0) - 2 * border, -tabSize, 1);
-			transform.FindChild("LowerTab").position = new Vector3((h0 + border), v0, -2);
+			transform.FindChild("LowerTab").position = new Vector3(-h1 + border, v0, -2);
 			transform.FindChild("LowerTab").localScale = new Vector3(2 * (h1 - h0)  - 2 * border, -tabSize, 1);	
 		}
 			

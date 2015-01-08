@@ -14,11 +14,13 @@ public class AVOWTab : MonoBehaviour {
 	
 	public Color[] cols = new Color[(int)State.kNumStates];
 	public State state;
+	public AVOWGraph.Node thisNode;
+	
 	State oldState = State.kNumStates;
 	
 	bool isMouseInside = false;
 	bool isMouseSelected = false;
-	bool isMouseDown = false;
+
 	
 	
 	// Use this for initialization
@@ -40,25 +42,28 @@ public class AVOWTab : MonoBehaviour {
 		isMouseInside = isInside;
 	}
 	
-	void SetMouseDown(bool isDown){
-		isMouseDown = isDown;
+	public void SetNode(AVOWGraph.Node node){
+		thisNode = node;
+	}
+	
+
+	public AVOWGraph.Node GetNode(){
+		return thisNode;
 		
 	}
+	
 	
 
 	
 	// Update is called once per frame
 	void Update () {
 		// Do the state logic
-		if (isMouseInside && isMouseDown){
-			state = State.kPressed;
-		}
+		if (isMouseSelected){
+			state = State.kSelected;
+		}		
 		else if (isMouseInside){
 			state = State.kOver;
 		}
-		else if (isMouseSelected){
-			state = State.kSelected;
-		}		
 		else{
 			state = State.kNormal;
 		}

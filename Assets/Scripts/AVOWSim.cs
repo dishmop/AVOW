@@ -52,7 +52,7 @@ public class AVOWSim : MonoBehaviour {
 		LayoutHOrder();
 		DebugPrintHOrder();
 		
-//		AppHelper.Quit();
+		//AppHelper.Quit();
 	}
 	
 	void DebugPrintLoops(){
@@ -233,7 +233,7 @@ public class AVOWSim : MonoBehaviour {
 					}
 				}
 				else if (loopElement.component.type == AVOWComponent.Type.kVoltageSource){
-					V[i, 0] -= loopElement.component.GetVoltage(loopElement.fromNode);
+					V[i, 0] = loopElement.component.GetVoltage(loopElement.fromNode);
 				}
 				else{
 					Debug.LogError ("Unknown type of component");
@@ -392,7 +392,7 @@ public class AVOWSim : MonoBehaviour {
 				thisComponent.visited = true;
 				
 				// Calc the voltage at the other end of this component
-				float voltageChange = -thisComponent.GetCurrent(lastNode) * thisComponent.GetResistance();
+				float voltageChange = thisComponent.GetCurrent(lastNode) * thisComponent.GetResistance();
 				AVOWGraph.Node nextNode = thisComponent.GetOtherNode(lastNode);
 				float nextNodeVoltage = lastNode.voltage - voltageChange;
 				
@@ -444,10 +444,10 @@ public class AVOWSim : MonoBehaviour {
 			foreach (GameObject go in node.components){
 				AVOWComponent component = go.GetComponent<AVOWComponent>();
 				float current = component.GetCurrent(node);
-				if (current > 0) currentOut += current;
-				else currentIn += current;
+				if (current > 0) currentOut += Mathf.Abs(current);
+				else currentIn += Mathf.Abs(current);
 			}
-			node.hWidth = currentOut;
+			node.hWidth = currentIn;
 		}
 		
 		
@@ -486,14 +486,14 @@ public class AVOWSim : MonoBehaviour {
 			for (int i = 0; i < thisNode.components.Count; ++i){
 				// Arrange them along the width of the node
 				AVOWComponent component = thisNode.components[i].GetComponent<AVOWComponent>();
-				if (component.IsForward (thisNode)){
+				if (component.GetCurrent (thisNode) > 0){
 					component.h0 = hOut;
-					component.h1 = hOut + component.fwCurrent;
+					component.h1 = hOut + Mathf.Abs(component.fwCurrent);
 					hOut = component.h1;
 				}
 				else{
 					component.h0 = hIn;
-					component.h1 = hIn + component.fwCurrent;
+					component.h1 = hIn + Mathf.Abs(component.fwCurrent);
 					hIn = component.h1;
 				}
 				component.visited = true;
