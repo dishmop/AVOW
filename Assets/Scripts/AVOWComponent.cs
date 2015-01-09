@@ -27,7 +27,6 @@ public class AVOWComponent : MonoBehaviour {
 	public bool visited;
 	public bool disable;
 	public float fwCurrent;
-	public bool isLayedOut;
 	
 	// Visulation data
 	public float h0;
@@ -39,6 +38,7 @@ public class AVOWComponent : MonoBehaviour {
 	public float tabSize;
 	public float border;
 	public int hOrder;	// components are sorted by this value when placed from left to right in diagram
+	public bool isLayedOut;
 	
 	// Debug data
 	static int staticCount = 0;
@@ -78,18 +78,36 @@ public class AVOWComponent : MonoBehaviour {
 	
 	public void Kill(float targetRes){
 		resistanceAngle.Set (targetRes);
-		float delta = resistanceAngle.GetDesValue() - resistanceAngle.GetValue();
 		removeOnTarget = true;
 	}
 	
 	void CheckForKillResistance(){
 		if (!removeOnTarget) return;
 		
+
+		
 		if (resistanceAngle.IsAtTarget()){
 			AVOWGraph.singleton.RemoveComponent(gameObject);
 		}
 	}
 	
+	public bool IsBetweenNodes(AVOWGraph.Node nodeA, AVOWGraph.Node nodeB){
+		if (node0 == nodeA && node1 == nodeB) return true;
+		if (node0 == nodeB && node1 == nodeA) return true;
+		return false;
+	}
+	
+	public void ReplaceNode(AVOWGraph.Node existingNode, AVOWGraph.Node newNode){
+		if (node0 == existingNode){
+			SetNode0(newNode);
+		} 
+		else if (node1 == existingNode){
+			SetNode1(newNode);
+		}
+		else{
+			Debug.LogError ("Error replacing node");
+		}
+	}
 	
 	public float GetCurrent(AVOWGraph.Node fromNode){
 		if (fromNode != node0 && fromNode != node1){
@@ -137,13 +155,18 @@ public class AVOWComponent : MonoBehaviour {
 	
 	public void SetNode0(AVOWGraph.Node node){
 		node0 = node;
-		transform.FindChild("LowerTab").GetComponent<AVOWTab>().SetNode(node);
+		AVOWTab tab = transform.FindChild("LowerTab").GetComponent<AVOWTab>();
+		tab.SetNode(node);
+		tab.SetAVOWComponent(this);
 	}
 
 	public void SetNode1(AVOWGraph.Node node){
 		node1 = node;
-		transform.FindChild("UpperTab").GetComponent<AVOWTab>().SetNode(node);
+		AVOWTab tab = transform.FindChild("UpperTab").GetComponent<AVOWTab>();
+		tab.SetNode(node);
+		tab.SetAVOWComponent(this);
 	}
+
 	
 	// Use this for initialization
 	void Awake () {
@@ -170,7 +193,7 @@ public class AVOWComponent : MonoBehaviour {
 		float v1 = node1.voltage;
 	
 		
-		border = 0.2f * (h1-h0);
+		border = 0;//0.2f * (h1-h0);
 		tabSize = 0.2f * (v1-v0);
 
 		if (type == Type.kLoad){

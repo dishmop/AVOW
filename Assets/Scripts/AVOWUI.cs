@@ -12,6 +12,7 @@ public class AVOWUI : MonoBehaviour {
 	
 	
 	AVOWTab selectedTab = null;
+	AVOWTab overTab = null;
 	
 	AVOWGraph.Node secondarySelectedNode = null;
 	AVOWGraph.Node previousSecondarySelectedNode = null;
@@ -43,24 +44,32 @@ public class AVOWUI : MonoBehaviour {
 		
 		AVOWGraph.Node node0 = graph.AddNode ();
 		AVOWGraph.Node node1 = graph.AddNode ();
-		AVOWGraph.Node node2 = graph.AddNode ();
-		
-		GameObject[] resistors = new GameObject[3];
-		resistors[0] = GameObject.Instantiate(resistorPrefab) as GameObject;
-		resistors[1] = GameObject.Instantiate(resistorPrefab) as GameObject;
-		resistors[2] = GameObject.Instantiate(resistorPrefab) as GameObject;
-		
-		GameObject cell = GameObject.Instantiate(cellPrefab) as GameObject;
 
-		graph.PlaceComponent(resistors[0], node0, node1);
-		graph.PlaceComponent(resistors[1], node1, node2);
-		graph.PlaceComponent(resistors[2], node2, node1);
-		graph.PlaceComponent(cell, node0, node2);
+				
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node1);
+		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node1);
 		
-		bool ok = graph.ValidateGraph();
-		if (!ok){
-			Debug.LogError ("built an invalid graph");
-		}
+//		
+//		AVOWGraph.Node node0 = graph.AddNode ();
+//		AVOWGraph.Node node1 = graph.AddNode ();
+//		AVOWGraph.Node node2 = graph.AddNode ();
+//		
+//		GameObject[] resistors = new GameObject[3];
+//		resistors[0] = GameObject.Instantiate(resistorPrefab) as GameObject;
+//		resistors[1] = GameObject.Instantiate(resistorPrefab) as GameObject;
+//		resistors[2] = GameObject.Instantiate(resistorPrefab) as GameObject;
+//		
+//		GameObject cell = GameObject.Instantiate(cellPrefab) as GameObject;
+//
+//		graph.PlaceComponent(resistors[0], node0, node1);
+//		graph.PlaceComponent(resistors[1], node1, node2);
+//		graph.PlaceComponent(resistors[2], node2, node1);
+//		graph.PlaceComponent(cell, node0, node2);
+//		
+//		bool ok = graph.ValidateGraph();
+//		if (!ok){
+//			Debug.LogError ("built an invalid graph");
+//		}
 		AVOWSim.singleton.Recalc();
 		
 		
@@ -79,11 +88,17 @@ public class AVOWUI : MonoBehaviour {
 		bool  buttonReleased = (Input.GetMouseButtonUp(0) && !Input.GetKey (KeyCode.LeftControl));
 		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
 		
+		if (buttonReleased){
+			secondarySelectedNode = null;
+			previousSecondarySelectedNode = null;
+			selectedTab = null;
+		}
 		if (buttonPressed || !buttonDown){
 			selectedTab = null;
 			secondarySelectedNode = null;
 		}
 		// If we do not have anything selected
+		overTab = null;
 		if (selectedTab == null){
 			foreach (AVOWTab tab in tabs){
 				bool isInside = tab.IsContaining(mouseWorldPos);
@@ -93,6 +108,7 @@ public class AVOWUI : MonoBehaviour {
 						
 						selectedTab = tab;
 					}
+					overTab = tab;
 				}
 				tab.SetSelected(tab == selectedTab);
 			}
@@ -104,7 +120,7 @@ public class AVOWUI : MonoBehaviour {
 			}		
 			secondarySelectedNode = null;	
 			foreach (AVOWTab tab in tabs){
-				// if we are in our select tabm then do nothing
+				// if we are in our select tab, then do nothing
 				if (tab == selectedTab) continue;
 				
 				bool isInside = tab.IsContaining(mouseWorldPos);
@@ -127,11 +143,21 @@ public class AVOWUI : MonoBehaviour {
 
 			}
 		}
+		
+		
+		
+		
+//		Debug.Log ("secondarySelectedNode = " + 
+//			(secondarySelectedNode!=null ? secondarySelectedNode.GetID() : "NULL") + " , previousSecondarySelectedNode = " + 
+//			(previousSecondarySelectedNode!=null ? previousSecondarySelectedNode.GetID() : "NULL"));
+
+
 		// if we have a new secondarySelectNode then need to make (or destroy) one of the components
 		if (secondarySelectedNode != previousSecondarySelectedNode){
 			AVOWGraph graph = AVOWGraph.singleton;
 			// If we were previously on a node, then we need to remove the last component we added
 			if (previousSecondarySelectedNode != null){
+				Debug.Log ("KillLastComponent()");
 				graph.KillLastComponent();
 			}
 			
@@ -139,6 +165,15 @@ public class AVOWUI : MonoBehaviour {
 			if (secondarySelectedNode != null){
 				// Are we trying to split a node
 				if (selectedTab.GetNode() == secondarySelectedNode){
+					AVOWGraph.Node newNode = graph.SplitNode(secondarySelectedNode, selectedTab.GetAVOWComponent ());
+					
+					GameObject newComponent = GameObject.Instantiate(resistorPrefab) as GameObject;
+					newComponent.GetComponent<AVOWComponent>().resistanceAngle.Force(0);
+					newComponent.GetComponent<AVOWComponent>().resistanceAngle.Set(45);
+					
+					graph.PlaceComponent(newComponent, newNode, secondarySelectedNode);
+					AVOWSim.singleton.Recalc();
+					
 				}
 				// or simple put a new component accross existing nodes
 				else{
@@ -155,8 +190,12 @@ public class AVOWUI : MonoBehaviour {
 		}		
 		
 		// If we have a selected tab, then figure out if any tabs need to be disabled
-		
-
+		// TO DO		
+	}
 	
+	void OnGUI(){
+		if (overTab){
+			GUI.Label (new Rect(10, 10, Screen.width, 30), "overTab Tab: node = " + overTab.GetNode().GetID() + ", compoonent = " + overTab.GetAVOWComponent().GetID());
+		}
 	}
 }

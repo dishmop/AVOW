@@ -15,6 +15,7 @@ public class AVOWTab : MonoBehaviour {
 	public Color[] cols = new Color[(int)State.kNumStates];
 	public State state;
 	public AVOWGraph.Node thisNode;
+	public AVOWComponent thisComponent;
 	
 	State oldState = State.kNumStates;
 	
@@ -52,11 +53,20 @@ public class AVOWTab : MonoBehaviour {
 		thisNode = node;
 	}
 	
+	public void SetAVOWComponent(AVOWComponent component){
+		thisComponent = component;
+	}	
+	
 
 	public AVOWGraph.Node GetNode(){
 		return thisNode;
 		
 	}
+	
+	public AVOWComponent GetAVOWComponent(){
+		return thisComponent;
+		
+	}	
 	
 	
 

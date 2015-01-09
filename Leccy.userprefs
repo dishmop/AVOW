@@ -1,20 +1,20 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/GameModeManager.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWComponent.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWUI.cs" Line="65" Column="3" />
-      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="35" Column="19" />
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="30" Column="24" />
-      <File FileName="Assets/Scripts/AVOWSim.cs" Line="637" Column="5" />
-      <File FileName="Assets/Scripts/AVOWTab.cs" Line="33" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="82" Column="21" />
+      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="51" Column="1" />
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="81" Column="1" />
+      <File FileName="Assets/Scripts/AVOWSim.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ServerUpload.cs" Line="1" Column="1" />
-      <File FileName="Assets/Shaders/AVOWVoltageSource.shader" Line="55" Column="29" />
+      <File FileName="Assets/Shaders/AVOWVoltageSource.shader" Line="1" Column="1" />
       <File FileName="Assets/Shaders/AVOWResistance.shader" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI.cs" Line="295" Column="37" />
-      <File FileName="Assets/Scripts/SpringValue.cs" Line="14" Column="19" />
+      <File FileName="Assets/Scripts/UI.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/SpringValue.cs" Line="25" Column="1" />
       <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="28" Column="42" />
-      <File FileName="Assets/Scripts/GameModeManager.cs" Line="7" Column="1" />
       <File FileName="Assets/Scripts/CamControl.cs" Line="5" Column="1" />
+      <File FileName="Assets/Scripts/QuitOnEsc.cs" Line="15" Column="41" />
+      <File FileName="Assets/Scripts/AVOWTab.cs" Line="23" Column="1" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">

@@ -35,7 +35,6 @@ public class AVOWSim : MonoBehaviour {
 	
 	
 	public void Recalc(){
-		RecordMousePos();
 
 		FindLoops();
 		//DebugPrintLoops();
@@ -66,6 +65,7 @@ public class AVOWSim : MonoBehaviour {
 	
 	void FixedUpdate(){
 
+		RecordMousePos();
 		Recalc();
 		CalcMouseOffset();
 		
@@ -476,6 +476,9 @@ public class AVOWSim : MonoBehaviour {
 		graph.allComponents.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().hOrder.CompareTo (obj2.GetComponent<AVOWComponent>().hOrder)));
 
 		// Now traverse the graph setting up the horizontal positions of each component
+		// We say a component is "visited" if it has been positioned
+		// We say a node is "visited" if all the components in it have been positioned
+		// We add a node to the queue if we can position all its components
 		graph.ClearVisitedFlags();
 		
 		// Find the first component in the H ordering and start with a node connected to it since both of its connecting nodes
@@ -484,10 +487,9 @@ public class AVOWSim : MonoBehaviour {
 		AVOWGraph.Node firstNode = firstComponent.node0;
 		firstNode.h0 = 0;
 		
-		// Rule 1: If a node is in the queu then we know its h0 (and this has been set)
-		// Rule 2: If a node has been visited, then we have set the h0 and h1 of all components attached to it
+		// Rule 1: If a node is in the queue then we know its h0 (and this has been set)
 		
-		// Set up a stack so we know which nodes we have visited
+		// Set up a queue so we can keep track of which nodes we can work on
 		Queue<AVOWGraph.Node> nodeQueue = new Queue<AVOWGraph.Node>();
 		nodeQueue.Enqueue (firstComponent.node0);
 		
@@ -496,33 +498,55 @@ public class AVOWSim : MonoBehaviour {
 			AVOWGraph.Node thisNode = nodeQueue.Dequeue ();
 			
 			// Go through the components attached to this node in order
+			// Whenw e find one that has not yet been positioned, we order it
+			// and then order all the other nodes which are between the same nodes as it
+			// Then we find the next unpositioned node until we have done all the components 
+			// in this node
+			
 			float hIn = thisNode.h0;
 			float hOut = thisNode.h0;
 			for (int i = 0; i < thisNode.components.Count; ++i){
-				// Arrange them along the width of the node
-				AVOWComponent component = thisNode.components[i].GetComponent<AVOWComponent>();
-				if (component.GetCurrent (thisNode) > 0){
-					component.h0 = hOut;
-					component.h1 = hOut + Mathf.Abs(component.fwCurrent);
-					hOut = component.h1;
+				AVOWComponent componentI = thisNode.components[i].GetComponent<AVOWComponent>();
+				
+				if (!componentI.visited){
+					AVOWGraph.Node otherNode = componentI.GetOtherNode(thisNode);
+
+					for (int j = i; j < thisNode.components.Count; ++j){
+						AVOWComponent componentJ = thisNode.components[j].GetComponent<AVOWComponent>();
+						
+						if (componentJ.IsBetweenNodes(thisNode, otherNode)){
+							if (componentJ.GetCurrent (thisNode) > 0){
+								componentJ.h0 = hOut;
+								componentJ.h1 = hOut + Mathf.Abs(componentJ.fwCurrent);
+								hOut = componentJ.h1;
+							}
+							else{
+								componentJ.h0 = hIn;
+								componentJ.h1 = hIn + Mathf.Abs(componentJ.fwCurrent);
+								hIn = componentJ.h1;
+							}	
+							componentJ.visited = true;
+							componentJ.isLayedOut = true;			
+						}
+					}
+					// Find the node at the other side of this connection and - if this connection is the
+					// lowest h-order component, then we can process the node - so set up its h0 and add it to the queue
+				
+					if (!otherNode.visited && otherNode.components[0].GetComponent<AVOWComponent>() == componentI){
+						otherNode.h0 = componentI.h0;
+						nodeQueue.Enqueue(otherNode);
+					}					
 				}
 				else{
-					component.h0 = hIn;
-					component.h1 = hIn + Mathf.Abs(component.fwCurrent);
-					hIn = component.h1;
+					if (componentI.GetCurrent (thisNode) > 0){
+						hOut += Mathf.Abs(componentI.fwCurrent);
+					}
+					else{
+						hIn += Mathf.Abs(componentI.fwCurrent);
+					}				
 				}
-				component.visited = true;
-				component.isLayedOut = true;
-				
-				// Find the node at the other side of this connection and - if this connection is the
-				// lowest h-order component, then we can process it - so set up its h0 and add it to the queue
-				AVOWGraph.Node otherNode = component.GetOtherNode(thisNode);
-				if (!otherNode.visited && otherNode.components[0].GetComponent<AVOWComponent>() == component){
-					otherNode.h0 = component.h0;
-					nodeQueue.Enqueue(otherNode);
-				}
-				
 			}
+			
 			thisNode.visited = true;
 		}
 	}
@@ -560,31 +584,36 @@ public class AVOWSim : MonoBehaviour {
 		foreach(GameObject go in graph.allComponents){
 			AVOWComponent component = go.GetComponent<AVOWComponent>();
 			
-			// Don't deal with Cells for the moment
-			if (component.type == AVOWComponent.Type.kVoltageSource) continue;
 			
 			// If this component has never been layed out, then ignore
 			if (!component.isLayedOut) continue;
 			
 			float lowVoltage = Mathf.Min (component.node0.voltage, component.node1.voltage);
 			float highVoltage = Mathf.Max (component.node0.voltage, component.node1.voltage);
+			float lowCurrent = component.h0;
+			float highCurrent = component.h1;
+			
+
+			
 			
 			// Keep track of global bounds
-			xMin = Mathf.Min (xMin, component.h0);
+			xMin = Mathf.Min (xMin, lowCurrent);
 			yMin = Mathf.Min (yMin, lowVoltage);
-			xMax = Mathf.Min (xMax, component.h1);
-			yMax = Mathf.Min (yMax, highVoltage);
+			xMax = Mathf.Max (xMax, highCurrent);
+			yMax = Mathf.Max (yMax, highVoltage);
 			
-			if (mouseWorldPos.x > component.h0 && 
-				mouseWorldPos.x < component.h1 && 
+			// Only register if over a resistor
+			if (component.type == AVOWComponent.Type.kLoad &&
+				mouseWorldPos.x > lowCurrent && 
+			    mouseWorldPos.x < highCurrent && 
 			    mouseWorldPos.y > lowVoltage && 
 			    mouseWorldPos.y < highVoltage){
 			    
 			    if (mouseOverComponent != null){
-			    	Debug.LogError ("Error - Our mouse is over two components");
+			    	Debug.Log ("Error1 - Our mouse is over two components");
 			    }
 				mouseOverComponent = component;
-				mouseOverXProp = (mouseWorldPos.x -  component.h0) / (component.h1 - component.h0);
+				mouseOverXProp = (mouseWorldPos.x -  lowCurrent) / (highCurrent - lowCurrent);
 				mouseOverYProp = (mouseWorldPos.y -  lowVoltage) / (highVoltage - lowVoltage);
 					
 			}
@@ -608,6 +637,13 @@ public class AVOWSim : MonoBehaviour {
 			xMax = mouseOverComponent.h1;
 			yMin = Mathf.Min (mouseOverComponent.node0.voltage, mouseOverComponent.node1.voltage);
 			yMax = Mathf.Max (mouseOverComponent.node0.voltage, mouseOverComponent.node1.voltage);
+			// If a voltage source then need to mirror it all
+//			if (mouseOverComponent.type == AVOWComponent.Type.kVoltageSource){
+//				float temp = xMin;
+//				xMin = -xMax;
+//				xMax = -temp;
+//			}		
+			
 		}
 		else{
 
@@ -616,12 +652,16 @@ public class AVOWSim : MonoBehaviour {
 				
 				float lowVoltage = Mathf.Min (component.node0.voltage, component.node1.voltage);
 				float highVoltage = Mathf.Max (component.node0.voltage, component.node1.voltage);
+				float lowCurrent = component.h0;
+				float highCurrent = component.h1;
+				
+					
 				
 				// Keep track of global bounds
-				xMin = Mathf.Min (xMin, component.h0);
+				xMin = Mathf.Min (xMin, lowCurrent);
 				yMin = Mathf.Min (yMin, lowVoltage);
-				xMax = Mathf.Min (xMax, component.h1);
-				yMax = Mathf.Min (yMax, highVoltage);
+				xMax = Mathf.Max (xMax, highCurrent);
+				yMax = Mathf.Max (yMax, highVoltage);
 				
 			}
 		}

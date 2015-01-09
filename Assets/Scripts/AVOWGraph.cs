@@ -24,6 +24,14 @@ public class AVOWGraph : MonoBehaviour {
 			return id.ToString ();
 		}
 		
+		static int staticCount = 0;
+		
+		public Node(){
+			id = staticCount++;
+		}
+		
+		
+		
 	}
 	
 	public List<Node> allNodes = new List<Node>();
@@ -51,11 +59,26 @@ public class AVOWGraph : MonoBehaviour {
 		AVOWComponent component = obj.GetComponent<AVOWComponent>();
 		AVOWGraph.Node node0 = component.node0;
 		AVOWGraph.Node node1 = component.node1;
-		
+
+		// Remove the component
 		allComponents.Remove(obj);
 		node0.components.Remove (obj);
 		node1.components.Remove (obj);
 		GameObject.Destroy(obj);
+		
+		// Count the number of connections between these two nodes
+		int countConnections = 0;
+		foreach (GameObject go in node0.components){
+			AVOWComponent otherComponent = go.GetComponent<AVOWComponent>();
+			if (otherComponent.GetOtherNode(node0) == node1){
+				countConnections++;
+			}
+		}	
+		
+		// If we no longer have any connections, then merge the two nodes
+		if (countConnections == 0){
+			MergeNodes(node0, node1);
+		}
 		
 	}
 	
@@ -78,6 +101,7 @@ public class AVOWGraph : MonoBehaviour {
 		}
 		// Otherwise, we need to more the nodes together
 		else{
+			component.Kill(0);
 			
 		}
 		
@@ -96,12 +120,57 @@ public class AVOWGraph : MonoBehaviour {
 		return allComponents.Find(item => item.GetComponent<AVOWComponent>().type == AVOWComponent.Type.kVoltageSource);
 	}
 	
+	// Merges all connections to node0
+	public void MergeNodes(Node node0, Node node1){
+		
+		// Replace all the instances of node1 with node 0 in the components attached to node1
+		// Add add the components to node0's list of components
+		foreach(GameObject go in node1.components){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			component.ReplaceNode(node1, node0);
+			node0.components.Add (go);
+		}
+		
+		// Delete node 1 - since it is no longet used
+		allNodes.Remove (node1);
+		
+		
+	}
+	
 
 
+	// SPlit the nodeToSplit into two new nodes
+	// we attach all apart from the anchored component to the new node
+	public Node SplitNode(Node nodeToSplit, AVOWComponent movedComponent){
+//		Node newNode = AddNode();
+//		
+//		foreach (GameObject go in nodeToSplit.components){
+//			AVOWComponent component = go.GetComponent<AVOWComponent>();
+//			if (component != anchoredComponent){
+//				component.ReplaceNode(nodeToSplit, newNode);
+//				
+//				newNode.components.Add (go);
+//			}
+//		}
+//		nodeToSplit.components.Clear();
+//		nodeToSplit.components.Add (anchoredComponent.gameObject);
+//		
+//		
+//		return newNode;
+		
+		Node newNode = AddNode();
+		
+		nodeToSplit.components.Remove(movedComponent.gameObject);
+		movedComponent.ReplaceNode(nodeToSplit, newNode);
+		
+		newNode.components.Add (movedComponent.gameObject);
+		
+		return newNode;
+	}
+	
 	
 	public Node AddNode(){
 		Node newNode = new Node();
-		newNode.id = allNodes.Count;
 		allNodes.Add (newNode);
 		return newNode;
 	}
@@ -125,6 +194,9 @@ public class AVOWGraph : MonoBehaviour {
 		return true;
 		
 	}
+	
+	
+
 	
 	public void ClearVisitedFlags(){
 		foreach (GameObject componentGO in allComponents){
