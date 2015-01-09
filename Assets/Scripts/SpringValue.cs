@@ -10,12 +10,12 @@ public class SpringValue{
 	
 	float desValue = 0f;
 	float currentValue = 0f;
-	float linSpeed = 500f;
-	float asSpeed = 10f;
+	float linSpeed = 100f;
+	float asSpeed = 4f;
 	
 	
 	
-	Mode mode =  Mode.kAsymptotic;
+	Mode mode =  Mode.kLinear;
 	
 	
 	public SpringValue(float val){
@@ -71,4 +71,5 @@ public class SpringValue{
 		}
 	
 	}
+	
 }

@@ -9,6 +9,8 @@ public class AVOWSim : MonoBehaviour {
 	
 	public GameObject graphGO;
 	
+	AVOWGraph graph;
+	
 	public class LoopElement{
 		public LoopElement(AVOWComponent component, AVOWGraph.Node fromNode){
 			this.component = component;
@@ -21,21 +23,20 @@ public class AVOWSim : MonoBehaviour {
 	
 	public List<List<LoopElement>> loops;
 	
+	// Recording the mouse posiiton
+	Vector3			mouseWorldPos;
+	AVOWComponent 	mouseOverComponent = null; 	// null if not over any compnent
+	float			mouseOverXProp = 0.5f;		// Proportion of width from left of component (or entire diagram if null)
+	float			mouseOverYProp = 0.5f;		// Proportio of height from bottom of component (or entire diagram if null)
+	
 	// Current solving	
 	double epsilon = 0.0001;
 	float[]						loopCurrents;
 	
 	
-	void Awake(){
-		if (singleton != null) Debug.LogError ("Error assigning singleton");
-		singleton = this;
-	}
-	
-	void OnDestroy(){
-		singleton = null;
-	}
-	
-	void FixedUpdate(){
+	public void Recalc(){
+		RecordMousePos();
+
 		FindLoops();
 		//DebugPrintLoops();
 		
@@ -49,8 +50,24 @@ public class AVOWSim : MonoBehaviour {
 		CalcVoltages();
 		//DebugPrintVoltages();
 		
+		
 		LayoutHOrder();
 		//DebugPrintHOrder();
+	}
+	
+	void Awake(){
+		if (singleton != null) Debug.LogError ("Error assigning singleton");
+		singleton = this;
+	}
+	
+	void OnDestroy(){
+		singleton = null;
+	}
+	
+	void FixedUpdate(){
+
+		Recalc();
+		CalcMouseOffset();
 		
 		//AppHelper.Quit();
 	}
@@ -80,11 +97,15 @@ public class AVOWSim : MonoBehaviour {
 		}
 	}
 	
+	void Start(){
+		graph = graphGO.GetComponent<AVOWGraph>();
+		
+	}
+	
 	
 	// Fins a set of indendpent loops in the graph
 	void FindLoops(){
 		loops = new List<List<LoopElement>>();
-		AVOWGraph graph = graphGO.GetComponent<AVOWGraph>();
 
 		// If no nodes, then nothing to do
 		if (graph.allNodes.Count == 0) return;
@@ -193,7 +214,6 @@ public class AVOWSim : MonoBehaviour {
 	
 	
 	void RecordLoopsInComponents(){
-		AVOWGraph graph = graphGO.GetComponent<AVOWGraph>();
 		graph.ClearLoopRecords();
 		
 		for (int i = 0; i < loops.Count; ++i){
@@ -341,7 +361,6 @@ public class AVOWSim : MonoBehaviour {
 	
 	
 	void StoreCurrentsInComponents(){
-		AVOWGraph graph = graphGO.GetComponent<AVOWGraph>();
 		foreach (GameObject componentGO in graph.allComponents){
 			AVOWComponent component = componentGO.GetComponent<AVOWComponent>();
 			float totalCurrent = 0;
@@ -353,7 +372,6 @@ public class AVOWSim : MonoBehaviour {
 	}
 	
 	void DebugPrintComponentCurrents(){
-		AVOWGraph graph = graphGO.GetComponent<AVOWGraph>();
 		Debug.Log ("Print component currents");
 		foreach (GameObject componentGO in graph.allComponents){
 			AVOWComponent component = componentGO.GetComponent<AVOWComponent>();
@@ -363,7 +381,6 @@ public class AVOWSim : MonoBehaviour {
 	}
 	
 	void CalcVoltages(){
-		AVOWGraph graph = graphGO.GetComponent<AVOWGraph>();
 		graph.ClearVisitedFlags();
 
 		// First find the voltage source
@@ -419,8 +436,7 @@ public class AVOWSim : MonoBehaviour {
 	
 	void DebugPrintVoltages(){
 		Debug.Log ("Printing voltages");
-		AVOWGraph graph = graphGO.GetComponent<AVOWGraph>();
-		
+
 		foreach (AVOWGraph.Node node in graph.allNodes){
 			Debug.Log ("Node " + node.GetID() + ": " + node.voltage + "V");
 		}
@@ -435,7 +451,6 @@ public class AVOWSim : MonoBehaviour {
 //	}
 	
 	void LayoutHOrder(){
-		AVOWGraph graph = graphGO.GetComponent<AVOWGraph>();
 		
 		// Figure out the width of each node. The current flowing in == current flowing out == width
 		foreach (AVOWGraph.Node node in graph.allNodes){
@@ -497,6 +512,7 @@ public class AVOWSim : MonoBehaviour {
 					hIn = component.h1;
 				}
 				component.visited = true;
+				component.isLayedOut = true;
 				
 				// Find the node at the other side of this connection and - if this connection is the
 				// lowest h-order component, then we can process it - so set up its h0 and add it to the queue
@@ -512,7 +528,6 @@ public class AVOWSim : MonoBehaviour {
 	}
 	
 	void DebugPrintHOrder(){
-		AVOWGraph graph = graphGO.GetComponent<AVOWGraph>();
 		Debug.Log ("Printing HOrder Nodes");
 		foreach(AVOWGraph.Node node in graph.allNodes){
 			Debug.Log ("Node " + node.GetID() + ": h0 = " + node.h0 + ", hWidth = " + node.hWidth + ", visited = " + node.visited);
@@ -524,4 +539,111 @@ public class AVOWSim : MonoBehaviour {
 			Debug.Log ("Component " + component.GetID() + ": h0 = " + component.h0 + ", h1 = " + component.h1 + ", visited = " + component.visited);
 		}
 	}
+	
+	// Records the position of the mouse as a local position in one of the components
+	void RecordMousePos(){
+		// Find mouse pos in screen space
+		Vector3 screenPos = Input.mousePosition;
+		screenPos.z = 0;
+		
+		// Find mouse pos in world space
+		mouseWorldPos = Camera.main.ScreenToWorldPoint( screenPos);
+		mouseWorldPos.z = 0;
+		
+		// check which component we are over
+		mouseOverComponent = null;
+		// Keep track of global bounds of entire diagram (as we will use this if not over ay specific component)
+		float xMin = 100;
+		float yMin = 100;
+		float xMax = -1;
+		float yMax = -1;
+		foreach(GameObject go in graph.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			
+			// Don't deal with Cells for the moment
+			if (component.type == AVOWComponent.Type.kVoltageSource) continue;
+			
+			// If this component has never been layed out, then ignore
+			if (!component.isLayedOut) continue;
+			
+			float lowVoltage = Mathf.Min (component.node0.voltage, component.node1.voltage);
+			float highVoltage = Mathf.Max (component.node0.voltage, component.node1.voltage);
+			
+			// Keep track of global bounds
+			xMin = Mathf.Min (xMin, component.h0);
+			yMin = Mathf.Min (yMin, lowVoltage);
+			xMax = Mathf.Min (xMax, component.h1);
+			yMax = Mathf.Min (yMax, highVoltage);
+			
+			if (mouseWorldPos.x > component.h0 && 
+				mouseWorldPos.x < component.h1 && 
+			    mouseWorldPos.y > lowVoltage && 
+			    mouseWorldPos.y < highVoltage){
+			    
+			    if (mouseOverComponent != null){
+			    	Debug.LogError ("Error - Our mouse is over two components");
+			    }
+				mouseOverComponent = component;
+				mouseOverXProp = (mouseWorldPos.x -  component.h0) / (component.h1 - component.h0);
+				mouseOverYProp = (mouseWorldPos.y -  lowVoltage) / (highVoltage - lowVoltage);
+					
+			}
+		}
+		if (mouseOverComponent == null){
+			mouseOverXProp = (mouseWorldPos.x -  xMin) / (xMax - xMin);
+			mouseOverYProp = (mouseWorldPos.y -  yMin) / (yMax - yMin);
+		}
+		
+	}
+
+	
+	void CalcMouseOffset(){
+		float xMin = 100;
+		float yMin = 100;
+		float xMax = -1;
+		float yMax = -1;
+		//Figure out world posiiton of the location in the diagram where the mouse was
+		if (mouseOverComponent != null){
+			xMin = mouseOverComponent.h0;
+			xMax = mouseOverComponent.h1;
+			yMin = Mathf.Min (mouseOverComponent.node0.voltage, mouseOverComponent.node1.voltage);
+			yMax = Mathf.Max (mouseOverComponent.node0.voltage, mouseOverComponent.node1.voltage);
+		}
+		else{
+
+			foreach(GameObject go in graph.allComponents){
+				AVOWComponent component = go.GetComponent<AVOWComponent>();
+				
+				float lowVoltage = Mathf.Min (component.node0.voltage, component.node1.voltage);
+				float highVoltage = Mathf.Max (component.node0.voltage, component.node1.voltage);
+				
+				// Keep track of global bounds
+				xMin = Mathf.Min (xMin, component.h0);
+				yMin = Mathf.Min (yMin, lowVoltage);
+				xMax = Mathf.Min (xMax, component.h1);
+				yMax = Mathf.Min (yMax, highVoltage);
+				
+			}
+		}
+		
+		Vector3  worldPos = new Vector3(xMin + mouseOverXProp * (xMax - xMin), yMin +mouseOverYProp * (yMax - yMin), 0);
+		worldPos.z = 0;
+//		Vector3 screenPos = Camera.main.WorldToScreenPoint( worldPos);
+//		screenPos.z = 0;
+//		
+		Vector3 offset = worldPos - mouseWorldPos;
+		Camera.main.gameObject.GetComponent<AVOWCamControl>().AddOffset(offset);
+		
+//		if (offset.sqrMagnitude != 0){
+//			Debug.Log("***Moving****");
+//			Debug.Log("prop = " + mouseOverXProp + ", " + mouseOverYProp);
+//			Debug.Log ("yMin = " + yMin + " yMax = " + yMax);
+//			Debug.Log("worldPos = " + worldPos.x + ", " + worldPos.y);
+//			Debug.Log("mouseWorldPos = " + mouseWorldPos.x + ", " + mouseWorldPos.y);
+//			Debug.Log("offset = " + offset.x + ", " + offset.y);
+//		}
+		
+		
+	}
+	
 }

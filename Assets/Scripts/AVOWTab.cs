@@ -30,7 +30,9 @@ public class AVOWTab : MonoBehaviour {
 	}
 	
 	void OnDestroy(){
-	AVOWUI.singleton.UnregisterTab(this);
+		if (AVOWUI.singleton){
+			AVOWUI.singleton.UnregisterTab(this);
+		}
 	}
 	
 	public bool IsContaining(Vector3 worldPos){

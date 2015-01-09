@@ -1,24 +1,36 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWComponent.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/GameModeManager.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWUI.cs" Line="32" Column="1" />
-      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="135" Column="1" />
-      <File FileName="Assets/Scripts/AVOWSim.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWTab.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="65" Column="3" />
+      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="35" Column="19" />
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="30" Column="24" />
+      <File FileName="Assets/Scripts/AVOWSim.cs" Line="637" Column="5" />
+      <File FileName="Assets/Scripts/AVOWTab.cs" Line="33" Column="1" />
       <File FileName="Assets/Scripts/ServerUpload.cs" Line="1" Column="1" />
       <File FileName="Assets/Shaders/AVOWVoltageSource.shader" Line="55" Column="29" />
       <File FileName="Assets/Shaders/AVOWResistance.shader" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI.cs" Line="295" Column="37" />
+      <File FileName="Assets/Scripts/SpringValue.cs" Line="14" Column="19" />
+      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="28" Column="42" />
+      <File FileName="Assets/Scripts/GameModeManager.cs" Line="7" Column="1" />
+      <File FileName="Assets/Scripts/CamControl.cs" Line="5" Column="1" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
         <State>
-          <Value>thisNode</Value>
-          <Value>thisNode.components.Count</Value>
-          <Value>component</Value>
-          <Value>otherNode</Value>
-          <Value>otherNode.components[0]</Value>
+          <Value>mouseOverComponent.h0</Value>
+          <Value>mouseOverComponent.h1</Value>
+          <Value>mouseOverComponent.node0.voltage</Value>
+          <Value>mouseOverComponent.node1.voltage</Value>
+          <Value>component.h0</Value>
+          <Value>component.h1</Value>
+          <Value>component.node0.voltage</Value>
+          <Value>component.node1.voltage</Value>
+          <Value>mouseWorldPos.x</Value>
+          <Value>mouseWorldPos.y</Value>
+          <Value>mouseOverComponent.resistance</Value>
+          <Value>component.resistance.currentValue</Value>
         </State>
       </Pad>
     </Pads>

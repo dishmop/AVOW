@@ -40,6 +40,7 @@ public class AVOWGraph : MonoBehaviour {
 		newComponent.SetNode1(node1);
 		newComponent.SetID(allComponents.Count);
 
+
 		
 		node0.components.Add (newGO );
 		node1.components.Add (newGO );
@@ -47,6 +48,18 @@ public class AVOWGraph : MonoBehaviour {
 	}
 	
 	public void RemoveComponent(GameObject obj){
+		AVOWComponent component = obj.GetComponent<AVOWComponent>();
+		AVOWGraph.Node node0 = component.node0;
+		AVOWGraph.Node node1 = component.node1;
+		
+		allComponents.Remove(obj);
+		node0.components.Remove (obj);
+		node1.components.Remove (obj);
+		GameObject.Destroy(obj);
+		
+	}
+	
+	public void KillComponent(GameObject obj){
 		AVOWComponent component = obj.GetComponent<AVOWComponent>();
 		AVOWGraph.Node node0 = component.node0;
 		AVOWGraph.Node node1 = component.node1;
@@ -61,10 +74,7 @@ public class AVOWGraph : MonoBehaviour {
 		}
 		// If we have more than one connection then we just remove the component (easy)
 		if (countConnections > 1){
-			allComponents.Remove(obj);
-			node0.components.Remove (obj);
-			node1.components.Remove (obj);
-			GameObject.Destroy(obj);
+			component.Kill(89);
 		}
 		// Otherwise, we need to more the nodes together
 		else{
@@ -74,8 +84,8 @@ public class AVOWGraph : MonoBehaviour {
 		
 	}
 	
-	public void RemoveLastComponent(){
-		RemoveComponent(allComponents[allComponents.Count-1]);
+	public void KillLastComponent(){
+		KillComponent(allComponents[allComponents.Count-1]);
 		
 	}	
 	

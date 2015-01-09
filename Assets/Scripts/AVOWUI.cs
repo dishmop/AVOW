@@ -61,6 +61,7 @@ public class AVOWUI : MonoBehaviour {
 		if (!ok){
 			Debug.LogError ("built an invalid graph");
 		}
+		AVOWSim.singleton.Recalc();
 		
 		
 	}
@@ -131,7 +132,7 @@ public class AVOWUI : MonoBehaviour {
 			AVOWGraph graph = AVOWGraph.singleton;
 			// If we were previously on a node, then we need to remove the last component we added
 			if (previousSecondarySelectedNode != null){
-				graph.RemoveLastComponent();
+				graph.KillLastComponent();
 			}
 			
 			// If our currently selected one is a node, then we need to create a new component
@@ -142,10 +143,11 @@ public class AVOWUI : MonoBehaviour {
 				// or simple put a new component accross existing nodes
 				else{
 					GameObject newComponent = GameObject.Instantiate(resistorPrefab) as GameObject;
-					newComponent.GetComponent<AVOWComponent>().resistance.Force(100);
-					newComponent.GetComponent<AVOWComponent>().resistance.Set(1);
+					newComponent.GetComponent<AVOWComponent>().resistanceAngle.Force(89);
+					newComponent.GetComponent<AVOWComponent>().resistanceAngle.Set(45);
 					
 					graph.PlaceComponent(newComponent, selectedTab.GetNode(), secondarySelectedNode);
+					AVOWSim.singleton.Recalc();
 				}
 				
 			}

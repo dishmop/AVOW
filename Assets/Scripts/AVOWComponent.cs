@@ -7,7 +7,7 @@ public class AVOWComponent : MonoBehaviour {
 	// Intrinsic data
 	public AVOWGraph.Node node0;
 	public AVOWGraph.Node node1;
-	public SpringValue resistance = new SpringValue(1);
+	public SpringValue resistanceAngle = new SpringValue(45);
 	
 	public float voltage;
 	public enum Type{
@@ -27,6 +27,7 @@ public class AVOWComponent : MonoBehaviour {
 	public bool visited;
 	public bool disable;
 	public float fwCurrent;
+	public bool isLayedOut;
 	
 	// Visulation data
 	public float h0;
@@ -43,6 +44,9 @@ public class AVOWComponent : MonoBehaviour {
 	static int staticCount = 0;
 	int id;
 	
+	// Killing
+	bool removeOnTarget = false;
+	
 
 	
 	public AVOWGraph.Node GetOtherNode(AVOWGraph.Node node){
@@ -55,7 +59,7 @@ public class AVOWComponent : MonoBehaviour {
 		if (type != Type.kLoad){
 			Debug.LogError ("Attempting to read resistance from a non-Load type");
 		}
-		return resistance.GetValue();
+		return Mathf.Tan (Mathf.Deg2Rad * resistanceAngle.GetValue());
 	}
 	
 	// Return the voltage from fromNode to the other node
@@ -71,6 +75,21 @@ public class AVOWComponent : MonoBehaviour {
 		return (fromNode == node0) ? voltage : -voltage;
 		
 	}
+	
+	public void Kill(float targetRes){
+		resistanceAngle.Set (targetRes);
+		float delta = resistanceAngle.GetDesValue() - resistanceAngle.GetValue();
+		removeOnTarget = true;
+	}
+	
+	void CheckForKillResistance(){
+		if (!removeOnTarget) return;
+		
+		if (resistanceAngle.IsAtTarget()){
+			AVOWGraph.singleton.RemoveComponent(gameObject);
+		}
+	}
+	
 	
 	public float GetCurrent(AVOWGraph.Node fromNode){
 		if (fromNode != node0 && fromNode != node1){
@@ -131,11 +150,11 @@ public class AVOWComponent : MonoBehaviour {
 		id = staticCount++;
 		
 		if (type == Type.kLoad){
-			resistance.Set (1);
+			resistanceAngle.Set (45);
 			voltage = 0;
 		}
 		else{
-			resistance.Force (0);
+			resistanceAngle.Force (0);
 			voltage = 1;
 		}
 	
@@ -144,7 +163,8 @@ public class AVOWComponent : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		resistance.Update();
+		resistanceAngle.Update();
+		CheckForKillResistance();
 		
 		float v0 = node0.voltage;
 		float v1 = node1.voltage;
