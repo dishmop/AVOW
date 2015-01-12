@@ -41,13 +41,33 @@ public class AVOWUI : MonoBehaviour {
 	
 	void Start(){
 		AVOWGraph graph = AVOWGraph.singleton;
-		
+
 		AVOWGraph.Node node0 = graph.AddNode ();
 		AVOWGraph.Node node1 = graph.AddNode ();
 
 				
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node1);
 		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node1);
+		
+		/*
+		AVOWGraph.Node node0 = graph.AddNode ();
+		AVOWGraph.Node node1 = graph.AddNode ();
+		AVOWGraph.Node node2 = graph.AddNode ();
+		AVOWGraph.Node node3 = graph.AddNode ();
+		
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node0);
+		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node2);
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node1);
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node3, node0);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node0);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node3);
+
+		*/
+		
+		
 		
 //		
 //		AVOWGraph.Node node0 = graph.AddNode ();

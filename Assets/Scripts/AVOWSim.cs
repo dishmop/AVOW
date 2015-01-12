@@ -49,8 +49,14 @@ public class AVOWSim : MonoBehaviour {
 		CalcVoltages();
 		//DebugPrintVoltages();
 		
+		DebugPrintGraph();
+		bool finished = false;
+		int count = 0;
+		while (!finished && count < 10){
+			LayoutHOrder();
+			count++;
+		}
 		
-		LayoutHOrder();
 		//DebugPrintHOrder();
 	}
 	
@@ -70,6 +76,25 @@ public class AVOWSim : MonoBehaviour {
 		CalcMouseOffset();
 		
 		//AppHelper.Quit();
+	}
+	
+	
+	void DebugPrintGraph(){
+		Debug.Log ("Print graph");
+		Debug.Log ("Nodes");
+		foreach (AVOWGraph.Node node in graph.allNodes){
+			Debug.Log("Node " + node.GetID());			
+		}
+		Debug.Log ("Components");
+		foreach (GameObject go in graph.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			if (component.GetCurrent(component.node0) > 0){
+				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + component.node0.GetID() + " to " + component.node1.GetID());
+			}
+			else{
+					Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + component.node1.GetID() + " to " + component.node0.GetID());
+			}
+		}
 	}
 	
 	void DebugPrintLoops(){
@@ -450,8 +475,7 @@ public class AVOWSim : MonoBehaviour {
 //		}
 //	}
 	
-	void LayoutHOrder(){
-		
+	bool LayoutHOrder(){
 		// Figure out the width of each node. The current flowing in == current flowing out == width
 		foreach (AVOWGraph.Node node in graph.allNodes){
 			float currentIn = 0;
@@ -479,76 +503,192 @@ public class AVOWSim : MonoBehaviour {
 		// We say a component is "visited" if it has been positioned
 		// We say a node is "visited" if all the components in it have been positioned
 		// We add a node to the queue if we can position all its components
-		graph.ClearVisitedFlags();
+		graph.ClearLayoutFlags();
 		
-		// Find the first component in the H ordering and start with a node connected to it since both of its connecting nodes
-		// must be on the far left of the diagram
+		// Find the first component in the H ordering- we know this should be placed as far to the 
+		// left as possible and both of the nodes it is attached to wil also be as far to the left as
+		// possible
 		AVOWComponent firstComponent = graph.allComponents[0].GetComponent<AVOWComponent>();
-		AVOWGraph.Node firstNode = firstComponent.node0;
-		firstNode.h0 = 0;
+		firstComponent.h0 = 0;
+		firstComponent.h1 = Mathf.Abs(firstComponent.fwCurrent);
 		
-		// Rule 1: If a node is in the queue then we know its h0 (and this has been set)
+		// Set up the nodes at either end and start the counters on them
+		firstComponent.node0.h0 = 0;
+		firstComponent.node0.hIn = 0;
+		firstComponent.node0.hOut = 0;
+		firstComponent.node0.hasBegunLayout = true;
 		
-		// Set up a queue so we can keep track of which nodes we can work on
-		Queue<AVOWGraph.Node> nodeQueue = new Queue<AVOWGraph.Node>();
-		nodeQueue.Enqueue (firstComponent.node0);
+		firstComponent.node1.h0 = 0;
+		firstComponent.node1.hIn = 0;
+		firstComponent.node1.hOut = 0;
+		firstComponent.node1.hasBegunLayout = true;
 		
-		while(nodeQueue.Count != 0){
-			// Take the next node to be processed
-			AVOWGraph.Node thisNode = nodeQueue.Dequeue ();
-			
-			// Go through the components attached to this node in order
-			// Whenw e find one that has not yet been positioned, we order it
-			// and then order all the other nodes which are between the same nodes as it
-			// Then we find the next unpositioned node until we have done all the components 
-			// in this node
-			
-			float hIn = thisNode.h0;
-			float hOut = thisNode.h0;
-			for (int i = 0; i < thisNode.components.Count; ++i){
-				AVOWComponent componentI = thisNode.components[i].GetComponent<AVOWComponent>();
+		
+		// Layout any component which are also between exactly these nodes
+		int lastComponentsDone = 0;
+		int componentsDone = 0;
+		if (firstComponent.GetCurrent (firstComponent.node0) > 0)
+			componentsDone += LayoutAllBetweenOrdered(firstComponent.node0, firstComponent.node1);
+		else
+			componentsDone += LayoutAllBetweenOrdered(firstComponent.node1, firstComponent.node0);
+		
+		while (componentsDone < graph.allComponents.Count){
+			// Debug - this should never happen
+			if (lastComponentsDone == componentsDone){
+				Debug.LogError ("Failed to process any compnents - but not finished either");
+				return false;
+			}
+			lastComponentsDone = componentsDone;
+			// Go through each of the components in order
+			for (int i = 0; i < graph.allComponents.Count; ++i){
+				AVOWComponent component = graph.allComponents[i].GetComponent<AVOWComponent>();
 				
-				if (!componentI.visited){
-					AVOWGraph.Node otherNode = componentI.GetOtherNode(thisNode);
-
-					for (int j = i; j < thisNode.components.Count; ++j){
-						AVOWComponent componentJ = thisNode.components[j].GetComponent<AVOWComponent>();
-						
-						if (componentJ.IsBetweenNodes(thisNode, otherNode)){
-							if (componentJ.GetCurrent (thisNode) > 0){
-								componentJ.h0 = hOut;
-								componentJ.h1 = hOut + Mathf.Abs(componentJ.fwCurrent);
-								hOut = componentJ.h1;
-							}
-							else{
-								componentJ.h0 = hIn;
-								componentJ.h1 = hIn + Mathf.Abs(componentJ.fwCurrent);
-								hIn = componentJ.h1;
-							}	
-							componentJ.visited = true;
-							componentJ.isLayedOut = true;			
-						}
-					}
-					// Find the node at the other side of this connection and - if this connection is the
-					// lowest h-order component, then we can process the node - so set up its h0 and add it to the queue
+				// If we have already been visited, then nothing to do
+				if (component.visited) continue;
 				
-					if (!otherNode.visited && otherNode.components[0].GetComponent<AVOWComponent>() == componentI){
-						otherNode.h0 = componentI.h0;
-						nodeQueue.Enqueue(otherNode);
-					}					
-				}
-				else{
-					if (componentI.GetCurrent (thisNode) > 0){
-						hOut += Mathf.Abs(componentI.fwCurrent);
+				// If this is the lowest ordered component on a node and is the first component on the other node
+				// then we can set up the "other" node
+				if (IsLowestComponent(component, component.node0) && IsFirstComponentOn(component, component.node1)){
+					if (component.GetCurrent (component.node0) > 0){
+						component.node1.hOut = component.node0.hOut;
+						component.node1.hIn = component.node0.hOut;
+						component.node1.hasBegunLayout = true;
 					}
 					else{
-						hIn += Mathf.Abs(componentI.fwCurrent);
-					}				
+						component.node1.hOut = component.node0.hIn;
+						component.node1.hIn = component.node0.hIn;
+						component.node1.hasBegunLayout = true;
+					}
+					
 				}
+				else if (IsLowestComponent(component, component.node1) && IsFirstComponentOn(component, component.node0)){
+					if (component.GetCurrent (component.node1) > 0){
+						component.node0.hOut = component.node1.hOut;
+						component.node0.hIn = component.node1.hOut;
+						component.node0.hasBegunLayout = true;
+					}
+					else{
+						component.node0.hOut = component.node1.hIn;
+						component.node0.hIn = component.node1.hIn;
+						component.node0.hasBegunLayout = true;
+					}
+				}
+				// If we are the lowest component on one node and if our placement position on that node is also the next placable position on the
+				// the "other" node, then we can place it
+				if (IsLowestComponent(component, component.node0)){
+					// Come from node 0
+					if (component.GetCurrent(component.node0) > 0){
+						if (MathUtils.FP.Feq (component.node0.hOut, component.node1.hIn)){
+							componentsDone += LayoutAllBetweenOrdered(component.node0, component.node1);
+						}
+					}
+					// come from node1
+					else{
+						if (MathUtils.FP.Feq (component.node0.hIn, component.node1.hOut)){
+							componentsDone += LayoutAllBetweenOrdered(component.node1, component.node0);
+						}
+					}
+				}
+				else if (IsLowestComponent(component, component.node1)){
+					// Come from node 1
+					if (component.GetCurrent(component.node1) > 0){
+						if (MathUtils.FP.Feq (component.node1.hOut, component.node0.hIn)){
+							componentsDone += LayoutAllBetweenOrdered(component.node1, component.node0);
+						}
+					}
+					else{
+						if (MathUtils.FP.Feq (component.node1.hIn, component.node0.hOut)){
+							componentsDone += LayoutAllBetweenOrdered(component.node0, component.node1);
+						}
+					}
+				}
+				
 			}
 			
-			thisNode.visited = true;
 		}
+		return true;
+		
+	}
+	
+	bool IsFirstComponentOn(AVOWComponent component, AVOWGraph.Node node){
+		// If we have begun the layout, then there must already be a component here
+		if (node.hasBegunLayout) return false;
+		
+		// Test if this component is the lowest order component in this direction on this node
+		for (int i = 0; i < node.components.Count; ++i){
+			AVOWComponent testComponent = node.components[i].GetComponent<AVOWComponent>();
+			
+			// if either both positive, or both negative - then we can test if they are equal
+			if (testComponent.GetCurrent (node) * component.GetCurrent(node) > 0){
+				return testComponent == component;
+			}
+		}
+		// If we got to here then this component doesn't exist on this node - which is an error
+		Debug.LogError ("This component does not exist on this node");
+		return false;
+	}
+	
+	bool IsLowestComponent(AVOWComponent component, AVOWGraph.Node node){
+		// If ths node has not started to be layed out, then we do not know where it is
+		if (!node.hasBegunLayout) return false;
+		
+		// if this is the lowest ordered component which has not yet been layed out on this node, then
+		// we can lay it out (dealing with in and out components seperately
+		
+//		// DEBUG
+//		for (int i = 0; i < node.components.Count; ++i){
+//			AVOWComponent testComponent = node.components[i].GetComponent<AVOWComponent>();
+//			
+//			string idString = testComponent.GetID();
+//			Debug.Log (idString);
+//		}
+		
+		
+		
+		// If this component is flowing OUT of this node
+		if (component.GetCurrent (node) > 0){
+			for (int i = 0; i < node.components.Count; ++i){
+				AVOWComponent testComponent = node.components[i].GetComponent<AVOWComponent>();
+				
+				if (!testComponent.visited && testComponent.GetCurrent (node) > 0 && testComponent.hOrder < component.hOrder) return false;
+				if (testComponent == component) return true;
+			}
+		}
+		else{
+			for (int i = 0; i < node.components.Count; ++i){
+				AVOWComponent testComponent = node.components[i].GetComponent<AVOWComponent>();
+				
+				if (!testComponent.visited && testComponent.GetCurrent (node) <= 0 && testComponent.hOrder < component.hOrder) return false;
+				if (testComponent == component) return true;
+			}
+		}
+
+		// We should neve get here
+		Debug.LogError("Failed to find component in Node");
+		return false;
+		
+	}
+	
+	int LayoutAllBetweenOrdered(AVOWGraph.Node nodeA, AVOWGraph.Node nodeB){
+		int count = 0;
+		
+		for (int i = 0; i < graph.allComponents.Count; ++i){
+			AVOWComponent component = graph.allComponents[i].GetComponent<AVOWComponent>();
+				
+			float absCurrent = Mathf.Abs(component.fwCurrent);
+			if (!component.visited && component.IsBetweenNodes(nodeA, nodeB) && (component.GetCurrent (nodeA) > 0)){
+				component.h0 = nodeA.hOut;
+				nodeA.hOut += absCurrent;
+				nodeB.hIn += absCurrent;
+				component.h1 = nodeA.hOut;
+
+				count++;
+				component.visited = true;
+				component.isLayedOut = true;
+			}
+		}
+		return count;
+		
 	}
 	
 	void DebugPrintHOrder(){

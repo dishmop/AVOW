@@ -20,6 +20,11 @@ public class AVOWGraph : MonoBehaviour {
 		public float h0;
 		public float hWidth;
 		
+		// For use when building the layout
+		public float hIn;
+		public float hOut;
+		public bool hasBegunLayout;
+		
 		public string GetID(){
 			return id.ToString ();
 		}
@@ -196,7 +201,18 @@ public class AVOWGraph : MonoBehaviour {
 	}
 	
 	
-
+	public void ClearLayoutFlags(){
+		foreach (GameObject componentGO in allComponents){
+			componentGO.GetComponent<AVOWComponent>().visited = false;
+		}
+		foreach (Node node in allNodes){
+			node.visited = false;
+			node.hIn = -1;
+			node.hOut = -1;
+			node.hasBegunLayout = false;
+		}
+	}
+	
 	
 	public void ClearVisitedFlags(){
 		foreach (GameObject componentGO in allComponents){
