@@ -92,7 +92,7 @@ public class AVOWSim : MonoBehaviour {
 				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + component.node0.GetID() + " to " + component.node1.GetID());
 			}
 			else{
-					Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + component.node1.GetID() + " to " + component.node0.GetID());
+				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + component.node1.GetID() + " to " + component.node0.GetID());
 			}
 		}
 	}

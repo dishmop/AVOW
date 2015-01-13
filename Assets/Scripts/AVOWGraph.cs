@@ -71,52 +71,8 @@ public class AVOWGraph : MonoBehaviour {
 		node1.components.Remove (obj);
 		GameObject.Destroy(obj);
 		
-		// Count the number of connections between these two nodes
-		int countConnections = 0;
-		foreach (GameObject go in node0.components){
-			AVOWComponent otherComponent = go.GetComponent<AVOWComponent>();
-			if (otherComponent.GetOtherNode(node0) == node1){
-				countConnections++;
-			}
-		}	
-		
-		// If we no longer have any connections, then merge the two nodes
-		if (countConnections == 0){
-			MergeNodes(node0, node1);
-		}
-		
 	}
 	
-	public void KillComponent(GameObject obj){
-		AVOWComponent component = obj.GetComponent<AVOWComponent>();
-		AVOWGraph.Node node0 = component.node0;
-		AVOWGraph.Node node1 = component.node1;
-		
-		// Count the number of connections between these two nodes
-		int countConnections = 0;
-		foreach (GameObject go in node0.components){
-			AVOWComponent otherComponent = go.GetComponent<AVOWComponent>();
-			if (otherComponent.GetOtherNode(node0) == node1){
-				countConnections++;
-			}
-		}
-		// If we have more than one connection then we just remove the component (easy)
-		if (countConnections > 1){
-			component.Kill(89);
-		}
-		// Otherwise, we need to more the nodes together
-		else{
-			component.Kill(0);
-			
-		}
-		
-		
-	}
-	
-	public void KillLastComponent(){
-		KillComponent(allComponents[allComponents.Count-1]);
-		
-	}	
 	
 	
 	

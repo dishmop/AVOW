@@ -46,6 +46,7 @@ public class AVOWComponent : MonoBehaviour {
 	
 	// Killing
 	bool removeOnTarget = false;
+	public AVOWCommand onDeadCommand = null;
 	
 
 	
@@ -84,9 +85,9 @@ public class AVOWComponent : MonoBehaviour {
 	void CheckForKillResistance(){
 		if (!removeOnTarget) return;
 		
-
-		
 		if (resistanceAngle.IsAtTarget()){
+			if (onDeadCommand != null)
+				onDeadCommand.UndoStep();
 			AVOWGraph.singleton.RemoveComponent(gameObject);
 		}
 	}
