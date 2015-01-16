@@ -12,6 +12,10 @@ public class AVOWUI : MonoBehaviour {
 	
 	Stack<AVOWCommand> 	commands = new Stack<AVOWCommand>();
 	
+	// Set to true if we should not allow anything else to be created just yet
+	// do this when killing a component
+	public bool lockCreation;
+	
 	
 	AVOWTab selectedTab = null;
 	AVOWTab overTab = null;
@@ -42,25 +46,55 @@ public class AVOWUI : MonoBehaviour {
 	}	
 	
 	void Start(){
-//		AVOWGraph graph = AVOWGraph.singleton;
-//		
-//		AVOWGraph.Node node0 = graph.AddNode ();
-//		AVOWGraph.Node node1 = graph.AddNode ();
-//		AVOWGraph.Node node2 = graph.AddNode ();
-//		AVOWGraph.Node node3 = graph.AddNode ();
-//		AVOWGraph.Node node4 = graph.AddNode ();
-//		
-//		
-//		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node2);
-//		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node1, node0);
-//		
-//		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node3, node1);
-//		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node3);
-//		
-//		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node4, node1);
-//		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node4);
-//		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node4, node3);
+	/*
+		// Simple 3 resistors
+		AVOWGraph graph = AVOWGraph.singleton;
 		
+		AVOWGraph.Node node0 = graph.AddNode ();
+		AVOWGraph.Node node1 = graph.AddNode ();
+		AVOWGraph.Node node2 = graph.AddNode ();
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node2);
+		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node1);
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node0);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node0);
+	*/
+	
+		/*
+		// 4 at the top, one at the bottom
+		AVOWGraph graph = AVOWGraph.singleton;
+		
+		AVOWGraph.Node node0 = graph.AddNode ();
+		AVOWGraph.Node node1 = graph.AddNode ();
+		AVOWGraph.Node node2 = graph.AddNode ();
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node1);
+		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node1);
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node2);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node2);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node2);
+*/	
+	/*
+		// Misc
+		AVOWGraph graph = AVOWGraph.singleton;
+		
+		AVOWGraph.Node node0 = graph.AddNode ();
+		AVOWGraph.Node node1 = graph.AddNode ();
+		AVOWGraph.Node node2 = graph.AddNode ();
+		AVOWGraph.Node node3 = graph.AddNode ();
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node2);
+		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node1);
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node0);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node3);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node3, node0);
+		*/
+		
+		
+		// Simple start
 		AVOWGraph graph = AVOWGraph.singleton;
 
 		AVOWGraph.Node node0 = graph.AddNode ();
@@ -71,6 +105,44 @@ public class AVOWUI : MonoBehaviour {
 		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node1);
 		
 		
+		/*
+		// Sneeky crossover
+		AVOWGraph graph = AVOWGraph.singleton;
+		
+		AVOWGraph.Node node0 = graph.AddNode ();
+		AVOWGraph.Node node1 = graph.AddNode ();
+		AVOWGraph.Node node2 = graph.AddNode ();
+		AVOWGraph.Node node3 = graph.AddNode ();
+		AVOWGraph.Node node4 = graph.AddNode ();
+		
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node2);
+		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node1, node0);
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node3, node1);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node3);
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node4, node1);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node4);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node4, node3);
+		*/
+		/*
+		// Four in a block
+		AVOWGraph graph = AVOWGraph.singleton;
+		
+		AVOWGraph.Node node0 = graph.AddNode ();
+		AVOWGraph.Node node1 = graph.AddNode ();
+		AVOWGraph.Node node2 = graph.AddNode ();
+		AVOWGraph.Node node3 = graph.AddNode ();
+		
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node2);
+		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node1);
+		
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node0);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node3);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node3, node0);
+		*/
 		/*
 		AVOWGraph.Node node0 = graph.AddNode ();
 		AVOWGraph.Node node1 = graph.AddNode ();
@@ -200,10 +272,11 @@ public class AVOWUI : MonoBehaviour {
 			if (previousSecondarySelectedNode != null){
 				Debug.Log ("Undo last command");
 				UndoLastCommand();
+				previousSecondarySelectedNode  = secondarySelectedNode;
 			}
 			
 			// If our currently selected one is a node, then we need to create a new component
-			if (secondarySelectedNode != null){
+			if (secondarySelectedNode != null && !lockCreation){
 				// Are we trying to split a node
 				if (selectedTab.GetNode() == secondarySelectedNode){
 					AVOWCommand command = new AVOWCommandSplitAddComponent(secondarySelectedNode, selectedTab.GetAVOWComponent ().gameObject, resistorPrefab);
@@ -219,7 +292,8 @@ public class AVOWUI : MonoBehaviour {
 				}
 				
 			}
-			previousSecondarySelectedNode  = secondarySelectedNode;
+			if (!lockCreation)
+				previousSecondarySelectedNode  = secondarySelectedNode;
 		}		
 		
 		// If we have a selected tab, then figure out if any tabs need to be disabled

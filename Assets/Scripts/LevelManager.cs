@@ -103,6 +103,7 @@ public class LevelManager : MonoBehaviour {
 		// Ensure the assets are all realoaded and the cache cleared.
 		UnityEditor.AssetDatabase.Refresh();
 #endif
+
 	}	
 	
 	public void SerializeLevel(Stream stream){

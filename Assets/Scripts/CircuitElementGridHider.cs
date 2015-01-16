@@ -41,7 +41,7 @@ public class CircuitElementGridHider : CircuitElement {
 		return false;
 	}
 	
-	// return true if this component is only available in the editor
+	// return true if this component is only available in the left
 	public override bool IsEditorOnly(){
 		return true;
 	}	

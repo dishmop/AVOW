@@ -15,6 +15,11 @@ public class AVOWComponent : MonoBehaviour {
 		kLoad
 	}
 	public Type type;
+	
+	public enum FlowDirection{
+		kIn,
+		kOut
+	}
 
 	// Simulation data
 	public class LoopRecord{
@@ -29,16 +34,25 @@ public class AVOWComponent : MonoBehaviour {
 	public float fwCurrent;
 	
 	// Visulation data
-	public float h0;
-	public float h1;
 	public Color col0;
 	public Color col1;
-	
-	// UI layout
 	public float tabSize;
 	public float border;
-	public int hOrder;	// components are sorted by this value when placed from left to right in diagram
-	public bool isLayedOut;
+	
+	// Layout
+	public int hOrder;				// components are sorted by this value when placed from left to right in diagram
+	public float hWidth;			// Always known by the time we get to layout
+	public float h0;				// Set to -1 if unknown
+	public float h0LowerBound;		// Set to -1 if unknown
+	public float h0UpperBound;		// Set to -1 if unknown
+	public static int kOrdinalUnordered = 9999;
+	public int inNodeOrdinal;		// the nth component on node0 flowing in this direction (=kOrdinaUnordered if unknown)
+	public int outNodeOrdinal;		// the nth component on node1 flowing in this direction (=kOrdinaUnordered if unknown)
+	public float inLocalH0;			// The starting position measured from the inNodes h0 (which we may not know)
+	public float outLocalH0;		// The starting position measured from the outNodes h0 (which we may not know)
+	public AVOWGraph.Node inNode;	// references to node0 and node1 depdending on how the current is flowing
+	public AVOWGraph.Node outNode;	// references to node0 and node1 depdending on how the current is flowing
+	public bool hasBeenLayedOut;	// false at first and then true after we have been layed out at least once. 
 	
 	// Debug data
 	static int staticCount = 0;
@@ -80,15 +94,41 @@ public class AVOWComponent : MonoBehaviour {
 	public void Kill(float targetRes){
 		resistanceAngle.Set (targetRes);
 		removeOnTarget = true;
+		AVOWUI.singleton.lockCreation = true;
 	}
 	
 	void CheckForKillResistance(){
 		if (!removeOnTarget) return;
 		
 		if (resistanceAngle.IsAtTarget()){
-			if (onDeadCommand != null)
+			if (onDeadCommand != null){
 				onDeadCommand.UndoStep();
+			}
 			AVOWGraph.singleton.RemoveComponent(gameObject);
+			AVOWUI.singleton.lockCreation = false;
+			
+		}
+	}
+	
+	public FlowDirection GetDirection(AVOWGraph.Node node){
+		if (GetCurrent(node) > 0){
+			return FlowDirection.kOut;
+		}
+		else{
+			return FlowDirection.kIn;
+		}
+		
+	}
+	
+	
+	public void SetupInOutNodes(){
+		if (GetDirection(node0) == FlowDirection.kOut){
+			outNode = node0;
+			inNode = node1;
+		}
+		else{
+			inNode = node0;
+			outNode = node1;
 		}
 	}
 	
@@ -196,6 +236,8 @@ public class AVOWComponent : MonoBehaviour {
 		
 		border = 0;//0.2f * (h1-h0);
 		tabSize = 0.2f * (v1-v0);
+		
+		float h1 = h0 + hWidth;
 
 		if (type == Type.kLoad){
 			transform.FindChild("Resistance").renderer.material.SetColor("_Color0", col0);

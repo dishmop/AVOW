@@ -56,6 +56,28 @@ public class AVOWCamControl : MonoBehaviour {
 		
 		}
 		prevMousePos = mousePos;
+		
+		// If mouse is not held down
+		float prop = 0.1f;
+		if (!Input.GetMouseButton(0)){
+			Vector2 centre = new Vector2(0, (AVOWSim.singleton.yMin + AVOWSim.singleton.yMax) * 0.5f);
+			Vector3 pos = gameObject.transform.position;
+			pos.x = Mathf.Lerp(pos.x, centre.x, prop);
+			pos.y = Mathf.Lerp(pos.y, centre.y, prop);
+			gameObject.transform.position = pos;
+			
+			Vector2 size = new Vector2( AVOWSim.singleton.xMax * 2, AVOWSim.singleton.yMax - AVOWSim.singleton.yMin);
+			
+			float vSize0 = size.y;
+			float vSize1 = size.x / Camera.main.aspect;
+			float useVSize = 1.7f * Mathf.Max (vSize0, vSize1);
+			
+			float currentSize = transform.GetComponent<Camera>().orthographicSize;
+			float newSize = Mathf.Lerp (currentSize, useVSize * 0.5f, prop);
+			
+			transform.GetComponent<Camera>().orthographicSize = newSize;
+			
+		}
 			
 		
 	}

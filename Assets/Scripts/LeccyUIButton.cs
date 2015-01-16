@@ -75,7 +75,7 @@ public class LeccyUIButton : MonoBehaviour, PrefabListener {
 				stockTextBox.GetComponent<Text>().text = "";
 			}
 			
-			// we only enable the stock inc and doc buttons in editor mode
+			// we only enable the stock inc and doc buttons in left mode
 			transform.FindChild("ButtonFrame").FindChild("StockAdjust").gameObject.SetActive(GameModeManager.singleton.enableEditor && (element.uiType != CircuitElement.UIType.kModify));
 			
 			// We should now be able to destroy our Display mehs as the UIMesh object will have made a UI copy of it

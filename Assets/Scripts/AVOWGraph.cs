@@ -9,7 +9,9 @@ public class AVOWGraph : MonoBehaviour {
 	// the nodes in the graph are simply numbered
 	
 	public class Node{
+		// This list may not be needed anymore
 		public List<GameObject> components = new List<GameObject>();
+		
 		public bool visited;
 		public int id;
 		
@@ -17,14 +19,20 @@ public class AVOWGraph : MonoBehaviour {
 		public float voltage;
 		
 		// Visualisation data
-		public float h0;
+		public float h0;	// =-1 if not known yet	
+		public float h0LowerBound;		// Set to -1 if unknown
+		public float h0UpperBound;		// Set to -1 if unknown
+		public float inOrdinalledWidth;	// width which has been used up by ordinalled componens
+		public float outOrdinalledWidth;// width which has been used up by ordinalled componens
+		
 		public float hWidth;
 		
-		// For use when building the layout
-		public float hIn;
-		public float hOut;
-		public bool hasBegunLayout;
+		// These lists are filled with the components with current flowing in and out of the node (those which have been 
+		// ordered will be first)
+		public List<GameObject> inComponents;
+		public List<GameObject> outComponents;
 		
+
 		public string GetID(){
 			return id.ToString ();
 		}
@@ -34,10 +42,10 @@ public class AVOWGraph : MonoBehaviour {
 		public Node(){
 			id = staticCount++;
 		}
-		
-		
-		
 	}
+	
+	public static int kMinLowerBound = 0;
+	public static int kMaxUpperBound = 9999;
 	
 	public List<Node> allNodes = new List<Node>();
 	public List<GameObject> allComponents = new List<GameObject>();
@@ -158,15 +166,70 @@ public class AVOWGraph : MonoBehaviour {
 	
 	
 	public void ClearLayoutFlags(){
-		foreach (GameObject componentGO in allComponents){
-			componentGO.GetComponent<AVOWComponent>().visited = false;
+		foreach (GameObject go in allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			component.h0 = -1;
+			component.h0LowerBound = kMinLowerBound;
+			component.h0UpperBound = kMaxUpperBound;
+			component.hWidth = -1;
+			component.inNodeOrdinal = AVOWComponent.kOrdinalUnordered;
+			component.outNodeOrdinal = AVOWComponent.kOrdinalUnordered;	
+			component.inLocalH0 = -1;
+			component.outLocalH0 = -1;
+			component.inNode = null;
+			component.outNode = null;
 		}
 		foreach (Node node in allNodes){
-			node.visited = false;
-			node.hIn = -1;
-			node.hOut = -1;
-			node.hasBegunLayout = false;
+			node.h0 = -1;
+			node.h0LowerBound = kMinLowerBound;
+			node.h0UpperBound = kMaxUpperBound;
+			node.inOrdinalledWidth = 0;
+			node.outOrdinalledWidth = 0;
+			
+			node.hWidth = -1;			
+			// These lists are filled with the components with current flowing in and out of the node (those which have been 
+			// ordered will be first)
+			node.inComponents = new List<GameObject>();
+			node.outComponents = new List<GameObject>();
 		}
+
+	}
+
+	
+	public bool IsAllLayedOut(){
+		int numComponentsLayedOut = 0;
+		int numNodesLayedOut = 0;
+		
+//		foreach (GameObject go in allComponents){
+//			AVOWComponent component = go.GetComponent<AVOWComponent>();
+//			component.h0 = -1;
+//			component.hWidth = -1;
+//			component.node0Ordinal = AVOWComponent.kOrdinaUnordered;
+//			component.node1Ordinal = AVOWComponent.kOrdinaUnordered;	
+//		}
+//		foreach (Node node in allNodes){
+//			node.h0 = -1;
+//			node.hWidth = -1;			
+//			// These lists are filled with the components with current flowing in and out of the node (those which have been 
+//			// ordered will be first)
+//			node.inComponents = new List<GameObject>();
+//			node.outComponents = new List<GameObject>();
+//		}
+//		
+		foreach (GameObject go in allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			if (component.h0 >= 0 &&
+			    component.hWidth >= 0 &&
+			    component.inNodeOrdinal != AVOWComponent.kOrdinalUnordered &&
+			    component.outNodeOrdinal != AVOWComponent.kOrdinalUnordered) numComponentsLayedOut++;
+		}
+		// Note that here, we don't check the lists of in and out components that their ordinal numbers have been set
+		// as that would be covered int he loop above
+		foreach (Node node in allNodes){
+			if (node.h0 >= 0 &&
+				node.hWidth >= 0) numNodesLayedOut++;
+		}
+		return numComponentsLayedOut == allComponents.Count && numNodesLayedOut == allNodes.Count;
 	}
 	
 	

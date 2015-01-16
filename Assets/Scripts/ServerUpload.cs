@@ -3,7 +3,7 @@ using System.Collections;
 using System.IO;
 
 
-
+#if !UNITY_WEBPLAYER
 
 public class ServerUpload : MonoBehaviour {
 	public static ServerUpload singleton = null;
@@ -89,7 +89,8 @@ public class ServerUpload : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void UploadFile () {
+	void UploadFile () {	
+		
 		
 		// Load the file as a binary block
 		FileStream file = File.OpenRead(fileList[0].FullName);
@@ -116,6 +117,8 @@ public class ServerUpload : MonoBehaviour {
 				
 		// Try to upload the file
 		uploadWWW = new WWW(uploadURL, form);
+		
+		
 	}
 	
 	bool WaitForUploadToComplete(){
@@ -147,7 +150,7 @@ public class ServerUpload : MonoBehaviour {
 	}
 	
 	void MoveFile(string srcPath, string desPath){
-	
+		
 		string destDir = Path.GetDirectoryName(desPath);
 		// If the directory doesn't existTelemetry.BuildPathName() + errorPathName, make it exist
 		if (!Directory.Exists(destDir)){
@@ -168,9 +171,12 @@ public class ServerUpload : MonoBehaviour {
 		// Move the file
 		
 		
+		
 	}
 	
+	
 	void FillFileList(){
+
 		// Fil the file list
 		DirectoryInfo dir = new DirectoryInfo(Telemetry.GetPathName());
 		FileInfo[] fileListFinal = dir.GetFiles("*" + Telemetry.BuildExtension());	
@@ -195,7 +201,9 @@ public class ServerUpload : MonoBehaviour {
 		}
 		for (int i = 0; i < fileListIntErr.Length; ++i){
 			fileList[fileListFinalErr.Length + fileListInt.Length + fileListFinal.Length + i] = fileListIntErr[i];
-		}			
+		}
+		
+				
 		
 	}
 	
@@ -212,3 +220,37 @@ public class ServerUpload : MonoBehaviour {
 	
 
 }
+
+#else
+
+
+public class ServerUpload : MonoBehaviour {
+	public static ServerUpload singleton = null;
+	
+	public float waitDuration = 1f;
+	
+	public bool enableUpload;
+	
+	
+	
+	// Call to check if it is OK to quit the application
+	public bool CanQuit(){
+		return false;
+	}
+	
+	// Call if we want to esnure that everything we can gets uploaded
+	public void ForceUpload(){
+	}
+	// Use this for initialization
+	public void GameUpdate () {
+
+		
+	}
+	
+	
+	
+	
+}
+
+
+#endif

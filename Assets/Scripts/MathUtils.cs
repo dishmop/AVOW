@@ -39,6 +39,18 @@ namespace MathUtils
 	
 	#endregion
 
+	#region "Integer utilities"
+	class Int{
+		public static long Factorial(int x){
+			long ret = 1;
+			for (int i = 1; i <= x; ++i){
+				ret *= i;
+			}
+			return ret;
+		}
+	}	
+	
+	#endregion
 	#region "Exception in the Library"
 	class MatrixLibraryExceptions : ApplicationException
 	{ public MatrixLibraryExceptions(string message) : base(message) { } }

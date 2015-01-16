@@ -30,10 +30,10 @@ public class ElementSelectPanel : MonoBehaviour {
 		for (int i = 0; i < numElements; ++i){
 			GameObject prefab = factory.GetPrefab(uiTypeFilter, i);
 			
-			// If not in edtor mode and this element is only available in the editor, then skip this one
+			// If not in edtor mode and this element is only available in the left, then skip this one
 			if (prefab.GetComponent<CircuitElement>().IsEditorOnly() && !GameModeManager.singleton.enableEditor) continue;
 			
-			// If non to pick from, then don;t show it (unless in editor mode)
+			// If non to pick from, then don;t show it (unless in left mode)
 			if (factory.GetStockRemaining(prefab.GetComponent<SerializationID>().id) == 0 && !GameModeManager.singleton.enableEditor) continue;
 			
 			GameObject newButton = Instantiate(leccyButtonPrefab) as GameObject;

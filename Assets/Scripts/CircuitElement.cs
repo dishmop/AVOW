@@ -121,7 +121,7 @@ public class CircuitElement : MonoBehaviour {
 		
 	}
 	
-	// return true if this component is only available in the editor
+	// return true if this component is only available in the left
 	public virtual bool IsEditorOnly(){
 		return false;
 	}

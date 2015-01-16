@@ -72,7 +72,7 @@ public class CircuitElementAnchor : CircuitElement {
 		RebuildMesh();
 	}
 	
-	// return true if this component is only available in the editor
+	// return true if this component is only available in the left
 	public override bool IsEditorOnly(){
 		return true;
 	}	

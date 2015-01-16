@@ -147,6 +147,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphGO: {fileID: 1598369873}
+  xMin: 0
+  yMin: 0
+  xMax: 0
+  yMax: 0
 --- !u!4 &278192742
 Transform:
   m_ObjectHideFlags: 0
@@ -786,6 +790,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resistorPrefab: {fileID: 100006, guid: f0b3ec3f83404460fbba31843fecbcd3, type: 2}
   cellPrefab: {fileID: 100002, guid: 1bf68cd89ceda43d1bff59790ceef25b, type: 2}
+  lockCreation: 0
 --- !u!4 &1813380715
 Transform:
   m_ObjectHideFlags: 0

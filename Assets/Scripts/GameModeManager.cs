@@ -378,7 +378,7 @@ public class GameModeManager : MonoBehaviour {
 		HandleLevelInfo();
 		UpdateEndOfGameEffects();
 		
-		// If we are not in editor mode, then we should honour the anchors
+		// If we are not in left mode, then we should honour the anchors
 		if (!enableEditor){
 			UI.singleton.honourAnchors = true;
 		}

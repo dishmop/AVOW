@@ -272,7 +272,7 @@ public class CircuitElementAmmeter : CircuitElement {
 		VisualiseTemperature();
 	}
 	
-	// return true if this component is only available in the editor
+	// return true if this component is only available in the left
 	public override bool IsEditorOnly(){
 		return true;
 	}

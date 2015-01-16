@@ -388,7 +388,7 @@ public class OldUI : MonoBehaviour {
 		if (gameMode == GameMode.kEditMode || gameMode == GameMode.kPlayGame)
 		{
 		
-			// If not in editor mode we only want to show a subset of the buttons
+			// If not in left mode we only want to show a subset of the buttons
 			int numButtons = gameMode == GameMode.kEditMode ? (int)InputMode.kNumButtons : numNonEditButtons;
 			string[] useStrings = new string[numButtons];
 			Array.Copy(toolbarStrings, useStrings, numButtons);

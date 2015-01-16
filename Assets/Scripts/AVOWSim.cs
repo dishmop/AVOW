@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,6 +23,13 @@ public class AVOWSim : MonoBehaviour {
 	
 	public List<List<LoopElement>> loops;
 	
+	// Global bounds
+	public float xMin;
+	public float yMin;
+	public float xMax;
+	public float yMax;
+	
+	
 	// Recording the mouse posiiton
 	Vector3			mouseWorldPos;
 	AVOWComponent 	mouseOverComponent = null; 	// null if not over any compnent
@@ -33,6 +40,22 @@ public class AVOWSim : MonoBehaviour {
 	double epsilon = 0.0001;
 	float[]						loopCurrents;
 	
+	class EmergencyOption{
+		public EmergencyOption(AVOWComponent component, AVOWComponent.FlowDirection dir, int ordinalValue){
+			this.component = component;
+			this.dir = dir;
+			this.ordinalValue = ordinalValue;
+		}
+		
+		public AVOWComponent 				component;
+		public AVOWComponent.FlowDirection 	dir;
+		public int 							ordinalValue;
+	};
+	
+	List<EmergencyOption>	emergencyOptions = new List<EmergencyOption>();
+	
+	// List of permutations matricies
+	int[][,] cachedPermutations = new int[AVOWComponent.kOrdinalUnordered][,];
 	
 	public void Recalc(){
 
@@ -49,7 +72,7 @@ public class AVOWSim : MonoBehaviour {
 		CalcVoltages();
 		//DebugPrintVoltages();
 		
-		DebugPrintGraph();
+		//DebugPrintGraph();
 		bool finished = false;
 		int count = 0;
 		while (!finished && count < 10){
@@ -467,6 +490,1200 @@ public class AVOWSim : MonoBehaviour {
 		}
 	}
 	
+	void SortByOrdinal(AVOWGraph.Node node, AVOWComponent.FlowDirection dir){
+		if (dir == AVOWComponent.FlowDirection.kOut){
+			node.outComponents.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().outNodeOrdinal.CompareTo (obj2.GetComponent<AVOWComponent>().outNodeOrdinal)));
+		}
+		else{
+			node.inComponents.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().inNodeOrdinal.CompareTo (obj2.GetComponent<AVOWComponent>().inNodeOrdinal)));
+		}
+	}
+	
+//	void SortByOrdinal(AVOWGraph.Node node, AVOWComponent.FlowDirection dir){
+//		if (dir == AVOWComponent.FlowDirection.kOut){
+//			node.outComponents = node.outComponents.OrderBy (obj => obj.GetComponent<AVOWComponent>().outNodeOrdinal).ToList();
+//		}
+//		else{
+//			node.inComponents = node.inComponents.OrderBy (obj => obj.GetComponent<AVOWComponent>().outNodeOrdinal).ToList ();
+//		}
+//	}
+
+	
+	bool LayoutHOrder(){	
+		// Get ready for layout
+		graph.ClearLayoutFlags();
+		
+		// Order the list of components for each node according to hOrder (not sure if this is necessary)
+		foreach (AVOWGraph.Node node in graph.allNodes){
+			node.components.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().hOrder.CompareTo (obj2.GetComponent<AVOWComponent>().hOrder)));
+			
+		}
+		// Order the "allComponents" list in the same way
+		graph.allComponents.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().hOrder.CompareTo (obj2.GetComponent<AVOWComponent>().hOrder)));
+		
+		
+		// Set up the widths of  components and also the in and out lists on the relevent nodes
+		foreach (GameObject go in graph.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			component.hWidth = Mathf.Abs(component.fwCurrent);
+			component.SetupInOutNodes();
+			component.outNode.outComponents.Add (go);
+			component.inNode.inComponents.Add (go);
+		}
+		
+		foreach (AVOWGraph.Node node in graph.allNodes){
+			float outWidth = 0;
+			foreach (GameObject go in node.outComponents){
+				outWidth += go.GetComponent<AVOWComponent>().hWidth;
+				
+			}
+			float inWidth = 0;
+			foreach (GameObject go in node.inComponents){
+				inWidth += go.GetComponent<AVOWComponent>().hWidth;
+				
+			}
+			// Check that in and outs agree and then set the node width 
+			if (!MathUtils.FP.Feq(inWidth, outWidth)){
+				Debug.LogError ("In and out widths on this node are not the same");
+			}
+			node.hWidth = inWidth;
+		}
+			
+		// We know that the most left component has h0=0
+		AVOWComponent firstComponent = graph.allComponents[0].GetComponent<AVOWComponent>();
+		firstComponent.SetupInOutNodes();
+		firstComponent.h0 = 0;
+		firstComponent.inNodeOrdinal = 0;
+		firstComponent.outNodeOrdinal = 0;	
+		
+		SortByOrdinal(firstComponent.outNode, AVOWComponent.FlowDirection.kOut);
+		SortByOrdinal(firstComponent.inNode, AVOWComponent.FlowDirection.kIn);
+		
+		// Now we have some information and need other information. We have a set of inference rules
+		// each one passes over all the data attempting to add new information. If after going through all
+		// the rules we have not added any new information, then we are stuck (for the moment).
+		int count = 0;
+		while (!graph.IsAllLayedOut()){
+			int numInfosAdded = 0;
+			emergencyOptions.Clear();
+			
+			numInfosAdded += ApplyFirstComponentRule();
+			numInfosAdded += ApplyOtherFirstComponentRule();
+			numInfosAdded += ApplyNoFreedomRule();
+			numInfosAdded += ApplyOrderedNeighboursRule();
+			numInfosAdded += ApplyPositionedNeighboursRule();
+			numInfosAdded += ApplyBoundsRule();
+			
+			if (numInfosAdded == 0){
+				numInfosAdded += TryEmergencyOption();
+			}
+			
+			// If we weren't able to add any new info (before we finished
+			// then we need a "push" - yet to be figured out
+			if (numInfosAdded == 0){
+				Debug.Log ("Cannot add more info to information graph - breaking out of loop");
+				break;
+			}
+			
+			if (count++ > 10){
+				Debug.Log ("Gone round 10 times probably stuck!");
+				break;
+			}
+		}
+		
+		// All compoennts have now been layed out
+		foreach (GameObject go in graph.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			component.hasBeenLayedOut = true;
+		}
+	
+		return true;
+	
+	}
+	
+	
+	// If this is the first component (ordinal == 0) in a given direction of flow and we know h0, then we can set
+	// h0 on the node too
+	int ApplyFirstComponentRule(){
+		int infosAdded = 0;
+		foreach (GameObject go in graph.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			if (component.h0 >= 0){
+				if (component.outNodeOrdinal == 0 && component.outNode.h0 < 0){
+					component.outNode.h0 = component.h0;
+					infosAdded++;
+				}
+				if (component.inNodeOrdinal == 0 && component.inNode.h0 < 0){
+					component.inNode.h0 = component.h0;
+					infosAdded++;
+				}
+				
+			}
+		}
+		return infosAdded;
+		
+	}
+	
+	// If we know h0 on the node and this is the first component in a given direction of flow on that node,
+	// then we can set h0 on the component (note that this can happen because the node.h0 may have been set by
+	// the first component in the other flow direction). 
+	int ApplyOtherFirstComponentRule(){
+		int infosAdded = 0;
+		foreach (GameObject go in graph.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			
+			if (component.h0 < 0){
+				if (component.inNodeOrdinal == 0 && component.inNode.h0 >= 0){
+					component.h0 = component.inNode.h0;
+					infosAdded++;
+				}
+				if (component.outNodeOrdinal == 0 && component.outNode.h0 >= 0){
+					component.h0 = component.outNode.h0;
+					infosAdded++;
+				}
+				
+			}
+		}
+		return infosAdded;		
+	}
+	
+	
+	// Used by ApplyNoFreedomRule
+	int ApplyNoFreedomToOuts(AVOWGraph.Node node){
+	
+		int infosAdded = 0;
+		AVOWGraph.Node toNode = null;
+		bool allSameToNode = true;
+		int	minHOrder = -1;
+		AVOWComponent minHOrderComponent = null;
+		int lastValidOrdinal = -1;
+		
+		// for all the components flowing out of this node find one that has not got an ordinal
+		// Then record its toNode and check that all the others without an ordinal have the same toNode
+		// Record which component of these has the lowest hOrder
+		for (int i = 0; i < node.outComponents.Count; ++i){
+			AVOWComponent component = node.outComponents[i].GetComponent<AVOWComponent>();
+			
+			// If we haven't yet found one without an ordinal
+			// Then record it
+			if (toNode == null){
+				if (component.outNodeOrdinal == AVOWComponent.kOrdinalUnordered){
+					toNode = component.GetOtherNode(node);
+					minHOrder = component.hOrder;
+					minHOrderComponent = component;
+				}
+				else{
+					lastValidOrdinal = component.outNodeOrdinal;
+				}
+			}
+			// Otherwise we need to check that all the others have the same "from" and "to" nodes
+			// and record which of those has the lowest hOrder
+			else{
+				// the list should be ordered such that all components with an ordinal are at the beginning
+				// so if we have found one without an ordinal we should not be expecting to find any more with one
+				if (component.outNodeOrdinal != AVOWComponent.kOrdinalUnordered){	
+					Debug.LogError ("Error - found component with ordinal sorted after those without");
+				}
+				// Check if this component is between the same nodes that out first one without an ordinal is between
+				// Remember that they will all be flowing out from this node
+				if (component.IsBetweenNodes(node, toNode)){
+					
+					// check if this is the "mininal hOrdered' one
+					if (component.hOrder < minHOrder){
+						minHOrder = component.hOrder;
+						minHOrderComponent = component;
+					}
+				}
+				else
+					// If we have found another component which has different toNode then we are not constrained and we
+					// have the freedom to reorder these compoennts (which will have a material impact on the layout)
+					// so cannot do anything
+				{
+					allSameToNode = false;
+				}
+			}
+		}
+		// If we found a nonordinalled component and all the other components haver the same
+		// to and From nodes - so we can set the ordinal of the minmal one to be one more than
+		// the last valid one
+		if (toNode != null && allSameToNode){
+			minHOrderComponent.outNodeOrdinal = lastValidOrdinal + 1;
+			// Need to reorder our list
+			SortByOrdinal(node, AVOWComponent.FlowDirection.kOut);
+			// Record that we have made some changes
+			infosAdded++;
+			
+		}
+		return infosAdded;
+	}
+	
+	// Used by ApplyNoFreedomRule
+	int ApplyNoFreedomToIns(AVOWGraph.Node node){
+	
+		int infosAdded = 0;
+		AVOWGraph.Node fromNode = null;
+		bool allSameToNode = true;
+		int	minHOrder = -1;
+		AVOWComponent minHOrderComponent = null;
+		int lastValidOrdinal = -1;
+		
+		// for all the components flowing out of this node find one that has not got an ordinal
+		// Then record its toNode and check that all the others without an ordinal have the same toNode
+		// Record which component of these has the lowest hOrder
+		for (int i = 0; i < node.inComponents.Count; ++i){
+			AVOWComponent component = node.inComponents[i].GetComponent<AVOWComponent>();
+			
+			// If we haven't yet found one without an ordinal
+			// Then record it
+			if (fromNode == null){
+				if (component.inNodeOrdinal == AVOWComponent.kOrdinalUnordered){
+					fromNode = component.GetOtherNode(node);
+					minHOrder = component.hOrder;
+					minHOrderComponent = component;
+				}
+				else{
+					lastValidOrdinal = component.inNodeOrdinal;
+				}
+			}
+			// Otherwise we need to check that all the others have the same "from" and "to" nodes
+			// and record which of those has the lowest hOrder
+			else{
+				// the list should be ordered such that all components with an ordinal are at the beginning
+				// so if we have found one without an ordinal we should not be expecting to find any more with one
+				if (component.inNodeOrdinal != AVOWComponent.kOrdinalUnordered){	
+					Debug.LogError ("Error - found component with ordinal sorted after those without");
+				}
+				// Check if this component is between the same nodes that out first one without an ordinal is between
+				// Remember that they will all be flowing out from this node
+				if (component.IsBetweenNodes(node, fromNode)){
+					
+					// check if this is the "mininal hOrdered' one
+					if (component.hOrder < minHOrder){
+						minHOrder = component.hOrder;
+						minHOrderComponent = component;
+					}
+				}
+				else
+					// If we have found another component which has different fromNode then we are not constrained and we
+					// have the freedom to reorder these compoennts (which will have a material impact on the layout)
+					// so cannot do anything
+				{
+					allSameToNode = false;
+				}
+			}
+		}
+		// If we found a nonordinalled component and all the other components haver the same
+		// to and From nodes - so we can set the ordinal of the minmal one to be one more than
+		// the last valid one
+		if (fromNode != null && allSameToNode){
+			minHOrderComponent.inNodeOrdinal = lastValidOrdinal + 1;
+			// Need to reorder our list
+			SortByOrdinal(node, AVOWComponent.FlowDirection.kIn);
+			// Record that we have made some changes
+			infosAdded++;
+		}
+		return infosAdded;
+	}
+	
+	
+	
+	// If we are the only component left that has not got an ordinal number on a particular node then
+	// We can give ourselves an ordinal number (we are the one that is left)
+	// By extension this also applies if there are several components left to be "ordinalled" as long as all those
+	// components are going between the same nodes.
+	int ApplyNoFreedomRule(){
+		int infosAdded = 0;
+		
+		foreach (AVOWGraph.Node node in graph.allNodes){
+			infosAdded += ApplyNoFreedomToOuts(node);
+			infosAdded += ApplyNoFreedomToIns(node);
+		}
+
+		return infosAdded;		
+	}	
+	
+	int ApplyOrderedNeighbourToOuts(AVOWGraph.Node node){
+		int infosAdded = 0;
+		
+		// Create a loopup for the highest ordinals we have organised by which other node the components go to
+		Dictionary<AVOWGraph.Node, int> knownOrdinals = new Dictionary<AVOWGraph.Node, int>();
+		
+		// Create a lookup of all the components which have no ordinal, but do have a "hightest ordinal" in the previous lookup
+		Dictionary<AVOWGraph.Node, List<AVOWComponent>> processableComponents = new Dictionary<AVOWGraph.Node, List<AVOWComponent>> ();
+		
+		// This depends on the fact that the outComponents list is sorted so all those with ordinals already are at the front
+		for (int i = 0; i < node.outComponents.Count; ++i){
+			AVOWComponent component = node.outComponents[i].GetComponent<AVOWComponent>();
+			AVOWGraph.Node otherNode = component.GetOtherNode(node);
+			
+			// If we have an ordinal, make (or update) our ordinals lookup
+			if (component.outNodeOrdinal != AVOWComponent.kOrdinalUnordered){
+				if (knownOrdinals.ContainsKey(otherNode)){
+					knownOrdinals[otherNode] = component.outNodeOrdinal;
+				}
+				else{
+					knownOrdinals.Add(otherNode, component.outNodeOrdinal);
+				}
+			}
+			// If we don't have an ordinal for this component, check if we have already encounted a component that DOES have an ordinal
+			// which is going to this other node
+			else{
+				if (knownOrdinals.ContainsKey(otherNode)){
+					// Have we already added any such compoments
+					if (processableComponents.ContainsKey(otherNode)){
+						processableComponents[otherNode].Add (component);
+					}
+					else{
+						processableComponents.Add (otherNode, new List<AVOWComponent>());
+						processableComponents[otherNode].Add (component);
+					}
+					
+				}
+				
+			}
+		}
+		foreach (KeyValuePair<AVOWGraph.Node, List<AVOWComponent>> dicEntry in processableComponents){
+		
+			// Sort the list of components according to hOrder number
+			List<AVOWComponent> components = dicEntry.Value;
+			components.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().hOrder.CompareTo (obj2.GetComponent<AVOWComponent>().hOrder)));
+		
+			// Get the highest value ordinal number that we do know for this connection
+			int lastValueOrdinal = knownOrdinals[dicEntry.Key];
+			
+			// Set up the ordinals on the components in the list
+			for (int i = 0; i < components.Count; ++i){
+				components[i].outNodeOrdinal = ++lastValueOrdinal;
+				infosAdded++;
+			}
+		}
+		
+		if (infosAdded > 0){
+			SortByOrdinal(node, AVOWComponent.FlowDirection.kOut);
+		}
+		
+		
+		return infosAdded;
+	}
+	
+	int ApplyOrderedNeighbourToIns(AVOWGraph.Node node){
+		int infosAdded = 0;
+		
+		// Create a loopup for the highest ordinals we have organised by which other node the components go to
+		Dictionary<AVOWGraph.Node, int> knownOrdinals = new Dictionary<AVOWGraph.Node, int>();
+		
+		// Create a lookup of all the components which have no ordinal, but do have a "hightest ordinal" in the previous lookup
+		Dictionary<AVOWGraph.Node, List<AVOWComponent>> processableComponents = new Dictionary<AVOWGraph.Node, List<AVOWComponent>> ();
+		
+		// This depends on the fact that the inComponents list is sorted so all those with ordinals already are at the front
+		for (int i = 0; i < node.inComponents.Count; ++i){
+			AVOWComponent component = node.inComponents[i].GetComponent<AVOWComponent>();
+			AVOWGraph.Node otherNode = component.GetOtherNode(node);
+			
+			// If we have an ordinal, make (or update) our ordinals lookup
+			if (component.inNodeOrdinal != AVOWComponent.kOrdinalUnordered){
+				if (knownOrdinals.ContainsKey(otherNode)){
+					knownOrdinals[otherNode] = component.inNodeOrdinal;
+				}
+				else{
+					knownOrdinals.Add(otherNode, component.inNodeOrdinal);
+				}
+			}
+			// If we don't have an ordinal for this component, check if we have already encounted a component that DOES have an ordinal
+			// which is going to this other node
+			else{
+				if (knownOrdinals.ContainsKey(otherNode)){
+					// Have we already added any such compoments
+					if (processableComponents.ContainsKey(otherNode)){
+						processableComponents[otherNode].Add (component);
+					}
+					else{
+						processableComponents.Add (otherNode, new List<AVOWComponent>());
+						processableComponents[otherNode].Add (component);
+					}
+					
+				}
+				
+			}
+		}
+		foreach (KeyValuePair<AVOWGraph.Node, List<AVOWComponent>> dicEntry in processableComponents){
+			
+			// Sort the list of components according to hOrder number
+			List<AVOWComponent> components = dicEntry.Value;
+			components.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().hOrder.CompareTo (obj2.GetComponent<AVOWComponent>().hOrder)));
+			
+			// Get the highest value ordinal number that we do know for this connection
+			int lastValueOrdinal = knownOrdinals[dicEntry.Key];
+			
+			// Set up the ordinals on the components in the list
+			for (int i = 0; i < components.Count; ++i){
+				components[i].inNodeOrdinal = ++lastValueOrdinal;
+				infosAdded++;
+			}
+		}
+		
+		if (infosAdded > 0){
+			SortByOrdinal(node, AVOWComponent.FlowDirection.kIn);
+		}
+		
+		
+		return infosAdded;
+	}
+	
+	// If we have the ordinal of a comopnent for a given node, and there are other components going between the same 
+	// set of nodes - then we can give them ordinals too
+	int ApplyOrderedNeighboursRule(){
+		int infosAdded = 0;
+		
+		// Do this by examining the in and out components for each node		
+		foreach (AVOWGraph.Node node in graph.allNodes){
+			infosAdded += ApplyOrderedNeighbourToOuts(node);
+			infosAdded += ApplyOrderedNeighbourToIns(node);
+			
+		}
+		
+		return infosAdded;		
+	}	
+	
+	
+	int AppllyPositionedNeighbourToOuts(AVOWGraph.Node node){
+		int infosAdded = 0;	
+		
+		// check
+		int ordinalCheck = 0;
+		
+		// Note that this list is sorted
+		node.outOrdinalledWidth = 0;
+		for (int i = 0; i < node.outComponents.Count; ++i){
+			AVOWComponent component = node.outComponents[i].GetComponent<AVOWComponent>();
+			
+			if (component.outNodeOrdinal != AVOWComponent.kOrdinalUnordered){
+				// assert that they go up in ones
+				if (component.outNodeOrdinal != ordinalCheck){
+					Debug.LogError ("Ordinal values do not seem to be sequential");
+				}
+				ordinalCheck++;
+				if (component.outLocalH0  != node.outOrdinalledWidth){
+					component.outLocalH0 = node.outOrdinalledWidth;
+					++infosAdded;
+				}
+				node.outOrdinalledWidth += component.hWidth;
+				
+				// If we have not got an h0 then set up the actual h0
+				if (component.h0 < 0){
+					component.h0 = component.outLocalH0 + node.h0;
+					++infosAdded;
+				}
+				
+			}
+		}
+		return infosAdded;
+	}
+	
+	int AppllyPositionedNeighbourToIns(AVOWGraph.Node node){
+		int infosAdded = 0;	
+		
+		// check
+		int ordinalCheck = 0;
+		
+		// Note that this list is sorted
+		node.inOrdinalledWidth = 0;
+		for (int i = 0; i < node.inComponents.Count; ++i){
+			AVOWComponent component = node.inComponents[i].GetComponent<AVOWComponent>();
+			
+			if (component.inNodeOrdinal != AVOWComponent.kOrdinalUnordered){
+				// assert that they go up in ones
+				if (component.inNodeOrdinal != ordinalCheck){
+					Debug.LogError ("Ordinal values do not seem to be sequential");
+				}
+				ordinalCheck++;
+				if (component.inLocalH0  != node.inOrdinalledWidth){
+					component.inLocalH0 = node.inOrdinalledWidth;
+					++infosAdded;
+				}
+				node.inOrdinalledWidth += component.hWidth;
+				
+				// If we have not got an h0 then set up the actual h0
+				if (component.h0 < 0){
+					component.h0 = component.inLocalH0 + node.h0;
+					++infosAdded;
+				}
+				
+			}
+		}
+		return infosAdded;
+	}
+	
+
+	
+		
+	// If we know the h0 of a component in a node and its ordinal (which should be a certainty) then we can also set the h0
+	// of any other ordinaled componeonts
+	int ApplyPositionedNeighboursRule(){
+		int infosAdded = 0;
+		
+		// Do this by examining the in and out components for each node		
+		foreach (AVOWGraph.Node node in graph.allNodes){
+			if (node.h0 >= 0){
+				infosAdded += AppllyPositionedNeighbourToOuts(node);
+				infosAdded += AppllyPositionedNeighbourToIns(node);
+			}
+			
+		}
+		
+		return infosAdded;		
+	}	
+	
+
+	
+	
+	void RestrictBounds(AVOWGraph.Node node, float lowerConstraint, float upperConstraint){
+		// Chek the constraints are consistent with the numbers we have already
+		if (!MathUtils.FP.Fgeq(node.h0UpperBound, lowerConstraint) || !MathUtils.FP.Fleq(node.h0LowerBound, upperConstraint)){
+			Debug.LogError ("Inconsistent constraints");
+		}
+
+		
+		// if we have bounds already then just add the new constraints
+		node.h0LowerBound = Mathf.Max (node.h0LowerBound, lowerConstraint);
+		node.h0UpperBound = Mathf.Max (node.h0UpperBound, upperConstraint);
+	}
+	
+	void RestrictBounds(AVOWComponent component, float lowerConstraint, float upperConstraint){
+		// Chek the constraints are consistent with the numbers we have already
+		if (!MathUtils.FP.Fgeq(component.h0UpperBound, lowerConstraint) || !MathUtils.FP.Fleq(component.h0LowerBound, upperConstraint)){
+			Debug.LogError ("Inconsistent constraints");
+		}
+
+		// if we have bounds already then just add the new constraints
+		component.h0LowerBound = Mathf.Max (component.h0LowerBound, lowerConstraint);
+		component.h0UpperBound = Mathf.Max (component.h0UpperBound, upperConstraint);
+	}	
+	
+	void ModifyNodeOutBounds(AVOWGraph.Node node){
+		
+		float cumulativeWidth = 0;
+		for (int i = 0; i < node.outComponents.Count; ++i){
+			AVOWComponent component = node.outComponents[i].GetComponent<AVOWComponent>();
+			
+			// If we know the ordinal
+			if (component.outNodeOrdinal != AVOWComponent.kOrdinalUnordered){
+				RestrictBounds(node, component.h0LowerBound - cumulativeWidth, component.h0UpperBound - cumulativeWidth);
+				cumulativeWidth += component.hWidth;
+			}
+			// If we don't know the ordinal
+			else{
+				// Hmm, this node.Width should probably be the sum of the widths of all the components in this block (i.e. going between the same 
+				// nodes)
+				RestrictBounds(node, component.h0LowerBound - node.hWidth + component.hWidth, component.h0UpperBound - cumulativeWidth);
+			}
+		}
+	}
+	
+	void ModifyNodeInBounds(AVOWGraph.Node node){
+		
+		float cumulativeWidth = 0;
+		for (int i = 0; i < node.inComponents.Count; ++i){
+			AVOWComponent component = node.inComponents[i].GetComponent<AVOWComponent>();
+						
+			// If we know the ordinal
+			if (component.inNodeOrdinal != AVOWComponent.kOrdinalUnordered){
+				RestrictBounds(node, component.h0LowerBound - cumulativeWidth, component.h0UpperBound - cumulativeWidth);
+				cumulativeWidth += component.hWidth;
+			}
+			// If we don't know the ordinal
+			else{
+				// Hmm, this node.Width should probably be the sum of the widths of all the components in this block (i.e. going between the same 
+				// nodes)
+				RestrictBounds(node, component.h0LowerBound - node.hWidth + component.hWidth, component.h0UpperBound - cumulativeWidth);
+			}
+		}
+	}
+	
+	int ModifyComponentOutBounds(AVOWGraph.Node node){
+		int infosAdded = 0;
+		
+		// Go through all the comopnents flowing out of this node and set ther bounds
+		float cumulativeWidth = 0;
+		for (int i = 0; i < node.outComponents.Count; ++i){
+			AVOWComponent component = node.outComponents[i].GetComponent<AVOWComponent>();
+			
+			float oldLowerBound = component.h0LowerBound;
+			float oldUpperBound = component.h0UpperBound;
+			
+			
+			if (component.h0 < 0){
+				// If we know the ordinal
+				if (component.outNodeOrdinal != AVOWComponent.kOrdinalUnordered){
+					RestrictBounds(component, node.h0LowerBound + cumulativeWidth, node.h0UpperBound + cumulativeWidth);
+					cumulativeWidth += component.hWidth;
+				}
+				// If we don't know the ordinal
+				else{
+					RestrictBounds(component, node.h0LowerBound + cumulativeWidth, node.h0UpperBound + node.hWidth - component.hWidth);
+				}
+			}
+			// If we update the bounds, then record that fact
+			if (component.h0LowerBound != oldLowerBound || component.h0UpperBound != oldUpperBound){
+				infosAdded++;
+			}
+		}
+		return infosAdded;
+	}
+	
+	int ModifyComponentInBounds(AVOWGraph.Node node){
+		int infosAdded = 0;
+		
+		// Go through all the comopnents flowing in of this node and set ther bounds
+		float cumulativeWidth = 0;
+		for (int i = 0; i < node.inComponents.Count; ++i){
+			AVOWComponent component = node.inComponents[i].GetComponent<AVOWComponent>();
+			
+			float oldLowerBound = component.h0LowerBound;
+			float oldUpperBound = component.h0UpperBound;
+			
+			
+			if (component.h0 < 0){
+				// If we know the ordinal
+				if (component.inNodeOrdinal != AVOWComponent.kOrdinalUnordered){
+					RestrictBounds(component, node.h0LowerBound + cumulativeWidth, node.h0UpperBound + cumulativeWidth);
+					cumulativeWidth += component.hWidth;
+				}
+				// If we don't know the ordinal
+				else{
+					RestrictBounds(component, node.h0LowerBound + cumulativeWidth, node.h0UpperBound + node.hWidth - component.hWidth);
+				}
+			}
+			// If we update the bounds, then record that fact
+			if (component.h0LowerBound != oldLowerBound || component.h0UpperBound != oldUpperBound){
+				infosAdded++;
+			}
+		}
+		return infosAdded;
+	}
+	
+	// Update any bounds information for h0 on nodes and components
+	int ModifyBounds(){
+		int infosAdded = 0;
+		
+		// First do the obvious (if h0 is set, then set the bounds around it)
+		foreach (AVOWGraph.Node node in graph.allNodes){
+			if (node.h0 >= 0 && (node.h0LowerBound != node.h0 || node.h0UpperBound != node.h0)){
+				node.h0LowerBound = node.h0;
+				node.h0UpperBound = node.h0;
+				++infosAdded;				
+			}
+		}
+		
+		foreach (GameObject go in graph.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			if (component.h0 >= 0 && (component.h0LowerBound != component.h0 || component.h0UpperBound != component.h0)){
+				component.h0LowerBound = component.h0;
+				component.h0UpperBound = component.h0;
+				++infosAdded;				
+			}
+		}
+			
+		
+		// Do the nodes
+		foreach (AVOWGraph.Node node in graph.allNodes){
+			float oldLowerBound = node.h0LowerBound;
+			float oldUpperBound = node.h0UpperBound;
+			
+			// If we knew the position absolutley then it would already have bee sorted			
+			if (node.h0 < 0){
+				// Check any components flowing out of it
+				ModifyNodeOutBounds(node);
+				ModifyNodeInBounds(node);
+
+			}
+			// If we update the bounds, then record that fact
+			if (node.h0LowerBound != oldLowerBound || node.h0UpperBound != oldUpperBound){
+				infosAdded++;
+			}
+		}
+		// Do the components 
+		// we do this node by node as it is more efficient
+		foreach (AVOWGraph.Node node in graph.allNodes){
+			infosAdded += ModifyComponentOutBounds(node);
+			infosAdded += ModifyComponentInBounds(node);
+		}
+		return infosAdded;
+	}
+	
+	
+	void HeapsPermutations(int n, int[] sequencePass, ref int[,] outputArr, ref int outputIndex){
+		int[] sequence = new int[sequencePass.Length];
+		sequencePass.CopyTo(sequence, 0);
+	
+		// If n==1 Copy to the output array and increment outputIndex
+		if (n ==0){
+			for (int i = 0; i < sequence.Length; ++i){
+				outputArr[outputIndex, i] = sequence[i];
+			}
+			++outputIndex;
+		}
+		else{
+			for (int i = 0; i < n; ++i){
+				HeapsPermutations(n - 1, sequence, ref outputArr, ref outputIndex);
+				// if i is even
+				int j = (i %2 == 0) ? 1 : i;
+				// Swap i an j
+				int temp = sequence[i];
+				sequence[i] = sequence[j];
+				sequence[j] = temp;
+			}
+		}
+	}
+	
+	// Regsiter there there seems to be a valid option to set this components ordinal value to ordinalValue
+	// We don't just "do it" as we wait to make sure there are no other options and then pick the "highst HOrder" option to go with
+	void RegisterEmergencyOption(AVOWComponent component, AVOWComponent.FlowDirection dir, int ordinalValue){
+		emergencyOptions.Add(new EmergencyOption(component, dir, ordinalValue));
+	}
+	
+	int TryEmergencyOption(){
+		// If nothing to try, try nothing
+		if (emergencyOptions.Count == 0) return 0;
+		
+		// Find the option with the lowest hOrder component
+		int hMinOrder = AVOWComponent.kOrdinalUnordered;
+		foreach (EmergencyOption option in emergencyOptions){
+			if (option.component.hOrder < hMinOrder){
+				hMinOrder = option.component.hOrder;
+			}
+		}
+		// Make a shrunk list of just those options which involve that component
+		List<EmergencyOption> shrunkList = new List<EmergencyOption>();
+		foreach (EmergencyOption option in emergencyOptions){
+			if (option.component.hOrder == hMinOrder){
+				shrunkList.Add (option);
+			}
+		}	
+		// Now consider the node which we are being asked to ordinate with respect to
+		// Find the one with the left most position which has been allocagted to ordinalled components
+		// so far
+		// If there is more than one with the same posiiton, it probably doesn't matter which of the options we choose
+		EmergencyOption useOption = null;
+		foreach (EmergencyOption option in shrunkList){
+			float minLeftPos = AVOWGraph.kMaxUpperBound;
+			float leftPos = -1;
+			if (option.dir == AVOWComponent.FlowDirection.kOut){
+				leftPos = option.component.outNode.h0UpperBound + option.component.outNode.outOrdinalledWidth;
+			}
+			else{
+				leftPos = option.component.inNode.h0UpperBound + option.component.inNode.inOrdinalledWidth;
+			}
+			if (leftPos < minLeftPos){
+				minLeftPos = leftPos;
+				useOption = option;
+			}
+		}
+		
+		// We should have an option to use
+		if (useOption == null){
+			Debug.LogError ("We do not have an option to use");
+		}
+		
+		if (useOption.dir == AVOWComponent.FlowDirection.kOut){
+			useOption.component.outNodeOrdinal = useOption.ordinalValue;
+			SortByOrdinal(useOption.component.outNode, AVOWComponent.FlowDirection.kOut);
+		}
+		else{
+			useOption.component.inNodeOrdinal = useOption.ordinalValue;
+			SortByOrdinal(useOption.component.inNode, AVOWComponent.FlowDirection.kIn);
+		}
+		return 1;
+		
+		
+		
+	}
+	
+	int[,] GeneratePermutations(int numItems){
+		if (cachedPermutations[numItems] == null){
+			int numPerms = (int)MathUtils.Int.Factorial(numItems);
+			
+			int[,] permutations = new int[numPerms, numItems];
+			int[] sequence = new int[numItems];
+			// Fill sequence
+			for (int i = 0; i < numItems; ++i){
+				sequence[i] = i;
+			}
+			// Generate the permutations
+			int outputIndex = 0;
+			HeapsPermutations(numItems, sequence, ref permutations, ref outputIndex);
+			cachedPermutations[numItems]  = permutations;
+		}
+		return cachedPermutations[numItems] ;
+	}
+	
+	int ApplyBoundsRuleToOutBounds(AVOWGraph.Node node){
+		int infosAdded = 0;
+		
+		// Create a loopup for the highest ordinals we have organised by which other node the components go to
+		Dictionary<AVOWGraph.Node, float> freeWidths = new Dictionary<AVOWGraph.Node, float>();
+		
+		// Create a lookup of all the components which have no ordinal organised into groups flowing to the same component
+		Dictionary<AVOWGraph.Node, List<AVOWComponent>> freeComponents = new Dictionary<AVOWGraph.Node, List<AVOWComponent>> ();
+		float cumulativeWidth = 0;
+		int highestOrdinal = -1;
+		for (int i = 0; i < node.outComponents.Count; ++i){
+			AVOWComponent component = node.outComponents[i].GetComponent<AVOWComponent>();
+			AVOWGraph.Node otherNode = component.GetOtherNode(node);
+			
+			// If we have an ordinal, then sum up our width so far
+			if (component.outNodeOrdinal != AVOWComponent.kOrdinalUnordered){
+				cumulativeWidth += component.hWidth;
+				highestOrdinal = component.outNodeOrdinal;
+				
+			}
+			// If not, it goes in the bucket of free components
+			else{
+				if (freeComponents.ContainsKey(otherNode)){
+					freeComponents[otherNode].Add (component);
+					freeWidths[otherNode] += component.hWidth;
+				}
+				else{
+					freeComponents.Add(otherNode, new List<AVOWComponent>());
+					freeWidths.Add (otherNode, 0);
+					freeComponents[otherNode].Add (component);
+					freeWidths[otherNode] += component.hWidth;
+				}
+			}
+			
+		}
+		int numFreeBlocks = freeComponents.Count;
+		
+		// If less than 2 free blocks then this is dealt with by other rules
+		if (numFreeBlocks < 2) return 0;
+		
+		// Sort the lists 
+		foreach (List<AVOWComponent> list in freeComponents.Values){
+			list.Sort ((obj1, obj2) => (obj1.hOrder.CompareTo (obj2.hOrder)));
+		}		
+		
+		AVOWGraph.Node[] freeBlockNodes = new AVOWGraph.Node[numFreeBlocks];
+		freeComponents.Keys.CopyTo (freeBlockNodes, 0);
+		
+		// Now we have cumulativeWidth tells us how much space is used up by components which are already fixed in place on this node
+		// We have a set of lists of components  - where each list has all componetns flowing to (and from) the same node
+		// we hve the width of each such set of components
+		// We have an array of nodes (which wil let us look up the above lists).
+		
+		// Given an ordering of indexes e.g. (1, 3, 0, 2) we should be able to determine if this yields positions which contradict the 
+		// bounds of the node on the other end of the components
+		int[,] permutations = GeneratePermutations(numFreeBlocks);
+		int numPerms = permutations.GetLength(0);
+		
+		// DEBUG print out the permutations
+//		if (numFreeBlocks > 0 ){
+//			Debug.Log ("Print Permutations:");
+//			for (int i = 0; i < numPerms; ++i){
+//				string seq = "";
+//				for (int j = 0; j < numFreeBlocks; ++j){
+//					seq += permutations[i, j];
+//				}
+//				Debug.Log ("Permuation " + i.ToString () + ": " + seq);
+//			}
+//		}
+		
+		bool[] isValidSequence = new bool[numPerms];
+		// Implement a number of tests for consistence on a given sequence
+		for (int i = 0; i < numPerms; ++i){
+			// Keep track of the start position of each block
+			float blockH0 = cumulativeWidth;
+			
+			// Go through this permutation and check its validity 
+			bool permIsValid = true;
+			for (int j = 0; j < numFreeBlocks; ++j){
+				AVOWGraph.Node otherNode = freeBlockNodes[permutations[i, j]];
+				float blockWidth = freeWidths[otherNode];
+				// Get lowest hOrder component from the block
+				AVOWComponent firstComponent = freeComponents[otherNode][0];
+				
+				// Find bounds of the block (given the ordering we are testing) - note that this is upper bound of h1 (not h0)
+				float blockH0LowerBound = node.h0LowerBound + blockH0;
+				float blockH1UpperBound = node.h0UpperBound + blockH0 + blockWidth;
+				
+				// Test against bounds of other node
+				// --------------
+				
+				// The widest gap in which this block has to fit (note that this is an interval, rather than 
+				// a single position we are specifying the bounds for. i.e. upper bound is the upperbound of
+				// right hand edge and lower bound is lowerbound of left hand edge
+				float nodeSpaceLowerBound;
+				float nodeSpaceUpperBound;
+				
+				// If we know the relative position of this component on the inNode
+				if (firstComponent.inLocalH0 >= 0){
+					nodeSpaceLowerBound = otherNode.h0LowerBound + firstComponent.inLocalH0;
+					nodeSpaceUpperBound = otherNode.h0UpperBound + firstComponent.inLocalH0 + blockWidth;
+				}
+				// If it is a free component
+				else{
+					nodeSpaceLowerBound = otherNode.h0LowerBound + otherNode.inOrdinalledWidth;
+					nodeSpaceUpperBound = otherNode.h0UpperBound + otherNode.hWidth;
+				}
+				
+				// Test if there is a position where we can place this block which conforms to both sets of constraints
+				if (!MathUtils.FP.Fleq ( blockH0LowerBound, nodeSpaceUpperBound - blockWidth) || !MathUtils.FP.Fgeq ( blockH1UpperBound, nodeSpaceLowerBound + blockWidth)){
+					permIsValid = false;
+					break;
+				}
+				
+				// Test against component bounds
+				// ---------------------------
+				int numComponentsInBlock = freeComponents[otherNode].Count;
+				AVOWComponent lastComponent = freeComponents[otherNode][numComponentsInBlock - 1];
+				float componentBlockLowerBound = firstComponent.h0LowerBound;
+				float componentBlockUpperBound = lastComponent.h0UpperBound + lastComponent.hWidth;
+				
+				if (!MathUtils.FP.Fleq(blockH0LowerBound, componentBlockUpperBound - blockWidth) || !MathUtils.FP.Fgeq ( blockH1UpperBound, componentBlockLowerBound + blockWidth)){
+					permIsValid = false;
+					break;
+				}				
+				
+				// Increment h0
+				blockH0 += blockWidth;
+				
+			}
+			isValidSequence[i] = permIsValid;
+		}
+		
+		// go through the potentially valid permutations and check if the first block is always consistent. If it is,
+		// We can place the first component from that block next in line (and the other rules should fill int he gaps)
+		int firstBlock = -1;
+		bool ok = true;
+		for (int i = 0; i < numPerms; ++i){
+			if (isValidSequence[i]){
+				if (firstBlock == -1) firstBlock = permutations[i, 0];
+				else if (firstBlock != permutations[i, 0]) ok = false;
+			}
+		}
+		if (firstBlock == -1){
+			Debug.LogError ("Should have at least one first block");
+		}
+		if (ok){
+			// Find the first component in the block
+			AVOWGraph.Node otherNode = freeBlockNodes[firstBlock];
+			// Get lowest hOrder component from the block
+			AVOWComponent thisComponent = freeComponents[otherNode][0];
+			thisComponent.outNodeOrdinal = highestOrdinal  + 1;
+			SortByOrdinal(node, AVOWComponent.FlowDirection.kOut);
+			
+			infosAdded++;
+		}
+		// Otherwise we have multiple valid options
+		else{
+			for (int i = 0; i < numPerms; ++i){
+				if (isValidSequence[i]){
+					AVOWComponent thisComponent = freeComponents[freeBlockNodes[permutations[i, 0]]][0];
+					RegisterEmergencyOption(thisComponent, AVOWComponent.FlowDirection.kOut, highestOrdinal  + 1);
+				}
+			}
+		}
+		
+		return infosAdded;
+	}
+	
+	int ApplyBoundsRuleToInBounds(AVOWGraph.Node node){
+		int infosAdded = 0;
+		
+		// Create a loopup for the highest ordinals we have organised by which other node the components go to
+		Dictionary<AVOWGraph.Node, float> freeWidths = new Dictionary<AVOWGraph.Node, float>();
+		
+		// Create a lookup of all the components which have no ordinal organised into groups flowing to the same component
+		Dictionary<AVOWGraph.Node, List<AVOWComponent>> freeComponents = new Dictionary<AVOWGraph.Node, List<AVOWComponent>> ();
+		float cumulativeWidth = 0;
+		int highestOrdinal = -1;
+		for (int i = 0; i < node.inComponents.Count; ++i){
+			AVOWComponent component = node.inComponents[i].GetComponent<AVOWComponent>();
+			AVOWGraph.Node otherNode = component.GetOtherNode(node);
+			
+			// If we have an ordinal, then sum up our width so far
+			if (component.inNodeOrdinal != AVOWComponent.kOrdinalUnordered){
+				cumulativeWidth += component.hWidth;
+				highestOrdinal = component.inNodeOrdinal;
+			}
+			// If not, it goes in the bucket of free components
+			else{
+				if (freeComponents.ContainsKey(otherNode)){
+					freeComponents[otherNode].Add (component);
+					freeWidths[otherNode] += component.hWidth;
+				}
+				else{
+					freeComponents.Add(otherNode, new List<AVOWComponent>());
+					freeWidths.Add (otherNode, 0);
+					freeComponents[otherNode].Add (component);
+					freeWidths[otherNode] += component.hWidth;
+				}
+			}
+			
+		}
+		int numFreeBlocks = freeComponents.Count;
+		
+		// If less than 2 free blocks then this is dealt with by other rules
+		if (numFreeBlocks < 2) return 0;
+		
+		// Sort the lists 
+		foreach (List<AVOWComponent> list in freeComponents.Values){
+			list.Sort ((obj1, obj2) => (obj1.hOrder.CompareTo (obj2.hOrder)));
+		}
+
+		AVOWGraph.Node[] freeBlockNodes = new AVOWGraph.Node[numFreeBlocks];
+		freeComponents.Keys.CopyTo (freeBlockNodes, 0);
+		
+		// Now we have cumulativeWidth tells us how much space is used up by components which are already fixed in place on this node
+		// We have a set of lists of components  - where each list has all componetns flowing to (and from) the same node
+		// we hve the width of each such set of components
+		// We have an array of nodes (which will let us look up the above lists).
+		// We have lower ad upper bounds on h0 for this node
+		// We have highestOrdinal, the highest ordinal that a component has been given on this node
+		
+		// Given an ordering of indexes e.g. (1, 3, 0, 2) we should be able to determine if this yields positions which contradict the 
+		// bounds of the node on the other end of the components
+		int numPerms = (int)MathUtils.Int.Factorial(numFreeBlocks);
+		int[,] permutations = new int[numPerms, numFreeBlocks];
+		int[] sequence = new int[numFreeBlocks];
+		// Fill sequence
+		for (int i = 0; i < numFreeBlocks; ++i){
+			sequence[i] = i;
+		}
+		// Generate the permutations
+		int outputIndex = 0;
+		HeapsPermutations(numFreeBlocks, sequence, ref permutations, ref outputIndex);
+		
+		// DEBUG print out the permutations
+//		if (numFreeBlocks > 0){
+//			Debug.Log ("Print Permutations:");
+//			for (int i = 0; i < numPerms; ++i){
+//				string seq = "";
+//				for (int j = 0; j < numFreeBlocks; ++j){
+//					seq += permutations[i, j];
+//				}
+//				Debug.Log ("Permuation " + i.ToString () + ": " + seq);
+//			}
+//		}
+		
+		bool[] isValidSequence = new bool[numPerms];
+		// Implement a number of tests for consistence on a given sequence
+		for (int i = 0; i < numPerms; ++i){
+			// Keep track of the start position of each block
+			float blockH0 = cumulativeWidth;
+			
+			// Go through this permutation and check its validity 
+			bool permIsValid = true;
+			for (int j = 0; j < numFreeBlocks; ++j){
+				AVOWGraph.Node otherNode = freeBlockNodes[permutations[i, j]];
+				float blockWidth = freeWidths[otherNode];
+				// Get lowest hOrder component from the block
+				AVOWComponent firstComponent = freeComponents[otherNode][0];
+				
+				// Find bounds of the block (given the ordering we are testing) - note that this is upper bound of h1 (not h0)
+				float blockH0LowerBound = node.h0LowerBound + blockH0;
+				float blockH1UpperBound = node.h0UpperBound + blockH0 + blockWidth;
+				
+				// Test against bounds of other node
+				// --------------
+				
+				// The widest gap in which this block has to fit (note that this is an interval, rather than 
+				// a single position we are specifying the bounds for. i.e. upper bound is the upperbound of
+				// right hand edge and lower bound is lowerbound of left hand edge
+				float nodeSpaceLowerBound;
+				float nodeSpaceUpperBound;
+				
+				// If we know the relative position of this component on the outNode
+				if (firstComponent.outLocalH0 >= 0){
+					nodeSpaceLowerBound = otherNode.h0LowerBound + firstComponent.outLocalH0;
+					nodeSpaceUpperBound = otherNode.h0UpperBound + firstComponent.outLocalH0 + blockWidth;
+				}
+				// If it is a free component
+				else{
+					nodeSpaceLowerBound = otherNode.h0LowerBound + otherNode.outOrdinalledWidth;
+					nodeSpaceUpperBound = otherNode.h0UpperBound + otherNode.hWidth;
+				}
+				
+				// Test if there is a position where we can place this block which conforms to both sets of constraints
+				if (!MathUtils.FP.Fleq ( blockH0LowerBound, nodeSpaceUpperBound - blockWidth) || !MathUtils.FP.Fgeq ( blockH1UpperBound, nodeSpaceLowerBound + blockWidth)){
+					permIsValid = false;
+					break;
+				}
+				
+				// Test against component bounds
+				// ---------------------------
+				int numComponentsInBlock = freeComponents[otherNode].Count;
+				AVOWComponent lastComponent = freeComponents[otherNode][numComponentsInBlock - 1];
+				float componentBlockLowerBound = firstComponent.h0LowerBound;
+				float componentBlockUpperBound = lastComponent.h0UpperBound + lastComponent.hWidth;
+				
+				if (!MathUtils.FP.Fleq(blockH0LowerBound, componentBlockUpperBound - blockWidth) || !MathUtils.FP.Fgeq ( blockH1UpperBound, componentBlockLowerBound + blockWidth)){
+					permIsValid = false;
+					break;
+				}				
+				
+				// Increment h0
+				blockH0 += blockWidth;
+				
+			}
+			isValidSequence[i] = permIsValid;
+		}
+		
+		// go through the potentially valid permutations and check if the first block is always consistent. If it is,
+		// We can place the first component from that block next in line (and the other rules should fill int he gaps)
+		int firstBlock = -1;
+		bool ok = true;
+		for (int i = 0; i < numPerms; ++i){
+			if (isValidSequence[i]){
+				if (firstBlock == -1) firstBlock = permutations[i, 0];
+				else if (firstBlock != permutations[i, 0]) ok = false;
+			}
+		}
+		if (firstBlock == -1){
+			Debug.LogError ("Should have at least one first block");
+		}
+		if (ok){
+			// Find the first component in the block
+			AVOWGraph.Node otherNode = freeBlockNodes[firstBlock];
+			// Get lowest hOrder component from the block
+			AVOWComponent thisComponent = freeComponents[otherNode][0];
+			thisComponent.inNodeOrdinal = highestOrdinal  + 1;
+			SortByOrdinal(node, AVOWComponent.FlowDirection.kIn);
+			infosAdded++;
+		}
+		// Otherwise we have multiple valid options
+		else{
+			for (int i = 0; i < numPerms; ++i){
+				if (isValidSequence[i]){
+					AVOWComponent thisComponent = freeComponents[freeBlockNodes[permutations[i, 0]]][0];
+					RegisterEmergencyOption(thisComponent, AVOWComponent.FlowDirection.kIn, highestOrdinal  + 1);
+				}
+			}
+		}		
+		
+		return infosAdded;
+	}	
+
+	// Create lower and upper bounds for each component and each node by using info about positional information of the things attached to them
+	// then try different orderings of the unordered components in each node and see if there is only one oriding which satifies the bounds
+	// at the other end of each component
+	int ApplyBoundsRule(){
+		int infosAdded = 0;
+		
+		infosAdded += ModifyBounds();
+		
+		// Do this by examining the in and out components for each node		
+		foreach (AVOWGraph.Node node in graph.allNodes){
+			infosAdded += ApplyBoundsRuleToOutBounds(node);
+			infosAdded += ApplyBoundsRuleToInBounds(node);			
+		}
+		
+		return infosAdded;		
+	}	
+	
+
+	
+
+	
 //	class GOComparer : IComparer<GameObject>
 //	{
 //		public int Compare(GameObject obj1, GameObject obj2)
@@ -474,7 +1691,7 @@ public class AVOWSim : MonoBehaviour {
 //			return obj1.GetComponent<AVOWComponent>().hOrder.CompareTo (obj2.GetComponent<AVOWComponent>().hOrder);
 //		}
 //	}
-	
+	/*
 	bool LayoutHOrder(){
 		// Figure out the width of each node. The current flowing in == current flowing out == width
 		foreach (AVOWGraph.Node node in graph.allNodes){
@@ -703,6 +1920,7 @@ public class AVOWSim : MonoBehaviour {
 			Debug.Log ("Component " + component.GetID() + ": h0 = " + component.h0 + ", h1 = " + component.h1 + ", visited = " + component.visited);
 		}
 	}
+	*/
 	
 	// Records the position of the mouse as a local position in one of the components
 	void RecordMousePos(){
@@ -717,21 +1935,21 @@ public class AVOWSim : MonoBehaviour {
 		// check which component we are over
 		mouseOverComponent = null;
 		// Keep track of global bounds of entire diagram (as we will use this if not over ay specific component)
-		float xMin = 100;
-		float yMin = 100;
-		float xMax = -1;
-		float yMax = -1;
+		xMin = 100;
+		yMin = 100;
+		xMax = -1;
+		yMax = -1;
 		foreach(GameObject go in graph.allComponents){
 			AVOWComponent component = go.GetComponent<AVOWComponent>();
 			
 			
 			// If this component has never been layed out, then ignore
-			if (!component.isLayedOut) continue;
+			if (!component.hasBeenLayedOut) continue;
 			
 			float lowVoltage = Mathf.Min (component.node0.voltage, component.node1.voltage);
 			float highVoltage = Mathf.Max (component.node0.voltage, component.node1.voltage);
 			float lowCurrent = component.h0;
-			float highCurrent = component.h1;
+			float highCurrent = component.h0 + component.hWidth;
 			
 
 			
@@ -774,7 +1992,7 @@ public class AVOWSim : MonoBehaviour {
 		//Figure out world posiiton of the location in the diagram where the mouse was
 		if (mouseOverComponent != null){
 			xMin = mouseOverComponent.h0;
-			xMax = mouseOverComponent.h1;
+			xMax = mouseOverComponent.h0 + mouseOverComponent.hWidth;
 			yMin = Mathf.Min (mouseOverComponent.node0.voltage, mouseOverComponent.node1.voltage);
 			yMax = Mathf.Max (mouseOverComponent.node0.voltage, mouseOverComponent.node1.voltage);
 			// If a voltage source then need to mirror it all
@@ -793,7 +2011,7 @@ public class AVOWSim : MonoBehaviour {
 				float lowVoltage = Mathf.Min (component.node0.voltage, component.node1.voltage);
 				float highVoltage = Mathf.Max (component.node0.voltage, component.node1.voltage);
 				float lowCurrent = component.h0;
-				float highCurrent = component.h1;
+				float highCurrent = component.h0 + component.hWidth;
 				
 					
 				
