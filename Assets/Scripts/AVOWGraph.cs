@@ -44,6 +44,8 @@ public class AVOWGraph : MonoBehaviour {
 		}
 	}
 	
+	public int maxNodeId = -1;
+	
 	public static int kMinLowerBound = 0;
 	public static int kMaxUpperBound = 9999;
 	
@@ -140,6 +142,7 @@ public class AVOWGraph : MonoBehaviour {
 	
 	public Node AddNode(){
 		Node newNode = new Node();
+		maxNodeId = Mathf.Max (maxNodeId, newNode.id);
 		allNodes.Add (newNode);
 		return newNode;
 	}

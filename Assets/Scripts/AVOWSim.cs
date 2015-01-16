@@ -39,7 +39,7 @@ public class AVOWSim : MonoBehaviour {
 	// Current solving	
 	double epsilon = 0.0001;
 	float[]						loopCurrents;
-	
+	/*
 	class EmergencyOption{
 		public EmergencyOption(AVOWComponent component, AVOWComponent.FlowDirection dir, int ordinalValue){
 			this.component = component;
@@ -53,9 +53,43 @@ public class AVOWSim : MonoBehaviour {
 	};
 	
 	List<EmergencyOption>	emergencyOptions = new List<EmergencyOption>();
-	
+	*/
 	// List of permutations matricies
 	int[][,] cachedPermutations = new int[AVOWComponent.kOrdinalUnordered][,];
+	
+	
+	static readonly int kOut = 0;
+	static readonly int kIn = 1;
+	static readonly int kNumDirs = 2;
+	
+	static int ReverseDirection(int dir){ return 1-dir;}
+	
+	class SimNode{
+		public int id = -1;
+		public List<SimBlock>[] blockList = new List<SimBlock>[kNumDirs];
+		public SimBlock[][] blockArray = new SimBlock[kNumDirs][];
+		public float h0 = -1;
+
+
+	};
+	
+	class SimBlock{
+		public int id = -1;
+		public int[] ordinals = new int[kNumDirs];
+		public SimNode[] nodes = new SimNode[kNumDirs];
+		public float h0 = -1;
+		public float hWidth = -1;
+		public int hOrder = -1;
+		public List<AVOWComponent> components = new List<AVOWComponent>();
+	};
+	
+	SimNode[] allSimNodes;
+	SimBlock[] allSimBlocks;
+	
+	int[,]		permutations;
+	List<int> validPermutations = new List<int>();
+	
+	
 	
 	public void Recalc(){
 
@@ -508,6 +542,313 @@ public class AVOWSim : MonoBehaviour {
 //		}
 //	}
 
+
+	void ConstructLists(){
+	
+		// Setup widths of comonents and in/out nodes
+		foreach (GameObject go in graph.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			component.hWidth = Mathf.Abs(component.fwCurrent);
+			component.SetupInOutNodes();
+		}
+		
+	
+		int[] idToIndexLookup = new int[graph.maxNodeId + 1];
+	
+		// Make a copy of the nodes in the tree
+		allSimNodes = new SimNode[graph.allNodes.Count];
+		int nodeIndex = 0;
+		foreach (AVOWGraph.Node node in graph.allNodes){
+			SimNode newNode = new SimNode();
+			newNode.id = node.id;
+			newNode.blockList[kIn] = new List<SimBlock>();
+			newNode.blockList[kOut] = new List<SimBlock>();
+			allSimNodes[nodeIndex] = newNode;
+			idToIndexLookup[node.id] = nodeIndex;
+			++nodeIndex;
+		}
+		
+		// Create a lookup for all the components organised by which nodes they are between (direction matters)
+		Dictionary<Eppy.Tuple<AVOWGraph.Node, AVOWGraph.Node>, List<AVOWComponent>> components = new Dictionary<Eppy.Tuple<AVOWGraph.Node, AVOWGraph.Node>, List<AVOWComponent>>  ();
+		
+		foreach (GameObject go in graph.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			
+			Eppy.Tuple<AVOWGraph.Node, AVOWGraph.Node> key = new Eppy.Tuple<AVOWGraph.Node, AVOWGraph.Node>(component.inNode, component.outNode);
+			if (components.ContainsKey(key)){
+				components[key].Add (component);
+			}
+			else{
+				components.Add(key, new List<AVOWComponent>{});
+				components[key].Add (component);
+			}
+		}
+		
+		// Transfer all of these components into our block structure
+		int numBlocks = components.Count;
+		allSimBlocks = new SimBlock[numBlocks];
+		
+		int blockIndex = 0;
+		foreach(KeyValuePair<Eppy.Tuple<AVOWGraph.Node, AVOWGraph.Node>, List<AVOWComponent>> item in components){
+			SimBlock newBlock = new SimBlock();
+			newBlock.components = item.Value;
+			// order the components so the lowest hOrder value is at the beginning
+			newBlock.components.Sort((obj1, obj2) => obj1.hOrder.CompareTo(obj2.hOrder));
+			
+			newBlock.hOrder = newBlock.components[0].hOrder;
+			newBlock.nodes[kIn] = allSimNodes[idToIndexLookup[item.Key.Item1.id]];
+			newBlock.nodes[kOut] = allSimNodes[idToIndexLookup[item.Key.Item2.id]];
+			newBlock.ordinals[kIn] = -1;
+			newBlock.ordinals[kOut] = -1;
+			
+			// Determine the ovall width									
+			newBlock.hWidth = 0;
+			foreach (AVOWComponent component in newBlock.components){
+				newBlock.hWidth  += component.hWidth;
+			}
+			
+			// Add ourselves to the approprite lists on the nodes
+			newBlock.nodes[kIn].blockList[kIn].Add(newBlock);
+			newBlock.nodes[kOut].blockList[kOut].Add(newBlock);
+			allSimBlocks[blockIndex] = newBlock;
+			++blockIndex;
+		}
+		
+		// for each block list on the nodes convert to an array (as these are quicker to index)
+		foreach (SimNode node in allSimNodes){
+			for (int i = 0; i < kNumDirs; ++i){
+				node.blockArray[i] = new SimBlock[node.blockList[i].Count];
+				node.blockList[i].CopyTo(node.blockArray[i]);
+			}
+		}
+	}
+	
+	void ConstructPermutations(){
+	
+		// Count how many permutations each list in each node has
+		int numNodes = allSimNodes.Length;
+		int[,] numPerms = new int[kNumDirs, numNodes];
+		int numElements = 0;		
+		for (int i = 0; i < allSimNodes.Length; ++i){
+			SimNode node = allSimNodes[i];
+			for (int j = 0; j < kNumDirs; j++){
+				numPerms[j, i] = (int)MathUtils.Int.Factorial(node.blockArray[j].Length);
+				numElements += node.blockArray[j].Length;
+			}
+		}
+		
+		// The total number of permutations is the number of permutations in each block list multiplied together
+		int totalPerms = 1;
+		foreach (int perms in numPerms){
+			totalPerms *= perms;
+		}
+		
+		permutations = new int[totalPerms, numElements];
+		// Create list of all these permutations
+		int itemIndex = 0;
+		int numRepeats = 1;
+		for (int i = 0; i < allSimNodes.Length; ++i){
+			SimNode node = allSimNodes[i];
+			for (int j = 0; j < kNumDirs; j++){
+				int[,] localPerms = GeneratePermutations(node.blockArray[j].Length);
+				
+				// Go through the perm indicies				
+				int grandPermIndex = 0;
+				for (int k = 0; k < totalPerms/numRepeats; ++k){
+					int localPermIndex = k % localPerms.GetLength(0);
+					for (int l = 0; l < numRepeats; ++l){
+						// Loop through elements in sequence
+						for (int m = 0; m < localPerms.GetLength(1); ++m){
+							permutations[grandPermIndex, itemIndex + m] = localPerms[localPermIndex, m];
+							
+						}
+						++grandPermIndex;
+						
+					}
+						
+				}
+				itemIndex += node.blockArray[j].Length;
+				
+				numRepeats = numRepeats * localPerms.GetLength(0);
+				if (grandPermIndex != totalPerms){
+					Debug.LogError ("Have miscalculated number of permutations");
+				}
+				
+			}
+
+		}
+	}
+	
+	float GetInvalidH0(){
+		return Single.NaN;
+	}
+	
+	bool IsInvalidH0(float test){
+		return Single.IsNaN(test);
+	}
+	
+	
+	void ClearTestData(){
+		foreach(SimNode node in allSimNodes){
+			node.h0 = GetInvalidH0();
+		}
+		foreach(SimBlock block in allSimBlocks){
+			block.h0 = GetInvalidH0();
+			block.ordinals[kOut] = 	-1;
+			block.ordinals[kIn] = 	-1;
+		}
+	}
+	
+	void SetupOrdinals(int i){
+		// Which element we are giving an ordinal to
+		int permIndex = 0;
+		for (int j = 0; j < allSimNodes.Length; ++j){
+			for (int k = 0; k < kNumDirs; ++k){
+				// Set up the ordinals for this permutationt
+				for (int l = 0; l < allSimNodes[j].blockArray[k].Length; ++l){
+					allSimNodes[j].blockArray[k][l].ordinals[k] = permutations[i, permIndex++];
+				}
+			}
+		}
+	}
+	
+	bool SetUpH0s(){
+		// Traverse the graph from our first node only going to the next node when we have set its h0 - also watchout fo contradictions
+		bool error = false;
+		Queue<SimNode> nodeQueue = new Queue<SimNode>();
+		nodeQueue.Enqueue(allSimNodes[0]);
+		while (nodeQueue.Count > 0 && !error){
+			SimNode node = nodeQueue.Dequeue();
+			if (IsInvalidH0(node.h0)){
+				Debug.LogError("Should not be processing a ndoe wth an invalid H0");
+			}
+			for (int dir = 0; dir< kNumDirs  && !error; ++dir){
+				
+				// Sort the list of components according to their ordinal numbers
+				Array.Sort (node.blockArray[dir], (obj1, obj2) => obj1.ordinals[dir].CompareTo(obj2.ordinals[dir]));
+				
+				// Go through blocks accumulating widths and setting h0 on blocks
+				float width = node.h0;
+				for (int j = 0; j < node.blockArray[dir].Length  && !error; ++j){
+					SimBlock block = node.blockArray[dir][j];
+					if (!IsInvalidH0(block.h0) && !MathUtils.FP.Feq (block.h0, width)){
+						error = true;
+					}
+					else{
+						block.h0 = width;
+						width += block.hWidth;
+					}
+					// ALso, check if blocks are the first component on block on other end
+					// and this node has no h0 and if so, set H0 on this and add to queue
+					int reverseDir = ReverseDirection(dir);
+					SimNode otherNode = block.nodes[reverseDir];
+					if (block.ordinals[reverseDir] == 0 && IsInvalidH0(otherNode.h0)){
+						otherNode.h0 = block.h0;
+						nodeQueue.Enqueue(otherNode);
+						
+					}
+				}
+				
+				
+			}
+		}
+		return error;
+	}
+	
+	bool SetupPermutation(int i){
+		ClearTestData();
+		
+		// set up an h0 value for an arbitrary node
+		allSimNodes[0].h0 = 0;
+		
+		// Set up the ordinals
+		SetupOrdinals(i);
+		
+		return SetUpH0s();
+	}
+	
+	
+	void TestPermutations(){
+		validPermutations.Clear();
+		
+		// Iterate through all the permutations setting up the ordinals and then testing the result
+		for (int i = 0; i < permutations.GetLength(0); ++i){
+			if (SetupPermutation(i)){
+				validPermutations.Add (i);
+			}
+			
+			
+		}
+	}
+	
+	void CreateHOrderArray(int[] hOrderArray){
+		Array.Sort (allSimBlocks, (obj1, obj2) => (obj1.h0.CompareTo(obj2.h0)));
+		for (int i = 0; i < allSimBlocks.Length; ++i){
+			hOrderArray[i] = allSimBlocks[i].hOrder;
+		}
+
+	}
+	
+	bool IsLexLower(int[] hOrderArray1, int[] hOrderArray2){
+		for (int i = 0; i < hOrderArray1.Length; ++i){
+			if (hOrderArray1[i] < hOrderArray2[i]) return true;
+			if (hOrderArray1[i] > hOrderArray2[i]) return false;
+		}
+		return false;
+	}
+	
+	
+	void ApplyBestPermutation(){
+		// array of HOrder values for a given permutation
+		int[] hOrderArrayMin = new int[permutations.GetLength (1)];
+		int[] hOrderArrayTest = new int[permutations.GetLength (1)];
+		int bestI = -1;
+		bool hasLowest = false;
+		
+		foreach(int i in validPermutations){
+			SetupPermutation(i);
+			CreateHOrderArray(hOrderArrayTest);
+			if (!hasLowest || IsLexLower(hOrderArrayTest, hOrderArrayMin)){
+				hOrderArrayTest.CopyTo(hOrderArrayMin, 0);
+				hasLowest = true;
+				bestI = i;
+			}
+		}
+		
+		SetupPermutation(bestI);
+		foreach(SimBlock block in allSimBlocks){
+			float width = block.h0;
+			for (int i = 0; i < block.components.Count; ++i){
+				block.components[i].h0 = width;
+				width += block.components[i].hWidth;
+				block.components[i].hasBeenLayedOut = true;
+			
+			}
+		}
+		
+	}
+
+	bool LayoutHOrder(){	
+	
+		// Construct simBlock and SimNodes according to direction of current flow
+		ConstructLists();
+		
+		// Create list of all permutations or orderings of blocks on nodes
+		ConstructPermutations();
+		
+		// For each permuation, set up positions of each componetn and each node early existing if we ever get a contradiction
+		// Note that we can set localH0 on each component - at sme point, we can infer h0 on node and when we do, we can start testing validite.
+		TestPermutations();
+		
+		// For all valid permutations, pick the best one (according to lexographical hOrder)
+		
+		return false;
+		
+		
+		
+	}
+
+/*
 	
 	bool LayoutHOrder(){	
 		// Get ready for layout
@@ -1212,31 +1553,6 @@ public class AVOWSim : MonoBehaviour {
 	}
 	
 	
-	void HeapsPermutations(int n, int[] sequencePass, ref int[,] outputArr, ref int outputIndex){
-		int[] sequence = new int[sequencePass.Length];
-		sequencePass.CopyTo(sequence, 0);
-//		int[] sequence = sequencePass;
-
-	
-		// If n==1 Copy to the output array and increment outputIndex
-		if (n ==0){
-			for (int i = 0; i < sequence.Length; ++i){
-				outputArr[outputIndex, i] = sequence[i];
-			}
-			++outputIndex;
-		}
-		else{
-			for (int i = 0; i < n; ++i){
-				HeapsPermutations(n - 1, sequence, ref outputArr, ref outputIndex);
-				// if i is even
-				int j = ((i % 2) == 0) ? 0 : i;
-				// Swap i an j
-				int temp = sequence[n-1];
-				sequence[n-1] = sequence[j];
-				sequence[j] = temp;
-			}
-		}
-	}
 	
 	// Regsiter there there seems to be a valid option to set this components ordinal value to ordinalValue
 	// We don't just "do it" as we wait to make sure there are no other options and then pick the "highst HOrder" option to go with
@@ -1299,6 +1615,34 @@ public class AVOWSim : MonoBehaviour {
 		
 		
 		
+	}*/
+	
+	
+	
+	void HeapsPermutations(int n, int[] sequencePass, ref int[,] outputArr, ref int outputIndex){
+		int[] sequence = new int[sequencePass.Length];
+		sequencePass.CopyTo(sequence, 0);
+		//		int[] sequence = sequencePass;
+		
+		
+		// If n==1 Copy to the output array and increment outputIndex
+		if (n ==0){
+			for (int i = 0; i < sequence.Length; ++i){
+				outputArr[outputIndex, i] = sequence[i];
+			}
+			++outputIndex;
+		}
+		else{
+			for (int i = 0; i < n; ++i){
+				HeapsPermutations(n - 1, sequence, ref outputArr, ref outputIndex);
+				// if i is even
+				int j = ((i % 2) == 0) ? 0 : i;
+				// Swap i an j
+				int temp = sequence[n-1];
+				sequence[n-1] = sequence[j];
+				sequence[j] = temp;
+			}
+		}
 	}
 	
 	int[,] GeneratePermutations(int numItems){
@@ -1318,7 +1662,7 @@ public class AVOWSim : MonoBehaviour {
 		}
 		return cachedPermutations[numItems] ;
 	}
-	
+	/*
 	int ApplyBoundsRuleToOutBounds(AVOWGraph.Node node){
 		int infosAdded = 0;
 		
@@ -1682,7 +2026,7 @@ public class AVOWSim : MonoBehaviour {
 		return infosAdded;		
 	}	
 	
-
+*/
 	
 
 	

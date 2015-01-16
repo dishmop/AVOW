@@ -93,7 +93,7 @@ public class AVOWUI : MonoBehaviour {
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node3, node0);
 		*/
 		
-		/*
+		
 		// 4 down the side, one next to them - then join them up
 		AVOWGraph graph = AVOWGraph.singleton;
 		
@@ -120,8 +120,8 @@ public class AVOWUI : MonoBehaviour {
 		
 		// Another joiner
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node4);
-		*/
 		
+		/*
 	
 		// Simple start
 		AVOWGraph graph = AVOWGraph.singleton;
@@ -135,7 +135,7 @@ public class AVOWUI : MonoBehaviour {
 		cell.GetComponent<AVOWComponent>().voltage = 4;
 		graph.PlaceComponent(cell, node0, node1);
 		
-		
+		*/
 		/*
 		// Sneeky crossover
 		AVOWGraph graph = AVOWGraph.singleton;

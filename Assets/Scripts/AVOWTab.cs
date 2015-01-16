@@ -51,8 +51,8 @@ public class AVOWTab : MonoBehaviour {
 	
 	public void SetNode(AVOWGraph.Node node){
 		thisNode = node;
-		int nodeID = thisNode.id + 1;
 		/*
+		int nodeID = thisNode.id + 1;
 		// Create a standard colour
 		int red = (nodeID * 89) % 256;
 		int green = (nodeID * 137) % 256;
