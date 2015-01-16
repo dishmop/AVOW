@@ -585,8 +585,8 @@ public class AVOWSim : MonoBehaviour {
 				break;
 			}
 			
-			if (count++ > 10){
-				Debug.Log ("Gone round 10 times probably stuck!");
+			if (count++ > 50){
+				Debug.Log ("Gone round 50 times probably stuck!");
 				break;
 			}
 		}
@@ -1046,7 +1046,7 @@ public class AVOWSim : MonoBehaviour {
 		
 		// if we have bounds already then just add the new constraints
 		node.h0LowerBound = Mathf.Max (node.h0LowerBound, lowerConstraint);
-		node.h0UpperBound = Mathf.Max (node.h0UpperBound, upperConstraint);
+		node.h0UpperBound = Mathf.Min (node.h0UpperBound, upperConstraint);
 	}
 	
 	void RestrictBounds(AVOWComponent component, float lowerConstraint, float upperConstraint){
@@ -1057,7 +1057,7 @@ public class AVOWSim : MonoBehaviour {
 
 		// if we have bounds already then just add the new constraints
 		component.h0LowerBound = Mathf.Max (component.h0LowerBound, lowerConstraint);
-		component.h0UpperBound = Mathf.Max (component.h0UpperBound, upperConstraint);
+		component.h0UpperBound = Mathf.Min (component.h0UpperBound, upperConstraint);
 	}	
 	
 	void ModifyNodeOutBounds(AVOWGraph.Node node){
@@ -1215,6 +1215,8 @@ public class AVOWSim : MonoBehaviour {
 	void HeapsPermutations(int n, int[] sequencePass, ref int[,] outputArr, ref int outputIndex){
 		int[] sequence = new int[sequencePass.Length];
 		sequencePass.CopyTo(sequence, 0);
+//		int[] sequence = sequencePass;
+
 	
 		// If n==1 Copy to the output array and increment outputIndex
 		if (n ==0){
@@ -1227,10 +1229,10 @@ public class AVOWSim : MonoBehaviour {
 			for (int i = 0; i < n; ++i){
 				HeapsPermutations(n - 1, sequence, ref outputArr, ref outputIndex);
 				// if i is even
-				int j = (i %2 == 0) ? 1 : i;
+				int j = ((i % 2) == 0) ? 0 : i;
 				// Swap i an j
-				int temp = sequence[i];
-				sequence[i] = sequence[j];
+				int temp = sequence[n-1];
+				sequence[n-1] = sequence[j];
 				sequence[j] = temp;
 			}
 		}

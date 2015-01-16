@@ -1,8 +1,8 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWTab.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWSim.cs" Line="1732" Column="46" />
+      <File FileName="Assets/Scripts/AVOWSim.cs" Line="1648" Column="1" />
       <File FileName="Assets/Scripts/AVOWGraph.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWComponent.cs" Line="238" Column="6" />
       <File FileName="Assets/Scripts/ServerUpload.cs" Line="1" Column="1" />
@@ -10,17 +10,17 @@
       <File FileName="Assets/Shaders/AVOWResistance.shader" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWCommandSplitAddComponent.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="73" Column="24" />
+      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/CamControl.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/QuitOnEsc.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWTab.cs" Line="66" Column="3" />
-      <File FileName="Assets/Scripts/AVOWUI.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWTab.cs" Line="66" Column="5" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="134" Column="33" />
       <File FileName="Assets/Scripts/AVOWCommand.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/CircuitElementAnchor.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWCommandAddComponent.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Simulator.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/SpringValue.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Telemetry.cs" Line="12" Column="21" />
+      <File FileName="Assets/Scripts/Telemetry.cs" Line="900" Column="32" />
       <File FileName="Assets/Scripts/GameModeManager.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/LevelManager.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AppHelper.cs" Line="1" Column="1" />
@@ -32,11 +32,11 @@
         <State>
           <Value>numInfosAdded</Value>
           <Value>node.id</Value>
-          <Value>oldUpperBound</Value>
-          <Value>node.h0UpperBound</Value>
-          <Value>component.h0UpperBound</Value>
-          <Value>component.id</Value>
-          <Value>component.h0UpperBound</Value>
+          <Value>permutations[i, 0]</Value>
+          <Value>permutations[i, 1]</Value>
+          <Value>firstComponent.id</Value>
+          <Value>thisComponent.id</Value>
+          <Value>highestOrdinal</Value>
         </State>
       </Pad>
     </Pads>
@@ -52,8 +52,6 @@
       <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/GameModeManager.cs" line="10" />
       <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/OnMouseDown.cs" line="16" />
       <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/LevelManager.cs" line="9" />
-      <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWSim.cs" line="1043" />
-      <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWSim.cs" line="1055" />
       <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWSim.cs" line="963" />
       <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWSim.cs" line="997" />
     </BreakpointStore>

@@ -93,7 +93,36 @@ public class AVOWUI : MonoBehaviour {
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node3, node0);
 		*/
 		
+		/*
+		// 4 down the side, one next to them - then join them up
+		AVOWGraph graph = AVOWGraph.singleton;
 		
+		AVOWGraph.Node node0 = graph.AddNode ();
+		AVOWGraph.Node node1 = graph.AddNode ();
+		AVOWGraph.Node node2 = graph.AddNode ();
+		AVOWGraph.Node node3 = graph.AddNode ();
+		AVOWGraph.Node node4 = graph.AddNode ();
+		
+		// The cell
+		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node4, node0);
+		
+		// The 4 up the side
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node3, node4);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node3);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node2);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node1);
+
+		// the big one
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node4);
+		
+		// the joiner
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node2);
+		
+		// Another joiner
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node4);
+		*/
+		
+	
 		// Simple start
 		AVOWGraph graph = AVOWGraph.singleton;
 
@@ -102,7 +131,9 @@ public class AVOWUI : MonoBehaviour {
 
 				
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node1);
-		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node1);
+		GameObject cell = GameObject.Instantiate(cellPrefab) as GameObject;
+		cell.GetComponent<AVOWComponent>().voltage = 4;
+		graph.PlaceComponent(cell, node0, node1);
 		
 		
 		/*
