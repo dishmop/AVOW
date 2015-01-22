@@ -232,18 +232,20 @@ public class AVOWComponent : MonoBehaviour {
 		
 		float v0 = node0.voltage;
 		float v1 = node1.voltage;
-	
+		
 		
 		border = 0;//0.2f * (h1-h0);
 		tabSize = 0.2f * (v1-v0);
 		
 		float h1 = h0 + hWidth;
+		
+	
 
 		if (type == Type.kLoad){
 			transform.FindChild("Resistance").renderer.material.SetColor("_Color0", col0);
 			transform.FindChild("Resistance").renderer.material.SetColor("_Color1", col1);
-			transform.FindChild("Resistance").position = new Vector3(h0, v0, 0);
-			transform.FindChild("Resistance").localScale = new Vector3(h1 - h0, v1-v0, 1);
+			transform.FindChild("Resistance").position = new Vector3(h0, Mathf.Min (v0, v1), 0);
+			transform.FindChild("Resistance").localScale = new Vector3(h1 - h0, Mathf.Abs (v1-v0), 1);
 			transform.FindChild("UpperTab").position = new Vector3(h1 - border, v1, -2);
 			transform.FindChild("UpperTab").localScale = new Vector3((h1 - h0) - 2 * border, tabSize, 1);
 			transform.FindChild("LowerTab").position = new Vector3(h0 + border, v0, -2);

@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 
 public class AVOWSim : MonoBehaviour {
@@ -68,6 +69,7 @@ public class AVOWSim : MonoBehaviour {
 		public int id = -1;
 		public List<SimBlock>[] blockList = new List<SimBlock>[kNumDirs];
 		public SimBlock[][] blockArray = new SimBlock[kNumDirs][];
+		public SimBlock[][] sortedBlockArray = new SimBlock[kNumDirs][];
 		public float h0 = -1;
 
 
@@ -107,12 +109,7 @@ public class AVOWSim : MonoBehaviour {
 		//DebugPrintVoltages();
 		
 		//DebugPrintGraph();
-		bool finished = false;
-		int count = 0;
-		while (!finished && count < 10){
-			LayoutHOrder();
-			count++;
-		}
+		LayoutHOrder();
 		
 		//DebugPrintHOrder();
 	}
@@ -706,10 +703,24 @@ public class AVOWSim : MonoBehaviour {
 			for (int k = 0; k < kNumDirs; ++k){
 				// Set up the ordinals for this permutationt
 				for (int l = 0; l < allSimNodes[j].blockArray[k].Length; ++l){
-					allSimNodes[j].blockArray[k][l].ordinals[k] = permutations[i, permIndex++];
+					allSimNodes[j].blockArray[k][l].ordinals[k] = permutations[i, permIndex];
+					permIndex++;
 				}
 			}
 		}
+		
+//		// Print out the permutations
+//		Debug.Log ("Permutation: " + i);
+//		for (int j = 0; j < allSimNodes.Length; ++j){
+//			Debug.Log ("Nodex: " + allSimNodes[j].id);
+//			for (int k = 0; k < kNumDirs; ++k){
+//				Debug.Log (k == 0 ? "Flowing out" : "Flowing in");
+//				for (int l = 0; l < allSimNodes[j].blockArray[k].Length; ++l){
+//					Debug.Log ("Block id " + allSimNodes[j].blockArray[k][l].components[0].GetID () + "ordinal: " + allSimNodes[j].blockArray[k][l].ordinals[k] );
+//				}
+//			}
+//		}
+		
 	}
 	
 	bool SetUpH0s(){
@@ -724,13 +735,14 @@ public class AVOWSim : MonoBehaviour {
 			}
 			for (int dir = 0; dir< kNumDirs  && !error; ++dir){
 				
-				// Sort the list of components according to their ordinal numbers
-				Array.Sort (node.blockArray[dir], (obj1, obj2) => obj1.ordinals[dir].CompareTo(obj2.ordinals[dir]));
+				// Created sorted list of components according to their ordinal numbers
+				//Array.Sort (node.blockArray[dir], (obj1, obj2) => obj1.ordinals[dir].CompareTo(obj2.ordinals[dir]));
+				node.sortedBlockArray[dir] = node.blockArray[dir].OrderBy(obj => obj.ordinals[dir]).ToArray();
 				
 				// Go through blocks accumulating widths and setting h0 on blocks
 				float width = node.h0;
-				for (int j = 0; j < node.blockArray[dir].Length  && !error; ++j){
-					SimBlock block = node.blockArray[dir][j];
+				for (int j = 0; j < node.sortedBlockArray[dir].Length  && !error; ++j){
+					SimBlock block = node.sortedBlockArray[dir][j];
 					if (!IsInvalidH0(block.h0) && !MathUtils.FP.Feq (block.h0, width)){
 						error = true;
 					}
@@ -752,7 +764,7 @@ public class AVOWSim : MonoBehaviour {
 				
 			}
 		}
-		return error;
+		return !error;
 	}
 	
 	bool SetupPermutation(int i){
@@ -776,8 +788,9 @@ public class AVOWSim : MonoBehaviour {
 			if (SetupPermutation(i)){
 				validPermutations.Add (i);
 			}
-			
-			
+		}
+		if (validPermutations.Count == 0){
+			Debug.LogError ("Failed to layout circuit");
 		}
 	}
 	
@@ -789,25 +802,42 @@ public class AVOWSim : MonoBehaviour {
 
 	}
 	
-	bool IsLexLower(int[] hOrderArray1, int[] hOrderArray2){
-		for (int i = 0; i < hOrderArray1.Length; ++i){
-			if (hOrderArray1[i] < hOrderArray2[i]) return true;
-			if (hOrderArray1[i] > hOrderArray2[i]) return false;
+	void CreateH0Array(float[] h0Array){
+		Array.Sort (allSimBlocks, (obj1, obj2) => (obj1.hOrder.CompareTo(obj2.hOrder)));
+		for (int i = 0; i < allSimBlocks.Length; ++i){
+			h0Array[i] = allSimBlocks[i].h0;
+		}
+		
+	}
+	
+//	bool IsLexLower(int[] hOrderArray1, int[] hOrderArray2){
+//		for (int i = 0; i < hOrderArray1.Length; ++i){
+//			if (hOrderArray1[i] < hOrderArray2[i]) return true;
+//			if (hOrderArray1[i] > hOrderArray2[i]) return false;
+//		}
+//		return false;
+//	}
+	
+	
+	bool IsLexLower(float[] h0Array1, float[] h0Array2){
+		for (int i = 0; i < h0Array1.Length; ++i){
+			if (h0Array1[i] < h0Array2[i]) return true;
+			if (h0Array1[i] > h0Array2[i]) return false;
 		}
 		return false;
 	}
-	
-	
-	void ApplyBestPermutation(){
+
+		void ApplyBestPermutation(){
 		// array of HOrder values for a given permutation
-		int[] hOrderArrayMin = new int[permutations.GetLength (1)];
-		int[] hOrderArrayTest = new int[permutations.GetLength (1)];
+		float[] hOrderArrayMin = new float[permutations.GetLength (1)];
+		float[] hOrderArrayTest = new float[permutations.GetLength (1)];
 		int bestI = -1;
 		bool hasLowest = false;
 		
 		foreach(int i in validPermutations){
 			SetupPermutation(i);
-			CreateHOrderArray(hOrderArrayTest);
+			CreateH0Array(hOrderArrayTest);
+			//CreateHOrderArray(hOrderArrayTest);
 			if (!hasLowest || IsLexLower(hOrderArrayTest, hOrderArrayMin)){
 				hOrderArrayTest.CopyTo(hOrderArrayMin, 0);
 				hasLowest = true;
@@ -828,7 +858,7 @@ public class AVOWSim : MonoBehaviour {
 		
 	}
 
-	bool LayoutHOrder(){	
+	void LayoutHOrder(){	
 	
 		// Construct simBlock and SimNodes according to direction of current flow
 		ConstructLists();
@@ -841,10 +871,7 @@ public class AVOWSim : MonoBehaviour {
 		TestPermutations();
 		
 		// For all valid permutations, pick the best one (according to lexographical hOrder)
-		
-		return false;
-		
-		
+		ApplyBestPermutation();
 		
 	}
 
@@ -2254,6 +2281,8 @@ public class AVOWSim : MonoBehaviour {
 		
 	}
 	
+	*/
+	
 	void DebugPrintHOrder(){
 		Debug.Log ("Printing HOrder Nodes");
 		foreach(AVOWGraph.Node node in graph.allNodes){
@@ -2263,10 +2292,10 @@ public class AVOWSim : MonoBehaviour {
 		Debug.Log ("Printing HOrder Components");
 		foreach(GameObject go in graph.allComponents){
 			AVOWComponent component = go.GetComponent<AVOWComponent>();
-			Debug.Log ("Component " + component.GetID() + ": h0 = " + component.h0 + ", h1 = " + component.h1 + ", visited = " + component.visited);
+			Debug.Log ("Component " + component.GetID() + ": h0 = " + component.h0 + ", hWidth = " + component.hWidth + ", visited = " + component.visited);
 		}
 	}
-	*/
+	
 	
 	// Records the position of the mouse as a local position in one of the components
 	void RecordMousePos(){

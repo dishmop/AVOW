@@ -39,8 +39,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c58fdd06e135d41868b2b10258eff4ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resistorPrefab: {fileID: 100006, guid: c45e54d4fc02c4b2d82ed1d74875e954, type: 2}
-  cellPrefab: {fileID: 0}
+  resistorPrefab: {fileID: 100002, guid: f0b3ec3f83404460fbba31843fecbcd3, type: 2}
+  cellPrefab: {fileID: 100002, guid: 1bf68cd89ceda43d1bff59790ceef25b, type: 2}
+  lockCreation: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

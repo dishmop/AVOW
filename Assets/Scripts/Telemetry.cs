@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 // Stream includes
 using System.Threading;
-#if !UNITY_WEBPLAYER && !UNITY_ANDROID
+#if false
 public class DCOutputStream : ICSharpCode.SharpZipLib.GZip.GZipOutputStream{
 
 	public long writeCount = 0;
