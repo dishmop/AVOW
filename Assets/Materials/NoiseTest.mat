@@ -44,7 +44,7 @@ Material:
       data:
         first:
           name: _Speed0
-        second: -1
+        second: 0
       data:
         first:
           name: _Speed1
@@ -56,7 +56,7 @@ Material:
       data:
         first:
           name: _Speed3
-        second: 1
+        second: 0
       data:
         first:
           name: _StaticSpeed0
@@ -84,16 +84,16 @@ Material:
         second: {r: .0117863435, g: .801470578, b: .115262121, a: 0}
       data:
         first:
+          name: _Color0
+        second: {r: .399978399, g: 1, b: .419892281, a: 1}
+      data:
+        first:
           name: _Color1
         second: {r: .286115915, g: .926470578, b: .312861383, a: 1}
       data:
         first:
           name: _BkColor
         second: {r: .0590935349, g: .00508218445, b: .345588207, a: 1}
-      data:
-        first:
-          name: _Color0
-        second: {r: .399978399, g: 1, b: .419892281, a: 1}
       data:
         first:
           name: _BkColor0

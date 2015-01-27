@@ -1,4 +1,4 @@
-﻿Shader "Custom/BlendGreyLightmap" {
+﻿xShader "Custom/BlendGreyLightmap" {
 	Properties{
 		_MainTex ("Texture 1 (A - Lightmap)", 2D) = ""
 		_Texture2 ("Texxture 2 (A - Mask)", 2D) = ""

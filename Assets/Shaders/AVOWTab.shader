@@ -46,8 +46,9 @@
 		        	float alpha = CalcCurve(i.uv[1]);
 		        	//float alpha = 1-i.uv[1];
 		        	float4 col = _Color;
-		        	col[3] = alpha;
-		        	return col;
+		        	col[3] = alpha* _Color.z;
+		        	//return col;
+		        	return float4(0, 0, 0, 0);
 		        }
 		        ENDCG
 

@@ -1,3 +1,87 @@
 Base path: /Applications/Unity/Unity.app/Contents
 Pipe name: \\.\pipe\UnityShaderCompiler-1--1596501592
 Cmd: getPlatforms
+Cmd: preprocess
+  insize=1864 outsize=447 ok=1
+Cmd: preprocess
+  insize=2005 outsize=447 ok=1
+Cmd: compileSnippet
+  error: 1 plat 0 at (53): implicit cast from "float4" to "float3"
+  error: 2 plat 0 at (54): undefined variable "_TextureScale"
+  api=0 type=0 insize=1859 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=2013 outsize=446 ok=1
+Cmd: compileSnippet
+  error: 2 plat 0 at (54): syntax error, unexpected integer constant, expecting identifier or reserved word "operator" or template identifier or type identifier at token "<int-const>" type name expected at token "<int-const>"
+  api=0 type=0 insize=1867 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=2005 outsize=447 ok=1
+Cmd: compileSnippet
+  error: 2 plat 0 at (54): undefined variable "_TextureScale"
+  api=0 type=0 insize=1859 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=2028 outsize=446 ok=1
+Cmd: compileSnippet
+  error: 2 plat 0 at (55): assignment of incompatible types
+  api=0 type=0 insize=1882 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=2028 outsize=447 ok=1
+Cmd: compileSnippet
+  error: 2 plat 0 at (55): assignment of incompatible types
+  api=0 type=0 insize=1882 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=2128 outsize=447 ok=1
+Cmd: compileSnippet
+  error: 1 plat 0 at (54): implicit cast from "float4" to "float3"
+  error: 2 plat 0 at (55): incompatible types in initialization; invalid initialization
+  api=0 type=0 insize=1982 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=2035 outsize=447 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1889 outsize=512 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1889 outsize=4961 kw= ok=1
+Cmd: preprocess
+  insize=2038 outsize=447 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1892 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1892 outsize=4961 kw= ok=1
+Cmd: preprocess
+  insize=2039 outsize=447 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1893 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1893 outsize=4961 kw= ok=1
+Cmd: preprocess
+  insize=2039 outsize=447 ok=1
+Cmd: preprocess
+  insize=2039 outsize=447 ok=1
+Cmd: preprocess
+  insize=2039 outsize=447 ok=1
+Cmd: compileSnippet
+  error: 2 plat 0 at (55): undefined variable "worldPsos"
+  api=0 type=0 insize=1893 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=2038 outsize=447 ok=1
+Cmd: preprocess
+  insize=2040 outsize=446 ok=1
+Cmd: compileSnippet
+  error: 2 plat 0 at (0): Required output 'POSITION' not written
+  api=0 type=0 insize=1894 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=2038 outsize=447 ok=1
+Cmd: preprocess
+  insize=1245 outsize=378 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1166 outsize=328 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1166 outsize=268 kw= ok=1
+Cmd: preprocess
+  insize=1245 outsize=378 ok=1
+Cmd: preprocess
+  insize=1247 outsize=378 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1168 outsize=328 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1168 outsize=92 kw= ok=1

@@ -13,13 +13,13 @@ public class AVOWSim : MonoBehaviour {
 	AVOWGraph graph;
 	
 	public class LoopElement{
-		public LoopElement(AVOWComponent component, AVOWGraph.Node fromNode){
+		public LoopElement(AVOWComponent component, AVOWNode fromNode){
 			this.component = component;
 			this.fromNode = fromNode;
 		}
 			
 		public AVOWComponent component;
-		public AVOWGraph.Node fromNode;
+		public AVOWNode fromNode;
 	}
 	
 	public List<List<LoopElement>> loops;
@@ -71,6 +71,8 @@ public class AVOWSim : MonoBehaviour {
 		public SimBlock[][] blockArray = new SimBlock[kNumDirs][];
 		public SimBlock[][] sortedBlockArray = new SimBlock[kNumDirs][];
 		public float h0 = -1;
+		public AVOWNode originalNode;
+		public float hWidth;
 
 
 	};
@@ -136,17 +138,19 @@ public class AVOWSim : MonoBehaviour {
 	void DebugPrintGraph(){
 		Debug.Log ("Print graph");
 		Debug.Log ("Nodes");
-		foreach (AVOWGraph.Node node in graph.allNodes){
-			Debug.Log("Node " + node.GetID());			
+		foreach (GameObject nodeGO in graph.allNodes){
+			Debug.Log("Node " + nodeGO.GetComponent<AVOWNode>().GetID());			
 		}
 		Debug.Log ("Components");
 		foreach (GameObject go in graph.allComponents){
 			AVOWComponent component = go.GetComponent<AVOWComponent>();
-			if (component.GetCurrent(component.node0) > 0){
-				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + component.node0.GetID() + " to " + component.node1.GetID());
+			AVOWNode node0 = component.node0GO.GetComponent<AVOWNode>();
+			AVOWNode node1 = component.node1GO.GetComponent<AVOWNode>();
+			if (component.GetCurrent(component.node0GO) > 0){
+				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + node0.GetID() + " to " + node1.GetID());
 			}
 			else{
-				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + component.node1.GetID() + " to " + component.node0.GetID());
+				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + node1.GetID() + " to " + node0.GetID());
 			}
 		}
 	}
@@ -154,11 +158,11 @@ public class AVOWSim : MonoBehaviour {
 	void DebugPrintLoops(){
 		Debug.Log ("Printing loops");
 		for (int i = 0; i < loops.Count; ++i){
-			AVOWGraph.Node lastNode = loops[i][0].fromNode;
+			AVOWNode lastNode = loops[i][0].fromNode;
 			string loopString = lastNode.GetID ();
 			
 			for (int j = 0; j < loops[i].Count; ++j){
-				AVOWGraph.Node nextNode = loops[i][j].component.GetOtherNode(lastNode);
+				AVOWNode nextNode = loops[i][j].component.GetOtherNode(lastNode.gameObject).GetComponent<AVOWNode>();
 				// print the connection and the final node
 				loopString += "=" + loops[i][j].component.GetID () + "=>" + nextNode.GetID ();
 				lastNode = nextNode;
@@ -190,7 +194,7 @@ public class AVOWSim : MonoBehaviour {
 		if (graph.allNodes.Count == 0) return;
 
 		// Get any node which is going to be our starting point for all traversals		
-		AVOWGraph.Node startNode = graph.allNodes[0];
+		AVOWNode startNode = graph.allNodes[0].GetComponent<AVOWNode>();
 		
 		
 		// We have no components disabled then as we find loops, we disable one component at a time
@@ -203,7 +207,7 @@ public class AVOWSim : MonoBehaviour {
 			graph.ClearVisitedFlags();
 			
 			// Create a stack of nodes which we use to traverse the graph
-			Stack<AVOWGraph.Node> nodeStack = new Stack<AVOWGraph.Node>();
+			Stack<AVOWNode> nodeStack = new Stack<AVOWNode>();
 			Stack<AVOWComponent> componentStack = new Stack<AVOWComponent>();
 			
 			
@@ -214,7 +218,7 @@ public class AVOWSim : MonoBehaviour {
 			while (!finished && !foundLoop){
 			
 				// We visit our current node
-				AVOWGraph.Node currentNode = nodeStack.Peek();
+				AVOWNode currentNode = nodeStack.Peek();
 				currentNode.visited = true;
 				
 				// Go through each connections from here in order and find one that has not yet been traversed
@@ -231,7 +235,7 @@ public class AVOWSim : MonoBehaviour {
 				
 				// If we found an untraversed connection then this is our next point in our path
 				if (nextConnection != null){
-					AVOWGraph.Node nextNode = nextConnection.GetOtherNode(currentNode);
+					AVOWNode nextNode = nextConnection.GetOtherNode(currentNode.gameObject).GetComponent<AVOWNode>();
 					
 					if (nextNode == null){
 						Debug.LogError ("Failed to find other end of connection when finding loops");
@@ -263,7 +267,7 @@ public class AVOWSim : MonoBehaviour {
 				// If we found a loop, then record it
 				// We do this by stepping backwards down our stack until we find our current node again - this ensures thast we just get the loop
 				// and no stragglers
-				AVOWGraph.Node loopStartNode = nodeStack.Peek();
+				AVOWNode loopStartNode = nodeStack.Peek();
 				AVOWComponent loopStartComponent = componentStack.Peek();
 				
 				List<LoopElement> thisLoop = new List<LoopElement>();
@@ -297,7 +301,7 @@ public class AVOWSim : MonoBehaviour {
 		
 		for (int i = 0; i < loops.Count; ++i){
 			for (int j = 0; j < loops[i].Count; ++j){
-				loops[i][j].component.AddLoopRecord(i, loops[i][j].fromNode);
+				loops[i][j].component.AddLoopRecord(i, loops[i][j].fromNode.gameObject);
 			}
 		}
 	
@@ -322,7 +326,7 @@ public class AVOWSim : MonoBehaviour {
 					
 					// For each component in the loop, add in resistances for each loop that passes through it
 					foreach (AVOWComponent.LoopRecord record in loopElement.component.loopRecords){
-						if (record.isForward == loopElement.component.IsForward(loopElement.fromNode)){
+						if (record.isForward == loopElement.component.IsForward(loopElement.fromNode.gameObject)){
 							R[i, record.loopId] += resistance;
 						}
                         else{
@@ -454,7 +458,7 @@ public class AVOWSim : MonoBehaviour {
 		Debug.Log ("Print component currents");
 		foreach (GameObject componentGO in graph.allComponents){
 			AVOWComponent component = componentGO.GetComponent<AVOWComponent>();
-			Debug.Log ("Component " + component.GetID() + ": from " + component.node0.GetID () + " to " + component.node1.GetID() + ": current = " + component.fwCurrent + "A");
+			Debug.Log ("Component " + component.GetID() + ": from " + component.node0GO.GetComponent<AVOWNode>().GetID () + " to " + component.node1GO.GetComponent<AVOWNode>().GetID() + ": current = " + component.fwCurrent + "A");
 			
 		}
 	}
@@ -466,17 +470,17 @@ public class AVOWSim : MonoBehaviour {
 		AVOWComponent cell = graph.FindVoltageSource().GetComponent<AVOWComponent>();
 		
 		// Set up the voltage accross it
-		cell.node0.voltage = 0;
+		cell.node0GO.GetComponent<AVOWNode>().voltage = 0;
 		
 		// We have now visited this cell and the first node. 
 		cell.visited = true;
-		cell.node0.visited = true;		
-		Stack<AVOWGraph.Node> nodeStack = new Stack<AVOWGraph.Node>();
+		cell.node0GO.GetComponent<AVOWNode>().visited = true;		
+		Stack<AVOWNode> nodeStack = new Stack<AVOWNode>();
 		
-		nodeStack.Push(cell.node0);
+		nodeStack.Push(cell.node0GO.GetComponent<AVOWNode>());
 		
 		while(nodeStack.Count != 0){
-			AVOWGraph.Node lastNode = nodeStack.Peek();
+			AVOWNode lastNode = nodeStack.Peek();
 			
 			//Find a component attached to this node which has not yet been visited
 			GameObject go = lastNode.components.Find (obj => !obj.GetComponent<AVOWComponent>().visited);
@@ -488,8 +492,8 @@ public class AVOWSim : MonoBehaviour {
 				thisComponent.visited = true;
 				
 				// Calc the voltage at the other end of this component
-				float voltageChange = thisComponent.GetCurrent(lastNode) * thisComponent.GetResistance();
-				AVOWGraph.Node nextNode = thisComponent.GetOtherNode(lastNode);
+				float voltageChange = thisComponent.GetCurrent(lastNode.gameObject) * thisComponent.GetResistance();
+				AVOWNode nextNode = thisComponent.GetOtherNode(lastNode.gameObject).GetComponent<AVOWNode>();
 				float nextNodeVoltage = lastNode.voltage - voltageChange;
 				
 				// If we have not yet visited this node, then set the voltage on it and add it to the stack
@@ -516,12 +520,13 @@ public class AVOWSim : MonoBehaviour {
 	void DebugPrintVoltages(){
 		Debug.Log ("Printing voltages");
 
-		foreach (AVOWGraph.Node node in graph.allNodes){
+		foreach (GameObject nodeGO in graph.allNodes){
+			AVOWNode node = nodeGO.GetComponent<AVOWNode>();
 			Debug.Log ("Node " + node.GetID() + ": " + node.voltage + "V");
 		}
 	}
 	
-	void SortByOrdinal(AVOWGraph.Node node, AVOWComponent.FlowDirection dir){
+	void SortByOrdinal(AVOWNode node, AVOWComponent.FlowDirection dir){
 		if (dir == AVOWComponent.FlowDirection.kOut){
 			node.outComponents.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().outNodeOrdinal.CompareTo (obj2.GetComponent<AVOWComponent>().outNodeOrdinal)));
 		}
@@ -530,7 +535,7 @@ public class AVOWSim : MonoBehaviour {
 		}
 	}
 	
-//	void SortByOrdinal(AVOWGraph.Node node, AVOWComponent.FlowDirection dir){
+//	void SortByOrdinal(AVOWNode node, AVOWComponent.FlowDirection dir){
 //		if (dir == AVOWComponent.FlowDirection.kOut){
 //			node.outComponents = node.outComponents.OrderBy (obj => obj.GetComponent<AVOWComponent>().outNodeOrdinal).ToList();
 //		}
@@ -555,23 +560,25 @@ public class AVOWSim : MonoBehaviour {
 		// Make a copy of the nodes in the tree
 		allSimNodes = new SimNode[graph.allNodes.Count];
 		int nodeIndex = 0;
-		foreach (AVOWGraph.Node node in graph.allNodes){
+		foreach (GameObject nodeGO in graph.allNodes){
+			AVOWNode node = nodeGO.GetComponent<AVOWNode>();
 			SimNode newNode = new SimNode();
 			newNode.id = node.id;
 			newNode.blockList[kIn] = new List<SimBlock>();
 			newNode.blockList[kOut] = new List<SimBlock>();
+			newNode.originalNode = node;
 			allSimNodes[nodeIndex] = newNode;
 			idToIndexLookup[node.id] = nodeIndex;
 			++nodeIndex;
 		}
 		
 		// Create a lookup for all the components organised by which nodes they are between (direction matters)
-		Dictionary<Eppy.Tuple<AVOWGraph.Node, AVOWGraph.Node>, List<AVOWComponent>> components = new Dictionary<Eppy.Tuple<AVOWGraph.Node, AVOWGraph.Node>, List<AVOWComponent>>  ();
+		Dictionary<Eppy.Tuple<AVOWNode, AVOWNode>, List<AVOWComponent>> components = new Dictionary<Eppy.Tuple<AVOWNode, AVOWNode>, List<AVOWComponent>>  ();
 		
 		foreach (GameObject go in graph.allComponents){
 			AVOWComponent component = go.GetComponent<AVOWComponent>();
 			
-			Eppy.Tuple<AVOWGraph.Node, AVOWGraph.Node> key = new Eppy.Tuple<AVOWGraph.Node, AVOWGraph.Node>(component.inNode, component.outNode);
+			Eppy.Tuple<AVOWNode, AVOWNode> key = new Eppy.Tuple<AVOWNode, AVOWNode>(component.inNodeGO.GetComponent<AVOWNode>(), component.outNodeGO.GetComponent<AVOWNode>());
 			if (components.ContainsKey(key)){
 				components[key].Add (component);
 			}
@@ -586,7 +593,7 @@ public class AVOWSim : MonoBehaviour {
 		allSimBlocks = new SimBlock[numBlocks];
 		
 		int blockIndex = 0;
-		foreach(KeyValuePair<Eppy.Tuple<AVOWGraph.Node, AVOWGraph.Node>, List<AVOWComponent>> item in components){
+		foreach(KeyValuePair<Eppy.Tuple<AVOWNode, AVOWNode>, List<AVOWComponent>> item in components){
 			SimBlock newBlock = new SimBlock();
 			newBlock.components = item.Value;
 			// order the components so the lowest hOrder value is at the beginning
@@ -688,6 +695,7 @@ public class AVOWSim : MonoBehaviour {
 	void ClearTestData(){
 		foreach(SimNode node in allSimNodes){
 			node.h0 = GetInvalidH0();
+			node.hWidth = -1;
 		}
 		foreach(SimBlock block in allSimBlocks){
 			block.h0 = GetInvalidH0();
@@ -749,6 +757,9 @@ public class AVOWSim : MonoBehaviour {
 					else{
 						block.h0 = width;
 						width += block.hWidth;
+						
+						// set the node width to be this (when we have finished the loop, is will be correct)
+						node.hWidth = width - node.h0;
 					}
 					// ALso, check if blocks are the first component on block on other end
 					// and this node has no h0 and if so, set H0 on this and add to queue
@@ -851,9 +862,13 @@ public class AVOWSim : MonoBehaviour {
 			for (int i = 0; i < block.components.Count; ++i){
 				block.components[i].h0 = width;
 				width += block.components[i].hWidth;
-				block.components[i].hasBeenLayedOut = true;
+				block.components[i].HasBeenLayedOut();
 			
 			}
+		}
+		foreach(SimNode simNode in allSimNodes){	
+			simNode.originalNode.h0 = simNode.h0;
+			simNode.originalNode.hWidth = simNode.hWidth;
 		}
 		
 	}
@@ -882,7 +897,7 @@ public class AVOWSim : MonoBehaviour {
 		graph.ClearLayoutFlags();
 		
 		// Order the list of components for each node according to hOrder (not sure if this is necessary)
-		foreach (AVOWGraph.Node node in graph.allNodes){
+		foreach (AVOWNode node in graph.allNodes){
 			node.components.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().hOrder.CompareTo (obj2.GetComponent<AVOWComponent>().hOrder)));
 			
 		}
@@ -899,7 +914,7 @@ public class AVOWSim : MonoBehaviour {
 			component.inNode.inComponents.Add (go);
 		}
 		
-		foreach (AVOWGraph.Node node in graph.allNodes){
+		foreach (AVOWNode node in graph.allNodes){
 			float outWidth = 0;
 			foreach (GameObject go in node.outComponents){
 				outWidth += go.GetComponent<AVOWComponent>().hWidth;
@@ -1017,10 +1032,10 @@ public class AVOWSim : MonoBehaviour {
 	
 	
 	// Used by ApplyNoFreedomRule
-	int ApplyNoFreedomToOuts(AVOWGraph.Node node){
+	int ApplyNoFreedomToOuts(AVOWNode node){
 	
 		int infosAdded = 0;
-		AVOWGraph.Node toNode = null;
+		AVOWNode toNode = null;
 		bool allSameToNode = true;
 		int	minHOrder = -1;
 		AVOWComponent minHOrderComponent = null;
@@ -1086,10 +1101,10 @@ public class AVOWSim : MonoBehaviour {
 	}
 	
 	// Used by ApplyNoFreedomRule
-	int ApplyNoFreedomToIns(AVOWGraph.Node node){
+	int ApplyNoFreedomToIns(AVOWNode node){
 	
 		int infosAdded = 0;
-		AVOWGraph.Node fromNode = null;
+		AVOWNode fromNode = null;
 		bool allSameToNode = true;
 		int	minHOrder = -1;
 		AVOWComponent minHOrderComponent = null;
@@ -1162,7 +1177,7 @@ public class AVOWSim : MonoBehaviour {
 	int ApplyNoFreedomRule(){
 		int infosAdded = 0;
 		
-		foreach (AVOWGraph.Node node in graph.allNodes){
+		foreach (AVOWNode node in graph.allNodes){
 			infosAdded += ApplyNoFreedomToOuts(node);
 			infosAdded += ApplyNoFreedomToIns(node);
 		}
@@ -1170,19 +1185,19 @@ public class AVOWSim : MonoBehaviour {
 		return infosAdded;		
 	}	
 	
-	int ApplyOrderedNeighbourToOuts(AVOWGraph.Node node){
+	int ApplyOrderedNeighbourToOuts(AVOWNode node){
 		int infosAdded = 0;
 		
 		// Create a loopup for the highest ordinals we have organised by which other node the components go to
-		Dictionary<AVOWGraph.Node, int> knownOrdinals = new Dictionary<AVOWGraph.Node, int>();
+		Dictionary<AVOWNode, int> knownOrdinals = new Dictionary<AVOWNode, int>();
 		
 		// Create a lookup of all the components which have no ordinal, but do have a "hightest ordinal" in the previous lookup
-		Dictionary<AVOWGraph.Node, List<AVOWComponent>> processableComponents = new Dictionary<AVOWGraph.Node, List<AVOWComponent>> ();
+		Dictionary<AVOWNode, List<AVOWComponent>> processableComponents = new Dictionary<AVOWNode, List<AVOWComponent>> ();
 		
 		// This depends on the fact that the outComponents list is sorted so all those with ordinals already are at the front
 		for (int i = 0; i < node.outComponents.Count; ++i){
 			AVOWComponent component = node.outComponents[i].GetComponent<AVOWComponent>();
-			AVOWGraph.Node otherNode = component.GetOtherNode(node);
+			AVOWNode otherNode = component.GetOtherNode(node);
 			
 			// If we have an ordinal, make (or update) our ordinals lookup
 			if (component.outNodeOrdinal != AVOWComponent.kOrdinalUnordered){
@@ -1210,7 +1225,7 @@ public class AVOWSim : MonoBehaviour {
 				
 			}
 		}
-		foreach (KeyValuePair<AVOWGraph.Node, List<AVOWComponent>> dicEntry in processableComponents){
+		foreach (KeyValuePair<AVOWNode, List<AVOWComponent>> dicEntry in processableComponents){
 		
 			// Sort the list of components according to hOrder number
 			List<AVOWComponent> components = dicEntry.Value;
@@ -1234,19 +1249,19 @@ public class AVOWSim : MonoBehaviour {
 		return infosAdded;
 	}
 	
-	int ApplyOrderedNeighbourToIns(AVOWGraph.Node node){
+	int ApplyOrderedNeighbourToIns(AVOWNode node){
 		int infosAdded = 0;
 		
 		// Create a loopup for the highest ordinals we have organised by which other node the components go to
-		Dictionary<AVOWGraph.Node, int> knownOrdinals = new Dictionary<AVOWGraph.Node, int>();
+		Dictionary<AVOWNode, int> knownOrdinals = new Dictionary<AVOWNode, int>();
 		
 		// Create a lookup of all the components which have no ordinal, but do have a "hightest ordinal" in the previous lookup
-		Dictionary<AVOWGraph.Node, List<AVOWComponent>> processableComponents = new Dictionary<AVOWGraph.Node, List<AVOWComponent>> ();
+		Dictionary<AVOWNode, List<AVOWComponent>> processableComponents = new Dictionary<AVOWNode, List<AVOWComponent>> ();
 		
 		// This depends on the fact that the inComponents list is sorted so all those with ordinals already are at the front
 		for (int i = 0; i < node.inComponents.Count; ++i){
 			AVOWComponent component = node.inComponents[i].GetComponent<AVOWComponent>();
-			AVOWGraph.Node otherNode = component.GetOtherNode(node);
+			AVOWNode otherNode = component.GetOtherNode(node);
 			
 			// If we have an ordinal, make (or update) our ordinals lookup
 			if (component.inNodeOrdinal != AVOWComponent.kOrdinalUnordered){
@@ -1274,7 +1289,7 @@ public class AVOWSim : MonoBehaviour {
 				
 			}
 		}
-		foreach (KeyValuePair<AVOWGraph.Node, List<AVOWComponent>> dicEntry in processableComponents){
+		foreach (KeyValuePair<AVOWNode, List<AVOWComponent>> dicEntry in processableComponents){
 			
 			// Sort the list of components according to hOrder number
 			List<AVOWComponent> components = dicEntry.Value;
@@ -1304,7 +1319,7 @@ public class AVOWSim : MonoBehaviour {
 		int infosAdded = 0;
 		
 		// Do this by examining the in and out components for each node		
-		foreach (AVOWGraph.Node node in graph.allNodes){
+		foreach (AVOWNode node in graph.allNodes){
 			infosAdded += ApplyOrderedNeighbourToOuts(node);
 			infosAdded += ApplyOrderedNeighbourToIns(node);
 			
@@ -1314,7 +1329,7 @@ public class AVOWSim : MonoBehaviour {
 	}	
 	
 	
-	int AppllyPositionedNeighbourToOuts(AVOWGraph.Node node){
+	int AppllyPositionedNeighbourToOuts(AVOWNode node){
 		int infosAdded = 0;	
 		
 		// check
@@ -1348,7 +1363,7 @@ public class AVOWSim : MonoBehaviour {
 		return infosAdded;
 	}
 	
-	int AppllyPositionedNeighbourToIns(AVOWGraph.Node node){
+	int AppllyPositionedNeighbourToIns(AVOWNode node){
 		int infosAdded = 0;	
 		
 		// check
@@ -1391,7 +1406,7 @@ public class AVOWSim : MonoBehaviour {
 		int infosAdded = 0;
 		
 		// Do this by examining the in and out components for each node		
-		foreach (AVOWGraph.Node node in graph.allNodes){
+		foreach (AVOWNode node in graph.allNodes){
 			if (node.h0 >= 0){
 				infosAdded += AppllyPositionedNeighbourToOuts(node);
 				infosAdded += AppllyPositionedNeighbourToIns(node);
@@ -1405,7 +1420,7 @@ public class AVOWSim : MonoBehaviour {
 
 	
 	
-	void RestrictBounds(AVOWGraph.Node node, float lowerConstraint, float upperConstraint){
+	void RestrictBounds(AVOWNode node, float lowerConstraint, float upperConstraint){
 		// Chek the constraints are consistent with the numbers we have already
 		if (!MathUtils.FP.Fgeq(node.h0UpperBound, lowerConstraint) || !MathUtils.FP.Fleq(node.h0LowerBound, upperConstraint)){
 			Debug.LogError ("Inconsistent constraints");
@@ -1428,7 +1443,7 @@ public class AVOWSim : MonoBehaviour {
 		component.h0UpperBound = Mathf.Min (component.h0UpperBound, upperConstraint);
 	}	
 	
-	void ModifyNodeOutBounds(AVOWGraph.Node node){
+	void ModifyNodeOutBounds(AVOWNode node){
 		
 		float cumulativeWidth = 0;
 		for (int i = 0; i < node.outComponents.Count; ++i){
@@ -1448,7 +1463,7 @@ public class AVOWSim : MonoBehaviour {
 		}
 	}
 	
-	void ModifyNodeInBounds(AVOWGraph.Node node){
+	void ModifyNodeInBounds(AVOWNode node){
 		
 		float cumulativeWidth = 0;
 		for (int i = 0; i < node.inComponents.Count; ++i){
@@ -1468,7 +1483,7 @@ public class AVOWSim : MonoBehaviour {
 		}
 	}
 	
-	int ModifyComponentOutBounds(AVOWGraph.Node node){
+	int ModifyComponentOutBounds(AVOWNode node){
 		int infosAdded = 0;
 		
 		// Go through all the comopnents flowing out of this node and set ther bounds
@@ -1499,7 +1514,7 @@ public class AVOWSim : MonoBehaviour {
 		return infosAdded;
 	}
 	
-	int ModifyComponentInBounds(AVOWGraph.Node node){
+	int ModifyComponentInBounds(AVOWNode node){
 		int infosAdded = 0;
 		
 		// Go through all the comopnents flowing in of this node and set ther bounds
@@ -1535,7 +1550,7 @@ public class AVOWSim : MonoBehaviour {
 		int infosAdded = 0;
 		
 		// First do the obvious (if h0 is set, then set the bounds around it)
-		foreach (AVOWGraph.Node node in graph.allNodes){
+		foreach (AVOWNode node in graph.allNodes){
 			if (node.h0 >= 0 && (node.h0LowerBound != node.h0 || node.h0UpperBound != node.h0)){
 				node.h0LowerBound = node.h0;
 				node.h0UpperBound = node.h0;
@@ -1554,7 +1569,7 @@ public class AVOWSim : MonoBehaviour {
 			
 		
 		// Do the nodes
-		foreach (AVOWGraph.Node node in graph.allNodes){
+		foreach (AVOWNode node in graph.allNodes){
 			float oldLowerBound = node.h0LowerBound;
 			float oldUpperBound = node.h0UpperBound;
 			
@@ -1572,7 +1587,7 @@ public class AVOWSim : MonoBehaviour {
 		}
 		// Do the components 
 		// we do this node by node as it is more efficient
-		foreach (AVOWGraph.Node node in graph.allNodes){
+		foreach (AVOWNode node in graph.allNodes){
 			infosAdded += ModifyComponentOutBounds(node);
 			infosAdded += ModifyComponentInBounds(node);
 		}
@@ -1690,19 +1705,19 @@ public class AVOWSim : MonoBehaviour {
 		return cachedPermutations[numItems] ;
 	}
 	/*
-	int ApplyBoundsRuleToOutBounds(AVOWGraph.Node node){
+	int ApplyBoundsRuleToOutBounds(AVOWNode node){
 		int infosAdded = 0;
 		
 		// Create a loopup for the highest ordinals we have organised by which other node the components go to
-		Dictionary<AVOWGraph.Node, float> freeWidths = new Dictionary<AVOWGraph.Node, float>();
+		Dictionary<AVOWNode, float> freeWidths = new Dictionary<AVOWNode, float>();
 		
 		// Create a lookup of all the components which have no ordinal organised into groups flowing to the same component
-		Dictionary<AVOWGraph.Node, List<AVOWComponent>> freeComponents = new Dictionary<AVOWGraph.Node, List<AVOWComponent>> ();
+		Dictionary<AVOWNode, List<AVOWComponent>> freeComponents = new Dictionary<AVOWNode, List<AVOWComponent>> ();
 		float cumulativeWidth = 0;
 		int highestOrdinal = -1;
 		for (int i = 0; i < node.outComponents.Count; ++i){
 			AVOWComponent component = node.outComponents[i].GetComponent<AVOWComponent>();
-			AVOWGraph.Node otherNode = component.GetOtherNode(node);
+			AVOWNode otherNode = component.GetOtherNode(node);
 			
 			// If we have an ordinal, then sum up our width so far
 			if (component.outNodeOrdinal != AVOWComponent.kOrdinalUnordered){
@@ -1735,7 +1750,7 @@ public class AVOWSim : MonoBehaviour {
 			list.Sort ((obj1, obj2) => (obj1.hOrder.CompareTo (obj2.hOrder)));
 		}		
 		
-		AVOWGraph.Node[] freeBlockNodes = new AVOWGraph.Node[numFreeBlocks];
+		AVOWNode[] freeBlockNodes = new AVOWNode[numFreeBlocks];
 		freeComponents.Keys.CopyTo (freeBlockNodes, 0);
 		
 		// Now we have cumulativeWidth tells us how much space is used up by components which are already fixed in place on this node
@@ -1769,7 +1784,7 @@ public class AVOWSim : MonoBehaviour {
 			// Go through this permutation and check its validity 
 			bool permIsValid = true;
 			for (int j = 0; j < numFreeBlocks; ++j){
-				AVOWGraph.Node otherNode = freeBlockNodes[permutations[i, j]];
+				AVOWNode otherNode = freeBlockNodes[permutations[i, j]];
 				float blockWidth = freeWidths[otherNode];
 				// Get lowest hOrder component from the block
 				AVOWComponent firstComponent = freeComponents[otherNode][0];
@@ -1838,7 +1853,7 @@ public class AVOWSim : MonoBehaviour {
 		}
 		if (ok){
 			// Find the first component in the block
-			AVOWGraph.Node otherNode = freeBlockNodes[firstBlock];
+			AVOWNode otherNode = freeBlockNodes[firstBlock];
 			// Get lowest hOrder component from the block
 			AVOWComponent thisComponent = freeComponents[otherNode][0];
 			thisComponent.outNodeOrdinal = highestOrdinal  + 1;
@@ -1859,19 +1874,19 @@ public class AVOWSim : MonoBehaviour {
 		return infosAdded;
 	}
 	
-	int ApplyBoundsRuleToInBounds(AVOWGraph.Node node){
+	int ApplyBoundsRuleToInBounds(AVOWNode node){
 		int infosAdded = 0;
 		
 		// Create a loopup for the highest ordinals we have organised by which other node the components go to
-		Dictionary<AVOWGraph.Node, float> freeWidths = new Dictionary<AVOWGraph.Node, float>();
+		Dictionary<AVOWNode, float> freeWidths = new Dictionary<AVOWNode, float>();
 		
 		// Create a lookup of all the components which have no ordinal organised into groups flowing to the same component
-		Dictionary<AVOWGraph.Node, List<AVOWComponent>> freeComponents = new Dictionary<AVOWGraph.Node, List<AVOWComponent>> ();
+		Dictionary<AVOWNode, List<AVOWComponent>> freeComponents = new Dictionary<AVOWNode, List<AVOWComponent>> ();
 		float cumulativeWidth = 0;
 		int highestOrdinal = -1;
 		for (int i = 0; i < node.inComponents.Count; ++i){
 			AVOWComponent component = node.inComponents[i].GetComponent<AVOWComponent>();
-			AVOWGraph.Node otherNode = component.GetOtherNode(node);
+			AVOWNode otherNode = component.GetOtherNode(node);
 			
 			// If we have an ordinal, then sum up our width so far
 			if (component.inNodeOrdinal != AVOWComponent.kOrdinalUnordered){
@@ -1903,7 +1918,7 @@ public class AVOWSim : MonoBehaviour {
 			list.Sort ((obj1, obj2) => (obj1.hOrder.CompareTo (obj2.hOrder)));
 		}
 
-		AVOWGraph.Node[] freeBlockNodes = new AVOWGraph.Node[numFreeBlocks];
+		AVOWNode[] freeBlockNodes = new AVOWNode[numFreeBlocks];
 		freeComponents.Keys.CopyTo (freeBlockNodes, 0);
 		
 		// Now we have cumulativeWidth tells us how much space is used up by components which are already fixed in place on this node
@@ -1947,7 +1962,7 @@ public class AVOWSim : MonoBehaviour {
 			// Go through this permutation and check its validity 
 			bool permIsValid = true;
 			for (int j = 0; j < numFreeBlocks; ++j){
-				AVOWGraph.Node otherNode = freeBlockNodes[permutations[i, j]];
+				AVOWNode otherNode = freeBlockNodes[permutations[i, j]];
 				float blockWidth = freeWidths[otherNode];
 				// Get lowest hOrder component from the block
 				AVOWComponent firstComponent = freeComponents[otherNode][0];
@@ -2016,7 +2031,7 @@ public class AVOWSim : MonoBehaviour {
 		}
 		if (ok){
 			// Find the first component in the block
-			AVOWGraph.Node otherNode = freeBlockNodes[firstBlock];
+			AVOWNode otherNode = freeBlockNodes[firstBlock];
 			// Get lowest hOrder component from the block
 			AVOWComponent thisComponent = freeComponents[otherNode][0];
 			thisComponent.inNodeOrdinal = highestOrdinal  + 1;
@@ -2045,7 +2060,7 @@ public class AVOWSim : MonoBehaviour {
 		infosAdded += ModifyBounds();
 		
 		// Do this by examining the in and out components for each node		
-		foreach (AVOWGraph.Node node in graph.allNodes){
+		foreach (AVOWNode node in graph.allNodes){
 			infosAdded += ApplyBoundsRuleToOutBounds(node);
 			infosAdded += ApplyBoundsRuleToInBounds(node);			
 		}
@@ -2067,7 +2082,7 @@ public class AVOWSim : MonoBehaviour {
 	/*
 	bool LayoutHOrder(){
 		// Figure out the width of each node. The current flowing in == current flowing out == width
-		foreach (AVOWGraph.Node node in graph.allNodes){
+		foreach (AVOWNode node in graph.allNodes){
 			float currentIn = 0;
 			float currentOut = 0;
 			foreach (GameObject go in node.components){
@@ -2081,7 +2096,7 @@ public class AVOWSim : MonoBehaviour {
 		
 		
 		// Order all the components in the most lists according to their H ordering
-		foreach (AVOWGraph.Node node in graph.allNodes){
+		foreach (AVOWNode node in graph.allNodes){
 			//node.components.Sort (new GOComparer());
 			node.components.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().hOrder.CompareTo (obj2.GetComponent<AVOWComponent>().hOrder)));
 			
@@ -2200,7 +2215,7 @@ public class AVOWSim : MonoBehaviour {
 		
 	}
 	
-	bool IsFirstComponentOn(AVOWComponent component, AVOWGraph.Node node){
+	bool IsFirstComponentOn(AVOWComponent component, AVOWNode node){
 		// If we have begun the layout, then there must already be a component here
 		if (node.hasBegunLayout) return false;
 		
@@ -2218,7 +2233,7 @@ public class AVOWSim : MonoBehaviour {
 		return false;
 	}
 	
-	bool IsLowestComponent(AVOWComponent component, AVOWGraph.Node node){
+	bool IsLowestComponent(AVOWComponent component, AVOWNode node){
 		// If ths node has not started to be layed out, then we do not know where it is
 		if (!node.hasBegunLayout) return false;
 		
@@ -2259,7 +2274,7 @@ public class AVOWSim : MonoBehaviour {
 		
 	}
 	
-	int LayoutAllBetweenOrdered(AVOWGraph.Node nodeA, AVOWGraph.Node nodeB){
+	int LayoutAllBetweenOrdered(AVOWNode nodeA, AVOWNode nodeB){
 		int count = 0;
 		
 		for (int i = 0; i < graph.allComponents.Count; ++i){
@@ -2285,7 +2300,8 @@ public class AVOWSim : MonoBehaviour {
 	
 	void DebugPrintHOrder(){
 		Debug.Log ("Printing HOrder Nodes");
-		foreach(AVOWGraph.Node node in graph.allNodes){
+		foreach(GameObject nodeGO in graph.allNodes){
+			AVOWNode node = nodeGO.GetComponent<AVOWNode>();
 			Debug.Log ("Node " + node.GetID() + ": h0 = " + node.h0 + ", hWidth = " + node.hWidth + ", visited = " + node.visited);
 		}
 		
@@ -2321,8 +2337,8 @@ public class AVOWSim : MonoBehaviour {
 			// If this component has never been layed out, then ignore
 			if (!component.hasBeenLayedOut) continue;
 			
-			float lowVoltage = Mathf.Min (component.node0.voltage, component.node1.voltage);
-			float highVoltage = Mathf.Max (component.node0.voltage, component.node1.voltage);
+			float lowVoltage = Mathf.Min (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
+			float highVoltage = Mathf.Max (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
 			float lowCurrent = component.h0;
 			float highCurrent = component.h0 + component.hWidth;
 			
@@ -2368,8 +2384,8 @@ public class AVOWSim : MonoBehaviour {
 		if (mouseOverComponent != null){
 			xMin = mouseOverComponent.h0;
 			xMax = mouseOverComponent.h0 + mouseOverComponent.hWidth;
-			yMin = Mathf.Min (mouseOverComponent.node0.voltage, mouseOverComponent.node1.voltage);
-			yMax = Mathf.Max (mouseOverComponent.node0.voltage, mouseOverComponent.node1.voltage);
+			yMin = Mathf.Min (mouseOverComponent.node0GO.GetComponent<AVOWNode>().voltage, mouseOverComponent.node1GO.GetComponent<AVOWNode>().voltage);
+			yMax = Mathf.Max (mouseOverComponent.node0GO.GetComponent<AVOWNode>().voltage, mouseOverComponent.node1GO.GetComponent<AVOWNode>().voltage);
 			// If a voltage source then need to mirror it all
 //			if (mouseOverComponent.type == AVOWComponent.Type.kVoltageSource){
 //				float temp = xMin;
@@ -2383,8 +2399,8 @@ public class AVOWSim : MonoBehaviour {
 			foreach(GameObject go in graph.allComponents){
 				AVOWComponent component = go.GetComponent<AVOWComponent>();
 				
-				float lowVoltage = Mathf.Min (component.node0.voltage, component.node1.voltage);
-				float highVoltage = Mathf.Max (component.node0.voltage, component.node1.voltage);
+				float lowVoltage = Mathf.Min (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
+				float highVoltage = Mathf.Max (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
 				float lowCurrent = component.h0;
 				float highCurrent = component.h0 + component.hWidth;
 				

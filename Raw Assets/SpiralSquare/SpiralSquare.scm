@@ -152,7 +152,7 @@
 			 	
 			 	; Figure out the normal
 			 	(set! normalX  (- (vector-ref sidePoints 1) (vector-ref sidePoints 3 )))
-			 	(set! normalY  (- (vector-ref sidePoints 2) (vector-ref sidePoints 0 )))
+			 	(set! normalY  (- (vector-ref sidePoints 0) (vector-ref sidePoints 2 )))
 			 	(set! normalZ  0.1)
 			 	(set! normalMag (sqrt (+ (sqr normalX) (sqr normalY)  (sqr normalZ))))
 			 	

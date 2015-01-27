@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &100002
 GameObject:
   m_ObjectHideFlags: 0
@@ -261,11 +261,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cols:
-  - {r: .498039216, g: .498039216, b: .498039216, a: 1}
+  - {r: .498039216, g: .498039216, b: .498039216, a: 0}
   - {r: .498039216, g: 1, b: .498039216, a: 1}
   - {r: 1, g: 1, b: 1, a: 1}
   - {r: .752941191, g: 1, b: .752941191, a: 1}
   state: 0
+  thisComponent: {fileID: 0}
 --- !u!114 &11400002
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -282,13 +283,20 @@ MonoBehaviour:
   visited: 0
   disable: 0
   fwCurrent: 0
-  h0: 0
-  h1: 1
   col0: {r: 1, g: 0, b: 0, a: 1}
   col1: {r: .98620677, g: 1, b: 0, a: 1}
   tabSize: .200000003
   border: .100000001
   hOrder: 0
+  hWidth: 0
+  h0: 0
+  h0LowerBound: 0
+  h0UpperBound: 0
+  inNodeOrdinal: 0
+  outNodeOrdinal: 0
+  inLocalH0: 0
+  outLocalH0: 0
+  hasBeenLayedOut: 0
 --- !u!114 &11400004
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -301,11 +309,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cols:
-  - {r: .498039216, g: .498039216, b: .498039216, a: 1}
+  - {r: .498039216, g: .498039216, b: .498039216, a: 0}
   - {r: .498039216, g: 1, b: .498039216, a: 1}
   - {r: 1, g: 1, b: 1, a: 1}
   - {r: .752941191, g: 1, b: .752941191, a: 1}
   state: 0
+  thisComponent: {fileID: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

@@ -3,7 +3,7 @@ using System;
 
 public class AVOWCommandSplitAddComponent : AVOWCommand{
 
-	public AVOWGraph.Node node;
+	public GameObject nodeGO;
 	public GameObject movedComponent;
 	public GameObject prefab;
 	GameObject newComponent;
@@ -15,21 +15,22 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 	
 	UndoStepState step = UndoStepState.kRemoveComponent;
 	
-	public AVOWCommandSplitAddComponent(AVOWGraph.Node splitNode, GameObject component, GameObject prefabToUse){
-		node = splitNode;
+	public AVOWCommandSplitAddComponent(GameObject splitNodeGO, GameObject component, GameObject prefabToUse){
+		nodeGO = splitNodeGO;
 		movedComponent = component;
 		prefab = prefabToUse;
 		
 	}
 
 	public void Execute(){
-		AVOWGraph.Node newNode = AVOWGraph.singleton.SplitNode(node, movedComponent.GetComponent<AVOWComponent>());
+		GameObject newNodeGO = AVOWGraph.singleton.SplitNode(nodeGO, movedComponent.GetComponent<AVOWComponent>());
 		
 		newComponent = GameObject.Instantiate(prefab) as GameObject;
 		newComponent.GetComponent<AVOWComponent>().resistanceAngle.Force(0);
 		newComponent.GetComponent<AVOWComponent>().resistanceAngle.Set(45);
+		newComponent.SetActive(false);
 		
-		AVOWGraph.singleton.PlaceComponent(newComponent, newNode, node);
+		AVOWGraph.singleton.PlaceComponent(newComponent, newNodeGO, nodeGO);
 		AVOWSim.singleton.Recalc();
 		
 		
@@ -45,7 +46,7 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 				return false;
 			}
 			case UndoStepState.kMergeNode:{
-				AVOWGraph.singleton.MergeNodes(component.node0, component.node1);
+				AVOWGraph.singleton.MergeNodes(component.node0GO, component.node1GO);
 				return true;
 			}
 		};

@@ -14,7 +14,7 @@ public class AVOWTab : MonoBehaviour {
 	
 	public Color[] cols = new Color[(int)State.kNumStates];
 	public State state;
-	public AVOWGraph.Node thisNode;
+	public AVOWNode thisNode;
 	public AVOWComponent thisComponent;
 	
 	State oldState = State.kNumStates;
@@ -49,7 +49,7 @@ public class AVOWTab : MonoBehaviour {
 		isMouseInside = isInside;
 	}
 	
-	public void SetNode(AVOWGraph.Node node){
+	public void SetNode(AVOWNode node){
 		thisNode = node;
 		/*
 		int nodeID = thisNode.id + 1;
@@ -71,7 +71,7 @@ public class AVOWTab : MonoBehaviour {
 	}	
 	
 
-	public AVOWGraph.Node GetNode(){
+	public AVOWNode GetNode(){
 		return thisNode;
 		
 	}

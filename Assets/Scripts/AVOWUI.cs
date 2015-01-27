@@ -20,8 +20,9 @@ public class AVOWUI : MonoBehaviour {
 	AVOWTab selectedTab = null;
 	AVOWTab overTab = null;
 	
-	AVOWGraph.Node secondarySelectedNode = null;
-	AVOWGraph.Node previousSecondarySelectedNode = null;
+	AVOWNode secondarySelectedNode = null;
+	AVOWComponent secondarySelectedComponent = null;
+	public AVOWNode previousSecondarySelectedNode = null;
 		
 
 	public void RegisterTab(AVOWTab tab){
@@ -50,9 +51,9 @@ public class AVOWUI : MonoBehaviour {
 		// Simple 3 resistors
 		AVOWGraph graph = AVOWGraph.singleton;
 		
-		AVOWGraph.Node node0 = graph.AddNode ();
-		AVOWGraph.Node node1 = graph.AddNode ();
-		AVOWGraph.Node node2 = graph.AddNode ();
+		AVOWNode node0 = graph.AddNode ();
+		AVOWNode node1 = graph.AddNode ();
+		AVOWNode node2 = graph.AddNode ();
 		
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node2);
 		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node1);
@@ -65,9 +66,9 @@ public class AVOWUI : MonoBehaviour {
 		// 4 at the top, one at the bottom
 		AVOWGraph graph = AVOWGraph.singleton;
 		
-		AVOWGraph.Node node0 = graph.AddNode ();
-		AVOWGraph.Node node1 = graph.AddNode ();
-		AVOWGraph.Node node2 = graph.AddNode ();
+		AVOWNode node0 = graph.AddNode ();
+		AVOWNode node1 = graph.AddNode ();
+		AVOWNode node2 = graph.AddNode ();
 		
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2, node1);
 		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node1);
@@ -80,10 +81,10 @@ public class AVOWUI : MonoBehaviour {
 		// Misc
 		AVOWGraph graph = AVOWGraph.singleton;
 		
-		AVOWGraph.Node node0 = graph.AddNode ();
-		AVOWGraph.Node node1 = graph.AddNode ();
-		AVOWGraph.Node node2 = graph.AddNode ();
-		AVOWGraph.Node node3 = graph.AddNode ();
+		AVOWNode node0 = graph.AddNode ();
+		AVOWNode node1 = graph.AddNode ();
+		AVOWNode node2 = graph.AddNode ();
+		AVOWNode node3 = graph.AddNode ();
 		
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node2);
 		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node1);
@@ -99,11 +100,11 @@ public class AVOWUI : MonoBehaviour {
 		/*
 		AVOWGraph graph = AVOWGraph.singleton;
 		
-		AVOWGraph.Node node0 = graph.AddNode ();
-		AVOWGraph.Node node1 = graph.AddNode ();
-		AVOWGraph.Node node2 = graph.AddNode ();
-		AVOWGraph.Node node3 = graph.AddNode ();
-		AVOWGraph.Node node4 = graph.AddNode ();
+		AVOWNode node0 = graph.AddNode ();
+		AVOWNode node1 = graph.AddNode ();
+		AVOWNode node2 = graph.AddNode ();
+		AVOWNode node3 = graph.AddNode ();
+		AVOWNode node4 = graph.AddNode ();
 		
 		// The cell
 		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node4, node0);
@@ -128,9 +129,9 @@ public class AVOWUI : MonoBehaviour {
 		//		
 		AVOWGraph graph = AVOWGraph.singleton;
 		
-		AVOWGraph.Node node0 = graph.AddNode ();
-		AVOWGraph.Node node1 = graph.AddNode ();
-		AVOWGraph.Node node2 = graph.AddNode ();
+		AVOWNode node0 = graph.AddNode ();
+		AVOWNode node1 = graph.AddNode ();
+		AVOWNode node2 = graph.AddNode ();
 		
 		
 		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node1);
@@ -142,23 +143,23 @@ public class AVOWUI : MonoBehaviour {
 		// Simple start
 		AVOWGraph graph = AVOWGraph.singleton;
 
-		AVOWGraph.Node node0 = graph.AddNode ();
-		AVOWGraph.Node node1 = graph.AddNode ();
+		GameObject node0GO = graph.AddNode ();
+		GameObject node1GO = graph.AddNode ();
 
 				
-		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0, node1);
-		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node0);
+		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0GO, node1GO);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node0GO);
 		
 		
 		/*
 		// Sneeky crossover
 		AVOWGraph graph = AVOWGraph.singleton;
 		
-		AVOWGraph.Node node0 = graph.AddNode ();
-		AVOWGraph.Node node1 = graph.AddNode ();
-		AVOWGraph.Node node2 = graph.AddNode ();
-		AVOWGraph.Node node3 = graph.AddNode ();
-		AVOWGraph.Node node4 = graph.AddNode ();
+		AVOWNode node0 = graph.AddNode ();
+		AVOWNode node1 = graph.AddNode ();
+		AVOWNode node2 = graph.AddNode ();
+		AVOWNode node3 = graph.AddNode ();
+		AVOWNode node4 = graph.AddNode ();
 		
 		
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node0, node2);
@@ -175,10 +176,10 @@ public class AVOWUI : MonoBehaviour {
 		// Four in a block
 		AVOWGraph graph = AVOWGraph.singleton;
 		
-		AVOWGraph.Node node0 = graph.AddNode ();
-		AVOWGraph.Node node1 = graph.AddNode ();
-		AVOWGraph.Node node2 = graph.AddNode ();
-		AVOWGraph.Node node3 = graph.AddNode ();
+		AVOWNode node0 = graph.AddNode ();
+		AVOWNode node1 = graph.AddNode ();
+		AVOWNode node2 = graph.AddNode ();
+		AVOWNode node3 = graph.AddNode ();
 		
 		
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node2);
@@ -189,10 +190,10 @@ public class AVOWUI : MonoBehaviour {
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node3, node0);
 		*/
 		/*
-		AVOWGraph.Node node0 = graph.AddNode ();
-		AVOWGraph.Node node1 = graph.AddNode ();
-		AVOWGraph.Node node2 = graph.AddNode ();
-		AVOWGraph.Node node3 = graph.AddNode ();
+		AVOWNode node0 = graph.AddNode ();
+		AVOWNode node1 = graph.AddNode ();
+		AVOWNode node2 = graph.AddNode ();
+		AVOWNode node3 = graph.AddNode ();
 		
 		
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node0);
@@ -209,9 +210,9 @@ public class AVOWUI : MonoBehaviour {
 		
 		
 //		
-//		AVOWGraph.Node node0 = graph.AddNode ();
-//		AVOWGraph.Node node1 = graph.AddNode ();
-//		AVOWGraph.Node node2 = graph.AddNode ();
+//		AVOWNode node0 = graph.AddNode ();
+//		AVOWNode node1 = graph.AddNode ();
+//		AVOWNode node2 = graph.AddNode ();
 //		
 //		GameObject[] resistors = new GameObject[3];
 //		resistors[0] = GameObject.Instantiate(resistorPrefab) as GameObject;
@@ -249,6 +250,7 @@ public class AVOWUI : MonoBehaviour {
 		
 		if (buttonReleased){
 			secondarySelectedNode = null;
+			secondarySelectedComponent = null;
 			previousSecondarySelectedNode = null;
 			selectedTab = null;
 		}
@@ -278,6 +280,7 @@ public class AVOWUI : MonoBehaviour {
 				tab.SetMouseInside(false);
 			}		
 			secondarySelectedNode = null;	
+			secondarySelectedComponent = null;
 			foreach (AVOWTab tab in tabs){
 				// if we are in our select tab, then do nothing
 				if (tab == selectedTab) continue;
@@ -287,10 +290,11 @@ public class AVOWUI : MonoBehaviour {
 				// part of this node - as we are "inside" all of them now too
 				if (isInside){
 					secondarySelectedNode = tab.GetNode();
+					secondarySelectedComponent = tab.GetAVOWComponent();
 					foreach (GameObject go in secondarySelectedNode.components){
 						AVOWComponent component = go.GetComponent<AVOWComponent>();
 						AVOWTab otherTab = null;
-						if (component.node0 == secondarySelectedNode){
+						if (component.node0GO == secondarySelectedNode){
 							otherTab = go.transform.FindChild("LowerTab").GetComponent<AVOWTab>();
 						}
 						else{
@@ -312,6 +316,14 @@ public class AVOWUI : MonoBehaviour {
 
 
 		// if we have a new secondarySelectNode then need to make (or destroy) one of the components
+//		Debug.Log ("secondarySelectedNode = " + ((secondarySelectedNode != null) ? secondarySelectedNode.GetID():"NULL") + "...previousSecondarySelectedNode = " + ((previousSecondarySelectedNode != null) ? 
+//			previousSecondarySelectedNode.GetID() : "NULL") + "....selectedComponent = " + ((selectedTab != null) ? selectedTab.GetAVOWComponent ().GetID() : "NULL") + 
+//		           "...secondarySelectedComponent = " + ((secondarySelectedComponent != null) ? secondarySelectedComponent.GetID() : "NULL"));
+		
+//		if (secondarySelectedNode != null && previousSecondarySelectedNode != null && secondarySelectedNode.GetComponent<AVOWNode>().splitFromNode != null && secondarySelectedNode.GetComponent<AVOWNode>().splitFromNode.GetComponent<AVOWNode>() == previousSecondarySelectedNode){
+//			previousSecondarySelectedNode = secondarySelectedNode;
+//		}
+		
 		if (secondarySelectedNode != previousSecondarySelectedNode){
 			// If we were previously on a node, then we need to remove the last component we added
 			if (previousSecondarySelectedNode != null){
@@ -324,14 +336,14 @@ public class AVOWUI : MonoBehaviour {
 			if (secondarySelectedNode != null && !lockCreation){
 				// Are we trying to split a node
 				if (selectedTab.GetNode() == secondarySelectedNode){
-					AVOWCommand command = new AVOWCommandSplitAddComponent(secondarySelectedNode, selectedTab.GetAVOWComponent ().gameObject, resistorPrefab);
+					AVOWCommand command = new AVOWCommandSplitAddComponent(secondarySelectedNode.gameObject, selectedTab.GetAVOWComponent ().gameObject, resistorPrefab);
 					IssueCommand(command);
 
 					
 				}
 				// or simple put a new component accross existing nodes
 				else{
-					AVOWCommand command = new AVOWCommandAddComponent(selectedTab.GetNode(), secondarySelectedNode, resistorPrefab);
+					AVOWCommand command = new AVOWCommandAddComponent(selectedTab.GetNode().gameObject, secondarySelectedNode.gameObject, resistorPrefab);
 					IssueCommand(command);
 					
 				}

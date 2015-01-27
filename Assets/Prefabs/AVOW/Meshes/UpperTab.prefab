@@ -85,11 +85,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cols:
-  - {r: .498039216, g: .498039216, b: .498039216, a: 1}
+  - {r: .498039216, g: .498039216, b: .498039216, a: 0}
   - {r: .498039216, g: 1, b: .498039216, a: 1}
   - {r: 1, g: 1, b: 1, a: 1}
   - {r: .752941191, g: 1, b: .752941191, a: 1}
   state: 0
+  thisComponent: {fileID: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
