@@ -10,6 +10,11 @@ public class AVOWUI : MonoBehaviour {
 	public GameObject resistorPrefab;
 	public GameObject cellPrefab;
 	
+	public GameObject cursorCubePrefab;
+	public GameObject lighteningPrefab;
+	
+	GameObject cursorCube;
+	GameObject lightening;
 	Stack<AVOWCommand> 	commands = new Stack<AVOWCommand>();
 	
 	// Set to true if we should not allow anything else to be created just yet
@@ -46,7 +51,16 @@ public class AVOWUI : MonoBehaviour {
 		singleton = null;
 	}	
 	
+	
+	void NewStart(){
+		cursorCube = GameObject.Instantiate(cursorCubePrefab) as GameObject;
+		lightening = GameObject.Instantiate(lighteningPrefab) as GameObject;
+	
+	}
+	
 	void Start(){
+	
+		NewStart();
 	/*
 		// Simple 3 resistors
 		AVOWGraph graph = AVOWGraph.singleton;
@@ -236,6 +250,67 @@ public class AVOWUI : MonoBehaviour {
 	}
 	
 	
+	void NewUpdate(){
+		Vector3 mousePos = Input.mousePosition;
+		mousePos.z = 0;
+		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
+		
+		Vector3 oldCubePos = cursorCube.transform.position;
+		mouseWorldPos.z = oldCubePos.z;
+		cursorCube.transform.position = mouseWorldPos;
+		
+		// Rotate the cube a bit too
+		cursorCube.transform.Rotate (new Vector3(1, 2, 4));
+		
+		// Find the node we are closest to
+		float minDist = 100;
+		AVOWNode minNode = null;
+		Vector3 testPos = mouseWorldPos;
+		Vector3 minPos = Vector3.zero;
+		foreach (GameObject go in AVOWGraph.singleton.allNodes){
+			AVOWNode node = go.GetComponent<AVOWNode>();
+			
+			// If inside the cruz of the node
+			float thisDist = -1;
+			Vector3 thisPos = Vector3.zero;
+			if (testPos.x > node.h0 && testPos.x < node.h0 + node.hWidth){
+				thisDist = Mathf.Abs(testPos.y - node.voltage);
+				thisPos = new Vector3(testPos.x, node.voltage, testPos.z);
+				
+			}
+			else{
+				if (testPos.x <= node.h0){
+					thisPos = new Vector3(node.h0, node.voltage, testPos.z);
+				}
+				else{
+					thisPos = new Vector3(node.h0 + node.hWidth, node.voltage, testPos.z);
+				}
+				thisDist = (testPos - thisPos).magnitude;
+			}
+			if (thisDist < minDist){
+				minNode = node;
+				minDist = thisDist;
+				minPos = thisPos;
+				
+			}
+		}
+		
+		// If we have such a node then make som lightening to it
+		if (minNode != null){
+			//cursorCube.transform.position = minPos;
+			lightening.GetComponent<Lightening>().startPoint = cursorCube.transform.position;
+			lightening.GetComponent<Lightening>().endPoint = minPos;
+			lightening.GetComponent<Lightening>().size = 0.2f;
+			lightening.GetComponent<Lightening>().ConstructMesh();
+			
+			
+		}
+		
+	}
+	
+
+	
+	
 
 	// Update is called once per frame
 	void Update () {
@@ -243,6 +318,8 @@ public class AVOWUI : MonoBehaviour {
 		Vector3 mousePos = Input.mousePosition;
 		mousePos.z = 0;
 		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
+		
+		NewUpdate();
 		
 		bool  buttonPressed = (Input.GetMouseButtonDown(0) && !Input.GetKey (KeyCode.LeftControl));
 		bool  buttonReleased = (Input.GetMouseButtonUp(0) && !Input.GetKey (KeyCode.LeftControl));

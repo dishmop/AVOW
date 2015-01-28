@@ -5,6 +5,7 @@ public class QuitOnEsc : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		Screen.showCursor = false;
 	
 	}
 	
