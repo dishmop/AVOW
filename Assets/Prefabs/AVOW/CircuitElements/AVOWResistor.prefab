@@ -706,7 +706,7 @@ MonoBehaviour:
   midSD: {x: 0, y: 0, z: 0}
   size: 1
   numStages: 8
-  probOfChange: .5
+  probOfChange: .899999976
 --- !u!114 &11400006
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -725,7 +725,7 @@ MonoBehaviour:
   midSD: {x: 0, y: 0, z: 0}
   size: 1
   numStages: 8
-  probOfChange: .5
+  probOfChange: .899999976
 --- !u!114 &11400008
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -744,7 +744,7 @@ MonoBehaviour:
   midSD: {x: 0, y: 0, z: 0}
   size: 1
   numStages: 8
-  probOfChange: .5
+  probOfChange: .899999976
 --- !u!114 &11400010
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -758,7 +758,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   node0GO: {fileID: 0}
   node1GO: {fileID: 0}
-  connectorProp: .100000001
+  connectorProp: .200000003
   squareGap: .00999999978
   lighteningSize: .5
   voltage: 1

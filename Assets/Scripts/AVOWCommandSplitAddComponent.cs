@@ -27,7 +27,7 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 		
 		newComponent = GameObject.Instantiate(prefab) as GameObject;
 		newComponent.GetComponent<AVOWComponent>().resistanceAngle.Force(0);
-		newComponent.GetComponent<AVOWComponent>().resistanceAngle.Set(45);
+		newComponent.GetComponent<AVOWComponent>().resistanceAngle.Set(10);
 		newComponent.SetActive(false);
 		
 		AVOWGraph.singleton.PlaceComponent(newComponent, newNodeGO, nodeGO);

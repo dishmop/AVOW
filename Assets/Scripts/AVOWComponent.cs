@@ -301,7 +301,7 @@ public class AVOWComponent : MonoBehaviour {
 			Vector3 connector0Pos = top + connectorProp * (bottom - top);
 			Vector3 connector1Pos = bottom + connectorProp * (top - bottom);
 			
-			if (true || !MathUtils.FP.Feq ((oldNode0Pos - newNode0Pos).sqrMagnitude, 0) || !MathUtils.FP.Feq ((oldNode1Pos - newNode1Pos).sqrMagnitude, 0)) {
+			if (false || !MathUtils.FP.Feq ((oldNode0Pos - newNode0Pos).magnitude, 0) || !MathUtils.FP.Feq ((oldNode1Pos - newNode1Pos).magnitude, 0)) {
 			
 				Lightening lightening0 = transform.FindChild("Lightening0").GetComponent<Lightening>();
 				Lightening lightening1 = transform.FindChild("Lightening1").GetComponent<Lightening>();
@@ -310,9 +310,9 @@ public class AVOWComponent : MonoBehaviour {
 				float pdSize = Mathf.Abs (useV1-useV0);
 
 				// Node0 to connector 0
-				transform.FindChild("Lightening0").gameObject.SetActive(false);
+				transform.FindChild("Lightening0").gameObject.SetActive(true);
 				lightening0.startPoint = new Vector3(connector0Pos.x, newNode0Pos.y);
-				lightening0.endPoint = newNode0Pos;
+				lightening0.endPoint = connector0Pos;
 				//lightening0.startSD = new Vector3(pdSize * 0.01f, 0, 0);
 				//lightening0.midSD = new Vector3(pdSize * 0.006f, pdSize * 0.00f, 0);
 				lightening0.size = lighteningSize * pdSize;
@@ -321,17 +321,18 @@ public class AVOWComponent : MonoBehaviour {
 
 				// connector0 to connector1
 				transform.FindChild("Lightening1").gameObject.SetActive(true);
-				lightening1.startPoint = new Vector3(connector0Pos.x, newNode0Pos.y);
-				lightening1.endPoint = new Vector3(connector1Pos.x, newNode1Pos.y);
+				lightening1.startPoint = connector0Pos;
+				lightening1.endPoint = connector1Pos;
 				//lightening1.midSD = new Vector3(pdSize * 0.02f, pdSize * 0.02f, 0);
 				lightening1.size =lighteningSize *  pdSize;
 				lightening1.ConstructMesh();	
 								
 				// Connector1 to node1
-				transform.FindChild("Lightening2").gameObject.SetActive(false);
+				transform.FindChild("Lightening2").gameObject.SetActive(true);
 				lightening2.startPoint = new Vector3(connector1Pos.x, newNode1Pos.y);
-				lightening2.endPoint = newNode1Pos;
+				lightening2.endPoint = connector1Pos;
 				lightening2.size = lighteningSize * pdSize;
+				lightening2.numStages = 2;
 				lightening2.ConstructMesh();	
 				
 				// Put our connection spheres in the right place.

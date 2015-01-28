@@ -10,6 +10,9 @@ public class AVOWCamControl : MonoBehaviour {
 	public bool				ignoreSide = false;
 	Vector3					prevMousePos = new Vector3();
 	
+	
+	int delay = 0;
+	
 	// Use this for initialization
 	void Start () {
 	
@@ -19,6 +22,8 @@ public class AVOWCamControl : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		delay--;
+		if (delay > 0) return;
 		
 		Camera camera = gameObject.GetComponent<Camera>();
 		float wheelVal = Input.GetAxis("Mouse ScrollWheel");
@@ -70,7 +75,7 @@ public class AVOWCamControl : MonoBehaviour {
 			
 			float vSize0 = size.y;
 			float vSize1 = size.x / Camera.main.aspect;
-			float useVSize = 1.2f * Mathf.Max (vSize0, vSize1);
+			float useVSize = 1.5f * Mathf.Max (vSize0, vSize1);
 			
 			float currentSize = transform.GetComponent<Camera>().orthographicSize;
 			float newSize = Mathf.Lerp (currentSize, useVSize * 0.5f, prop);

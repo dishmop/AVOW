@@ -37,6 +37,14 @@ public class AVOWGraph : MonoBehaviour {
 		allComponents.Add (newGO );
 	}
 	
+	public void FillAllResistors(){
+		foreach(GameObject go in allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			component.resistanceAngle.Set(45);
+		}
+	}
+	
+	
 	public void RemoveComponent(GameObject obj){
 		AVOWComponent component = obj.GetComponent<AVOWComponent>();
 		GameObject node0 = component.node0GO;

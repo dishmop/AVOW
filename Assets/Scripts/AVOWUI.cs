@@ -253,6 +253,7 @@ public class AVOWUI : MonoBehaviour {
 			secondarySelectedComponent = null;
 			previousSecondarySelectedNode = null;
 			selectedTab = null;
+			AVOWGraph.singleton.FillAllResistors();
 		}
 		if (buttonPressed || !buttonDown){
 			selectedTab = null;
