@@ -5,6 +5,9 @@ public class Lightening : MonoBehaviour {
 
 	public Vector3		startPoint;
 	public Vector3  	endPoint;
+	public Vector3      endSD;
+	public Vector3      startSD;
+	public Vector3		midSD;
 	public float		size;
 	public int			numStages;
 	public float		probOfChange;
@@ -40,15 +43,18 @@ public class Lightening : MonoBehaviour {
 				
 		Mesh mesh = GetComponent<MeshFilter>().mesh;
 	
+		mesh.triangles = null;
+		mesh.vertices = null;
+		mesh.uv = null;
 		
 		mesh.vertices =  vertices;
 		mesh.uv = uvs;
-		mesh.triangles = tris;;
+		mesh.triangles = tris;
 	}
 	
 	void UpdateMesh(){
 		
-		//FillBasePoints();
+		FillBasePoints();
 		FillPoints(true);
 		FillVertices();
 		Mesh mesh = GetComponent<MeshFilter>().mesh;
@@ -71,13 +77,27 @@ public class Lightening : MonoBehaviour {
 //		points[i++] = new Vector3 (0.5680748f, 0.6618122f, 0f);
 //		points[i++] = new Vector3 (0.5f, 1f, 0f);
 	
+		// Set up defaults
+		
+		float sdScalar = 0.02f * (startPoint - endPoint).magnitude;
+		midSD = new Vector3(sdScalar, sdScalar, 0);
 		for (int i = 0; i < numPoints; ++i){
 			if (!useRandom || Random.Range (0f, 1f) < probOfChange){
 				float distStart = (startPoint - basePoints[i]).magnitude;
 				float distEnd = (endPoint - basePoints[i]).magnitude;
-				float sd = 0.1f * Mathf.Min (distStart * distEnd);
-				points[i] = new Vector3 (GetNormalSample(basePoints[i].x, sd), GetNormalSample(basePoints[i].y, sd), 0);
+				Vector3 sd = CalcSD((float)i * 1f/(numPoints-1));
+				points[i] = new Vector3 (GetNormalSample(basePoints[i].x, sd.x), GetNormalSample(basePoints[i].y, sd.y), 0);
 			}
+		}
+	}
+	
+	// Pass in how far along the line we are (0 for start, 1 for end)
+	Vector3 CalcSD(float dist){
+		if (dist < 0.5f){
+			return Vector3.Lerp (startSD, midSD, dist * 2f);
+		}
+		else{
+			return Vector3.Lerp (midSD, endSD, (dist-0.5f) * 2f);
 		}
 	}
 	

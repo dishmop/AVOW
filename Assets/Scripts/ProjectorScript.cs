@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ProjectorScript : MonoBehaviour {
 
-	public GameObject lightGO;
+
 	public float dist = 1;
 
 	// Use this for initialization
@@ -22,8 +22,8 @@ public class ProjectorScript : MonoBehaviour {
 	}
 	
 	void UpdatePos(){
-		Vector3 lightPos = lightGO.transform.position;
 		Vector3 ballPos = transform.parent.position;
+		Vector3 lightPos = ballPos + new Vector3(0, 0, -1f);
 		Vector3 thisLocalDir = lightPos - ballPos;
 		thisLocalDir.Normalize();
 		

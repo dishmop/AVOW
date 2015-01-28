@@ -62,6 +62,7 @@
      <None Include="Assets\Shaders\AVOWLightening.shader" />
      <None Include="Assets\Tutorial_1\Black.shader" />
      <None Include="Assets\Shaders\noise-simplex_v02.shader" />
+     <None Include="Assets\Shaders\AVOWNodeGlow.shader" />
      <None Include="Assets\Shaders\DC_Reflect-BumpSpec2.shader" />
      <None Include="Assets\Shaders\PlasmaBalls_old.shader" />
      <None Include="Assets\Tutorial_2\1_FlatColour.shader" />
@@ -81,7 +82,7 @@
      <None Include="Assets\Shaders\AVOWResistance.shader" />
      <None Include="Assets\Shaders\AVOWVoltageSource.shader" />
  <Reference Include="Assembly-UnityScript-firstpass">
- <HintPath>/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
+ <HintPath>/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/4.6.0/UnityEngine.UI.dll</HintPath>

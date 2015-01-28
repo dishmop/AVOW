@@ -1,20 +1,21 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ProjectorScript.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Shaders/AVOWLightening.shader">
     <Files>
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="319" Column="41" />
       <File FileName="Assets/Scripts/AmmeterEffect.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UIMesh.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Lightening.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Lightening.cs" Line="51" Column="3" />
       <File FileName="Assets/Scripts/AVOWUI.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="1" Column="1" />
       <File FileName="Assets/Shaders/noise-simplex_v02.shader" Line="1" Column="1" />
       <File FileName="Assets/Shaders/AVOWResistance.shader" Line="1" Column="1" />
       <File FileName="Assets/Shaders/DC_Reflect-BumpSpec2.shader" Line="1" Column="1" />
-      <File FileName="Assets/Shaders/AVOWLightening.shader" Line="1" Column="1" />
+      <File FileName="Assets/Shaders/AVOWNodeGlow.shader" Line="47" Column="89" />
       <File FileName="Assets/Shaders/DC_Reflect-BumpSpec.shader" Line="1" Column="1" />
       <File FileName="Assets/Tutorial_1/BlendGreyLightmap.shader" Line="1" Column="1" />
       <File FileName="Assets/Shaders/noise-simplex_v03.shader" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ProjectorScript.cs" Line="20" Column="57" />
+      <File FileName="Assets/Shaders/AVOWLightening.shader" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
