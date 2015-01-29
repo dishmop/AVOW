@@ -13,6 +13,13 @@ public class AVOWComponent : MonoBehaviour {
 	public float lighteningSize = 0.5f;
 	
 	
+	// top bottom, left right 
+	float useH0;
+	float useH1;
+	float useV0;
+	float useV1;
+	
+	
 	Vector3 oldNode0Pos = new Vector3(0, 0, 0);
 	Vector3 oldNode1Pos = new Vector3(0, 0, 0);
 	
@@ -133,6 +140,48 @@ public class AVOWComponent : MonoBehaviour {
 		
 	}
 	
+	public Vector3 GetConnectionPos0(){
+		float hMid = (h0 + 0.5f * hWidth);
+		float node0VPos = node0GO.GetComponent<AVOWNode>().voltage;
+		float node1VPos = node1GO.GetComponent<AVOWNode>().voltage;
+		float vPos = node0VPos + connectorProp * (node1VPos - node0VPos);
+		return new Vector3(hMid, vPos, transform.position.z);
+	}
+		
+	public Vector3 GetConnectionPos1(){
+		float hMid = (h0 + 0.5f * hWidth);
+		float node0VPos = node0GO.GetComponent<AVOWNode>().voltage;
+		float node1VPos = node1GO.GetComponent<AVOWNode>().voltage;
+		float vPos = node1VPos + connectorProp * (node0VPos - node1VPos);
+		return new Vector3(hMid, vPos, transform.position.z);
+	}
+
+	public Vector3 GetConnectionPosBottom(){
+		Vector3 top = new Vector3((useH1 + useH0) * 0.5f, (useV0 + useV1) * 0.5f - 0.5f * Mathf.Min (useH1 - useH0, useV1 - useV0));
+		Vector3 bottom = new Vector3((useH1 + useH0) * 0.5f, (useV0 + useV1) * 0.5f + 0.5f * Mathf.Min (useH1 - useH0, useV1 - useV0));
+		return bottom + connectorProp * (top - bottom);
+	}
+		
+	public Vector3 GetConnectionPosTop(){
+		Vector3 top = new Vector3((useH1 + useH0) * 0.5f, (useV0 + useV1) * 0.5f - 0.5f * Mathf.Min (useH1 - useH0, useV1 - useV0));
+		Vector3 bottom = new Vector3((useH1 + useH0) * 0.5f, (useV0 + useV1) * 0.5f + 0.5f * Mathf.Min (useH1 - useH0, useV1 - useV0));
+		
+		return top + connectorProp * (bottom - top);
+	}
+	
+	public void EnableLightening(GameObject nodeGO, bool enable){
+		if (type == Type.kVoltageSource) return;
+		
+		Transform lighteningT = null;
+		if (nodeGO == node0GO){
+			lighteningT = transform.FindChild("Lightening0");
+		}
+		else{
+			lighteningT = transform.FindChild("Lightening1");
+		}
+		lighteningT.gameObject.SetActive(enable);
+		
+	}
 	
 	public void SetupInOutNodes(){
 		if (GetDirection(node0GO) == FlowDirection.kOut){
@@ -265,10 +314,10 @@ public class AVOWComponent : MonoBehaviour {
 		float midY = (v0 + v1)/2.0f;
 		float halfSize = 0.5f * Mathf.Min (Mathf.Abs (v1-v0), Mathf.Abs (h1-h0));
 		
-		float useH0 = midX - halfSize;
-		float useH1 = midX + halfSize;
-		float useV0 = midY - halfSize;
-		float useV1 = midY + halfSize;
+		useH0 = midX - halfSize;
+		useH1 = midX + halfSize;
+		useV0 = midY - halfSize;
+		useV1 = midY + halfSize;
 		
 		
 		// NOt sure why I need to do this but....
@@ -278,7 +327,9 @@ public class AVOWComponent : MonoBehaviour {
 			useV1 = temp;
 		}
 	
-
+		Vector3 connector0Pos = GetConnectionPos0();
+		Vector3 connector1Pos = GetConnectionPos1();
+		
 		if (type == Type.kLoad){
 			SetupUVs (transform.FindChild("Resistance").gameObject, Mathf.Abs (useV1-useV0));
 			transform.FindChild("Resistance").renderer.material.SetColor("_Color0", col0);
@@ -298,8 +349,6 @@ public class AVOWComponent : MonoBehaviour {
 			Vector3 bottom = new Vector3((useH1 + useH0) * 0.5f, (useV0 + useV1) * 0.5f + 0.5f * Mathf.Min (useH1 - useH0, useV1 - useV0));
 			Vector3 halfWidth = new Vector3((useH1 - useH0) * 0.5f, 0);
 			
-			Vector3 connector0Pos = top + connectorProp * (bottom - top);
-			Vector3 connector1Pos = bottom + connectorProp * (top - bottom);
 			
 			if (false || !MathUtils.FP.Feq ((oldNode0Pos - newNode0Pos).magnitude, 0) || !MathUtils.FP.Feq ((oldNode1Pos - newNode1Pos).magnitude, 0)) {
 			
@@ -310,30 +359,29 @@ public class AVOWComponent : MonoBehaviour {
 				float pdSize = Mathf.Abs (useV1-useV0);
 
 				// Node0 to connector 0
-				transform.FindChild("Lightening0").gameObject.SetActive(true);
+//				transform.FindChild("Lightening0").gameObject.SetActive(true);
 				lightening0.startPoint = new Vector3(connector0Pos.x, newNode0Pos.y);
 				lightening0.endPoint = connector0Pos;
-				//lightening0.startSD = new Vector3(pdSize * 0.01f, 0, 0);
-				//lightening0.midSD = new Vector3(pdSize * 0.006f, pdSize * 0.00f, 0);
 				lightening0.size = lighteningSize * pdSize;
 				lightening0.numStages = 2;
 				lightening0.ConstructMesh();
 
-				// connector0 to connector1
-				transform.FindChild("Lightening1").gameObject.SetActive(true);
-				lightening1.startPoint = connector0Pos;
-				lightening1.endPoint = connector1Pos;
-				//lightening1.midSD = new Vector3(pdSize * 0.02f, pdSize * 0.02f, 0);
-				lightening1.size =lighteningSize *  pdSize;
-				lightening1.ConstructMesh();	
+
 								
 				// Connector1 to node1
-				transform.FindChild("Lightening2").gameObject.SetActive(true);
-				lightening2.startPoint = new Vector3(connector1Pos.x, newNode1Pos.y);
+//				transform.FindChild("Lightening1").gameObject.SetActive(true);
+				lightening1.startPoint = new Vector3(connector1Pos.x, newNode1Pos.y);
+				lightening1.endPoint = connector1Pos;
+				lightening1.size = lighteningSize * pdSize;
+				lightening1.numStages = 2;
+				lightening1.ConstructMesh();	
+				
+				// connector0 to connector1
+//				transform.FindChild("Lightening0").gameObject.SetActive(true);
+				lightening2.startPoint = connector0Pos;
 				lightening2.endPoint = connector1Pos;
-				lightening2.size = lighteningSize * pdSize;
-				lightening2.numStages = 2;
-				lightening2.ConstructMesh();	
+				lightening2.size =lighteningSize *  pdSize;
+				lightening2.ConstructMesh();					
 				
 				// Put our connection spheres in the right place.
 				float scale = 0.1f * Mathf.Abs (useV1-useV0);
@@ -344,9 +392,6 @@ public class AVOWComponent : MonoBehaviour {
 				connectionSphere1.position = connector1Pos;
 				connectionSphere1.localScale = new Vector3(scale, scale, scale);
 				
-				
-					
-											
 				oldNode0Pos = newNode0Pos;
 				oldNode1Pos = newNode1Pos;
 			}

@@ -13,9 +13,21 @@ public class AVOWUI : MonoBehaviour {
 	public GameObject cursorCubePrefab;
 	public GameObject lighteningPrefab;
 	
+	public float maxLighteningDist;
+	
 	GameObject cursorCube;
-	GameObject lightening;
+	GameObject lightening0;
+	GameObject lightening1;
 	Stack<AVOWCommand> 	commands = new Stack<AVOWCommand>();
+	
+	enum State {
+		kIdle,
+		kNodeOnly,
+		kNodeAndResistor
+		
+	};
+	
+	State state = State.kIdle;
 	
 	// Set to true if we should not allow anything else to be created just yet
 	// do this when killing a component
@@ -54,8 +66,10 @@ public class AVOWUI : MonoBehaviour {
 	
 	void NewStart(){
 		cursorCube = GameObject.Instantiate(cursorCubePrefab) as GameObject;
-		lightening = GameObject.Instantiate(lighteningPrefab) as GameObject;
-	
+		lightening0 = GameObject.Instantiate(lighteningPrefab) as GameObject;
+		lightening0.transform.parent = transform;
+		lightening1 = GameObject.Instantiate(lighteningPrefab) as GameObject;
+		lightening1.transform.parent = transform;
 	}
 	
 	void Start(){
@@ -153,7 +167,24 @@ public class AVOWUI : MonoBehaviour {
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node0);
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node2);
 		*/
-	
+		
+		// Complex start
+		AVOWGraph graph = AVOWGraph.singleton;
+		
+		GameObject node0GO = graph.AddNode ();
+		GameObject node1GO = graph.AddNode ();
+		GameObject node2GO = graph.AddNode ();
+		GameObject node3GO = graph.AddNode ();		
+		
+		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0GO, node1GO);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node2GO);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2GO, node0GO);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node3GO);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node3GO);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node3GO, node0GO);
+		
+		
+	/*
 		// Simple start
 		AVOWGraph graph = AVOWGraph.singleton;
 
@@ -163,7 +194,7 @@ public class AVOWUI : MonoBehaviour {
 				
 		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0GO, node1GO);
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node0GO);
-		
+		*/
 		
 		/*
 		// Sneeky crossover
@@ -259,14 +290,14 @@ public class AVOWUI : MonoBehaviour {
 		mouseWorldPos.z = oldCubePos.z;
 		cursorCube.transform.position = mouseWorldPos;
 		
-		// Rotate the cube a bit too
-		cursorCube.transform.Rotate (new Vector3(1, 2, 4));
+		state = State.kIdle;
+		
 		
 		// Find the node we are closest to
-		float minDist = 100;
+		float minDist = maxLighteningDist;
 		AVOWNode minNode = null;
 		Vector3 testPos = mouseWorldPos;
-		Vector3 minPos = Vector3.zero;
+		Vector3 minNodePos = Vector3.zero;
 		foreach (GameObject go in AVOWGraph.singleton.allNodes){
 			AVOWNode node = go.GetComponent<AVOWNode>();
 			
@@ -287,23 +318,88 @@ public class AVOWUI : MonoBehaviour {
 				}
 				thisDist = (testPos - thisPos).magnitude;
 			}
-			if (thisDist < minDist){
+			float thisMaxDist = node.hWidth * 0.35f;
+			if (thisDist < minDist && thisDist < thisMaxDist){
 				minNode = node;
 				minDist = thisDist;
-				minPos = thisPos;
+				minNodePos = thisPos;
+				state = State.kNodeOnly;
+				
+			}
+		}
+		
+		// If we are connected to a node, see if we can also  connect to one of the 
+		// Resistors connected to this node
+		Vector3 minComponentPos = Vector3.zero;
+		minDist = maxLighteningDist;
+		AVOWComponent minComponent = null;
+		int minWhichNode = -1;
+		if (state == State.kNodeOnly){
+			
+			foreach (GameObject go in minNode.components){
+				AVOWComponent component = go.GetComponent<AVOWComponent>();
+				
+				if (component.type == AVOWComponent.Type.kVoltageSource) continue;
+				
+				float thisDist = 0;
+				int thisWhichNode = -1;
+				Vector3 connectionPos = Vector3.zero;
+				if (minNode == component.node0GO.GetComponent<AVOWNode>()){
+					connectionPos = component.GetConnectionPos0();
+					connectionPos.z = testPos.z;
+				}
+				else if (minNode == component.node1GO.GetComponent<AVOWNode>()){
+					connectionPos = component.GetConnectionPos1();
+					connectionPos.z = testPos.z;
+				}
+				else{
+					Debug.LogError ("Error UI");
+				}
+				thisDist = (connectionPos - testPos).magnitude;
+				float thisMaxDist = component.hWidth * 0.35f;
+				
+				if (thisDist < minDist && thisDist < thisMaxDist){
+					minComponent = component;
+					minDist = thisDist;
+					minWhichNode = thisWhichNode;
+					minComponentPos = connectionPos;
+					state = State.kNodeAndResistor;
+				}
 				
 			}
 		}
 		
 		// If we have such a node then make som lightening to it
-		if (minNode != null){
+		if (state == State.kNodeOnly || state == State.kNodeAndResistor){
 			//cursorCube.transform.position = minPos;
-			lightening.GetComponent<Lightening>().startPoint = cursorCube.transform.position;
-			lightening.GetComponent<Lightening>().endPoint = minPos;
-			lightening.GetComponent<Lightening>().size = 0.2f;
-			lightening.GetComponent<Lightening>().ConstructMesh();
+			lightening0.SetActive(true);
+			lightening0.GetComponent<Lightening>().startPoint = cursorCube.transform.position;
+			lightening0.GetComponent<Lightening>().endPoint = minNodePos;
+			lightening0.GetComponent<Lightening>().size = 0.2f;
+			lightening0.GetComponent<Lightening>().ConstructMesh();
 			
+			// Rotate the cube a bit too
+			cursorCube.transform.Rotate (new Vector3(1, 2, 4));
 			
+		}
+		else{
+			lightening0.SetActive(false);
+		}
+		AVOWGraph.singleton.EnableAllLightening();
+		
+		if (state == State.kNodeAndResistor){
+			
+			lightening1.SetActive(true);
+			lightening1.GetComponent<Lightening>().startPoint = cursorCube.transform.position;
+			lightening1.GetComponent<Lightening>().endPoint = minComponentPos;
+			lightening1.GetComponent<Lightening>().size = 0.2f;
+			lightening1.GetComponent<Lightening>().ConstructMesh();
+			
+			// Also need to hide the lightening from the compoment to the node
+			minComponent.GetComponent<AVOWComponent>().EnableLightening(minNode.gameObject, false);
+		}
+		else{
+			lightening1.SetActive(false);
 		}
 		
 	}

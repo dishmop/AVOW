@@ -44,6 +44,14 @@ public class AVOWGraph : MonoBehaviour {
 		}
 	}
 	
+	public void EnableAllLightening(){
+		foreach(GameObject go in allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			component.EnableLightening(component.node0GO, true);
+			component.EnableLightening(component.node1GO, true);
+		}
+	}
+	
 	
 	public void RemoveComponent(GameObject obj){
 		AVOWComponent component = obj.GetComponent<AVOWComponent>();
