@@ -27,7 +27,10 @@ public class AVOWNode : MonoBehaviour {
 	public List<GameObject> inComponents;
 	public List<GameObject> outComponents;
 	
+	public bool isInteractive = true;
 	
+	
+
 	public string GetID(){
 		return id.ToString ();
 	}

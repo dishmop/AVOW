@@ -15,19 +15,65 @@ public class AVOWUI : MonoBehaviour {
 	
 	public float maxLighteningDist;
 	
+	class Action{
+		public Action(GameObject conn0Node, GameObject conn1Node, GameObject conn1Component){
+			this.conn0Node = conn0Node;
+			this.conn1Node = conn1Node;
+			this.conn1Component = conn1Component;
+		}
+		
+		public  bool IsEqual(System.Object obj)
+		{
+			// If parameter is null return false.
+			if (obj == null)
+			{
+				return false;
+			}
+			
+			// If parameter cannot be cast to Action return false.
+			Action p = obj as Action;
+			if ((System.Object)p == null)
+			{
+				return false;
+			}
+			
+			// Return true if the fields match:
+			return (conn0Node == p.conn0Node) && (conn1Node == p.conn1Node) && (conn1Component == p.conn1Component);
+		}
+		
+		public GameObject conn0Node;
+		public GameObject conn1Node;
+		public GameObject conn1Component;
+	};
+	
+	Action	currentAction;
+	Action  lastAction;
+	
+	float uiZPos;
+	
 	GameObject cursorCube;
-	GameObject lightening0;
-	GameObject lightening1;
+	GameObject lightening0GO;
+	GameObject lightening1GO;
 	Stack<AVOWCommand> 	commands = new Stack<AVOWCommand>();
 	
+	Vector3 mouseWorldPos;
+	
+	//UI state stuff
+	GameObject connection0Node;
+	GameObject connection1Node;
+	GameObject connection1Component;
+	Vector3 connection0Pos;
+	Vector3 connection1Pos;
+	
 	enum State {
-		kIdle,
-		kNodeOnly,
-		kNodeAndResistor
+		kFree,
+		kHeldNode,
+		kHeldOpen
 		
 	};
 	
-	State state = State.kIdle;
+	
+	State state = State.kFree;
 	
 	// Set to true if we should not allow anything else to be created just yet
 	// do this when killing a component
@@ -66,10 +112,12 @@ public class AVOWUI : MonoBehaviour {
 	
 	void NewStart(){
 		cursorCube = GameObject.Instantiate(cursorCubePrefab) as GameObject;
-		lightening0 = GameObject.Instantiate(lighteningPrefab) as GameObject;
-		lightening0.transform.parent = transform;
-		lightening1 = GameObject.Instantiate(lighteningPrefab) as GameObject;
-		lightening1.transform.parent = transform;
+		lightening0GO = GameObject.Instantiate(lighteningPrefab) as GameObject;
+		lightening0GO.transform.parent = transform;
+		lightening1GO = GameObject.Instantiate(lighteningPrefab) as GameObject;
+		lightening1GO.transform.parent = transform;
+		
+		uiZPos = transform.position.z;
 	}
 	
 	void Start(){
@@ -280,127 +328,468 @@ public class AVOWUI : MonoBehaviour {
 		
 	}
 	
+	void ClearConnection0Data(){
+		connection0Pos = Vector3.zero;
+		connection0Node = null;
+	}
 	
-	void NewUpdate(){
-		Vector3 mousePos = Input.mousePosition;
-		mousePos.z = 0;
-		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
-		
-		Vector3 oldCubePos = cursorCube.transform.position;
-		mouseWorldPos.z = oldCubePos.z;
-		cursorCube.transform.position = mouseWorldPos;
-		
-		state = State.kIdle;
-		
-		
-		// Find the node we are closest to
+	void ClearConnection1Data(){
+		connection1Pos = Vector3.zero;
+		connection1Node = null;
+		connection1Component = null;
+	}
+	
+	float FindClosestComponent(Vector3 pos, AVOWNode node, out GameObject closestComponent, out Vector3 closestPos){
+		// initialise outputs
+		closestComponent = null;
+		closestPos = Vector3.zero;
 		float minDist = maxLighteningDist;
-		AVOWNode minNode = null;
-		Vector3 testPos = mouseWorldPos;
-		Vector3 minNodePos = Vector3.zero;
+		
+		foreach (GameObject go in node.components){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			
+			if (component.type == AVOWComponent.Type.kVoltageSource) continue;
+			
+			if (!component.isInteractive) continue;
+			
+			float thisDist = 0;
+			Vector3 thisPos = Vector3.zero;
+			if (node == component.node0GO.GetComponent<AVOWNode>()){
+				thisPos = component.GetConnectionPos0();
+			}
+			else if (node == component.node1GO.GetComponent<AVOWNode>()){
+				thisPos = component.GetConnectionPos1();
+			}
+			else{
+				Debug.LogError ("Error UI");
+			}
+			thisPos.z = uiZPos;
+			thisDist = (thisPos - pos).magnitude;
+			float thisMaxDist = component.hWidth * 0.35f;
+			
+			if (thisDist < minDist){
+				minDist = thisDist;
+				if (thisDist < thisMaxDist){
+					closestComponent = go;
+					closestPos = thisPos;
+				}
+				else{
+					closestComponent = null;
+					closestPos = Vector3.zero;
+				}
+			}
+			
+		}	
+		return closestComponent ? minDist : maxLighteningDist;
+	}
+	
+	void FindClosestPointOnNode(Vector3 pos, AVOWNode node, out Vector3 closestPos){
+
+		closestPos = Vector3.zero;
+
+		// If inside the h-range of the node
+		if (pos.x > node.h0 && pos.x < node.h0 + node.hWidth){
+			closestPos = new Vector3(pos.x, node.voltage, uiZPos);
+			
+		}
+		else{
+			if (pos.x <= node.h0){
+				closestPos = new Vector3(node.h0, node.voltage, uiZPos);
+			}
+			else{
+				closestPos = new Vector3(node.h0 + node.hWidth, node.voltage, uiZPos);
+			}
+		}
+	}
+
+	
+	float FindClosestNode(Vector3 pos, GameObject ignoreNode, out GameObject closestNode, out Vector3 closestPos){
+		// Initialise return values
+		closestNode = null;
+		closestPos = Vector3.zero;
+		float minDist = maxLighteningDist;
+		
 		foreach (GameObject go in AVOWGraph.singleton.allNodes){
+		
+			if (go == ignoreNode) continue;
+			
 			AVOWNode node = go.GetComponent<AVOWNode>();
 			
-			// If inside the cruz of the node
+			// If inside the h-range of the node
 			float thisDist = -1;
 			Vector3 thisPos = Vector3.zero;
-			if (testPos.x > node.h0 && testPos.x < node.h0 + node.hWidth){
-				thisDist = Mathf.Abs(testPos.y - node.voltage);
-				thisPos = new Vector3(testPos.x, node.voltage, testPos.z);
+			if (pos.x > node.h0 && pos.x < node.h0 + node.hWidth){
+				thisDist = Mathf.Abs(pos.y - node.voltage);
+				thisPos = new Vector3(pos.x, node.voltage, uiZPos);
 				
 			}
 			else{
-				if (testPos.x <= node.h0){
-					thisPos = new Vector3(node.h0, node.voltage, testPos.z);
+				if (pos.x <= node.h0){
+					thisPos = new Vector3(node.h0, node.voltage, uiZPos);
 				}
 				else{
-					thisPos = new Vector3(node.h0 + node.hWidth, node.voltage, testPos.z);
+					thisPos = new Vector3(node.h0 + node.hWidth, node.voltage, uiZPos);
 				}
-				thisDist = (testPos - thisPos).magnitude;
+				thisDist = (pos - thisPos).magnitude;
 			}
-			float thisMaxDist = node.hWidth * 0.35f;
-			if (thisDist < minDist && thisDist < thisMaxDist){
-				minNode = node;
+			float thisMaxDist = node.hWidth * 0.30f;
+			if (thisDist < minDist){
 				minDist = thisDist;
-				minNodePos = thisPos;
-				state = State.kNodeOnly;
-				
-			}
-		}
-		
-		// If we are connected to a node, see if we can also  connect to one of the 
-		// Resistors connected to this node
-		Vector3 minComponentPos = Vector3.zero;
-		minDist = maxLighteningDist;
-		AVOWComponent minComponent = null;
-		int minWhichNode = -1;
-		if (state == State.kNodeOnly){
-			
-			foreach (GameObject go in minNode.components){
-				AVOWComponent component = go.GetComponent<AVOWComponent>();
-				
-				if (component.type == AVOWComponent.Type.kVoltageSource) continue;
-				
-				float thisDist = 0;
-				int thisWhichNode = -1;
-				Vector3 connectionPos = Vector3.zero;
-				if (minNode == component.node0GO.GetComponent<AVOWNode>()){
-					connectionPos = component.GetConnectionPos0();
-					connectionPos.z = testPos.z;
-				}
-				else if (minNode == component.node1GO.GetComponent<AVOWNode>()){
-					connectionPos = component.GetConnectionPos1();
-					connectionPos.z = testPos.z;
+				// We we are outside the min dist for this node, then do not connect to it
+				// but also ensure that if we are connected to aby it is our closets one
+				if (thisDist < thisMaxDist){
+					closestNode = go;
+					closestPos = thisPos;
+					
 				}
 				else{
-					Debug.LogError ("Error UI");
+					closestNode = null;
+					closestPos = Vector3.zero;
 				}
-				thisDist = (connectionPos - testPos).magnitude;
-				float thisMaxDist = component.hWidth * 0.35f;
+			}
+		}	
+		return closestNode ? minDist : maxLighteningDist;
+	}
+	
+	
+	void NewUpdate(){
+		// Calc the mouse posiiton on world spave
+		Vector3 mousePos = Input.mousePosition;
+		mousePos.z = 0;
+		mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
+		
+		// Get the mouse buttons
+		bool  buttonPressed = (Input.GetMouseButtonDown(0) && !Input.GetKey (KeyCode.LeftControl));
+		bool  buttonReleased = (Input.GetMouseButtonUp(0) && !Input.GetKey (KeyCode.LeftControl));
+		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
+		
+		// Set the cursor cubes position
+		Vector3 oldCubePos = cursorCube.transform.position;
+		mouseWorldPos.z = uiZPos;
+		cursorCube.transform.position = mouseWorldPos;
+		
+		// Do connection logic
+		switch (state){
+			// We are not holding on to anything
+			case State.kFree:
+			{
+				ClearConnection0Data();
+				ClearConnection1Data();
+				FindClosestNode(mouseWorldPos, null, out connection0Node, out connection0Pos);
 				
-				if (thisDist < minDist && thisDist < thisMaxDist){
-					minComponent = component;
-					minDist = thisDist;
-					minWhichNode = thisWhichNode;
-					minComponentPos = connectionPos;
-					state = State.kNodeAndResistor;
+				// Only if we are connected to a node go we then test if we can connect to something else
+				if (connection0Node != null){
+					// Test if we are near a component connector
+					float compDist = FindClosestComponent(mouseWorldPos, connection0Node.GetComponent<AVOWNode>(), out connection1Component, out connection1Pos);
+					
+					// Test if we are near a node
+					GameObject nodeGO = null;
+					Vector3 nodePos = Vector3.zero;
+					float nodeDist = FindClosestNode(mouseWorldPos, connection0Node, out nodeGO, out nodePos);
+					
+					// Connect us to the closest of the two
+					if (connection0Node != null && nodeDist < compDist){
+						connection1Component = null;
+						connection1Node = nodeGO;
+						connection1Pos = nodePos;
+					}
+					
+					// If the button is pressed and we have a node, we need to change state
+					if (buttonPressed){
+						state = State.kHeldNode;
+					}
 				}
 				
+				break;
+			}
+			case State.kHeldNode:
+			{
+				ClearConnection1Data();
+				FindClosestPointOnNode(mouseWorldPos, connection0Node.GetComponent<AVOWNode>(), out connection0Pos);
+				
+				// Test if we are near a component connector
+				float compDist = FindClosestComponent(mouseWorldPos, connection0Node.GetComponent<AVOWNode>(), out connection1Component, out connection1Pos);
+				
+				// Test if we are near a node
+				GameObject nodeGO = null;
+				Vector3 nodePos = Vector3.zero;
+				float nodeDist = FindClosestNode(mouseWorldPos, connection0Node, out nodeGO, out nodePos);
+				
+				// Connect us to the closest of the two
+				if (connection0Node != null && nodeDist < compDist){
+					connection1Component = null;
+					connection1Node = nodeGO;
+					connection1Pos = nodePos;
+				}	
+				
+				// If the button is pressed, we need to change state
+				if (!buttonDown){
+					state = State.kFree;
+				}
+				break;
+			}
+			case State.kHeldOpen:
+			{
+				//FindClosestPointOnNode(mouseWorldPos, connection0Node.GetComponent<AVOWNode>(), out connection0Pos);
+				
+				// Test if we are near a component connector (we store the position in a different variable so we can lerp
+				// to the correction position.
+				Vector3 conn1Pos = Vector3.zero;
+				float compDist = FindClosestComponent(mouseWorldPos, connection0Node.GetComponent<AVOWNode>(), out connection1Component, out conn1Pos);
+				
+				// Test if we are near a node
+				GameObject nodeGO = null;
+				Vector3 nodePos = Vector3.zero;
+				connection1Node = null;
+				float nodeDist = FindClosestNode(mouseWorldPos, connection0Node, out nodeGO, out nodePos);
+				
+				// Connect us to the closest of the two
+				if (connection0Node != null && nodeDist < compDist){
+					connection1Component = null;
+					connection1Node = nodeGO;
+					conn1Pos = nodePos;
+				}	
+				
+				// Test if we are no longer attached to the node we were originally
+				if (connection1Node != currentAction.conn1Node){
+					state = State.kHeldNode;
+					connection1Pos = conn1Pos;
+				}
+				// If we are still attached, then set the connection points to the connection
+				// points of the new compment we made
+				else{
+					AVOWComponent newComp = currentAction.conn1Component.GetComponent<AVOWComponent>();
+					
+					connection0Pos.x = Mathf.Lerp(connection0Pos.x, newComp.h0 + 0.5f * newComp.hWidth, 0.1f);
+					connection1Pos.x = Mathf.Lerp(connection1Pos.x, newComp.h0 + 0.5f * newComp.hWidth, 0.1f);
+				}
+				
+				// If the button is pressed, we need to change state
+				if (!buttonDown){
+					state = State.kFree;
+				}
+				break;
+			}
+			
+		}
+		// Record what we need to define the action associated with this state
+		lastAction = currentAction;
+		currentAction = DefineAction();
+		
+	}
+	
+	Action DefineAction(){
+		switch(state){
+			case (State.kFree):{
+				return null;
+			}
+			case (State.kHeldNode):{
+				if (connection1Node == null && connection1Component == null) 
+					return null;
+				else
+					return new Action (connection0Node, connection1Node, connection1Component);
+			}
+			// Just keep the action as it is!
+			case (State.kHeldOpen):{
+				return currentAction;
 			}
 		}
+		return null;
+	}
+	
+	bool ActionHasChange(){
+		if (currentAction == null && lastAction == null) return false;
 		
-		// If we have such a node then make som lightening to it
-		if (state == State.kNodeOnly || state == State.kNodeAndResistor){
-			//cursorCube.transform.position = minPos;
-			lightening0.SetActive(true);
-			lightening0.GetComponent<Lightening>().startPoint = cursorCube.transform.position;
-			lightening0.GetComponent<Lightening>().endPoint = minNodePos;
-			lightening0.GetComponent<Lightening>().size = 0.2f;
-			lightening0.GetComponent<Lightening>().ConstructMesh();
+		if (currentAction == null && lastAction != null) return true;
+		
+		if (currentAction != null && lastAction == null) return true;
+		
+		// So neither are null
+		return !currentAction.IsEqual(lastAction);
+		
+	}
+	
+	void NewUpdateVisuals(){
+	
+		// If we have changed the things we are pointing at
+		if (ActionHasChange()){
+			if (lastAction != null){
+				UndoLastCommand();
+			}
+			if (currentAction != null){
+				if (currentAction.conn1Node != null){
+
+					AVOWCommand command = new AVOWCommandAddComponent(currentAction.conn0Node , currentAction.conn1Node, resistorPrefab);
+					IssueCommand(command);
+				}
+				// Otherwise it is a component
+				else{
+					AVOWCommandSplitAddComponent command = new AVOWCommandSplitAddComponent(currentAction.conn0Node, currentAction.conn1Component, resistorPrefab);
+					IssueCommand(command);
+					// Our current "action" is now meaninless as the comoment is not connected to the node anymore
+					// So adjust our "last action" to make sense in this new context
+					currentAction.conn1Component = command.newComponentGO;
+					currentAction.conn1Node = command.newNodeGO;
+					
+					lastAction = currentAction;
+					
+					state = State.kHeldOpen;
+					
+				}
+			}
+		}
+	
+		// Lightening to connection 0 - which is always a node
+		if (connection0Node != null){
+			lightening0GO.SetActive(true);
+			Lightening lightening0 = lightening0GO.GetComponent<Lightening>();
 			
-			// Rotate the cube a bit too
-			cursorCube.transform.Rotate (new Vector3(1, 2, 4));
-			
+			lightening0.startPoint = mouseWorldPos;
+			lightening0.endPoint = connection0Pos;
+			lightening0.size =  (state == State.kFree) ? 0.1f : 0.4f;;
+			lightening0.ConstructMesh();
 		}
 		else{
-			lightening0.SetActive(false);
+			lightening0GO.SetActive(false);
 		}
-		AVOWGraph.singleton.EnableAllLightening();
 		
-		if (state == State.kNodeAndResistor){
-			
-			lightening1.SetActive(true);
-			lightening1.GetComponent<Lightening>().startPoint = cursorCube.transform.position;
-			lightening1.GetComponent<Lightening>().endPoint = minComponentPos;
-			lightening1.GetComponent<Lightening>().size = 0.2f;
-			lightening1.GetComponent<Lightening>().ConstructMesh();
+		// Lightening to connection 1 - which may be a component or a node
+		AVOWGraph.singleton.EnableAllLightening();
+		if (connection1Component != null || connection1Node != null){
+			lightening1GO.SetActive(true);
+			Lightening lightening1 = lightening1GO.GetComponent<Lightening>();
+			lightening1.startPoint = mouseWorldPos;
+			lightening1.endPoint = connection1Pos;
+			lightening1.size = 0.1f;
+			lightening1.ConstructMesh();
 			
 			// Also need to hide the lightening from the compoment to the node
-			minComponent.GetComponent<AVOWComponent>().EnableLightening(minNode.gameObject, false);
+			if (connection1Component != null){
+				connection1Component.GetComponent<AVOWComponent>().EnableLightening(connection0Node, false);
+			}
 		}
 		else{
-			lightening1.SetActive(false);
+			lightening1GO.SetActive(false);
+		}		
+		
+		// If we are connected to something then rotate the cube a bit
+		if (connection0Node != null || connection1Node != null){
+			cursorCube.transform.Rotate (new Vector3(1, 2, 4));
 		}
+		
+	}
+
+	void OldNewUpdate()		{
+		
+		
+		
+//
+//
+//		if (state == State.kNodeHeld){
+//			minNode = fixedNodeGO.GetComponent<AVOWNode>();
+//			
+//			// If inside the cruz of the node
+//			if (testPos.x > minNode.h0 && testPos.x < minNode.h0 + minNode.hWidth){
+//				minDist = Mathf.Abs(testPos.y - minNode.voltage);
+//				minNodePos = new Vector3(testPos.x, minNode.voltage, testPos.z);
+//				
+//			}
+//			else{
+//				if (testPos.x <= minNode.h0){
+//					minNodePos = new Vector3(minNode.h0, minNode.voltage, testPos.z);
+//				}
+//				else{
+//					minNodePos = new Vector3(minNode.h0 + minNode.hWidth, minNode.voltage, testPos.z);
+//				}
+//				minDist = (testPos - minNodePos).magnitude;
+//			}
+//		}
+
+//		// If we are connected to a node, see if we can also  connect to one of the 
+//		// Resistors connected to this node
+//		Vector3 minComponentPos = Vector3.zero;
+//		minDist = maxLighteningDist;
+//		AVOWComponent minComponent = null;
+//		int minWhichNode = -1;
+//		if (state == State.kNodeOnly || state == State.kNodeHeld){
+//			
+//			foreach (GameObject go in minNode.components){
+//				AVOWComponent component = go.GetComponent<AVOWComponent>();
+//				
+//				if (component.type == AVOWComponent.Type.kVoltageSource) continue;
+//				
+//				float thisDist = 0;
+//				int thisWhichNode = -1;
+//				Vector3 connectionPos = Vector3.zero;
+//				if (minNode == component.node0GO.GetComponent<AVOWNode>()){
+//					connectionPos = component.GetConnectionPos0();
+//					connectionPos.z = testPos.z;
+//				}
+//				else if (minNode == component.node1GO.GetComponent<AVOWNode>()){
+//					connectionPos = component.GetConnectionPos1();
+//					connectionPos.z = testPos.z;
+//				}
+//				else{
+//					Debug.LogError ("Error UI");
+//				}
+//				thisDist = (connectionPos - testPos).magnitude;
+//				float thisMaxDist = component.hWidth * 0.35f;
+//				
+//				if (thisDist < minDist && thisDist < thisMaxDist){
+//					minComponent = component;
+//					minDist = thisDist;
+//					minWhichNode = thisWhichNode;
+//					minComponentPos = connectionPos;
+//					state = State.kNodeAndResistor;
+//				}
+//				
+//			}
+//		}
+//		
+//		
+//		
+//		if (buttonPressed){
+//			if (state == State.kNodeOnly || state == State.kNodeAndResistor){
+//				fixedNodeGO = minNode.gameObject;
+//				state = State.kNodeHeld;
+//			}
+//		}
+//		
+//		// If we have such a node then make some lightening to it
+//		if (state == State.kNodeOnly || state == State.kNodeAndResistor){
+//			//cursorCube.transform.position = minPos;
+//			lightening0.SetActive(true);
+//			lightening0.GetComponent<Lightening>().startPoint = cursorCube.transform.position;
+//			lightening0.GetComponent<Lightening>().endPoint = minNodePos;
+//			lightening0.GetComponent<Lightening>().size = 0.2f;
+//			lightening0.GetComponent<Lightening>().ConstructMesh();
+//			
+//			// Rotate the cube a bit too
+//			cursorCube.transform.Rotate (new Vector3(1, 2, 4));
+//			
+//		}
+//		else{
+//			lightening0.SetActive(false);
+//		}
+//		
+//
+//		
+//		AVOWGraph.singleton.EnableAllLightening();
+//		
+//		if (state == State.kNodeAndResistor){
+//			
+//			lightening1.SetActive(true);
+//			lightening1.GetComponent<Lightening>().startPoint = cursorCube.transform.position;
+//			lightening1.GetComponent<Lightening>().endPoint = minComponentPos;
+//			lightening1.GetComponent<Lightening>().size = 0.2f;
+//			lightening1.GetComponent<Lightening>().ConstructMesh();
+//			
+//			// Also need to hide the lightening from the compoment to the node
+//			minComponent.GetComponent<AVOWComponent>().EnableLightening(minNode.gameObject, false);
+//		}
+//		else{
+//			lightening1.SetActive(false);
+//		}
 		
 	}
 	
@@ -410,129 +799,131 @@ public class AVOWUI : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		// Get the mouse position in world space
-		Vector3 mousePos = Input.mousePosition;
-		mousePos.z = 0;
-		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
+//		// Get the mouse position in world space
+//		Vector3 mousePos = Input.mousePosition;
+//		mousePos.z = 0;
+//		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
 		
 		NewUpdate();
-		
-		bool  buttonPressed = (Input.GetMouseButtonDown(0) && !Input.GetKey (KeyCode.LeftControl));
-		bool  buttonReleased = (Input.GetMouseButtonUp(0) && !Input.GetKey (KeyCode.LeftControl));
-		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
-		
-		if (buttonReleased){
-			secondarySelectedNode = null;
-			secondarySelectedComponent = null;
-			previousSecondarySelectedNode = null;
-			selectedTab = null;
-			AVOWGraph.singleton.FillAllResistors();
-		}
-		if (buttonPressed || !buttonDown){
-			selectedTab = null;
-			secondarySelectedNode = null;
-		}
-		// If we do not have anything selected
-		overTab = null;
-		if (selectedTab == null){
-			foreach (AVOWTab tab in tabs){
-				bool isInside = tab.IsContaining(mouseWorldPos);
-				tab.SetMouseInside(isInside);
-				if (isInside){
-					if (buttonPressed){
-						
-						selectedTab = tab;
-					}
-					overTab = tab;
-				}
-				tab.SetSelected(tab == selectedTab);
-			}
-		}
-		// If we do have something selected, then we have different logic
-		else{
-			foreach (AVOWTab tab in tabs){
-				tab.SetMouseInside(false);
-			}		
-			secondarySelectedNode = null;	
-			secondarySelectedComponent = null;
-			foreach (AVOWTab tab in tabs){
-				// if we are in our select tab, then do nothing
-				if (tab == selectedTab) continue;
-				
-				bool isInside = tab.IsContaining(mouseWorldPos);
-				// If we are inside this tab, find all the other tabs which are
-				// part of this node - as we are "inside" all of them now too
-				if (isInside){
-					secondarySelectedNode = tab.GetNode();
-					secondarySelectedComponent = tab.GetAVOWComponent();
-					foreach (GameObject go in secondarySelectedNode.components){
-						AVOWComponent component = go.GetComponent<AVOWComponent>();
-						AVOWTab otherTab = null;
-						if (component.node0GO == secondarySelectedNode){
-							otherTab = go.transform.FindChild("LowerTab").GetComponent<AVOWTab>();
-						}
-						else{
-							otherTab = go.transform.FindChild("UpperTab").GetComponent<AVOWTab>();
-						}
-						otherTab.SetMouseInside(true);
-					}
-				}
-
-			}
-		}
-		
-		
-		
-		
-//		Debug.Log ("secondarySelectedNode = " + 
-//			(secondarySelectedNode!=null ? secondarySelectedNode.GetID() : "NULL") + " , previousSecondarySelectedNode = " + 
-//			(previousSecondarySelectedNode!=null ? previousSecondarySelectedNode.GetID() : "NULL"));
-
-
-		// if we have a new secondarySelectNode then need to make (or destroy) one of the components
-//		Debug.Log ("secondarySelectedNode = " + ((secondarySelectedNode != null) ? secondarySelectedNode.GetID():"NULL") + "...previousSecondarySelectedNode = " + ((previousSecondarySelectedNode != null) ? 
-//			previousSecondarySelectedNode.GetID() : "NULL") + "....selectedComponent = " + ((selectedTab != null) ? selectedTab.GetAVOWComponent ().GetID() : "NULL") + 
-//		           "...secondarySelectedComponent = " + ((secondarySelectedComponent != null) ? secondarySelectedComponent.GetID() : "NULL"));
-		
-//		if (secondarySelectedNode != null && previousSecondarySelectedNode != null && secondarySelectedNode.GetComponent<AVOWNode>().splitFromNode != null && secondarySelectedNode.GetComponent<AVOWNode>().splitFromNode.GetComponent<AVOWNode>() == previousSecondarySelectedNode){
-//			previousSecondarySelectedNode = secondarySelectedNode;
+		NewUpdateVisuals();
+		return;
+//		
+//		bool  buttonPressed = (Input.GetMouseButtonDown(0) && !Input.GetKey (KeyCode.LeftControl));
+//		bool  buttonReleased = (Input.GetMouseButtonUp(0) && !Input.GetKey (KeyCode.LeftControl));
+//		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
+//		
+//		if (buttonReleased){
+//			secondarySelectedNode = null;
+//			secondarySelectedComponent = null;
+//			previousSecondarySelectedNode = null;
+//			selectedTab = null;
+//			AVOWGraph.singleton.FillAllResistors();
 //		}
-		
-		if (secondarySelectedNode != previousSecondarySelectedNode){
-			// If we were previously on a node, then we need to remove the last component we added
-			if (previousSecondarySelectedNode != null){
-				Debug.Log ("Undo last command");
-				UndoLastCommand();
-				previousSecondarySelectedNode  = secondarySelectedNode;
-			}
-			
-			// If our currently selected one is a node, then we need to create a new component
-			if (secondarySelectedNode != null && !lockCreation){
-				// Are we trying to split a node
-				if (selectedTab.GetNode() == secondarySelectedNode){
-					AVOWCommand command = new AVOWCommandSplitAddComponent(secondarySelectedNode.gameObject, selectedTab.GetAVOWComponent ().gameObject, resistorPrefab);
-					IssueCommand(command);
-
-					
-				}
-				// or simple put a new component accross existing nodes
-				else{
-					AVOWCommand command = new AVOWCommandAddComponent(selectedTab.GetNode().gameObject, secondarySelectedNode.gameObject, resistorPrefab);
-					IssueCommand(command);
-					
-				}
-				
-			}
-			if (!lockCreation)
-				previousSecondarySelectedNode  = secondarySelectedNode;
-		}		
-		
-		// If we have a selected tab, then figure out if any tabs need to be disabled
-		// TO DO		
+//		if (buttonPressed || !buttonDown){
+//			selectedTab = null;
+//			secondarySelectedNode = null;
+//		}
+//		// If we do not have anything selected
+//		overTab = null;
+//		if (selectedTab == null){
+//			foreach (AVOWTab tab in tabs){
+//				bool isInside = tab.IsContaining(mouseWorldPos);
+//				tab.SetMouseInside(isInside);
+//				if (isInside){
+//					if (buttonPressed){
+//						
+//						selectedTab = tab;
+//					}
+//					overTab = tab;
+//				}
+//				tab.SetSelected(tab == selectedTab);
+//			}
+//		}
+//		// If we do have something selected, then we have different logic
+//		else{
+//			foreach (AVOWTab tab in tabs){
+//				tab.SetMouseInside(false);
+//			}		
+//			secondarySelectedNode = null;	
+//			secondarySelectedComponent = null;
+//			foreach (AVOWTab tab in tabs){
+//				// if we are in our select tab, then do nothing
+//				if (tab == selectedTab) continue;
+//				
+//				bool isInside = tab.IsContaining(mouseWorldPos);
+//				// If we are inside this tab, find all the other tabs which are
+//				// part of this node - as we are "inside" all of them now too
+//				if (isInside){
+//					secondarySelectedNode = tab.GetNode();
+//					secondarySelectedComponent = tab.GetAVOWComponent();
+//					foreach (GameObject go in secondarySelectedNode.components){
+//						AVOWComponent component = go.GetComponent<AVOWComponent>();
+//						AVOWTab otherTab = null;
+//						if (component.node0GO == secondarySelectedNode){
+//							otherTab = go.transform.FindChild("LowerTab").GetComponent<AVOWTab>();
+//						}
+//						else{
+//							otherTab = go.transform.FindChild("UpperTab").GetComponent<AVOWTab>();
+//						}
+//						otherTab.SetMouseInside(true);
+//					}
+//				}
+//
+//			}
+//		}
+//		
+//		
+//		
+//		
+////		Debug.Log ("secondarySelectedNode = " + 
+////			(secondarySelectedNode!=null ? secondarySelectedNode.GetID() : "NULL") + " , previousSecondarySelectedNode = " + 
+////			(previousSecondarySelectedNode!=null ? previousSecondarySelectedNode.GetID() : "NULL"));
+//
+//
+//		// if we have a new secondarySelectNode then need to make (or destroy) one of the components
+////		Debug.Log ("secondarySelectedNode = " + ((secondarySelectedNode != null) ? secondarySelectedNode.GetID():"NULL") + "...previousSecondarySelectedNode = " + ((previousSecondarySelectedNode != null) ? 
+////			previousSecondarySelectedNode.GetID() : "NULL") + "....selectedComponent = " + ((selectedTab != null) ? selectedTab.GetAVOWComponent ().GetID() : "NULL") + 
+////		           "...secondarySelectedComponent = " + ((secondarySelectedComponent != null) ? secondarySelectedComponent.GetID() : "NULL"));
+//		
+////		if (secondarySelectedNode != null && previousSecondarySelectedNode != null && secondarySelectedNode.GetComponent<AVOWNode>().splitFromNode != null && secondarySelectedNode.GetComponent<AVOWNode>().splitFromNode.GetComponent<AVOWNode>() == previousSecondarySelectedNode){
+////			previousSecondarySelectedNode = secondarySelectedNode;
+////		}
+//		
+//		if (secondarySelectedNode != previousSecondarySelectedNode){
+//			// If we were previously on a node, then we need to remove the last component we added
+//			if (previousSecondarySelectedNode != null){
+//				Debug.Log ("Undo last command");
+//				UndoLastCommand();
+//				previousSecondarySelectedNode  = secondarySelectedNode;
+//			}
+//			
+//			// If our currently selected one is a node, then we need to create a new component
+//			if (secondarySelectedNode != null && !lockCreation){
+//				// Are we trying to split a node
+//				if (selectedTab.GetNode() == secondarySelectedNode){
+//					AVOWCommand command = new AVOWCommandSplitAddComponent(secondarySelectedNode.gameObject, selectedTab.GetAVOWComponent ().gameObject, resistorPrefab);
+//					IssueCommand(command);
+//
+//					
+//				}
+//				// or simple put a new component accross existing nodes
+//				else{
+//					AVOWCommand command = new AVOWCommandAddComponent(selectedTab.GetNode().gameObject, secondarySelectedNode.gameObject, resistorPrefab);
+//					IssueCommand(command);
+//					
+//				}
+//				
+//			}
+//			if (!lockCreation)
+//				previousSecondarySelectedNode  = secondarySelectedNode;
+//		}		
+//		
+//		// If we have a selected tab, then figure out if any tabs need to be disabled
+//		// TO DO		
 	}
 	
 	void IssueCommand(AVOWCommand command){
-		command.Execute();
+		command.ExecuteStep();
 		commands.Push(command);
 		
 	}

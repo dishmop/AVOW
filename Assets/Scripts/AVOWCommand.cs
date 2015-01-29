@@ -3,7 +3,7 @@ using System;
 
 public interface AVOWCommand{
 
-	void Execute();
+	bool ExecuteStep();
 
 	// Undoes part of the command, this may need to be called again
 	// We return true when we have finished

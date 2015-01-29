@@ -11,7 +11,7 @@ public class AVOWComponent : MonoBehaviour {
 	public float connectorProp = 0.1f;
 	public float squareGap = 0.02f;
 	public float lighteningSize = 0.5f;
-	
+	public bool isInteractive = true;	
 	
 	// top bottom, left right 
 	float useH0;

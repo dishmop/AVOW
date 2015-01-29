@@ -6,14 +6,22 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 	public GameObject nodeGO;
 	public GameObject movedComponent;
 	public GameObject prefab;
-	GameObject newComponent;
+	public GameObject newNodeGO;
+	public GameObject newComponentGO;
 	
 	enum UndoStepState{
 		kRemoveComponent,
 		kMergeNode
 	}
 	
-	UndoStepState step = UndoStepState.kRemoveComponent;
+	enum ExecuteStepState{
+		kMakeGap,
+		kFixComponent
+	}
+	
+	UndoStepState undoStep = UndoStepState.kRemoveComponent;
+	ExecuteStepState executeStep = ExecuteStepState.kMakeGap;
+	
 	
 	public AVOWCommandSplitAddComponent(GameObject splitNodeGO, GameObject component, GameObject prefabToUse){
 		nodeGO = splitNodeGO;
@@ -22,31 +30,48 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 		
 	}
 
-	public void Execute(){
-		GameObject newNodeGO = AVOWGraph.singleton.SplitNode(nodeGO, movedComponent.GetComponent<AVOWComponent>());
-		
-		newComponent = GameObject.Instantiate(prefab) as GameObject;
-		newComponent.GetComponent<AVOWComponent>().resistanceAngle.Force(0);
-		newComponent.GetComponent<AVOWComponent>().resistanceAngle.Set(10);
-		newComponent.SetActive(false);
-		
-		AVOWGraph.singleton.PlaceComponent(newComponent, newNodeGO, nodeGO);
-		AVOWSim.singleton.Recalc();
+	public bool ExecuteStep(){
+		switch (executeStep){
+			case ExecuteStepState.kMakeGap:{
+				newNodeGO = AVOWGraph.singleton.SplitNode(nodeGO, movedComponent.GetComponent<AVOWComponent>());
+				
+				newComponentGO = GameObject.Instantiate(prefab) as GameObject;
+				newComponentGO.SetActive(false);
+
+				AVOWComponent newComponent = newComponentGO.GetComponent<AVOWComponent>();
+				newComponent.resistanceAngle.Force(0);
+				newComponent.resistanceAngle.Set(10);
+				newComponent.isInteractive = false;
+				
+				AVOWGraph.singleton.PlaceComponent(newComponentGO, newNodeGO, nodeGO);
+				AVOWSim.singleton.Recalc();
+				return false;
+			}
+			case ExecuteStepState.kFixComponent:{
+				AVOWComponent newComponent = newComponentGO.GetComponent<AVOWComponent>();
+				newComponent.isInteractive = true;
+				newComponent.resistanceAngle.Set(45);
+			
+				AVOWNode newNode = newNodeGO.GetComponent<AVOWNode>();
+				return true;
+			}
+		}
+		return false;
 		
 		
 	}
 
 	public bool UndoStep(){
-		AVOWComponent component = newComponent.GetComponent<AVOWComponent>();
-		switch (step){
+		AVOWComponent component = newComponentGO.GetComponent<AVOWComponent>();
+		switch (undoStep){
 			case UndoStepState.kRemoveComponent:{
 				component.Kill (0);
 				component.onDeadCommand = this;
-				step = UndoStepState.kMergeNode;
+				undoStep = UndoStepState.kMergeNode;
 				return false;
 			}
 			case UndoStepState.kMergeNode:{
-				AVOWGraph.singleton.MergeNodes(component.node0GO, component.node1GO);
+				AVOWGraph.singleton.MergeNodes(component.node1GO, component.node0GO);
 				return true;
 			}
 		};

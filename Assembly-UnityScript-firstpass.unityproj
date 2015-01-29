@@ -53,6 +53,7 @@
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Multiply.shader" />
      <None Include="Assets\Shaders\Outline.shader" />
      <None Include="Assets\Tutorial_1\Combiner.shader" />
+     <None Include="Assets\Shaders\AVOWCursorCube.shader" />
      <None Include="Assets\Scripts\alglib\gpl2.txt" />
      <None Include="Assets\Tutorial_2\2_Lambert.shader" />
      <None Include="Assets\Shaders\SolidColor_FG.shader" />

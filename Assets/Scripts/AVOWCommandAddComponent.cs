@@ -15,13 +15,14 @@ public class AVOWCommandAddComponent : AVOWCommand{
 		
 	}
 
-	public void Execute(){
+	public bool ExecuteStep(){
 		newComponent = GameObject.Instantiate(prefab) as GameObject;
 		newComponent.GetComponent<AVOWComponent>().resistanceAngle.Force(85);
 		newComponent.GetComponent<AVOWComponent>().resistanceAngle.Set(80);
 		
 		AVOWGraph.singleton.PlaceComponent(newComponent, node0GO, node1GO);
 		AVOWSim.singleton.Recalc();
+		return true;
 		
 	}
 
