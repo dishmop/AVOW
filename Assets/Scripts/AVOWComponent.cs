@@ -175,8 +175,17 @@ public class AVOWComponent : MonoBehaviour {
 		if (nodeGO == node0GO){
 			enableLightening0 = enable;
 		}
-		else{
+		else if (nodeGO == node1GO){
 			enableLightening1 = enable;
+		}
+		else if (!node0GO.GetComponent<AVOWNode>().isInteractive){
+			enableLightening0 = enable;
+		}
+		else if (!node1GO.GetComponent<AVOWNode>().isInteractive){
+			enableLightening1 = enable;
+		}
+		else{
+			Debug.LogError ("Error enable Lighting");
 		}
 		
 	}
@@ -206,7 +215,7 @@ public class AVOWComponent : MonoBehaviour {
 			SetNode1(newNodeGO);
 		}
 		else{
-			Debug.LogError ("Error replacing node");
+			Debug.LogError ("Error replacing node " + existingNodeGO.GetComponent<AVOWNode>().GetID() + " with node " + newNodeGO.GetComponent<AVOWNode>().GetID() + " on component " + GetID());
 		}
 	}
 	

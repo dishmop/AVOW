@@ -35,7 +35,7 @@ public class AVOWCommandAddComponent : AVOWCommand{
 				newComponentGO = GameObject.Instantiate(prefab) as GameObject;
 				AVOWComponent newComponent = newComponentGO.GetComponent<AVOWComponent>();
 			
-				newComponent.resistanceAngle.Force(85);
+				newComponent.resistanceAngle.Force(89);
 				newComponent.resistanceAngle.Set(80);
 				newComponent.isInteractive = false;
 			

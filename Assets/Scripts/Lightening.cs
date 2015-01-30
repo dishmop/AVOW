@@ -267,7 +267,8 @@ public class Lightening : MonoBehaviour {
 		float numerator = (p1.x-p0.x)*r0.y - (p1.y-p0.y)*r0.x;
 		float denominator = r1.y*r0.x-r1.x*r0.y;
 		if (MathUtils.FP.Feq(denominator, 0)){
-			Debug.Log ("Divide by zero when intersecting lines");
+//			Debug.Log ("Divide by zero when intersecting lines");
+			return p0;
 		}
 		float lambda1 = numerator / denominator;
 		return p1 + lambda1 * r1;
