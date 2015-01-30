@@ -16,10 +16,11 @@ public class AVOWUI : MonoBehaviour {
 	public float maxLighteningDist;
 	
 	class Action{
-		public Action(GameObject conn0Node, GameObject conn1Node, GameObject conn1Component){
+		public Action(GameObject conn0Node, GameObject conn1Node, GameObject conn1Component, bool isNodeGap){
 			this.conn0Node = conn0Node;
 			this.conn1Node = conn1Node;
 			this.conn1Component = conn1Component;
+			this.isNodeGap = isNodeGap;
 		}
 		
 		public  bool IsEqual(System.Object obj)
@@ -38,12 +39,15 @@ public class AVOWUI : MonoBehaviour {
 			}
 			
 			// Return true if the fields match:
-			return (conn0Node == p.conn0Node) && (conn1Node == p.conn1Node) && (conn1Component == p.conn1Component);
+			return (conn0Node == p.conn0Node) && (conn1Node == p.conn1Node) && (conn1Component == p.conn1Component) && (isNodeGap == p.isNodeGap);
 		}
-		
+				
 		public GameObject conn0Node;
 		public GameObject conn1Node;
 		public GameObject conn1Component;
+
+		// Otherwise it is a component gap
+		public bool	isNodeGap;
 	};
 	
 	Action	currentAction;
@@ -68,7 +72,8 @@ public class AVOWUI : MonoBehaviour {
 	enum State {
 		kFree,
 		kHeldNode,
-		kHeldOpen
+		kHeldOpen,
+		kHeldInside
 		
 	};
 	
@@ -365,18 +370,12 @@ public class AVOWUI : MonoBehaviour {
 			}
 			thisPos.z = uiZPos;
 			thisDist = (thisPos - pos).magnitude;
-			float thisMaxDist = component.hWidth * 0.35f;
 			
 			if (thisDist < minDist){
 				minDist = thisDist;
-				if (thisDist < thisMaxDist){
-					closestComponent = go;
-					closestPos = thisPos;
-				}
-				else{
-					closestComponent = null;
-					closestPos = Vector3.zero;
-				}
+				closestComponent = go;
+				closestPos = thisPos;
+
 			}
 			
 		}	
@@ -432,20 +431,10 @@ public class AVOWUI : MonoBehaviour {
 				}
 				thisDist = (pos - thisPos).magnitude;
 			}
-			float thisMaxDist = node.hWidth * 0.30f;
 			if (thisDist < minDist){
 				minDist = thisDist;
-				// We we are outside the min dist for this node, then do not connect to it
-				// but also ensure that if we are connected to aby it is our closets one
-				if (thisDist < thisMaxDist){
-					closestNode = go;
-					closestPos = thisPos;
-					
-				}
-				else{
-					closestNode = null;
-					closestPos = Vector3.zero;
-				}
+				closestNode = go;
+				closestPos = thisPos;
 			}
 		}	
 		return closestNode ? minDist : maxLighteningDist;
@@ -522,7 +511,7 @@ public class AVOWUI : MonoBehaviour {
 					connection1Pos = nodePos;
 				}	
 				
-				// If the button is pressed, we need to change state
+				// If the button is released, we need to change state
 				if (!buttonDown){
 					state = State.kFree;
 				}
@@ -530,24 +519,30 @@ public class AVOWUI : MonoBehaviour {
 			}
 			case State.kHeldOpen:
 			{
-				//FindClosestPointOnNode(mouseWorldPos, connection0Node.GetComponent<AVOWNode>(), out connection0Pos);
+				Vector3 node0Pos = Vector3.zero;
+				FindClosestPointOnNode(mouseWorldPos, connection0Node.GetComponent<AVOWNode>(), out node0Pos);
+				
+				// Check how close we are to the thing we are already attached to
+				float thisDist = (connection1Pos - mouseWorldPos).magnitude;
 				
 				// Test if we are near a component connector (we store the position in a different variable so we can lerp
 				// to the correction position.
 				Vector3 conn1Pos = Vector3.zero;
-				float compDist = FindClosestComponent(mouseWorldPos, connection0Node.GetComponent<AVOWNode>(), out connection1Component, out conn1Pos);
+				GameObject conn1Comp = null;
+				float compDist = FindClosestComponent(mouseWorldPos, connection0Node.GetComponent<AVOWNode>(), out conn1Comp, out conn1Pos);
+				connection1Component = conn1Comp;
 				
 				// Test if we are near a node
-				GameObject nodeGO = null;
-				Vector3 nodePos = Vector3.zero;
+				GameObject node1GO = null;
+				Vector3 node1Pos = Vector3.zero;
 				connection1Node = null;
-				float nodeDist = FindClosestNode(mouseWorldPos, connection0Node, out nodeGO, out nodePos);
+				float nodeDist = FindClosestNode(mouseWorldPos, connection0Node, out node1GO, out node1Pos);
 				
 				// Connect us to the closest of the two
 				if (connection0Node != null && nodeDist < compDist){
 					connection1Component = null;
-					connection1Node = nodeGO;
-					conn1Pos = nodePos;
+					connection1Node = node1GO;
+					conn1Pos = node1Pos;
 				}	
 				
 				// Test if we are no longer attached to the node we were originally
@@ -558,16 +553,33 @@ public class AVOWUI : MonoBehaviour {
 				// If we are still attached, then set the connection points to the connection
 				// points of the new compment we made
 				else{
-					AVOWComponent newComp = currentAction.conn1Component.GetComponent<AVOWComponent>();
-					
-					connection0Pos.x = Mathf.Lerp(connection0Pos.x, newComp.h0 + 0.5f * newComp.hWidth, 0.1f);
-					connection1Pos.x = Mathf.Lerp(connection1Pos.x, newComp.h0 + 0.5f * newComp.hWidth, 0.1f);
+					// If we are holding a component
+					if (currentAction.conn1Component != null){
+						AVOWComponent newComp = currentAction.conn1Component.GetComponent<AVOWComponent>();
+						
+						connection0Pos = node0Pos;
+						connection1Pos = Vector3.Lerp(connection1Pos, new Vector3( newComp.h0 + 0.5f * newComp.hWidth, node1Pos.y, node1Pos.z), 1f);
+					}
+					else{
+						connection0Pos = node0Pos;
+						connection1Pos = node1Pos;
+					}	
 				}
 				
-				// If the button is pressed, we need to change state
+				if (currentAction.isNodeGap){
+				}
+				
+				
+				
+				// If the button is released, then we need to finish off the component
 				if (!buttonDown){
+					commands.Peek().ExecuteStep();
 					state = State.kFree;
 				}
+				
+				break;
+			}
+			case State.kHeldInside:{
 				break;
 			}
 			
@@ -586,8 +598,9 @@ public class AVOWUI : MonoBehaviour {
 			case (State.kHeldNode):{
 				if (connection1Node == null && connection1Component == null) 
 					return null;
-				else
-					return new Action (connection0Node, connection1Node, connection1Component);
+				else{
+					return new Action (connection0Node, connection1Node, connection1Component, connection1Node != null);
+				}
 			}
 			// Just keep the action as it is!
 			case (State.kHeldOpen):{
@@ -614,13 +627,18 @@ public class AVOWUI : MonoBehaviour {
 		// If we have changed the things we are pointing at
 		if (ActionHasChange()){
 			if (lastAction != null){
-				UndoLastCommand();
+				UndoLastUnfinishedCommand();
 			}
 			if (currentAction != null){
 				if (currentAction.conn1Node != null){
 
-					AVOWCommand command = new AVOWCommandAddComponent(currentAction.conn0Node , currentAction.conn1Node, resistorPrefab);
+					AVOWCommandAddComponent command = new AVOWCommandAddComponent(currentAction.conn0Node , currentAction.conn1Node, resistorPrefab);
 					IssueCommand(command);
+
+					currentAction.conn1Component = command.GetNewComponent();
+					lastAction = currentAction;
+					
+					state = State.kHeldOpen;
 				}
 				// Otherwise it is a component
 				else{
@@ -628,8 +646,8 @@ public class AVOWUI : MonoBehaviour {
 					IssueCommand(command);
 					// Our current "action" is now meaninless as the comoment is not connected to the node anymore
 					// So adjust our "last action" to make sense in this new context
-					currentAction.conn1Component = command.newComponentGO;
-					currentAction.conn1Node = command.newNodeGO;
+					currentAction.conn1Component = command.GetNewComponent();
+					currentAction.conn1Node = command.GetNewNode();
 					
 					lastAction = currentAction;
 					
@@ -931,6 +949,14 @@ public class AVOWUI : MonoBehaviour {
 	void UndoLastCommand(){
 		AVOWCommand command = commands.Pop ();
 		command.UndoStep ();
+	}
+	
+	void UndoLastUnfinishedCommand(){
+		AVOWCommand command = commands.Peek ();
+		if (!command.IsFinished()){
+			commands.Pop ();
+			command.UndoStep ();
+		}
 	}
 	
 	void OnGUI(){

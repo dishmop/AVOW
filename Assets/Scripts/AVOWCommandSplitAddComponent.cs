@@ -6,8 +6,8 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 	public GameObject nodeGO;
 	public GameObject movedComponent;
 	public GameObject prefab;
-	public GameObject newNodeGO;
-	public GameObject newComponentGO;
+	GameObject newNodeGO;
+	GameObject newComponentGO;
 	
 	enum UndoStepState{
 		kRemoveComponent,
@@ -16,7 +16,8 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 	
 	enum ExecuteStepState{
 		kMakeGap,
-		kFixComponent
+		kFixComponent,
+		kFinished
 	}
 	
 	UndoStepState undoStep = UndoStepState.kRemoveComponent;
@@ -29,11 +30,16 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 		prefab = prefabToUse;
 		
 	}
+	
+	public bool IsFinished(){	
+		return executeStep == ExecuteStepState.kFinished;
+	}
 
 	public bool ExecuteStep(){
 		switch (executeStep){
 			case ExecuteStepState.kMakeGap:{
 				newNodeGO = AVOWGraph.singleton.SplitNode(nodeGO, movedComponent.GetComponent<AVOWComponent>());
+				newNodeGO.GetComponent<AVOWNode>().isInteractive = false;
 				
 				newComponentGO = GameObject.Instantiate(prefab) as GameObject;
 				newComponentGO.SetActive(false);
@@ -45,15 +51,21 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 				
 				AVOWGraph.singleton.PlaceComponent(newComponentGO, newNodeGO, nodeGO);
 				AVOWSim.singleton.Recalc();
+				executeStep = ExecuteStepState.kFixComponent;
 				return false;
 			}
 			case ExecuteStepState.kFixComponent:{
 				AVOWComponent newComponent = newComponentGO.GetComponent<AVOWComponent>();
 				newComponent.isInteractive = true;
 				newComponent.resistanceAngle.Set(45);
+				
+				newNodeGO.GetComponent<AVOWNode>().isInteractive = true;
 			
-				AVOWNode newNode = newNodeGO.GetComponent<AVOWNode>();
-				return true;
+			
+				
+				executeStep = ExecuteStepState.kFinished;
+			
+			return true;
 			}
 		}
 		return false;
@@ -78,5 +90,14 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 		return false;
 	
 	}
+	
+	public GameObject GetNewComponent(){
+		return newComponentGO;
+	}
+	
+	public GameObject GetNewNode(){
+		return newNodeGO;
+	}
+	
 	
 }

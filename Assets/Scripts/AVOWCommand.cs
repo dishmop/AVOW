@@ -9,4 +9,10 @@ public interface AVOWCommand{
 	// We return true when we have finished
 	bool UndoStep();
 	
+	bool IsFinished();
+	
+	GameObject GetNewComponent();
+	
+	GameObject GetNewNode();
+	
 }

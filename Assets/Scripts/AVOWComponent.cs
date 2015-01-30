@@ -19,13 +19,12 @@ public class AVOWComponent : MonoBehaviour {
 	float useV0;
 	float useV1;
 	
+	bool enableLightening0;
+	bool enableLightening1;
+	
 	
 	Vector3 oldNode0Pos = new Vector3(0, 0, 0);
 	Vector3 oldNode1Pos = new Vector3(0, 0, 0);
-	
-	
-	
-	
 	
 			
 	public float voltage;
@@ -174,12 +173,11 @@ public class AVOWComponent : MonoBehaviour {
 		
 		Transform lighteningT = null;
 		if (nodeGO == node0GO){
-			lighteningT = transform.FindChild("Lightening0");
+			enableLightening0 = enable;
 		}
 		else{
-			lighteningT = transform.FindChild("Lightening1");
+			enableLightening1 = enable;
 		}
-		lighteningT.gameObject.SetActive(enable);
 		
 	}
 	
@@ -331,6 +329,13 @@ public class AVOWComponent : MonoBehaviour {
 		Vector3 connector1Pos = GetConnectionPos1();
 		
 		if (type == Type.kLoad){
+			transform.FindChild("Resistance").gameObject.SetActive(isInteractive);
+			transform.FindChild("Lightening0").gameObject.SetActive(isInteractive && enableLightening0);
+			transform.FindChild("Lightening1").gameObject.SetActive(isInteractive && enableLightening1);
+			transform.FindChild("Lightening2").gameObject.SetActive(isInteractive);
+			transform.FindChild("ConnectionSphere0").gameObject.SetActive(isInteractive);
+			transform.FindChild("ConnectionSphere1").gameObject.SetActive(isInteractive);
+			
 			SetupUVs (transform.FindChild("Resistance").gameObject, Mathf.Abs (useV1-useV0));
 			transform.FindChild("Resistance").renderer.material.SetColor("_Color0", col0);
 			transform.FindChild("Resistance").renderer.material.SetColor("_Color1", col1);
@@ -395,7 +400,6 @@ public class AVOWComponent : MonoBehaviour {
 				oldNode0Pos = newNode0Pos;
 				oldNode1Pos = newNode1Pos;
 			}
-
 
 		}
 		else{
