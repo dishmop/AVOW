@@ -54,7 +54,6 @@ public class AVOWComponent : MonoBehaviour {
 	// Visulation data
 	public Color col0;
 	public Color col1;
-	public float tabSize;
 	public float border;
 	
 	// Layout
@@ -305,7 +304,6 @@ public class AVOWComponent : MonoBehaviour {
 		
 		
 		border = 0;//0.2f * (h1-h0);
-		tabSize = 0.2f * (v1-v0);
 		
 		float h1 = h0 + hWidth;
 
@@ -345,15 +343,12 @@ public class AVOWComponent : MonoBehaviour {
 //			transform.FindChild("Resistance").localScale = new Vector3((1-2 * squareGap) * (useH1 -useH0), (1-2 * squareGap) * Mathf.Abs (useV1-useV0), 1);
 			transform.FindChild("Resistance").position = new Vector3(useH0  + squareGap, Mathf.Min (useV0, useV1) + squareGap, 0);
 			transform.FindChild("Resistance").localScale = new Vector3((useH1 -useH0 - 2 * squareGap), Mathf.Abs (useV1-useV0) - 2 * squareGap, 1);
-			transform.FindChild("UpperTab").position = new Vector3(useH1 - border, useV1, -2);
-			transform.FindChild("UpperTab").localScale = new Vector3((useH1 - useH0) - 2 * border, tabSize, 1);
-			transform.FindChild("LowerTab").position = new Vector3(useH0 + border, useV0, -2);
-			transform.FindChild("LowerTab").localScale = new Vector3((useH1 - useH0)  - 2 * border, tabSize, 1);
 			Vector3 newNode0Pos = node0GO.transform.FindChild("Sphere").transform.position;
 			Vector3 newNode1Pos = node1GO.transform.FindChild("Sphere").transform.position;
 						
 			
-			if (false || !MathUtils.FP.Feq ((oldNode0Pos - newNode0Pos).magnitude, 0) || !MathUtils.FP.Feq ((oldNode1Pos - newNode1Pos).magnitude, 0)) {
+			// Otherwise, it doesn't work when they move
+			if (true || !MathUtils.FP.Feq ((oldNode0Pos - newNode0Pos).magnitude, 0) || !MathUtils.FP.Feq ((oldNode1Pos - newNode1Pos).magnitude, 0)) {
 			
 				Lightening lightening0 = transform.FindChild("Lightening0").GetComponent<Lightening>();
 				Lightening lightening1 = transform.FindChild("Lightening1").GetComponent<Lightening>();
@@ -386,18 +381,18 @@ public class AVOWComponent : MonoBehaviour {
 				lightening2.size =lighteningSize *  pdSize;
 				lightening2.ConstructMesh();					
 				
-				// Put our connection spheres in the right place.
-				float scale = 0.1f * Mathf.Abs (useV1-useV0);
-				Transform connectionSphere0 = transform.FindChild("ConnectionSphere0");
-				Transform connectionSphere1 = transform.FindChild("ConnectionSphere1");
-				connectionSphere0.position = connector0Pos;
-				connectionSphere0.localScale = new Vector3(scale, scale, scale);
-				connectionSphere1.position = connector1Pos;
-				connectionSphere1.localScale = new Vector3(scale, scale, scale);
 				
 				oldNode0Pos = newNode0Pos;
 				oldNode1Pos = newNode1Pos;
 			}
+			// Put our connection spheres in the right place.
+			float scale = 0.1f * Mathf.Abs (useV1-useV0);
+			Transform connectionSphere0 = transform.FindChild("ConnectionSphere0");
+			Transform connectionSphere1 = transform.FindChild("ConnectionSphere1");
+			connectionSphere0.position = connector0Pos;
+			connectionSphere0.localScale = new Vector3(scale, scale, scale);
+			connectionSphere1.position = connector1Pos;
+			connectionSphere1.localScale = new Vector3(scale, scale, scale);
 
 		}
 		else{
@@ -406,20 +401,18 @@ public class AVOWComponent : MonoBehaviour {
 			transform.FindChild("VoltageSource").position = new Vector3(-h0, v0, 0);
 			transform.FindChild("VoltageSource").localScale = new Vector3(h0 - h1, v1-v0, 1);
 
-			transform.FindChild("UpperTab").position = new Vector3(h1 - border, v1, -2);
-			transform.FindChild("UpperTab").localScale = new Vector3(2 * (h1 - h0) - 2 * border, -tabSize, 1);
-			transform.FindChild("LowerTab").position = new Vector3(-h1 + border, v0, -2);
-			transform.FindChild("LowerTab").localScale = new Vector3(2 * (h1 - h0)  - 2 * border, -tabSize, 1);	
 		}
+
+		
 			
 	}
 	
 	public bool IsPointInsideGap(Vector3 pos){
 		
-		return (pos.x > Mathf.Min (h0, h0 + hWidth) && 
-		        pos.x < Mathf.Max (h0, h0 + hWidth) && 
-		        pos.y > Mathf.Min (node0GO.GetComponent<AVOWNode>().voltage, node1GO.GetComponent<AVOWNode>().voltage) && 
-		        pos.y < Mathf.Max (node0GO.GetComponent<AVOWNode>().voltage, node1GO.GetComponent<AVOWNode>().voltage));	
+		return (pos.x >= Mathf.Min (h0, h0 + hWidth) && 
+		        pos.x <= Mathf.Max (h0, h0 + hWidth) && 
+		        pos.y >= Mathf.Min (node0GO.GetComponent<AVOWNode>().voltage, node1GO.GetComponent<AVOWNode>().voltage) && 
+		        pos.y <= Mathf.Max (node0GO.GetComponent<AVOWNode>().voltage, node1GO.GetComponent<AVOWNode>().voltage));	
 	}
 	
 	

@@ -14,15 +14,16 @@ public class AVOWUI : MonoBehaviour {
 	
 	
 	// New attempt at encoding the state of the UI
-	public GameObject connection0;
-	public GameObject connection1;
-	public Vector3 connection0Pos;
-	public Vector3 connection1Pos;	
-	public bool heldConnection;
-	public AVOWCommand heldGapCommand;
-	public GameObject heldGapConnection1;
+	public GameObject 	connection0;
+	public GameObject 	connection1;
+	public Vector3 		connection0Pos;
+	public Vector3 		connection1Pos;	
+	public bool 		heldConnection;
+	public AVOWCommand 	heldGapCommand;
+	public GameObject 	heldGapConnection1;
+	public float		newHOrder;
 	
-	float hysteresisFactor = 0.8f;
+	float hysteresisFactor = 0.7f;
 			
 	
 	public float maxLighteningDist;
@@ -146,7 +147,152 @@ public class AVOWUI : MonoBehaviour {
 			}
 		}
 	}
+	
+	void FindMinMaxHBounds(out float minBounds, out float maxBounds){	
+		minBounds = 99;
+		maxBounds = -99;
+		
+		foreach (GameObject go in AVOWGraph.singleton.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			if (component.type == AVOWComponent.Type.kVoltageSource) continue;
+			if (heldGapCommand != null && heldGapCommand.GetNewComponent() == go) continue;
+			minBounds = Mathf.Min (minBounds, component.hOrder);
+			maxBounds = Mathf.Max (minBounds, component.hOrder);
+		}
+		minBounds += -2;
+		maxBounds += 2;
+	}
+	
+	void CalcNewHOrder(){
 
+	
+		// Ony bother doing this if we have a connection1 and that conneciton is to another node
+		if (connection1 == null) return;
+		
+		AVOWNode node1 = connection1.GetComponent<AVOWNode>();
+		
+		if (node1 == null){
+			newHOrder = connection1.GetComponent<AVOWComponent>().hOrder;
+			return;
+		}
+		
+		AVOWNode node0 = connection0.GetComponent<AVOWNode>();
+		
+		// Constrain our test position ot be inside both thenodes
+		Vector3 testPos = mouseWorldPos;
+		
+		if (testPos.x < node0.h0) testPos.x = node0.h0;
+		if (testPos.x > node0.h0 + node0.hWidth) testPos.x = node0.h0 + node0.hWidth;
+		if (testPos.x < node1.h0) testPos.x = node1.h0;
+		if (testPos.x > node1.h0 + node1.hWidth) testPos.x = node1.h0 + node1.hWidth;
+		
+		
+		AVOWNode nodeHi = null;
+		AVOWNode nodeLo = null;
+		
+		if (node0.voltage > node1.voltage){
+			nodeHi = node0;
+			nodeLo = node1;
+		}
+		else{
+			nodeHi = node1;
+			nodeLo = node0;
+		}
+
+		// Construct a list of all components flowing out and in to the nodes in the right direction of flow
+		// there maybe repeasts
+		List<GameObject> components = new List<GameObject>();
+		foreach (GameObject go in nodeHi.components){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			if (component.outNodeGO == nodeHi.gameObject &&
+			    //(heldGapCommand == null || heldGapCommand.GetNewComponent() == null || go != heldGapCommand.GetNewComponent()) &&
+			    component.isInteractive && 
+			    component.type == AVOWComponent.Type.kLoad){
+				components.Add(go);
+			}
+		}
+		foreach (GameObject go in nodeLo.components){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			if (component.inNodeGO == nodeLo.gameObject && 
+			    //(heldGapCommand == null || heldGapCommand.GetNewComponent() == null || go != heldGapCommand.GetNewComponent()) &&
+			    component.isInteractive && 
+				component.type == AVOWComponent.Type.kLoad){
+				components.Add(go);
+			}
+		}
+		
+		
+		AVOWComponent compBefore = null;
+		float minDistBefore = 100;
+		float minHOrderBefore = -99;
+		AVOWComponent compAfter = null;
+		float minDistAfter = 100;
+		float minHOrderAfter = -99;
+		
+	
+		foreach (GameObject go in components){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			float xMid = component.h0 + 0.5f * component.hWidth;
+			
+			float dist = testPos.x - xMid;
+			
+			// check if it is the same first
+			if (MathUtils.FP.Feq(dist, minDistBefore)){
+				if (component.hOrder > compBefore.hOrder){
+					minDistBefore = dist;
+					compBefore = component;
+				}
+			}
+			if (MathUtils.FP.Feq(dist, minDistAfter)){
+				if (component.hOrder < compAfter.hOrder){
+					minDistAfter = dist;
+					compAfter = component;
+				}
+			}
+			
+			
+			// if the mouse is on the left of the comonent
+			if (dist > 0){
+				if (dist < minDistBefore){
+					minDistBefore = dist;
+					compBefore = component;
+				}
+			}
+			else{
+				if (-dist < minDistAfter){
+					minDistAfter = -dist;
+					compAfter = component;
+				}
+			}
+		}
+		
+		string debugText = "";
+		if (compBefore == null && compAfter == null){
+			newHOrder = 0;
+			debugText = "BeforeID = null, beforeHOrder = null, AfterID = null, AfterHOrder = null";
+		}
+		else if (compBefore == null)
+		{
+			newHOrder = compAfter.hOrder - 1;
+			debugText = "BeforeID = null, beforeHOrder = null, AfterID = " + compAfter.GetID() + " AfterHOrder = " + compAfter.hOrder;
+		}
+		else if (compAfter == null)
+		{
+			newHOrder = compBefore.hOrder + 1;
+			debugText = "BeforeID = " + compBefore.GetID() + ", beforeHOrder = " + compBefore.hOrder + ", AfterID = null, AfterHOrder = null";
+		}
+		else{		
+			newHOrder = (compBefore.hOrder + compAfter.hOrder) * 0.5f;
+			debugText = "BeforeID = " + compBefore.GetID() + ", beforeHOrder = " + compBefore.hOrder + ", AfterID = " + compAfter.GetID() + " AfterHOrder = " + compAfter.hOrder;
+		}
+		
+		//Debug.Log (debugText);
+		
+		
+		
+		
+	}
+		
 	
 	float FindClosestNode(Vector3 pos, GameObject ignoreNode, float minDist, GameObject currentSelection, ref GameObject closestNode, ref Vector3 closestPos){
 		
@@ -214,7 +360,7 @@ public class AVOWUI : MonoBehaviour {
 			connection1 = null;
 			connection1Pos = Vector3.zero;
 			
-			if (buttonPressed){
+			if (buttonPressed && connection0 != null){
 				heldConnection = true;
 			}
 		}
@@ -277,6 +423,9 @@ public class AVOWUI : MonoBehaviour {
 			if (connection1.GetComponent<AVOWComponent>() != null){
 				connection1.GetComponent<AVOWComponent>().EnableLightening(connection0, false);
 			}
+			
+			// Tell the sim (this shouild probably be the camera)
+			AVOWSim.singleton.mouseOverComponentForce = connection1;
 		}
 		else{
 			lightening1GO.SetActive(false);
@@ -292,9 +441,11 @@ public class AVOWUI : MonoBehaviour {
 		// if we have a command already check if we need to undo it
 		if (heldGapCommand != null){
 			// if the connection1 has changed (which includes us no longer holding anything) then undo our current command
-			if (heldGapConnection1 != connection1){
+			if (heldGapConnection1 != connection1  || (connection1.GetComponent<AVOWNode>() && newHOrder != heldGapCommand.GetNewComponent().GetComponent<AVOWComponent>().hOrder)){
 				heldGapCommand.UndoStep();
 				heldGapCommand = null;
+				
+				Debug.Log("Undo command " + Time.time);
 			}
 		}
 		
@@ -304,12 +455,15 @@ public class AVOWUI : MonoBehaviour {
 			heldGapConnection1 = connection1;
 			if (connection1.GetComponent<AVOWComponent>()){
 				heldGapCommand = new AVOWCommandSplitAddComponent(connection0, connection1, resistorPrefab);
+				Debug.Log("new AVOWCommandSplitAddComponent " + Time.time);
 			}
 			else{
 				heldGapCommand = new AVOWCommandAddComponent(connection0, connection1, resistorPrefab);
+				Debug.Log("new AVOWCommandAddComponent " + Time.time);
 				
 			}
 			heldGapCommand.ExecuteStep();
+			heldGapCommand.GetNewComponent().GetComponent<AVOWComponent>().hOrder = newHOrder;
 		}
 	}
 	
@@ -517,6 +671,7 @@ public class AVOWUI : MonoBehaviour {
 	void Update () {
 		
 		StateUpdate();
+		CalcNewHOrder();
 		CommandsUpdate();
 		VizUpdate();
 
@@ -526,9 +681,9 @@ public class AVOWUI : MonoBehaviour {
 
 	
 	void OnGUI(){
-//		float lineNum = 1;
-//		float lineSize = 20;
-//		GUI.Label (new Rect(10, lineSize * lineNum++ , Screen.width, lineSize), "connection0 = " + (connection0Node != null ? connection0Node.GetComponent<AVOWNode>().GetID() : "NULL"));
+		float lineNum = 1;
+		float lineSize = 20;
+		GUI.Label (new Rect(10, lineSize * lineNum++ , Screen.width, lineSize), "newHOrder = " + newHOrder);
 //		GUI.Label (new Rect(10, lineSize * lineNum++ , Screen.width, lineSize), "connection1 = " + (connection1Node != null ? connection1Node.GetComponent<AVOWNode>().GetID() : "NULL"));
 //		GUI.Label (new Rect(10, lineSize * lineNum++ , Screen.width, lineSize), "connection1Component = " + (connection1Component != null ? connection1Component .GetComponent<AVOWComponent>().GetID() : "NULL"));
 //		GUI.Label (new Rect(10, lineSize * lineNum++ , Screen.width, lineSize), "currentAction.conn0Node = " + ((currentAction!= null && currentAction.conn0Node != null) ? currentAction.conn0Node.GetComponent<AVOWNode>().GetID() : "NULL"));

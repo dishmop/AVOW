@@ -1,11 +1,14 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWUI.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="218" Column="1" />
-      <File FileName="Assets/Scripts/AVOWUI.cs" Line="747" Column="3" />
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="354" Column="4" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="232" Column="15" />
       <File FileName="Assets/Scripts/AVOWCommandAddComponent.cs" Line="66" Column="1" />
       <File FileName="Assets/Scripts/AVOWGraph.cs" Line="108" Column="1" />
+      <File FileName="Assets/Scripts/Lightening.cs" Line="236" Column="3" />
+      <File FileName="Assets/Scripts/Telemetry.cs" Line="1010" Column="21" />
+      <File FileName="Assets/GearProcedural/Editor/GearInspector.cs" Line="90" Column="3" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
@@ -34,7 +37,7 @@
       <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/LevelManager.cs" line="9" />
       <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWSim.cs" line="1347" />
       <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWSim.cs" line="1381" />
-      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWComponent.cs" line="218" />
+      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWComponent.cs" line="217" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

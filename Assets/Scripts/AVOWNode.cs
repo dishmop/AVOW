@@ -68,7 +68,8 @@ public class AVOWNode : MonoBehaviour {
 		transform.FindChild("Sphere").localScale = new Vector3( 0.2f * hWidth,  0.2f * hWidth,  0.2f * hWidth);
 		
 		transform.FindChild("LineNode").position = new Vector3(h0 + 0.5f * hWidth, voltage, 0);
-		transform.FindChild("LineNode").localScale = new Vector3( hWidth,  0.5f * hWidth,  1);		
+		transform.FindChild("LineNode").localScale = new Vector3( hWidth,  0.5f * hWidth,  1);
+		transform.FindChild("LineNode").gameObject.SetActive(isInteractive);		
 	
 	}
 }

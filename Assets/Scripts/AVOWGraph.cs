@@ -152,6 +152,8 @@ public class AVOWGraph : MonoBehaviour {
 	}
 	
 	
+	
+	
 	public void ClearLayoutFlags(){
 		foreach (GameObject go in allComponents){
 			AVOWComponent component = go.GetComponent<AVOWComponent>();
@@ -258,6 +260,12 @@ public class AVOWGraph : MonoBehaviour {
 		
 		singleton = null;
 	}	
+	
+	void Update(){
+		// Ensure all components are sorted by horder (makes things easier to find
+		allComponents.Sort((obj1, obj2) => obj1.GetComponent<AVOWComponent>().hOrder.CompareTo(obj2.GetComponent<AVOWComponent>().hOrder));
+		
+	}
 	
 	
 	

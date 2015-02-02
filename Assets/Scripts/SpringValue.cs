@@ -10,7 +10,7 @@ public class SpringValue{
 	
 	float desValue = 0f;
 	float currentValue = 0f;
-	float linSpeed = 50f;
+	float linSpeed = 10f;//50f;
 	float asSpeed = 4f;
 	
 	

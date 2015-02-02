@@ -232,19 +232,19 @@ public class Lightening : MonoBehaviour {
 				prevP2 += halfWidthPrev2;
 				nextP2 += halfWidthNext2;
 				
-//				Vector3 testCentre = FindIntersetion(prevP2, prevR2, nextP2, nextR2);
+				Vector3 testCentre = FindIntersetion(prevP2, prevR2, nextP2, nextR2);
 				
 				
 				// test for errors
-//				if (vertices[vi0].y  + vertices[vi1].y > 2.2 && false){
-//					Debug.Log ("Detected an error");
-//					Debug.Log ("int i = 0;");
-//					for (int j = 0; j < numPoints; ++j){
-//						Debug.Log ("points[i++] = new Vector3 (" + points[j].x + "f, "  + points[j].y + "f, 0f);");
-//					}
-//					AppHelper.Quit();
-//					
-//				}
+				if (vertices[vi0].y  + vertices[vi1].y > 2.2 && false){
+					Debug.Log ("Detected an error");
+					Debug.Log ("int i = 0;");
+					for (int j = 0; j < numPoints; ++j){
+						Debug.Log ("points[i++] = new Vector3 (" + points[j].x + "f, "  + points[j].y + "f, 0f);");
+					}
+					AppHelper.Quit();
+					
+				}
 
 //				Vector3 test0 = FindIntersetion(nextV0, nextR0, prevV0, prevR0);
 //				Vector3 test1 = FindIntersetion(nextV1, nextR1, prevV1, prevR1);			
