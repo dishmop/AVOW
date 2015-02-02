@@ -171,7 +171,6 @@ public class AVOWComponent : MonoBehaviour {
 	public void EnableLightening(GameObject nodeGO, bool enable){
 		if (type == Type.kVoltageSource) return;
 		
-		Transform lighteningT = null;
 		if (nodeGO == node0GO){
 			enableLightening0 = enable;
 		}
@@ -265,16 +264,10 @@ public class AVOWComponent : MonoBehaviour {
 	
 	public void SetNode0(GameObject nodeGO){
 		node0GO = nodeGO;
-		AVOWTab tab = transform.FindChild("LowerTab").GetComponent<AVOWTab>();
-		tab.SetNode(nodeGO.GetComponent<AVOWNode>());
-		tab.SetAVOWComponent(this);
 	}
 
 	public void SetNode1(GameObject nodeGO){
 		node1GO = nodeGO;
-		AVOWTab tab = transform.FindChild("UpperTab").GetComponent<AVOWTab>();
-		tab.SetNode(nodeGO.GetComponent<AVOWNode>());
-		tab.SetAVOWComponent(this);
 	}
 
 	
@@ -358,11 +351,7 @@ public class AVOWComponent : MonoBehaviour {
 			transform.FindChild("LowerTab").localScale = new Vector3((useH1 - useH0)  - 2 * border, tabSize, 1);
 			Vector3 newNode0Pos = node0GO.transform.FindChild("Sphere").transform.position;
 			Vector3 newNode1Pos = node1GO.transform.FindChild("Sphere").transform.position;
-			
-			Vector3 top = new Vector3((useH1 + useH0) * 0.5f, (useV0 + useV1) * 0.5f - 0.5f * Mathf.Min (useH1 - useH0, useV1 - useV0));
-			Vector3 bottom = new Vector3((useH1 + useH0) * 0.5f, (useV0 + useV1) * 0.5f + 0.5f * Mathf.Min (useH1 - useH0, useV1 - useV0));
-			Vector3 halfWidth = new Vector3((useH1 - useH0) * 0.5f, 0);
-			
+						
 			
 			if (false || !MathUtils.FP.Feq ((oldNode0Pos - newNode0Pos).magnitude, 0) || !MathUtils.FP.Feq ((oldNode1Pos - newNode1Pos).magnitude, 0)) {
 			
@@ -423,6 +412,14 @@ public class AVOWComponent : MonoBehaviour {
 			transform.FindChild("LowerTab").localScale = new Vector3(2 * (h1 - h0)  - 2 * border, -tabSize, 1);	
 		}
 			
+	}
+	
+	public bool IsPointInsideGap(Vector3 pos){
+		
+		return (pos.x > Mathf.Min (h0, h0 + hWidth) && 
+		        pos.x < Mathf.Max (h0, h0 + hWidth) && 
+		        pos.y > Mathf.Min (node0GO.GetComponent<AVOWNode>().voltage, node1GO.GetComponent<AVOWNode>().voltage) && 
+		        pos.y < Mathf.Max (node0GO.GetComponent<AVOWNode>().voltage, node1GO.GetComponent<AVOWNode>().voltage));	
 	}
 	
 	

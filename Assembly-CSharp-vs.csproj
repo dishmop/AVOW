@@ -58,7 +58,6 @@
      <Compile Include="Assets\Scripts\AVOWNode.cs" />
      <Compile Include="Assets\Scripts\AVOWPusher.cs" />
      <Compile Include="Assets\Scripts\AVOWSim.cs" />
-     <Compile Include="Assets\Scripts\AVOWTab.cs" />
      <Compile Include="Assets\Scripts\AVOWUI.cs" />
      <Compile Include="Assets\Scripts\AmmeterEffect.cs" />
      <Compile Include="Assets\Scripts\AppHelper.cs" />

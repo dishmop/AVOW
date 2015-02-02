@@ -83,8 +83,8 @@ public class Lightening : MonoBehaviour {
 		midSD = new Vector3(sdScalar, sdScalar, 0);
 		for (int i = 0; i < numPoints; ++i){
 			if (!useRandom || Random.Range (0f, 1f) < probOfChange){
-				float distStart = (startPoint - basePoints[i]).magnitude;
-				float distEnd = (endPoint - basePoints[i]).magnitude;
+//				float distStart = (startPoint - basePoints[i]).magnitude;
+//				float distEnd = (endPoint - basePoints[i]).magnitude;
 				Vector3 sd = CalcSD((float)i * 1f/(numPoints-1));
 				points[i] = new Vector3 (GetNormalSample(basePoints[i].x, sd.x), GetNormalSample(basePoints[i].y, sd.y), 0);
 			}
@@ -232,19 +232,19 @@ public class Lightening : MonoBehaviour {
 				prevP2 += halfWidthPrev2;
 				nextP2 += halfWidthNext2;
 				
-				Vector3 testCentre = FindIntersetion(prevP2, prevR2, nextP2, nextR2);
+//				Vector3 testCentre = FindIntersetion(prevP2, prevR2, nextP2, nextR2);
 				
 				
 				// test for errors
-				if (vertices[vi0].y  + vertices[vi1].y > 2.2 && false){
-					Debug.Log ("Detected an error");
-					Debug.Log ("int i = 0;");
-					for (int j = 0; j < numPoints; ++j){
-						Debug.Log ("points[i++] = new Vector3 (" + points[j].x + "f, "  + points[j].y + "f, 0f);");
-					}
-					AppHelper.Quit();
-					
-				}
+//				if (vertices[vi0].y  + vertices[vi1].y > 2.2 && false){
+//					Debug.Log ("Detected an error");
+//					Debug.Log ("int i = 0;");
+//					for (int j = 0; j < numPoints; ++j){
+//						Debug.Log ("points[i++] = new Vector3 (" + points[j].x + "f, "  + points[j].y + "f, 0f);");
+//					}
+//					AppHelper.Quit();
+//					
+//				}
 
 //				Vector3 test0 = FindIntersetion(nextV0, nextR0, prevV0, prevR0);
 //				Vector3 test1 = FindIntersetion(nextV1, nextR1, prevV1, prevR1);			

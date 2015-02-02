@@ -86,7 +86,7 @@ public class GearInspector : Editor {
 #if UNITY_4_3
 		Undo.RecordObject(gear, "Move Gear Point");
 #else
-		Undo.SetSnapshotTarget(gear, "Move Gear Point");
+//		Undo.SetSnapshotTarget(gear, "Move Gear Point");
 #endif
 		Handles.Disc(Quaternion.identity, gearTransform.position,gearTransform.up, baseRadius.x, true, 0f);
 		Handles.Disc(Quaternion.identity, gearTransform.position,gearTransform.up, gear.prefs.dk * gearTransform.localScale.x, true, 0f);

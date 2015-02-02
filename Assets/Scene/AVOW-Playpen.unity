@@ -3017,7 +3017,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 88b7108798d1944dd8f9cb7b7ab3dba7, type: 2}
       propertyPath: maxLighteningDist
-      value: .5
+      value: .200000003
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 88b7108798d1944dd8f9cb7b7ab3dba7, type: 2}
@@ -4833,9 +4833,14 @@ MonoBehaviour:
   cellPrefab: {fileID: 100002, guid: 1bf68cd89ceda43d1bff59790ceef25b, type: 2}
   cursorCubePrefab: {fileID: 100000, guid: 88c1abdfbc47544a981d1aaa7566a21f, type: 2}
   lighteningPrefab: {fileID: 100000, guid: ad922b5ed1a1644d68f7428a6f6d567b, type: 2}
-  maxLighteningDist: .5
+  connection0: {fileID: 0}
+  connection1: {fileID: 0}
+  connection0Pos: {x: 0, y: 0, z: 0}
+  connection1Pos: {x: 0, y: 0, z: 0}
+  heldConnection: 0
+  heldGapConnection1: {fileID: 0}
+  maxLighteningDist: .200000003
   lockCreation: 0
-  previousSecondarySelectedNode: {fileID: 0}
 --- !u!4 &1813380715
 Transform:
   m_ObjectHideFlags: 0
