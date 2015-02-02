@@ -497,6 +497,9 @@ public class AVOWUI : MonoBehaviour {
 		mouseWorldPos.z = uiZPos;
 		cursorCube.transform.position = mouseWorldPos;
 		
+		AVOWGraph.singleton.UnselectAllNodes();
+		
+		
 		// Do connection logic
 		switch (state){
 			// We are not holding on to anything
@@ -537,6 +540,9 @@ public class AVOWUI : MonoBehaviour {
 			}
 			case State.kHeldNode:
 			{
+				// Select the node that we are holding
+				connection0Node.GetComponent<AVOWNode>().SetSelected(true);
+				
 				//ClearConnection1Data();
 				FindClosestPointOnNode(mouseWorldPos, connection0Node.GetComponent<AVOWNode>(), out connection0Pos);
 				
@@ -573,6 +579,9 @@ public class AVOWUI : MonoBehaviour {
 			}
 			case State.kHeldOpen:
 			{
+				// Select the node that we are holding
+				connection0Node.GetComponent<AVOWNode>().SetSelected(true);
+			
 				Vector3 node0Pos = Vector3.zero;
 				FindClosestPointOnNode(mouseWorldPos, connection0Node.GetComponent<AVOWNode>(), out node0Pos);
 				
@@ -748,8 +757,9 @@ public class AVOWUI : MonoBehaviour {
 		}
 		
 		// Lightening to connection 1 - which may be a component or a node
+		// don't do this in free mode
 		AVOWGraph.singleton.EnableAllLightening();
-		if (connection1Component != null || connection1Node != null){
+		if (state != State.kFree && (connection1Component != null || connection1Node != null)){
 			lightening1GO.SetActive(true);
 			Lightening lightening1 = lightening1GO.GetComponent<Lightening>();
 			lightening1.startPoint = mouseWorldPos;
@@ -767,7 +777,7 @@ public class AVOWUI : MonoBehaviour {
 		}		
 		
 		// If we are connected to something then rotate the cube a bit
-		if (connection0Node != null || connection1Node != null){
+		if (connection0Node != null){
 			cursorCube.transform.Rotate (new Vector3(1, 2, 4));
 		}
 		

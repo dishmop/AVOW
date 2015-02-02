@@ -1,5 +1,6 @@
 ﻿Shader "Custom/AVOWNodeGlow" {
        Properties {
+             _Intensity ("Intensity", Range(0, 1)) = 0
         }
         SubShader {
         	//ZTest Always
@@ -15,8 +16,7 @@
 		        #include "UnityCG.cginc"
 		        
 		
-		        float4 _Color0;
-		        float4 _Color1;
+		        uniform float _Intensity;
 		    
 		
 		        struct v2f {
@@ -46,11 +46,11 @@
 		        	float xVal = i.uv[0] - 0.5;
 		        	float xMul = cos(3.14159 * 3.5 * xVal* xVal * xVal);
 		        	float y =  abs(i.uv[1] - 0.5);
-		        	//float4 col = float4(xMul *  CalcCurve(y, 0.01), xMul * CalcCurve(y, 0.02),  xMul * CalcCurve(y, 0.01),  xMul * CalcCurve(y, 0.01));
-		        	float4 col = float4(xMul *  CalcCurve(y, 0.01), xMul * CalcCurve(y, 0.02),  xMul * CalcCurve(y, 0.2),  xMul * CalcCurve(y, 0.02));
+		        	float4 col0 = float4(xMul *  CalcCurve(y, 0.01), xMul * CalcCurve(y, 0.02),  xMul * CalcCurve(y, 0.2),  xMul * CalcCurve(y, 0.02));
+		        	float4 col1 = float4(xMul *  CalcCurve(y, 0.01), xMul * CalcCurve(y, 0.02),  xMul * CalcCurve(y, 0.2),  xMul * CalcCurve(y, 0.2));
 
 
-		        	return   col;
+		        	return   lerp(col0, col1, _Intensity);
 		        	
 		        
 //		        	return lerp(_Color0, _Color1, val);

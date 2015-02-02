@@ -19,7 +19,8 @@ public class AVOWNode : MonoBehaviour {
 	public float inOrdinalledWidth;	// width which has been used up by ordinalled componens
 	public float outOrdinalledWidth;// width which has been used up by ordinalled componens
 	public GameObject splitFromNode;	// If we were splitout from another node - this points to that node
-
+	public bool hasBeenLayedOut;	// false at first and then true after we have been layed out at least once. 
+	
 	public float hWidth;
 	
 	// These lists are filled with the components with current flowing in and out of the node (those which have been 
@@ -28,6 +29,8 @@ public class AVOWNode : MonoBehaviour {
 	public List<GameObject> outComponents;
 	
 	public bool isInteractive = true;
+	
+	bool isSelected = false;
 	
 	
 
@@ -41,8 +44,26 @@ public class AVOWNode : MonoBehaviour {
 		id = staticCount++;
 	}
 	
+  	public void HasBeenLayedOut(){
+		hasBeenLayedOut = true;
+		
+		// A bit naughty, but the only way we can get all the things in the right place
+		Update ();
+	}
+		
+	
+	
+	public void SetSelected(bool enable){
+		isSelected = enable;
+	}
+
 	void Update(){
 	
+		Material material = transform.FindChild("LineNode").FindChild("LineNodeRender").renderer.material;
+		float currentSelectVal = material.GetFloat("_Intensity");
+		float newVal = Mathf.Lerp (currentSelectVal, isSelected ? 1 : 0, 0.4f);
+		material.SetFloat("_Intensity", newVal);
+				
 		transform.FindChild("Sphere").position = new Vector3(h0 + 0.5f * hWidth, voltage, 0);
 		transform.FindChild("Sphere").localScale = new Vector3( 0.2f * hWidth,  0.2f * hWidth,  0.2f * hWidth);
 		

@@ -58,7 +58,7 @@ public class AVOWComponent : MonoBehaviour {
 	public float border;
 	
 	// Layout
-	public int hOrder;				// components are sorted by this value when placed from left to right in diagram
+	public float hOrder;				// components are sorted by this value when placed from left to right in diagram
 	public float hWidth;			// Always known by the time we get to layout
 	public float h0;				// Set to -1 if unknown
 	public float h0LowerBound;		// Set to -1 if unknown
@@ -290,14 +290,14 @@ public class AVOWComponent : MonoBehaviour {
 			resistanceAngle.Force (0);
 			voltage = 1;
 		}
-	
-		gameObject.SetActive(false);
 	}
 	
 	
 	public void HasBeenLayedOut(){
 		hasBeenLayedOut = true;
-		gameObject.SetActive(true);
+		// A bit naughty, but the only way we can get all the things in the right place
+		Update ();
+		
 	}
 	
 
@@ -338,7 +338,7 @@ public class AVOWComponent : MonoBehaviour {
 		Vector3 connector1Pos = GetConnectionPos1();
 		
 		if (type == Type.kLoad){
-			transform.FindChild("Resistance").gameObject.SetActive(isInteractive);
+			//transform.FindChild("Resistance").gameObject.SetActive(isInteractive);
 			transform.FindChild("Lightening0").gameObject.SetActive(isInteractive && enableLightening0);
 			transform.FindChild("Lightening1").gameObject.SetActive(isInteractive && enableLightening1);
 			transform.FindChild("Lightening2").gameObject.SetActive(isInteractive);

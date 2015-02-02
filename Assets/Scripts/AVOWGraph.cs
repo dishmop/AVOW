@@ -115,6 +115,13 @@ public class AVOWGraph : MonoBehaviour {
 		return newNodeGO;
 	}
 	
+	public void UnselectAllNodes(){
+		foreach (GameObject go in allNodes){
+			AVOWNode node = go.GetComponent<AVOWNode>();
+			node.SetSelected(false);
+		}
+	}
+	
 	
 	public GameObject AddNode(){
 		GameObject newNodeGO = Instantiate(NodePrefab) as GameObject;

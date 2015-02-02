@@ -83,7 +83,7 @@ public class AVOWSim : MonoBehaviour {
 		public SimNode[] nodes = new SimNode[kNumDirs];
 		public float h0 = -1;
 		public float hWidth = -1;
-		public int hOrder = -1;
+		public float hOrder = -1;
 		public List<AVOWComponent> components = new List<AVOWComponent>();
 	};
 	
@@ -805,7 +805,7 @@ public class AVOWSim : MonoBehaviour {
 		}
 	}
 	
-	void CreateHOrderArray(int[] hOrderArray){
+	void CreateHOrderArray(float[] hOrderArray){
 		Array.Sort (allSimBlocks, (obj1, obj2) => (obj1.h0.CompareTo(obj2.h0)));
 		for (int i = 0; i < allSimBlocks.Length; ++i){
 			hOrderArray[i] = allSimBlocks[i].hOrder;
@@ -869,6 +869,7 @@ public class AVOWSim : MonoBehaviour {
 		foreach(SimNode simNode in allSimNodes){	
 			simNode.originalNode.h0 = simNode.h0;
 			simNode.originalNode.hWidth = simNode.hWidth;
+			simNode.originalNode.HasBeenLayedOut();
 		}
 		
 	}

@@ -1,41 +1,40 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWUI.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AudioTimeScalar.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AmmeterEffect.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UIMesh.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Lightening.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Lightening.cs" Line="245" Column="12" />
       <File FileName="Assets/Shaders/noise-simplex_v02.shader" Line="1" Column="1" />
-      <File FileName="Assets/Shaders/AVOWResistance.shader" Line="1" Column="1" />
+      <File FileName="Assets/Shaders/AVOWResistance.shader" Line="2" Column="1" />
       <File FileName="Assets/Shaders/DC_Reflect-BumpSpec2.shader" Line="1" Column="1" />
-      <File FileName="Assets/Shaders/AVOWNodeGlow.shader" Line="1" Column="1" />
+      <File FileName="Assets/Shaders/AVOWNodeGlow.shader" Line="50" Column="139" />
       <File FileName="Assets/Shaders/DC_Reflect-BumpSpec.shader" Line="1" Column="1" />
       <File FileName="Assets/Tutorial_1/BlendGreyLightmap.shader" Line="1" Column="1" />
-      <File FileName="Assets/Shaders/noise-simplex_v03.shader" Line="1" Column="1" />
+      <File FileName="Assets/Shaders/noise-simplex_v03.shader" Line="4" Column="14" />
       <File FileName="Assets/Scripts/ProjectorScript.cs" Line="1" Column="1" />
       <File FileName="Assets/Shaders/AVOWCursorCube.shader" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWNode.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWGreenBackground.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWPusher.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWSim.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWCommandSplitAddComponent.cs" Line="62" Column="60" />
-      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWCommandAddComponent.cs" Line="72" Column="1" />
+      <File FileName="Assets/Scripts/AVOWNode.cs" Line="45" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="68" Column="1" />
+      <File FileName="Assets/Scripts/AVOWGreenBackground.cs" Line="14" Column="1" />
+      <File FileName="Assets/Scripts/AVOWPusher.cs" Line="13" Column="1" />
+      <File FileName="Assets/Scripts/AVOWSim.cs" Line="802" Column="4" />
+      <File FileName="Assets/Scripts/AVOWCommandSplitAddComponent.cs" Line="41" Column="1" />
+      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="121" Column="28" />
+      <File FileName="Assets/Scripts/AVOWCommandAddComponent.cs" Line="38" Column="42" />
       <File FileName="Assets/Scripts/QuitOnEsc.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWUI.cs" Line="361" Column="56" />
       <File FileName="Assets/Shaders/AVOWLightening.shader" Line="1" Column="1" />
       <File FileName="Assets/Scripts/GridPoint.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWCommand.cs" Line="17" Column="1" />
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="56" Column="20" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="781" Column="1" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
         <State>
-          <Value>currentAction</Value>
-          <Value>lastAction</Value>
-          <Value>node.id</Value>
+          <Value>connectionIsNodeGap</Value>
+          <Value>connection1Node</Value>
         </State>
       </Pad>
     </Pads>
