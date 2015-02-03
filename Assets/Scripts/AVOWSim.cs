@@ -129,20 +129,35 @@ public class AVOWSim : MonoBehaviour {
 	}
 	
 	public void FixedUpdate(){
-//		Debug.Log("Sim Update");
+		Debug.Log("Sim Update");
 		
 		RecordMousePos();
 		Recalc();
 		CalcMouseOffset();
 		
-//		Debug.Log ("Print out order of node 1");
-//		AVOWNode node0 = graph.allNodes[1].GetComponent<AVOWNode>();
-//		for (int i = 0; i < node0.outComponents.Count; ++i){
-//			AVOWComponent component = node0.outComponents[i].GetComponent<AVOWComponent>();
-//			Debug.Log ("ID - " + component.GetID() + ", h0 = " + component.h0 + ", hOrder = " + component.hOrder);
-//		}
+		Debug.Log ("Print out order of node 1");
+		AVOWNode node0 = graph.allNodes[1].GetComponent<AVOWNode>();
+		for (int i = 0; i < node0.outComponents.Count; ++i){
+			AVOWComponent component = node0.outComponents[i].GetComponent<AVOWComponent>();
+			Debug.Log ("ID - " + component.GetID() + ", h0 = " + component.h0 + ", hOrder = " + component.hOrder);
+		}
 		
 		//AppHelper.Quit();
+		
+		// Record the hOrders
+		List<GameObject> posComps  = graph.allComponents.OrderBy(obj => obj.GetComponent<AVOWComponent>().h0 + 0.5f * obj.GetComponent<AVOWComponent>().hWidth).ToList();
+		
+		for (int i = 0; i < posComps.Count; ++i){
+			AVOWComponent component = posComps[i].GetComponent<AVOWComponent>();
+			if (component.type == AVOWComponent.Type.kVoltageSource){
+				component.hOrder = -1;
+			}
+			else{
+				component.hOrder = i;
+			}
+		}
+		// Ensure all components are sorted by horder (makes things easier to find
+		graph.allComponents.Sort((obj1, obj2) => obj1.GetComponent<AVOWComponent>().hOrder.CompareTo(obj2.GetComponent<AVOWComponent>().hOrder));
 	}
 	
 	

@@ -1,29 +1,28 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Lightening.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/QuitOnEsc.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWCommandAddComponent.cs" Line="57" Column="16" />
-      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="268" Column="1" />
-      <File FileName="Assets/Scripts/Lightening.cs" Line="193" Column="1" />
+      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="265" Column="1" />
+      <File FileName="Assets/Scripts/Lightening.cs" Line="235" Column="3" />
       <File FileName="Assets/Scripts/Telemetry.cs" Line="1010" Column="21" />
       <File FileName="Assets/GearProcedural/Editor/GearInspector.cs" Line="90" Column="3" />
-      <File FileName="Assets/Scripts/AVOWCommandSplitAddComponent.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWSim.cs" Line="840" Column="15" />
-      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="68" Column="1" />
-      <File FileName="Assets/Scripts/SpringValue.cs" Line="13" Column="25" />
-      <File FileName="Assets/Scripts/AVOWNode.cs" Line="28" Column="26" />
-      <File FileName="Assets/Scripts/AVOWGreenBackground.cs" Line="10" Column="2" />
+      <File FileName="Assets/Scripts/AVOWCommandSplitAddComponent.cs" Line="45" Column="2" />
+      <File FileName="Assets/Scripts/AVOWSim.cs" Line="132" Column="3" />
+      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="69" Column="26" />
+      <File FileName="Assets/Scripts/SpringValue.cs" Line="15" Column="2" />
+      <File FileName="Assets/Scripts/AVOWNode.cs" Line="28" Column="33" />
+      <File FileName="Assets/Scripts/AVOWGreenBackground.cs" Line="14" Column="1" />
       <File FileName="Assets/Scripts/AVOWPusher.cs" Line="13" Column="1" />
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="338" Column="4" />
-      <File FileName="Assets/Scripts/AVOWUI.cs" Line="462" Column="43" />
+      <File FileName="Assets/Scripts/ProjectorScript.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="366" Column="5" />
+      <File FileName="Assets/Scripts/QuitOnEsc.cs" Line="10" Column="4" />
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="363" Column="114" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
         <State>
-          <Value>component.outNodeGO.gameObject.activem_UnityRuntimeReferenceData.instanceID</Value>
-          <Value>component.inNodeGO.gameObject.activem_UnityRuntimeReferenceData.instanceID</Value>
-          <Value>nodeHi.m_UnityRuntimeReferenceData.instanceID</Value>
-          <Value>nodeLo.m_UnityRuntimeReferenceData.instanceID</Value>
+          <Value>thisCompID</Value>
+          <Value>node0.id</Value>
         </State>
       </Pad>
     </Pads>

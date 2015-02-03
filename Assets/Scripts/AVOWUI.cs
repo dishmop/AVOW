@@ -175,6 +175,7 @@ public class AVOWUI : MonoBehaviour {
 		
 		if (node1 == null){
 			newHOrder = connection1.GetComponent<AVOWComponent>().hOrder;
+			Debug.Log("CalcNewHOrder = " + newHOrder);
 			return;
 		}
 		
@@ -251,15 +252,15 @@ public class AVOWUI : MonoBehaviour {
 			}
 			
 			
-			// if the mouse is on the left of the comonent
+			// if the mouse is on the right of the comonent
 			if (dist > 0){
-				if (dist < minDistBefore){
+				if  (compBefore == null || component.hOrder > compBefore.hOrder ){
 					minDistBefore = dist;
 					compBefore = component;
 				}
 			}
 			else{
-				if (-dist < minDistAfter){
+				if (compAfter == null || component.hOrder < compAfter.hOrder ){
 					minDistAfter = -dist;
 					compAfter = component;
 				}
@@ -286,7 +287,7 @@ public class AVOWUI : MonoBehaviour {
 			debugText = "BeforeID = " + compBefore.GetID() + ", beforeHOrder = " + compBefore.hOrder + ", AfterID = " + compAfter.GetID() + " AfterHOrder = " + compAfter.hOrder;
 		}
 		
-		//Debug.Log (debugText + " - NewHOrder = " + newHOrder);
+		Debug.Log ("CalcNewHOrder: " + debugText + " - NewHOrder = " + newHOrder);
 		
 		
 		
@@ -482,6 +483,10 @@ public class AVOWUI : MonoBehaviour {
 	
 			AVOWComponent inComponent = go.GetComponent<AVOWComponent>();
 			
+			if (!inComponent.isInteractive) continue;
+			if (!inComponent.type == AVOWComponent.Type.kVoltageSource) continue;
+			
+			
 			if (inComponent.hOrder <= oldHOrder){
 				inOrdinalOld++;
 			}
@@ -495,6 +500,10 @@ public class AVOWUI : MonoBehaviour {
 
 			AVOWComponent outComponent = go.GetComponent<AVOWComponent>();
 			
+			if (!outComponent.isInteractive) continue;
+			if (!outComponent.type == AVOWComponent.Type.kVoltageSource) continue;
+
+						
 			if (outComponent.hOrder < oldHOrder){
 				outOrdinalOld++;
 			}
@@ -502,7 +511,7 @@ public class AVOWUI : MonoBehaviour {
 				outOrdinalNew++;
 			}
 		}
-	//	Debug.Log("inOrdinalOld " + inOrdinalOld + ", inOrdinalNew = " + inOrdinalNew + ", outOrdinalOld = " + outOrdinalOld + ", outOrdinalNew = " + outOrdinalNew);
+		Debug.Log("inOrdinalOld " + inOrdinalOld + ", inOrdinalNew = " + inOrdinalNew + ", outOrdinalOld = " + outOrdinalOld + ", outOrdinalNew = " + outOrdinalNew);
 		return (inOrdinalOld != inOrdinalNew || outOrdinalOld != outOrdinalNew);
 	}
 	
