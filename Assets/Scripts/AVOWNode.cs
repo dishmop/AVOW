@@ -23,10 +23,10 @@ public class AVOWNode : MonoBehaviour {
 	
 	public float hWidth;
 	
-	// These lists are filled with the components with current flowing in and out of the node (those which have been 
-	// ordered will be first)
-	public List<GameObject> inComponents;
-	public List<GameObject> outComponents;
+	// These lists are filled with the components with current flowing in and out of the node
+	// we oreder these by their h order
+	public List<GameObject> inComponents;		// Components that have current flowing into this node
+	public List<GameObject> outComponents;		// Componets that hae current flowing out of this node
 	
 	public bool isInteractive = true;
 	

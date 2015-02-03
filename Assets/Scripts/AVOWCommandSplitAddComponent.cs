@@ -42,7 +42,7 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 				newNodeGO.GetComponent<AVOWNode>().isInteractive = false;
 				
 				newComponentGO = GameObject.Instantiate(prefab) as GameObject;
-				newComponentGO.SetActive(false);
+	
 
 				AVOWComponent newComponent = newComponentGO.GetComponent<AVOWComponent>();
 				newComponent.resistanceAngle.Force(0);

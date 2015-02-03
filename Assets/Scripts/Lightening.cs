@@ -232,7 +232,7 @@ public class Lightening : MonoBehaviour {
 				prevP2 += halfWidthPrev2;
 				nextP2 += halfWidthNext2;
 				
-				Vector3 testCentre = FindIntersetion(prevP2, prevR2, nextP2, nextR2);
+//				Vector3 testCentre = FindIntersetion(prevP2, prevR2, nextP2, nextR2);
 				
 				
 				// test for errors

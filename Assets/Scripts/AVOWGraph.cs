@@ -262,8 +262,6 @@ public class AVOWGraph : MonoBehaviour {
 	}	
 	
 	void Update(){
-		// Ensure all components are sorted by horder (makes things easier to find
-		allComponents.Sort((obj1, obj2) => obj1.GetComponent<AVOWComponent>().hOrder.CompareTo(obj2.GetComponent<AVOWComponent>().hOrder));
 		
 	}
 	

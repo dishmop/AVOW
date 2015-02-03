@@ -67,8 +67,8 @@ public class AVOWComponent : MonoBehaviour {
 	public int outNodeOrdinal;		// the nth component on node1 flowing in this direction (=kOrdinaUnordered if unknown)
 	public float inLocalH0;			// The starting position measured from the inNodes h0 (which we may not know)
 	public float outLocalH0;		// The starting position measured from the outNodes h0 (which we may not know)
-	public GameObject inNodeGO;	// references to node0 and node1 depdending on how the current is flowing
-	public GameObject outNodeGO;	// references to node0 and node1 depdending on how the current is flowing
+	public GameObject inNodeGO;		// references to node0 and node1. Current flows in to this node from the componet
+	public GameObject outNodeGO;	// references to node0 and node1. Current flows out of this node into the compoent
 	public bool hasBeenLayedOut;	// false at first and then true after we have been layed out at least once. 
 	
 	// Debug data
@@ -85,6 +85,12 @@ public class AVOWComponent : MonoBehaviour {
 		if (node == node0GO) return node1GO;
 		if (node == node1GO) return node0GO;
 		return null;
+	}
+	
+	
+	void Start(){
+		if (type == Type.kLoad)
+			transform.FindChild("Resistance").gameObject.renderer.materials[0].color =  new Color(Random.Range(0f, 1f), Random.Range(0f, 1f),Random.Range(0f, 1f));
 	}
 	
 	public float GetResistance(){
@@ -342,9 +348,19 @@ public class AVOWComponent : MonoBehaviour {
 //			transform.FindChild("Resistance").position = new Vector3(useH0  + (useH1 -useH0) * squareGap, Mathf.Min (useV0, useV1) + Mathf.Abs (useV1-useV0) * squareGap, 0);
 //			transform.FindChild("Resistance").localScale = new Vector3((1-2 * squareGap) * (useH1 -useH0), (1-2 * squareGap) * Mathf.Abs (useV1-useV0), 1);
 			transform.FindChild("Resistance").position = new Vector3(useH0  + squareGap, Mathf.Min (useV0, useV1) + squareGap, 0);
-			transform.FindChild("Resistance").localScale = new Vector3((useH1 -useH0 - 2 * squareGap), Mathf.Abs (useV1-useV0) - 2 * squareGap, 1);
+			float xScale = useH1 -useH0 - 2 * squareGap;
+			float yScale = Mathf.Abs (useV1-useV0) - 2 * squareGap;
+			
+			xScale = Mathf.Max (xScale, 0);
+			yScale = Mathf.Max (yScale, 0);
+			
+			transform.FindChild("Resistance").localScale = new Vector3(xScale, yScale, 1);
 			Vector3 newNode0Pos = node0GO.transform.FindChild("Sphere").transform.position;
 			Vector3 newNode1Pos = node1GO.transform.FindChild("Sphere").transform.position;
+			
+			// Debug text
+			//transform.FindChild("Resistance").FindChild ("AVOWTextBox").gameObject.SetActive(false);
+			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = GetID() + " - " + hOrder.ToString();
 						
 			
 			// Otherwise, it doesn't work when they move

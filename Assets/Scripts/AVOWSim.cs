@@ -128,10 +128,19 @@ public class AVOWSim : MonoBehaviour {
 		singleton = null;
 	}
 	
-	void FixedUpdate(){
+	public void FixedUpdate(){
+//		Debug.Log("Sim Update");
+		
 		RecordMousePos();
 		Recalc();
 		CalcMouseOffset();
+		
+//		Debug.Log ("Print out order of node 1");
+//		AVOWNode node0 = graph.allNodes[1].GetComponent<AVOWNode>();
+//		for (int i = 0; i < node0.outComponents.Count; ++i){
+//			AVOWComponent component = node0.outComponents[i].GetComponent<AVOWComponent>();
+//			Debug.Log ("ID - " + component.GetID() + ", h0 = " + component.h0 + ", hOrder = " + component.hOrder);
+//		}
 		
 		//AppHelper.Quit();
 	}
@@ -527,16 +536,16 @@ public class AVOWSim : MonoBehaviour {
 			Debug.Log ("Node " + node.GetID() + ": " + node.voltage + "V");
 		}
 	}
-	
-	void SortByOrdinal(AVOWNode node, AVOWComponent.FlowDirection dir){
-		if (dir == AVOWComponent.FlowDirection.kOut){
-			node.outComponents.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().outNodeOrdinal.CompareTo (obj2.GetComponent<AVOWComponent>().outNodeOrdinal)));
-		}
-		else{
-			node.inComponents.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().inNodeOrdinal.CompareTo (obj2.GetComponent<AVOWComponent>().inNodeOrdinal)));
-		}
-	}
-	
+//	
+//	void SortByOrdinal(AVOWNode node, AVOWComponent.FlowDirection dir){
+//		if (dir == AVOWComponent.FlowDirection.kOut){
+//			node.outComponents.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().outNodeOrdinal.CompareTo (obj2.GetComponent<AVOWComponent>().outNodeOrdinal)));
+//		}
+//		else{
+//			node.inComponents.Sort ((obj1, obj2) => (obj1.GetComponent<AVOWComponent>().inNodeOrdinal.CompareTo (obj2.GetComponent<AVOWComponent>().inNodeOrdinal)));
+//		}
+//	}
+//	
 //	void SortByOrdinal(AVOWNode node, AVOWComponent.FlowDirection dir){
 //		if (dir == AVOWComponent.FlowDirection.kOut){
 //			node.outComponents = node.outComponents.OrderBy (obj => obj.GetComponent<AVOWComponent>().outNodeOrdinal).ToList();
@@ -548,6 +557,10 @@ public class AVOWSim : MonoBehaviour {
 
 
 	void ConstructLists(){
+	
+		// Ensure all components are sorted by horder (makes things easier to find
+		graph.allComponents.Sort((obj1, obj2) => obj1.GetComponent<AVOWComponent>().hOrder.CompareTo(obj2.GetComponent<AVOWComponent>().hOrder));
+		
 	
 		// Setup widths of comonents and in/out nodes
 		foreach (GameObject go in graph.allComponents){
@@ -575,27 +588,92 @@ public class AVOWSim : MonoBehaviour {
 		}
 		
 		// Create a lookup for all the components organised by which nodes they are between (direction matters)
-		Dictionary<Eppy.Tuple<AVOWNode, AVOWNode>, List<AVOWComponent>> components = new Dictionary<Eppy.Tuple<AVOWNode, AVOWNode>, List<AVOWComponent>>  ();
+		// At the same time construct a an "in" and "out" list for each node
+		Dictionary<Eppy.Tuple<AVOWNode, AVOWNode, int>, List<AVOWComponent>> components = new Dictionary<Eppy.Tuple<AVOWNode, AVOWNode, int>, List<AVOWComponent>>  ();
+		
+		// Keep track of the number of lists we have associated with each node pair
+		Dictionary<Eppy.Tuple<AVOWNode, AVOWNode>, int> blockTally = new Dictionary<Eppy.Tuple<AVOWNode, AVOWNode>, int>  ();
+		
+		// First clear the in/out lists
+		foreach (GameObject go in graph.allNodes){
+			AVOWNode node = go.GetComponent<AVOWNode>();
+			node.inComponents.Clear();
+			node.outComponents.Clear();
+		}		
 		
 		foreach (GameObject go in graph.allComponents){
 			AVOWComponent component = go.GetComponent<AVOWComponent>();
 			
-			Eppy.Tuple<AVOWNode, AVOWNode> key = new Eppy.Tuple<AVOWNode, AVOWNode>(component.inNodeGO.GetComponent<AVOWNode>(), component.outNodeGO.GetComponent<AVOWNode>());
+			// Get list of components going in and out of the nodes at either end of this component (this won't include this one...yet)			
+			List<GameObject> inComponents = component.inNodeGO.GetComponent<AVOWNode>().inComponents;
+			List<GameObject> outComponents = component.outNodeGO.GetComponent<AVOWNode>().outComponents;
+
+			// Check this first before making a normal key
+			Eppy.Tuple<AVOWNode, AVOWNode> tallyKey = new Eppy.Tuple<AVOWNode, AVOWNode>(component.inNodeGO.GetComponent<AVOWNode>(), component.outNodeGO.GetComponent<AVOWNode>());
+			
+			int tally = 0;
+			if (blockTally.ContainsKey(tallyKey)){
+				tally = blockTally[tallyKey];
+			}
+			
+			Eppy.Tuple<AVOWNode, AVOWNode, int> key = new Eppy.Tuple<AVOWNode, AVOWNode, int>(component.inNodeGO.GetComponent<AVOWNode>(), component.outNodeGO.GetComponent<AVOWNode>(), tally);
+			
 			if (components.ContainsKey(key)){
-				components[key].Add (component);
+				// Check if the last component added to these  in/out node list is the most recent one added to this dicionary entry. If it is, we can add this one
+				// If not we need to up the number (and somehow keep track of this number
+				
+				int numCompsDict = components[key].Count;
+				int numCompsIn = inComponents.Count;
+				int numCompsOut = outComponents.Count;
+				
+				string thisCompID = component.GetID();
+				string blockID = components[key][numCompsDict-1].GetID();
+				
+				if (components[key][numCompsDict-1].gameObject == inComponents[numCompsIn-1] || components[key][numCompsDict-1].gameObject == outComponents[numCompsOut-1]){
+					components[key].Add (component);
+				}
+				else{
+				
+					if (!blockTally.ContainsKey(tallyKey)) Debug.LogError ("No tally entry");
+					
+					tally++;
+					
+					Eppy.Tuple<AVOWNode, AVOWNode, int> newKey = new Eppy.Tuple<AVOWNode, AVOWNode, int>(component.inNodeGO.GetComponent<AVOWNode>(), component.outNodeGO.GetComponent<AVOWNode>(), tally);
+					components.Add(newKey, new List<AVOWComponent>{});
+					components[newKey].Add (component);
+					blockTally[tallyKey] = tally;	
+//					Debug.Log ("Created new block for component :" + component.GetComponent<AVOWComponent>().GetID());			
+				}
 			}
 			else{
+				// In this case, the tally should be zero
+				if (tally != 0) Debug.LogError("Tally not zero, but no dictionary value found!");
+				
 				components.Add(key, new List<AVOWComponent>{});
 				components[key].Add (component);
+				blockTally.Add(tallyKey, tally);
 			}
+			inComponents.Add (go);
+			outComponents.Add (go);
 		}
 		
+	//	Debug.Log ("components.Count = " + components.Count);
+		
+		
+		
+		// Sort all out in/out lists
+		foreach (GameObject go in graph.allNodes){
+			AVOWNode node = go.GetComponent<AVOWNode>();
+			node.inComponents.Sort ((obj1, obj2) => obj1.GetComponent<AVOWComponent>().hOrder.CompareTo(obj2.GetComponent<AVOWComponent>().hOrder));
+			node.outComponents.Sort ((obj1, obj2) => obj1.GetComponent<AVOWComponent>().hOrder.CompareTo(obj2.GetComponent<AVOWComponent>().hOrder));
+		}
+//		
 		// Transfer all of these components into our block structure
 		int numBlocks = components.Count;
 		allSimBlocks = new SimBlock[numBlocks];
 		
 		int blockIndex = 0;
-		foreach(KeyValuePair<Eppy.Tuple<AVOWNode, AVOWNode>, List<AVOWComponent>> item in components){
+		foreach(KeyValuePair<Eppy.Tuple<AVOWNode, AVOWNode, int>, List<AVOWComponent>> item in components){
 			SimBlock newBlock = new SimBlock();
 			newBlock.components = item.Value;
 			// order the components so the lowest hOrder value is at the beginning
@@ -607,7 +685,7 @@ public class AVOWSim : MonoBehaviour {
 			newBlock.ordinals[kIn] = -1;
 			newBlock.ordinals[kOut] = -1;
 			
-			// Determine the ovall width									
+			// Determine the overall width									
 			newBlock.hWidth = 0;
 			foreach (AVOWComponent component in newBlock.components){
 				newBlock.hWidth  += component.hWidth;
@@ -648,6 +726,8 @@ public class AVOWSim : MonoBehaviour {
 		foreach (int perms in numPerms){
 			totalPerms *= perms;
 		}
+		
+//		Debug.Log("totalPerms = "+ totalPerms);
 		
 		permutations = new int[totalPerms, numElements];
 		// Create list of all these permutations
@@ -1098,7 +1178,7 @@ public class AVOWSim : MonoBehaviour {
 //		Vector3 screenPos = Camera.main.WorldToScreenPoint( worldPos);
 //		screenPos.z = 0;
 //		
-		Vector3 offset = worldPos - mouseWorldPos;
+	//	Vector3 offset = worldPos - mouseWorldPos;
 		//Camera.main.gameObject.GetComponent<AVOWCamControl>().AddOffset(offset);
 		
 //		if (offset.sqrMagnitude != 0){

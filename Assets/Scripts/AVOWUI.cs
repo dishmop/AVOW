@@ -24,6 +24,8 @@ public class AVOWUI : MonoBehaviour {
 	public float		newHOrder;
 	
 	float hysteresisFactor = 0.7f;
+	
+	int debugCount = 0;
 			
 	
 	public float maxLighteningDist;
@@ -224,10 +226,8 @@ public class AVOWUI : MonoBehaviour {
 		
 		AVOWComponent compBefore = null;
 		float minDistBefore = 100;
-		float minHOrderBefore = -99;
 		AVOWComponent compAfter = null;
 		float minDistAfter = 100;
-		float minHOrderAfter = -99;
 		
 	
 		foreach (GameObject go in components){
@@ -286,7 +286,7 @@ public class AVOWUI : MonoBehaviour {
 			debugText = "BeforeID = " + compBefore.GetID() + ", beforeHOrder = " + compBefore.hOrder + ", AfterID = " + compAfter.GetID() + " AfterHOrder = " + compAfter.hOrder;
 		}
 		
-		//Debug.Log (debugText);
+		//Debug.Log (debugText + " - NewHOrder = " + newHOrder);
 		
 		
 		
@@ -342,12 +342,30 @@ public class AVOWUI : MonoBehaviour {
 		// Get the mouse buttons
 		bool  buttonPressed = (Input.GetMouseButtonDown(0) && !Input.GetKey (KeyCode.LeftControl));
 		bool  buttonReleased = (Input.GetMouseButtonUp(0) && !Input.GetKey (KeyCode.LeftControl));
-		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
+//		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
 		
 		// Set the cursor cubes position
 		mouseWorldPos.z = uiZPos;
 		cursorCube.transform.position = mouseWorldPos;
+
+
+//		
+//		// Playback bug
+//		if (debugCount == 0){
+//			mouseWorldPos = new Vector3(0.6f, 0.9f, -0.1f);
+//			buttonPressed = true;
+//		
+//		}
+//		else if (debugCount < 300){
+//			mouseWorldPos = new Vector3(0.6f, 0.75f, -0.1f);
+//		}
+//		else {
+//			mouseWorldPos = new Vector3(0.6f, 0.9f, -0.1f);
+//		}	
+//		++debugCount;	
+//		
 		
+	//	Debug.Log("Mouse world pos = " + mouseWorldPos.ToString());
 		
 		
 		// If we don't have a held connection, then we find the closest node and that's all
@@ -421,6 +439,7 @@ public class AVOWUI : MonoBehaviour {
 			
 			// Also need to hide the lightening from the compoment to the node
 			if (connection1.GetComponent<AVOWComponent>() != null){
+				Debug.Log("connection1.GetComponent<AVOWComponent>().ID = " + connection1.GetComponent<AVOWComponent>().GetID());
 				connection1.GetComponent<AVOWComponent>().EnableLightening(connection0, false);
 			}
 			
@@ -437,15 +456,71 @@ public class AVOWUI : MonoBehaviour {
 		}
 	}
 	
+	
+	bool OrderHasChanged(){
+		// Consider the two nodes we are putting a component between
+		// Consider all the Interactive components on each node and see at what position our hValue would place a new component
+		// We also look at where our old Hvalue would place the component if it is in the same position, then the order has not changed.
+		AVOWComponent component = heldGapCommand.GetNewComponent().GetComponent<AVOWComponent>();
+		AVOWNode inNode = component.inNodeGO.GetComponent<AVOWNode>();
+		AVOWNode outNode = component.outNodeGO.GetComponent<AVOWNode>();
+		
+		// These should be ordered by hOrder
+		List<GameObject> inComponents = inNode.inComponents;
+		List<GameObject> outComponents = outNode.outComponents;
+		
+		float oldHOrder = component.hOrder;
+		
+		int inOrdinalOld = -1;
+		int inOrdinalNew = -1;
+		int outOrdinalOld = -1;
+		int outOrdinalNew = -1;
+		
+		foreach (GameObject go in inComponents){
+			// This list might be out of date
+			if (go == null) continue;
+	
+			AVOWComponent inComponent = go.GetComponent<AVOWComponent>();
+			
+			if (inComponent.hOrder <= oldHOrder){
+				inOrdinalOld++;
+			}
+			if (inComponent.hOrder <= newHOrder){
+				inOrdinalNew++;
+			}
+		}
+		foreach (GameObject go in outComponents){
+			// This list might be out of date
+			if (go == null) continue;
+
+			AVOWComponent outComponent = go.GetComponent<AVOWComponent>();
+			
+			if (outComponent.hOrder < oldHOrder){
+				outOrdinalOld++;
+			}
+			if (outComponent.hOrder < newHOrder){
+				outOrdinalNew++;
+			}
+		}
+	//	Debug.Log("inOrdinalOld " + inOrdinalOld + ", inOrdinalNew = " + inOrdinalNew + ", outOrdinalOld = " + outOrdinalOld + ", outOrdinalNew = " + outOrdinalNew);
+		return (inOrdinalOld != inOrdinalNew || outOrdinalOld != outOrdinalNew);
+	}
+	
 	void CommandsUpdate(){
 		// if we have a command already check if we need to undo it
 		if (heldGapCommand != null){
 			// if the connection1 has changed (which includes us no longer holding anything) then undo our current command
-			if (heldGapConnection1 != connection1  || (connection1.GetComponent<AVOWNode>() && newHOrder != heldGapCommand.GetNewComponent().GetComponent<AVOWComponent>().hOrder)){
+			if (heldGapConnection1 != connection1 || OrderHasChanged()){
 				heldGapCommand.UndoStep();
 				heldGapCommand = null;
 				
-				Debug.Log("Undo command " + Time.time);
+				string newID = null;
+				string oldID = null;
+				if (connection1)
+					newID = connection1.GetComponent<AVOWComponent>() != null ? connection1.GetComponent<AVOWComponent>().GetID() : connection1.GetComponent<AVOWNode>().GetID();
+				if (heldGapConnection1)
+					oldID = heldGapConnection1.GetComponent<AVOWComponent>() != null ? heldGapConnection1.GetComponent<AVOWComponent>().GetID() : heldGapConnection1.GetComponent<AVOWNode>().GetID();
+				Debug.Log("Undo command. OldID = " + oldID + ", newID = " + newID + ", Time = " + Time.time);
 			}
 		}
 		
@@ -464,6 +539,10 @@ public class AVOWUI : MonoBehaviour {
 			}
 			heldGapCommand.ExecuteStep();
 			heldGapCommand.GetNewComponent().GetComponent<AVOWComponent>().hOrder = newHOrder;
+			
+			// Ned to force the sim to do an update (this would be better if all this logic was in a fixed update and it 
+			// was more tightly controlled
+			AVOWSim.singleton.FixedUpdate();
 		}
 	}
 	
@@ -669,7 +748,7 @@ public class AVOWUI : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		
+//		Debug.Log(Time.time + ": UI Update");
 		StateUpdate();
 		CalcNewHOrder();
 		CommandsUpdate();
