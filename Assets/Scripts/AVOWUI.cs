@@ -165,6 +165,123 @@ public class AVOWUI : MonoBehaviour {
 		maxBounds += 2;
 	}
 	
+	
+	class OrderBlock{
+	
+		public float minOrder = 99;
+		public float maxOrder = -99;
+		public float minPos = 99;
+		public float maxPos = -99;
+		public bool connectingHi;	// does it connect our nodes ina valid way?
+		public bool connectingLo;	// does it connect our nodes ina valid way?
+		
+		public void AddComponent(AVOWComponent component){
+			minOrder = Mathf.Min(minOrder, component.hOrder);
+			maxOrder = Mathf.Max(maxOrder, component.hOrder);
+			minPos = Mathf.Min(minPos, component.h0);
+			maxPos = Mathf.Max(maxPos, component.h0 + component.hWidth);
+			component.uiOrderVisited = true;
+			
+		}
+	}
+	
+	AVOWComponent GetValidOrderingComponent(GameObject go){
+		if (go == null) return null;
+		
+		AVOWComponent component = go.GetComponent<AVOWComponent>();
+		//if (heldGapCommand != null && component.gameObject == heldGapCommand.GetNewComponent()) return null;
+		if (!component.isInteractive) return null;
+		if (component.type == AVOWComponent.Type.kVoltageSource) return null;
+		return component;
+		
+	}
+	
+	
+	void AddOutComponentToBlock(OrderBlock block, AVOWComponent component, AVOWNode nodeHi, AVOWNode nodeLo){
+		block.AddComponent(component);
+		
+		if (component.inNodeGO == null) return;
+		
+		
+		AVOWNode nodeIn = component.inNodeGO.GetComponent<AVOWNode>();
+		
+		if (nodeIn == nodeLo){
+			block.connectingLo = true;
+			return;
+		}
+		
+		if (nodeIn == nodeHi){
+			// If we've ended up back at the high node, but going into it - then this is not a valid route for a connection
+			return;
+		}
+		
+		// Run though all the components with current flowing out of this node
+		foreach (GameObject go in nodeIn.outComponents){
+			AVOWComponent thisComponent = GetValidOrderingComponent(go);
+			if (thisComponent == null) continue;
+			
+			// if we haven't been visited yet
+			if (!thisComponent.uiOrderVisited){
+				AddOutComponentToBlock(block, thisComponent, nodeHi, nodeLo );
+			}
+		}
+		foreach (GameObject go in nodeIn.inComponents){
+			AVOWComponent thisComponent = GetValidOrderingComponent(go);
+			if (thisComponent == null) continue;
+			
+			// if we haven't been visited yet
+			if (!thisComponent.uiOrderVisited){
+				AddInComponentToBlock(block, thisComponent, nodeHi, nodeLo );
+			}
+		}
+		
+
+	}
+	
+	void AddInComponentToBlock(OrderBlock block, AVOWComponent component, AVOWNode nodeHi, AVOWNode nodeLo){
+		block.AddComponent(component);
+		
+		if (component.outNodeGO == null) return;
+		
+		AVOWNode nodeOut = component.outNodeGO.GetComponent<AVOWNode>();
+
+		
+		if (nodeOut == nodeHi){
+			block.connectingHi = true;
+			return;
+		}
+		
+		if (nodeOut == nodeLo){
+			// If we've ended up back at the high node, but going into it - then this is not a valid route for a connection
+			return;
+		}
+		
+
+		// Run though all the components with current flowing in to this node
+		foreach (GameObject go in nodeOut.inComponents){
+			AVOWComponent thisComponent = GetValidOrderingComponent(go);
+			if (thisComponent == null) continue;
+			
+			// if we haven't been visited yet
+			if (!thisComponent.uiOrderVisited){
+				AddInComponentToBlock(block, thisComponent, nodeHi, nodeLo );
+			}
+		}
+		
+		foreach (GameObject go in nodeOut.outComponents){
+			AVOWComponent thisComponent = GetValidOrderingComponent(go);
+			if (thisComponent == null) continue;
+			
+			// if we haven't been visited yet
+			if (!thisComponent.uiOrderVisited){
+				AddOutComponentToBlock(block, thisComponent, nodeHi, nodeLo );
+			}
+		}	
+	}
+	
+
+	
+	
 	void CalcNewHOrder(){
 
 	
@@ -201,90 +318,129 @@ public class AVOWUI : MonoBehaviour {
 			nodeHi = node1;
 			nodeLo = node0;
 		}
+		
+		
+		// Creare a disjoint set of OrderBlocks - each ORderblock contains a number of components
+		// Construct a block by starting at a component on anodeHI or nodeLo and following its connections
+		// along every way we can until we git NdoeHi or NodeLo again our new component must fir on the left or the righ of this block.
+		AVOWGraph graph = AVOWGraph.singleton;
+		graph.ClearUIOrderedVisitedFlags();
+		List<OrderBlock> blocks = new List<OrderBlock>();
+		
+		// Run though all the components cwith current flowing out of the high component
+		foreach (GameObject go in nodeHi.outComponents){
+			AVOWComponent component = GetValidOrderingComponent(go);
+			if (component == null) continue;
+			
+			// if we haven't been visited yet
+			if (!component.uiOrderVisited){
+				OrderBlock newBlock = new OrderBlock();
+				AddOutComponentToBlock(newBlock, component, nodeHi, nodeLo );
+				if (newBlock.connectingLo) blocks.Add(newBlock);
+			}
+		}
+		foreach (GameObject go in nodeLo.inComponents){
+			AVOWComponent component = GetValidOrderingComponent(go);
+			if (component == null) continue;
+			
+			// if we haven't been visited yet
+			if (!component.uiOrderVisited){
+				OrderBlock newBlock = new OrderBlock();
+				AddInComponentToBlock(newBlock, component, nodeHi, nodeLo );
+				if (newBlock.connectingHi) blocks.Add(newBlock);
+				
+				
+			}
+		}
+		
+	
+		
+		Debug.Log("CalcNewHOrderL nodeHi =  " + nodeHi.GetID() + " , nodeLo = " + nodeLo.GetID() + ", numBlocks = " + blocks.Count);
+		
+		// print the contents fo the blocks
+		foreach (OrderBlock block in blocks){
+			Debug.Log ("block: minOrder = " + block.minOrder + ", maxOrder = " + block.maxOrder + ", minPos = " + block.minPos + ", maxPos = " + block.maxPos);
+		}
 
-		// Construct a list of all components flowing out and in to the nodes in the right direction of flow
-		// there maybe repeasts
-		List<GameObject> components = new List<GameObject>();
-		foreach (GameObject go in nodeHi.components){
-			AVOWComponent component = go.GetComponent<AVOWComponent>();
-			if (component.outNodeGO == nodeHi.gameObject &&
-			    //(heldGapCommand == null || heldGapCommand.GetNewComponent() == null || go != heldGapCommand.GetNewComponent()) &&
-			    component.isInteractive && 
-			    component.type == AVOWComponent.Type.kLoad){
-				components.Add(go);
-			}
-		}
-		foreach (GameObject go in nodeLo.components){
-			AVOWComponent component = go.GetComponent<AVOWComponent>();
-			if (component.inNodeGO == nodeLo.gameObject && 
-			    //(heldGapCommand == null || heldGapCommand.GetNewComponent() == null || go != heldGapCommand.GetNewComponent()) &&
-			    component.isInteractive && 
-				component.type == AVOWComponent.Type.kLoad){
-				components.Add(go);
-			}
-		}
-		
-		
-		AVOWComponent compBefore = null;
+		OrderBlock blockBefore = null;
 		float minDistBefore = 100;
-		AVOWComponent compAfter = null;
+		OrderBlock blockAfter = null;
 		float minDistAfter = 100;
 		
 	
-		foreach (GameObject go in components){
-			AVOWComponent component = go.GetComponent<AVOWComponent>();
-			float xMid = component.h0 + 0.5f * component.hWidth;
+		foreach (OrderBlock block in blocks){
+			float xMid = 0.5f * (block.minPos + block.maxPos);
 			
 			float dist = testPos.x - xMid;
 			
-			// check if it is the same first
-			if (MathUtils.FP.Feq(dist, minDistBefore)){
-				if (component.hOrder > compBefore.hOrder){
-					minDistBefore = dist;
-					compBefore = component;
-				}
-			}
-			if (MathUtils.FP.Feq(dist, minDistAfter)){
-				if (component.hOrder < compAfter.hOrder){
-					minDistAfter = dist;
-					compAfter = component;
-				}
-			}
-			
-			
-			// if the mouse is on the right of the comonent
+			// if the mouse is on the right of the block
 			if (dist > 0){
-				if  (compBefore == null || component.hOrder > compBefore.hOrder ){
+				if  (dist < minDistBefore){
 					minDistBefore = dist;
-					compBefore = component;
+					blockBefore = block;
 				}
 			}
 			else{
-				if (compAfter == null || component.hOrder < compAfter.hOrder ){
+				if (-dist < minDistAfter){
 					minDistAfter = -dist;
-					compAfter = component;
+					blockAfter = block;
 				}
 			}
 		}
 		
+		// If we haven't got any blocks then we are connecting between nodes that have no
+		// connections between them yet - so do some different logic
+		if (blocks.Count == 0){
+			OrderBlock blockHi = new OrderBlock();
+			OrderBlock blockLo = new OrderBlock();
+			foreach (GameObject go in nodeHi.components){
+				if (go == null) continue;
+				AVOWComponent component = go.GetComponent<AVOWComponent>();
+				if (heldGapCommand != null && component.gameObject == heldGapCommand.GetNewComponent()) continue;
+				if (component.type == AVOWComponent.Type.kVoltageSource) continue;
+				
+				blockHi.AddComponent(component);
+			}
+			foreach (GameObject go in nodeLo.components){
+				if (go == null) continue;
+				AVOWComponent component = go.GetComponent<AVOWComponent>();
+				if (heldGapCommand != null && component.gameObject == heldGapCommand.GetNewComponent()) continue;
+				if (component.type == AVOWComponent.Type.kVoltageSource) continue;
+				
+				blockLo.AddComponent(component);
+			}
+			
+			
+			if (nodeHi.h0 + 0.5f * nodeHi.hWidth > nodeLo.h0 + 0.5f * nodeLo.hWidth){
+				blockAfter = blockHi;
+				blockBefore = blockLo;
+			}
+			else{
+				blockAfter = blockLo;
+				blockBefore = blockHi;
+			}
+				
+		}
+		
 		string debugText = "";
-		if (compBefore == null && compAfter == null){
+		if (blockBefore == null && blockAfter == null){
+			// I'm not sure that this can ever happen
 			newHOrder = 0;
-			debugText = "BeforeID = null, beforeHOrder = null, AfterID = null, AfterHOrder = null";
+			debugText = "BeforeMinH = null, BeforeMaxH = null, AfterMinH = null, AfterMaxH = null";
 		}
-		else if (compBefore == null)
+		else if (blockBefore == null)
 		{
-			newHOrder = compAfter.hOrder - 1;
-			debugText = "BeforeID = null, beforeHOrder = null, AfterID = " + compAfter.GetID() + " AfterHOrder = " + compAfter.hOrder;
+			newHOrder = blockAfter.minOrder - 1;
+			debugText = "BeforeMinH = null, BeforeMaxH = null, AfterMinH = " + blockAfter.minOrder + " , AfterMaxH = " + blockAfter.maxOrder;
 		}
-		else if (compAfter == null)
+		else if (blockAfter == null)
 		{
-			newHOrder = compBefore.hOrder + 1;
-			debugText = "BeforeID = " + compBefore.GetID() + ", beforeHOrder = " + compBefore.hOrder + ", AfterID = null, AfterHOrder = null";
+			newHOrder = blockBefore.maxOrder + 1;
+			debugText = "BeforeMinH = " + blockBefore.minOrder + ", BeforeMaxH = " + blockBefore.maxOrder + ", AfterMinH = null , AfterMaxH = null";
 		}
 		else{		
-			newHOrder = (compBefore.hOrder + compAfter.hOrder) * 0.5f;
-			debugText = "BeforeID = " + compBefore.GetID() + ", beforeHOrder = " + compBefore.hOrder + ", AfterID = " + compAfter.GetID() + " AfterHOrder = " + compAfter.hOrder;
+			newHOrder = (blockBefore.maxOrder + blockAfter.minOrder) * 0.5f;
+			debugText = "BeforeMinH = " + blockBefore.minOrder + ", BeforeMaxH = " + blockBefore.maxOrder + ", AfterMinH = " + blockAfter.minOrder + " , AfterMaxH = " + blockAfter.maxOrder;
 		}
 		
 		Debug.Log ("CalcNewHOrder: " + debugText + " - NewHOrder = " + newHOrder);
@@ -484,7 +640,7 @@ public class AVOWUI : MonoBehaviour {
 			AVOWComponent inComponent = go.GetComponent<AVOWComponent>();
 			
 			if (!inComponent.isInteractive) continue;
-			if (!inComponent.type == AVOWComponent.Type.kVoltageSource) continue;
+			if (inComponent.type == AVOWComponent.Type.kVoltageSource) continue;
 			
 			
 			if (inComponent.hOrder <= oldHOrder){
@@ -501,7 +657,7 @@ public class AVOWUI : MonoBehaviour {
 			AVOWComponent outComponent = go.GetComponent<AVOWComponent>();
 			
 			if (!outComponent.isInteractive) continue;
-			if (!outComponent.type == AVOWComponent.Type.kVoltageSource) continue;
+			if (outComponent.type == AVOWComponent.Type.kVoltageSource) continue;
 
 						
 			if (outComponent.hOrder < oldHOrder){
@@ -511,7 +667,7 @@ public class AVOWUI : MonoBehaviour {
 				outOrdinalNew++;
 			}
 		}
-		Debug.Log("inOrdinalOld " + inOrdinalOld + ", inOrdinalNew = " + inOrdinalNew + ", outOrdinalOld = " + outOrdinalOld + ", outOrdinalNew = " + outOrdinalNew);
+		Debug.Log("oldHOrder = " + oldHOrder + ", newHOrder = " + newHOrder + ", inOrdinalOld " + inOrdinalOld + ", inOrdinalNew = " + inOrdinalNew + ", outOrdinalOld = " + outOrdinalOld + ", outOrdinalNew = " + outOrdinalNew);
 		return (inOrdinalOld != inOrdinalNew || outOrdinalOld != outOrdinalNew);
 	}
 	
@@ -543,7 +699,7 @@ public class AVOWUI : MonoBehaviour {
 			}
 			else{
 				heldGapCommand = new AVOWCommandAddComponent(connection0, connection1, resistorPrefab);
-				Debug.Log("new AVOWCommandAddComponent " + Time.time);
+				Debug.Log("new AVOWCommandAddComponent from " + connection0.GetComponent<AVOWNode>().GetID() + " to " + connection1.GetComponent<AVOWNode>().GetID() + " time = " + Time.time);
 				
 			}
 			heldGapCommand.ExecuteStep();
@@ -757,7 +913,16 @@ public class AVOWUI : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-//		Debug.Log(Time.time + ": UI Update");
+	
+//		// Test if (D) is < 0.55
+//		foreach (GameObject go in AVOWGraph.singleton.allComponents){
+//			AVOWComponent component = go.GetComponent<AVOWComponent>();
+//			if (component.hasBeenLayedOut && component.GetID () == "(D)" && component.h0 < 0.45f){	
+//				Debug.Log (Time.time + ": Debug don't update UI");
+//				return;
+//			}
+//		}
+		Debug.Log(Time.time + ": UI Update");
 		StateUpdate();
 		CalcNewHOrder();
 		CommandsUpdate();

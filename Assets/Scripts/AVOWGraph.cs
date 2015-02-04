@@ -224,6 +224,14 @@ public class AVOWGraph : MonoBehaviour {
 		return numComponentsLayedOut == allComponents.Count && numNodesLayedOut == allNodes.Count;
 	}
 	
+	public void ClearUIOrderedVisitedFlags(){
+		foreach (GameObject componentGO in allComponents){
+			componentGO.GetComponent<AVOWComponent>().uiOrderVisited = false;
+		}		
+	}
+	
+	
+	
 	
 	public void ClearVisitedFlags(){
 		foreach (GameObject componentGO in allComponents){

@@ -145,7 +145,7 @@ public class AVOWSim : MonoBehaviour {
 		//AppHelper.Quit();
 		
 		// Record the hOrders
-		List<GameObject> posComps  = graph.allComponents.OrderBy(obj => obj.GetComponent<AVOWComponent>().h0 + 0.5f * obj.GetComponent<AVOWComponent>().hWidth).ToList();
+		List<GameObject> posComps  = graph.allComponents.OrderBy(obj => obj.GetComponent<AVOWComponent>().h0).ToList();
 		
 		for (int i = 0; i < posComps.Count; ++i){
 			AVOWComponent component = posComps[i].GetComponent<AVOWComponent>();
@@ -913,7 +913,7 @@ public class AVOWSim : MonoBehaviour {
 	void CreateH0Array(float[] h0Array){
 		Array.Sort (allSimBlocks, (obj1, obj2) => (obj1.hOrder.CompareTo(obj2.hOrder)));
 		for (int i = 0; i < allSimBlocks.Length; ++i){
-			h0Array[i] = allSimBlocks[i].h0;
+			h0Array[i] = allSimBlocks[i].h0;//+ 0.5f * allSimBlocks[i].hWidth;
 		}
 		
 	}
