@@ -48,7 +48,7 @@ public class AVOWComponent : MonoBehaviour {
 	}
 	public List<LoopRecord> loopRecords;
 	public bool visited;
-	public bool uiOrderVisited;	// used by the UI to traverse
+	public int uiVisitedIndex;	// used by the UI to traverse
 	public bool disable;
 	public float fwCurrent;
 	

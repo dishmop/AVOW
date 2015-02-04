@@ -226,7 +226,7 @@ public class AVOWGraph : MonoBehaviour {
 	
 	public void ClearUIOrderedVisitedFlags(){
 		foreach (GameObject componentGO in allComponents){
-			componentGO.GetComponent<AVOWComponent>().uiOrderVisited = false;
+			componentGO.GetComponent<AVOWComponent>().uiVisitedIndex = -1;
 		}		
 	}
 	
