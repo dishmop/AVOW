@@ -90,8 +90,9 @@ public class AVOWComponent : MonoBehaviour {
 	
 	
 	void Start(){
-		if (type == Type.kLoad)
-			transform.FindChild("Resistance").gameObject.renderer.materials[0].color =  new Color(Random.Range(0f, 1f), Random.Range(0f, 1f),Random.Range(0f, 1f));
+		if (type == Type.kLoad){
+		//	transform.FindChild("Resistance").gameObject.renderer.materials[0].color =  new Color(Random.Range(0f, 1f), Random.Range(0f, 1f),Random.Range(0f, 1f));
+		}
 	}
 	
 	public float GetResistance(){
@@ -336,7 +337,7 @@ public class AVOWComponent : MonoBehaviour {
 		Vector3 connector1Pos = GetConnectionPos1();
 		
 		if (type == Type.kLoad){
-			//transform.FindChild("Resistance").gameObject.SetActive(isInteractive);
+			transform.FindChild("Resistance").gameObject.SetActive(isInteractive);
 			transform.FindChild("Lightening0").gameObject.SetActive(isInteractive && enableLightening0);
 			transform.FindChild("Lightening1").gameObject.SetActive(isInteractive && enableLightening1);
 			transform.FindChild("Lightening2").gameObject.SetActive(isInteractive);
@@ -360,8 +361,8 @@ public class AVOWComponent : MonoBehaviour {
 			Vector3 newNode1Pos = node1GO.transform.FindChild("Sphere").transform.position;
 			
 			// Debug text
-			//transform.FindChild("Resistance").FindChild ("AVOWTextBox").gameObject.SetActive(false);
-			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = GetID() + " - " + hOrder.ToString();
+			transform.FindChild("Resistance").FindChild ("AVOWTextBox").gameObject.SetActive(false);
+			//transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = GetID() + " - " + hOrder.ToString();
 						
 			
 			// Otherwise, it doesn't work when they move

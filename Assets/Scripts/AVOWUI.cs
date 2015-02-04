@@ -288,7 +288,7 @@ public class AVOWUI : MonoBehaviour {
 		
 		if (node1 == null){
 			newHOrder = connection1.GetComponent<AVOWComponent>().hOrder;
-			Debug.Log("CalcNewHOrder = " + newHOrder);
+//			Debug.Log("CalcNewHOrder = " + newHOrder);
 			return;
 		}
 		
@@ -315,9 +315,6 @@ public class AVOWUI : MonoBehaviour {
 			nodeLo = node0;
 		}
 		
-		if (nodeLo.GetID () == "0"){
-			Debug.Log ("Have switched");
-		}
 		
 		
 		// Creare a disjoint set of OrderBlocks - each ORderblock contains a number of components
@@ -410,12 +407,12 @@ public class AVOWUI : MonoBehaviour {
 
 			
 		
-		Debug.Log("CalcNewHOrderL nodeHi =  " + nodeHi.GetID() + " , nodeLo = " + nodeLo.GetID() + ", numBlocks = " + blocks.Count);
-		
-		// print the contents fo the blocks
-		foreach (OrderBlock block in blocks){
-			Debug.Log ("block: minOrder = " + block.minOrder + ", maxOrder = " + block.maxOrder + ", minPos = " + block.minPos + ", maxPos = " + block.maxPos);
-		}
+//		Debug.Log("CalcNewHOrderL nodeHi =  " + nodeHi.GetID() + " , nodeLo = " + nodeLo.GetID() + ", numBlocks = " + blocks.Count);
+//		
+//		// print the contents fo the blocks
+//		foreach (OrderBlock block in blocks){
+//			Debug.Log ("block: minOrder = " + block.minOrder + ", maxOrder = " + block.maxOrder + ", minPos = " + block.minPos + ", maxPos = " + block.maxPos);
+//		}
 
 		OrderBlock blockBefore = null;
 		float minDistBefore = 100;
@@ -504,7 +501,7 @@ public class AVOWUI : MonoBehaviour {
 			debugText = "BeforeMinH = " + blockBefore.minOrder + ", BeforeMaxH = " + blockBefore.maxOrder + ", AfterMinH = " + blockAfter.minOrder + " , AfterMaxH = " + blockAfter.maxOrder;
 		}
 		
-		Debug.Log ("CalcNewHOrder: " + debugText + " - NewHOrder = " + newHOrder);
+//		Debug.Log ("CalcNewHOrder: " + debugText + " - NewHOrder = " + newHOrder);
 		
 		
 		
@@ -657,7 +654,7 @@ public class AVOWUI : MonoBehaviour {
 			
 			// Also need to hide the lightening from the compoment to the node
 			if (connection1.GetComponent<AVOWComponent>() != null){
-				Debug.Log("connection1.GetComponent<AVOWComponent>().ID = " + connection1.GetComponent<AVOWComponent>().GetID());
+//				Debug.Log("connection1.GetComponent<AVOWComponent>().ID = " + connection1.GetComponent<AVOWComponent>().GetID());
 				connection1.GetComponent<AVOWComponent>().EnableLightening(connection0, false);
 			}
 			
@@ -728,7 +725,7 @@ public class AVOWUI : MonoBehaviour {
 				outOrdinalNew++;
 			}
 		}
-		Debug.Log("oldHOrder = " + oldHOrder + ", newHOrder = " + newHOrder + ", inOrdinalOld " + inOrdinalOld + ", inOrdinalNew = " + inOrdinalNew + ", outOrdinalOld = " + outOrdinalOld + ", outOrdinalNew = " + outOrdinalNew);
+//		Debug.Log("oldHOrder = " + oldHOrder + ", newHOrder = " + newHOrder + ", inOrdinalOld " + inOrdinalOld + ", inOrdinalNew = " + inOrdinalNew + ", outOrdinalOld = " + outOrdinalOld + ", outOrdinalNew = " + outOrdinalNew);
 		return (inOrdinalOld != inOrdinalNew || outOrdinalOld != outOrdinalNew);
 	}
 	
@@ -983,7 +980,7 @@ public class AVOWUI : MonoBehaviour {
 //				return;
 //			}
 //		}
-		Debug.Log(Time.time + ": UI Update");
+//		Debug.Log(Time.time + ": UI Update");
 		StateUpdate();
 		CalcNewHOrder();
 		CommandsUpdate();

@@ -1,47 +1,38 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWComponent.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWSim.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWUI.cs" Line="599" Column="3" />
-      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="229" Column="65" />
       <File FileName="Assets/Scripts/Lightening.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Telemetry.cs" Line="1" Column="1" />
       <File FileName="Assets/GearProcedural/Editor/GearInspector.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWCommandSplitAddComponent.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWSim.cs" Line="138" Column="45" />
+      <File FileName="Assets/Scripts/AVOWSim.cs" Line="139" Column="25" />
       <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/SpringValue.cs" Line="13" Column="20" />
+      <File FileName="Assets/Scripts/SpringValue.cs" Line="76" Column="1" />
       <File FileName="Assets/Scripts/AVOWNode.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWGreenBackground.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWPusher.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ProjectorScript.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/QuitOnEsc.cs" Line="10" Column="4" />
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="365" Column="6" />
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="54" Column="2" />
       <File FileName="Assets/Scripts/PrefabManager.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Simulator.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="355" Column="40" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Assembly-CSharp" expanded="True">
             <Node name="Scripts" expanded="True">
-              <Node name="AVOWComponent.cs" selected="True" />
+              <Node name="AVOWSim.cs" selected="True" />
             </Node>
           </Node>
         </State>
       </Pad>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
         <State>
-          <Value>thisCompID</Value>
-          <Value>node0.id</Value>
-          <Value>outComponent.id</Value>
-          <Value>outComponent.h</Value>
-          <Value>newHOrder</Value>
-          <Value>oldHOrder</Value>
-          <Value>outComponent.isInteractive</Value>
-          <Value>blockAfter</Value>
           <Value>component.id</Value>
-          <Value>thisComponent.id</Value>
         </State>
       </Pad>
     </Pads>

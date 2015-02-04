@@ -129,18 +129,18 @@ public class AVOWSim : MonoBehaviour {
 	}
 	
 	public void FixedUpdate(){
-		Debug.Log("Sim Update");
+//		Debug.Log("Sim Update");
 		
 		RecordMousePos();
 		Recalc();
 		CalcMouseOffset();
-		
-		Debug.Log ("Print out order of node 1");
-		AVOWNode node0 = graph.allNodes[1].GetComponent<AVOWNode>();
-		for (int i = 0; i < node0.outComponents.Count; ++i){
-			AVOWComponent component = node0.outComponents[i].GetComponent<AVOWComponent>();
-			Debug.Log ("ID - " + component.GetID() + ", h0 = " + component.h0 + ", hOrder = " + component.hOrder);
-		}
+//		
+//		Debug.Log ("Print out order of node 1");
+//		AVOWNode node0 = graph.allNodes[1].GetComponent<AVOWNode>();
+//		for (int i = 0; i < node0.outComponents.Count; ++i){
+//			AVOWComponent component = node0.outComponents[i].GetComponent<AVOWComponent>();
+//			Debug.Log ("ID - " + component.GetID() + ", h0 = " + component.h0 + ", hOrder = " + component.hOrder);
+//		}
 		
 		//AppHelper.Quit();
 		
