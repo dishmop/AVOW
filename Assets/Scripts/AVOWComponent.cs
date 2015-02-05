@@ -12,6 +12,7 @@ public class AVOWComponent : MonoBehaviour {
 	public float squareGap = 0.02f;
 	public float lighteningSize = 0.5f;
 	public bool isInteractive = true;	
+	public bool isInsideGap = false;
 	
 	// top bottom, left right 
 	float useH0;
@@ -337,7 +338,7 @@ public class AVOWComponent : MonoBehaviour {
 		Vector3 connector1Pos = GetConnectionPos1();
 		
 		if (type == Type.kLoad){
-			transform.FindChild("Resistance").gameObject.SetActive(isInteractive);
+			transform.FindChild("Resistance").gameObject.SetActive(isInteractive || isInsideGap);
 			transform.FindChild("Lightening0").gameObject.SetActive(isInteractive && enableLightening0);
 			transform.FindChild("Lightening1").gameObject.SetActive(isInteractive && enableLightening1);
 			transform.FindChild("Lightening2").gameObject.SetActive(isInteractive);

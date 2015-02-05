@@ -23,9 +23,21 @@ public class AVOWUI : MonoBehaviour {
 	public GameObject 	heldGapConnection1;
 	public float		newHOrder;
 	
-	float hysteresisFactor = 0.7f;
+	public enum InsideGapState{	
+		kNotInside,
+		kNotInsideAndExiting,
+		kEntering,
+		kFullyInside,
+		kOnNewComponent
+	};
+	public bool			  	isInside = false;
+	public InsideGapState 	insideState = InsideGapState.kNotInside;
+	GameObject				insideCube = null;
+	float					maxLerpSpeed = 0.5f;
+	float					minLerpSpeed = 0f;
+	float 					insideLerpSpeed;
 	
-	int debugCount = 0;
+	float hysteresisFactor = 0.7f;
 			
 	
 	public float maxLighteningDist;
@@ -63,12 +75,15 @@ public class AVOWUI : MonoBehaviour {
 	
 	void NewStart(){
 		cursorCube = GameObject.Instantiate(cursorCubePrefab) as GameObject;
+		cursorCube.transform.parent = transform;
 		lightening0GO = GameObject.Instantiate(lighteningPrefab) as GameObject;
 		lightening0GO.transform.parent = transform;
 		lightening1GO = GameObject.Instantiate(lighteningPrefab) as GameObject;
 		lightening1GO.transform.parent = transform;
 		
 		uiZPos = transform.position.z;
+		
+		insideLerpSpeed = minLerpSpeed;
 	}
 	
 
@@ -442,9 +457,7 @@ public class AVOWUI : MonoBehaviour {
 		
 		// If we haven't got any blocks then we are connecting between nodes that have no
 		// connections between them yet - so do some different logic
-		bool tempFlag = false;
 		if (blocks.Count == 0){
-			tempFlag = true;
 			OrderBlock blockHi = new OrderBlock();
 			OrderBlock blockLo = new OrderBlock();
 			foreach (GameObject go in nodeHi.components){
@@ -493,10 +506,6 @@ public class AVOWUI : MonoBehaviour {
 			debugText = "BeforeMinH = " + blockBefore.minOrder + ", BeforeMaxH = " + blockBefore.maxOrder + ", AfterMinH = null , AfterMaxH = null";
 		}
 		else{	
-			if (tempFlag == false){
-				Debug.Log ("**************************************************TempFlag");
-			}
-				
 			newHOrder = (blockBefore.maxOrder + blockAfter.minOrder) * 0.5f;
 			debugText = "BeforeMinH = " + blockBefore.minOrder + ", BeforeMaxH = " + blockBefore.maxOrder + ", AfterMinH = " + blockAfter.minOrder + " , AfterMaxH = " + blockAfter.maxOrder;
 		}
@@ -602,20 +611,191 @@ public class AVOWUI : MonoBehaviour {
 			// Update our connection posiiton on our node we are connected to
 			FindClosestPointOnNode(mouseWorldPos, connection0, ref connection0Pos);
 
-			// Now find the next closest thing - favouring whatever we have connected already
-			GameObject closestObj = null;
-			Vector3 closestPos = Vector3.zero;
-			float minDist = FindClosestComponent(mouseWorldPos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos);
-			minDist = FindClosestNode(mouseWorldPos, connection0, minDist, connection1, ref closestObj, ref closestPos);			
-			connection1 = closestObj;
-			connection1Pos = closestPos;		
-		
-			if (buttonReleased){
-				heldConnection = false;
+			// If not inside the held gap, find the next closest thing - favouring whatever we have connected already
+			if (!isInside){
+				GameObject closestObj = null;
+				Vector3 closestPos = Vector3.zero;
+				float minDist = FindClosestComponent(mouseWorldPos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos);
+				minDist = FindClosestNode(mouseWorldPos, connection0, minDist, connection1, ref closestObj, ref closestPos);			
+				connection1 = closestObj;
+				connection1Pos = closestPos;	
+				if (buttonReleased){
+					heldConnection = false;
+				}
 			}
+			else{
+				if (buttonReleased){
+					heldConnection = false;
+					heldGapCommand.ExecuteStep();
+					commands.Push(heldGapCommand);
+					heldGapCommand = null;
+					heldGapConnection1 = null;
+					connection1 = null;
+					connection0 = null;
+					insideState = InsideGapState.kOnNewComponent;
+				}
+			}
+						
 			
 		}
+		
+		// If we have a gap which we are holding open, check if our mous is inside the gap
+		isInside = false;
+		AVOWComponent component = GetHeldCommandComponent();
+		if (component != null){
+			isInside = component.IsPointInsideGap(mouseWorldPos);
+		}
+		
+		HandleCubeInsideGap();
 			
+	}
+	
+	AVOWComponent GetHeldCommandComponent(){
+		if (heldGapCommand == null) return null;
+		
+		GameObject go = heldGapCommand.GetNewComponent();
+		if (go == null) return null;
+		
+		AVOWComponent component = go.GetComponent<AVOWComponent>();
+		return component;
+	}
+	
+	void HandleCubeInsideGap(){
+	
+		
+	
+		// Manage the inside state machine
+		switch (insideState){
+			case InsideGapState.kNotInside:{
+				if (isInside) {
+					// Create a new cube which will travel to the gap
+					insideCube = GameObject.Instantiate(cursorCubePrefab, cursorCube.transform.position, cursorCube.transform.rotation) as GameObject;
+					insideCube.transform.parent = transform;
+					Material[] metalMaterials = new Material[1];
+					metalMaterials[0] = cursorCube.renderer.materials[0];
+					insideCube.renderer.materials = metalMaterials;
+					
+					
+					// Remove the metal material from the cube that we have
+					Material[] highlightMaterials = new Material[1];
+					highlightMaterials[0] = cursorCube.renderer.materials[1];
+					cursorCube.renderer.materials = highlightMaterials;
+					
+					insideState = InsideGapState.kEntering;
+					insideLerpSpeed = minLerpSpeed;
+				}
+				break;
+			}
+			case InsideGapState.kEntering:{
+				
+				// Move our inside cube to where it needs to be
+				AVOWComponent component = GetHeldCommandComponent();
+				if (component != null && isInside){
+				
+					Transform resistanceTransform = component.gameObject.transform.FindChild("Resistance");
+					
+					//Orentation
+					Quaternion targetOrient = resistanceTransform.rotation;
+					Quaternion currentOrient = insideCube.transform.rotation;
+					currentOrient = Quaternion.Slerp(currentOrient, targetOrient, insideLerpSpeed);
+					insideCube.transform.rotation = currentOrient;
+				
+					// Scale
+					Vector3 targetScale = new Vector3(resistanceTransform.localScale.x, resistanceTransform.localScale.x, resistanceTransform.localScale.x);
+					Vector3 currentScale = insideCube.transform.localScale;
+					currentScale = Vector3.Lerp(currentScale, targetScale, insideLerpSpeed);
+					insideCube.transform.localScale = new Vector3(currentScale.x, currentScale.x, currentScale.x);
+					
+					// Position
+					Vector3 targetPos = resistanceTransform.position + 0.5f * targetScale;
+					Vector3 currentPos = insideCube.transform.position;
+					currentPos = Vector3.Lerp(currentPos, targetPos, insideLerpSpeed);
+					insideCube.transform.position = currentPos;
+					
+					if (MathUtils.FP.Feq((currentPos - targetPos).magnitude, 0, 0.001f)){
+						insideState = InsideGapState.kFullyInside;
+						insideLerpSpeed = minLerpSpeed;
+					}
+				}
+				else{
+					insideState = InsideGapState.kNotInsideAndExiting;
+					insideLerpSpeed = minLerpSpeed;
+					
+				}
+				
+				insideLerpSpeed = Mathf.Lerp (insideLerpSpeed, maxLerpSpeed, 0.1f);
+				
+				break;
+			}
+			case InsideGapState.kFullyInside:{
+				AVOWComponent component = GetHeldCommandComponent();
+				if (component == null || !isInside){
+					insideState = InsideGapState.kNotInsideAndExiting;
+					insideLerpSpeed = minLerpSpeed;
+					
+				}
+				break;
+			}
+			case InsideGapState.kNotInsideAndExiting:{
+				Transform cursorTransform = cursorCube.transform;
+				
+				//Orentation
+				Quaternion targetOrient = cursorTransform.rotation;
+				Quaternion currentOrient = insideCube.transform.rotation;
+				currentOrient = Quaternion.Slerp(currentOrient, targetOrient, insideLerpSpeed);
+				insideCube.transform.rotation = currentOrient;
+				
+				// Scale
+				Vector3 targetScale = cursorTransform.localScale;
+				Vector3 currentScale = insideCube.transform.localScale;
+				currentScale = Vector3.Lerp(currentScale, targetScale, insideLerpSpeed);
+				insideCube.transform.localScale = new Vector3(currentScale.x, currentScale.x, currentScale.x);
+				
+				// Position
+				Vector3 targetPos = cursorTransform.position;
+				Vector3 currentPos = insideCube.transform.position;
+				currentPos = Vector3.Lerp(currentPos, targetPos, insideLerpSpeed);
+				insideCube.transform.position = currentPos;
+				
+				if (MathUtils.FP.Feq((currentPos - targetPos).magnitude, 0, 0.001f)){
+					insideState = InsideGapState.kNotInside;
+						
+					// Remake our cube
+					GameObject newCursorCube = GameObject.Instantiate(cursorCubePrefab, cursorCube.transform.position, cursorCube.transform.rotation) as GameObject;
+					newCursorCube.transform.localScale = cursorCube.transform.localScale;
+					newCursorCube.transform.parent = transform;
+					
+					GameObject.Destroy (cursorCube);
+					cursorCube = newCursorCube;
+					
+					GameObject.Destroy(insideCube);
+					insideCube = null;
+				}
+				AVOWComponent component = GetHeldCommandComponent();
+				if (component != null && isInside){
+					insideState = InsideGapState.kEntering;	
+					insideLerpSpeed = minLerpSpeed;
+				}
+				insideLerpSpeed = Mathf.Lerp (insideLerpSpeed, maxLerpSpeed, 0.1f);
+				break;
+			}			
+			case InsideGapState.kOnNewComponent:{
+				insideState = InsideGapState.kNotInside;
+				
+				// Remake our cube
+				GameObject newCursorCube = GameObject.Instantiate(cursorCubePrefab, cursorCube.transform.position, cursorCube.transform.rotation) as GameObject;
+				newCursorCube.transform.localScale = cursorCube.transform.localScale;
+				newCursorCube.transform.parent = transform;
+				
+				GameObject.Destroy (cursorCube);
+				cursorCube = newCursorCube;
+				
+				GameObject.Destroy(insideCube);
+				insideCube = null;
+				break;
+			}
+		}	
+
 	}
 	
 	
@@ -626,14 +806,22 @@ public class AVOWUI : MonoBehaviour {
 		AVOWGraph.singleton.UnselectAllNodes();
 		if (heldConnection) connection0.GetComponent<AVOWNode>().SetSelected(true);
 		
-	
+		Vector3 lighteningConductorPos = (isInside) ? insideCube.transform.position : mouseWorldPos;
+		Vector3 connection0PosUse = (isInside) ? new Vector3(insideCube.transform.position.x, connection0Pos.y, connection0Pos.z) : connection0Pos;
+		Vector3 connection1PosUse = (isInside && connection1 != null && connection1.GetComponent<AVOWComponent>() == null) ? new Vector3(insideCube.transform.position.x, connection1Pos.y, connection1Pos.z) : connection1Pos;
+		
+		
+		lighteningConductorPos.z = uiZPos;
+		
 		// Lightening to connection 0 - which is always a node
 		if (connection0 != null){
 			lightening0GO.SetActive(true);
 			Lightening lightening0 = lightening0GO.GetComponent<Lightening>();
-			
-			lightening0.startPoint = mouseWorldPos;
-			lightening0.endPoint = connection0Pos;
+			lightening0.startPoint = lighteningConductorPos;
+			lightening0.endPoint = connection0PosUse;
+
+			float len = (lightening0.startPoint  - lightening0.endPoint).magnitude;
+			lightening0.numStages = Mathf.Max ((int)(len * 10), 2);
 			lightening0.size =  heldConnection ? 0.4f : 0.1f;
 			lightening0.ConstructMesh();
 		}
@@ -646,9 +834,13 @@ public class AVOWUI : MonoBehaviour {
 		AVOWGraph.singleton.EnableAllLightening();
 		if (connection1 != null){
 			lightening1GO.SetActive(true);
+			
 			Lightening lightening1 = lightening1GO.GetComponent<Lightening>();
-			lightening1.startPoint = mouseWorldPos;
-			lightening1.endPoint = connection1Pos;
+			lightening1.startPoint = lighteningConductorPos;
+			lightening1.endPoint = connection1PosUse;
+			
+			float len = (lightening1.startPoint  - lightening1.endPoint).magnitude;
+			lightening1.numStages = Mathf.Max ((int)(len * 10), 2);
 			lightening1.size = 0.1f;
 			lightening1.ConstructMesh();
 			
@@ -669,6 +861,7 @@ public class AVOWUI : MonoBehaviour {
 		if (connection0 != null){
 			cursorCube.transform.Rotate (new Vector3(1, 2, 4));
 		}
+		
 	}
 	
 	
@@ -1007,6 +1200,34 @@ public class AVOWUI : MonoBehaviour {
 	void Start(){
 		
 		NewStart();
+		
+		// Simple start
+		AVOWGraph graph = AVOWGraph.singleton;
+
+		GameObject node0GO = graph.AddNode ();
+		GameObject node1GO = graph.AddNode ();
+
+				
+		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0GO, node1GO);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node0GO);
+		
+		/*
+		// Complex start
+		AVOWGraph graph = AVOWGraph.singleton;
+		
+		GameObject node0GO = graph.AddNode ();
+		GameObject node1GO = graph.AddNode ();
+		GameObject node2GO = graph.AddNode ();
+		GameObject node3GO = graph.AddNode ();		
+		
+		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0GO, node1GO);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node2GO);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2GO, node0GO);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node3GO);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node3GO);
+		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node3GO, node0GO);
+		*/
+		
 		/*
 			// Simple 3 resistors
 			AVOWGraph graph = AVOWGraph.singleton;
@@ -1100,33 +1321,9 @@ public class AVOWUI : MonoBehaviour {
 			graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1, node2);
 			*/
 		
-		// Complex start
-		AVOWGraph graph = AVOWGraph.singleton;
+
 		
-		GameObject node0GO = graph.AddNode ();
-		GameObject node1GO = graph.AddNode ();
-		GameObject node2GO = graph.AddNode ();
-		GameObject node3GO = graph.AddNode ();		
-		
-		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0GO, node1GO);
-		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node2GO);
-		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2GO, node0GO);
-		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node3GO);
-		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node3GO);
-		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node3GO, node0GO);
-		
-		
-		/*
-			// Simple start
-			AVOWGraph graph = AVOWGraph.singleton;
-	
-			GameObject node0GO = graph.AddNode ();
-			GameObject node1GO = graph.AddNode ();
-	
-					
-			graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0GO, node1GO);
-			graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node0GO);
-			*/
+
 		
 		/*
 			// Sneeky crossover

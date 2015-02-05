@@ -4842,6 +4842,8 @@ MonoBehaviour:
   heldConnection: 0
   heldGapConnection1: {fileID: 0}
   newHOrder: 0
+  isInside: 0
+  insideState: 0
   maxLighteningDist: .200000003
   lockCreation: 0
 --- !u!4 &1813380715

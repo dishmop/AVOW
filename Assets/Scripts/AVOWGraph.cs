@@ -125,6 +125,7 @@ public class AVOWGraph : MonoBehaviour {
 	
 	public GameObject AddNode(){
 		GameObject newNodeGO = Instantiate(NodePrefab) as GameObject;
+		newNodeGO.transform.parent = transform;
 		
 		maxNodeId = Mathf.Max (maxNodeId, newNodeGO.GetComponent<AVOWNode>().id);
 		allNodes.Add (newNodeGO);

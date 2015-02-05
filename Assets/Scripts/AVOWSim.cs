@@ -641,8 +641,8 @@ public class AVOWSim : MonoBehaviour {
 				int numCompsIn = inComponents.Count;
 				int numCompsOut = outComponents.Count;
 				
-				string thisCompID = component.GetID();
-				string blockID = components[key][numCompsDict-1].GetID();
+//				string thisCompID = component.GetID();
+//				string blockID = components[key][numCompsDict-1].GetID();
 				
 				if (components[key][numCompsDict-1].gameObject == inComponents[numCompsIn-1] || components[key][numCompsDict-1].gameObject == outComponents[numCompsOut-1]){
 					components[key].Add (component);
