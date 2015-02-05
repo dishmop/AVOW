@@ -22,6 +22,7 @@ public class AVOWComponent : MonoBehaviour {
 	
 	bool enableLightening0;
 	bool enableLightening1;
+	bool enableLightening2;
 	
 	
 	Vector3 oldNode0Pos = new Vector3(0, 0, 0);
@@ -151,16 +152,24 @@ public class AVOWComponent : MonoBehaviour {
 		float hMid = (h0 + 0.5f * hWidth);
 		float node0VPos = node0GO.GetComponent<AVOWNode>().voltage;
 		float node1VPos = node1GO.GetComponent<AVOWNode>().voltage;
-		float vPos = node0VPos + connectorProp * (node1VPos - node0VPos);
-		return new Vector3(hMid, vPos, transform.position.z);
+		if (type == Type.kLoad){
+			return new Vector3(hMid, node0VPos + connectorProp * (node1VPos - node0VPos), transform.position.z);
+		}
+		else{
+			return new Vector3(hMid, node0VPos - connectorProp * (node1VPos - node0VPos), transform.position.z);
+		}
 	}
 		
 	public Vector3 GetConnectionPos1(){
 		float hMid = (h0 + 0.5f * hWidth);
 		float node0VPos = node0GO.GetComponent<AVOWNode>().voltage;
 		float node1VPos = node1GO.GetComponent<AVOWNode>().voltage;
-		float vPos = node1VPos + connectorProp * (node0VPos - node1VPos);
-		return new Vector3(hMid, vPos, transform.position.z);
+		if (type == Type.kLoad){
+			return new Vector3(hMid, node1VPos + connectorProp * (node0VPos - node1VPos), transform.position.z);
+		}
+		else{
+			return new Vector3(hMid, node1VPos - connectorProp * (node0VPos - node1VPos), transform.position.z);
+		}
 	}
 
 	public Vector3 GetConnectionPosBottom(){
@@ -339,18 +348,11 @@ public class AVOWComponent : MonoBehaviour {
 		
 		if (type == Type.kLoad){
 			transform.FindChild("Resistance").gameObject.SetActive(isInteractive || isInsideGap);
-			transform.FindChild("Lightening0").gameObject.SetActive(isInteractive && enableLightening0);
-			transform.FindChild("Lightening1").gameObject.SetActive(isInteractive && enableLightening1);
-			transform.FindChild("Lightening2").gameObject.SetActive(isInteractive);
-			transform.FindChild("ConnectionSphere0").gameObject.SetActive(isInteractive);
-			transform.FindChild("ConnectionSphere1").gameObject.SetActive(isInteractive);
-			
 			SetupUVs (transform.FindChild("Resistance").gameObject, Mathf.Abs (useV1-useV0));
 			transform.FindChild("Resistance").renderer.material.SetColor("_Color0", col0);
 			transform.FindChild("Resistance").renderer.material.SetColor("_Color1", col1);
-//			transform.FindChild("Resistance").position = new Vector3(useH0  + (useH1 -useH0) * squareGap, Mathf.Min (useV0, useV1) + Mathf.Abs (useV1-useV0) * squareGap, 0);
-//			transform.FindChild("Resistance").localScale = new Vector3((1-2 * squareGap) * (useH1 -useH0), (1-2 * squareGap) * Mathf.Abs (useV1-useV0), 1);
 			transform.FindChild("Resistance").position = new Vector3(useH0  + squareGap, Mathf.Min (useV0, useV1) + squareGap, 0);
+
 			float xScale = useH1 -useH0 - 2 * squareGap;
 			float yScale = Mathf.Abs (useV1-useV0) - 2 * squareGap;
 			
@@ -358,69 +360,78 @@ public class AVOWComponent : MonoBehaviour {
 			yScale = Mathf.Max (yScale, 0);
 			
 			transform.FindChild("Resistance").localScale = new Vector3(xScale, yScale, 1);
-			Vector3 newNode0Pos = node0GO.transform.FindChild("Sphere").transform.position;
-			Vector3 newNode1Pos = node1GO.transform.FindChild("Sphere").transform.position;
 			
-			// Debug text
-			transform.FindChild("Resistance").FindChild ("AVOWTextBox").gameObject.SetActive(false);
-			//transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = GetID() + " - " + hOrder.ToString();
-						
-			
-			// Otherwise, it doesn't work when they move
-			if (true || !MathUtils.FP.Feq ((oldNode0Pos - newNode0Pos).magnitude, 0) || !MathUtils.FP.Feq ((oldNode1Pos - newNode1Pos).magnitude, 0)) {
-			
-				Lightening lightening0 = transform.FindChild("Lightening0").GetComponent<Lightening>();
-				Lightening lightening1 = transform.FindChild("Lightening1").GetComponent<Lightening>();
-				Lightening lightening2 = transform.FindChild("Lightening2").GetComponent<Lightening>();
-				
-				float pdSize = Mathf.Abs (useV1-useV0);
-
-				// Node0 to connector 0
-//				transform.FindChild("Lightening0").gameObject.SetActive(true);
-				lightening0.startPoint = new Vector3(connector0Pos.x, newNode0Pos.y);
-				lightening0.endPoint = connector0Pos;
-				lightening0.size = lighteningSize * pdSize;
-				lightening0.numStages = 2;
-				lightening0.ConstructMesh();
-
-
-								
-				// Connector1 to node1
-//				transform.FindChild("Lightening1").gameObject.SetActive(true);
-				lightening1.startPoint = new Vector3(connector1Pos.x, newNode1Pos.y);
-				lightening1.endPoint = connector1Pos;
-				lightening1.size = lighteningSize * pdSize;
-				lightening1.numStages = 2;
-				lightening1.ConstructMesh();	
-				
-				// connector0 to connector1
-//				transform.FindChild("Lightening0").gameObject.SetActive(true);
-				lightening2.startPoint = connector0Pos;
-				lightening2.endPoint = connector1Pos;
-				lightening2.size =lighteningSize *  pdSize;
-				lightening2.ConstructMesh();					
-				
-				
-				oldNode0Pos = newNode0Pos;
-				oldNode1Pos = newNode1Pos;
-			}
-			// Put our connection spheres in the right place.
-			float scale = 0.1f * Mathf.Abs (useV1-useV0);
-			Transform connectionSphere0 = transform.FindChild("ConnectionSphere0");
-			Transform connectionSphere1 = transform.FindChild("ConnectionSphere1");
-			connectionSphere0.position = connector0Pos;
-			connectionSphere0.localScale = new Vector3(scale, scale, scale);
-			connectionSphere1.position = connector1Pos;
-			connectionSphere1.localScale = new Vector3(scale, scale, scale);
-
+			transform.FindChild("Lightening0").gameObject.SetActive(isInteractive && enableLightening0);
+			transform.FindChild("Lightening1").gameObject.SetActive(isInteractive && enableLightening1);
+			transform.FindChild("Lightening2").gameObject.SetActive(isInteractive);
 		}
 		else{
-			transform.FindChild("VoltageSource").renderer.material.SetColor("_Color0", col0);
-			transform.FindChild("VoltageSource").renderer.material.SetColor("_Color1", col1);
-			transform.FindChild("VoltageSource").position = new Vector3(-h0, v0, 0);
-			transform.FindChild("VoltageSource").localScale = new Vector3(h0 - h1, v1-v0, 1);
-
+			enableLightening0 = true;
+			enableLightening1 = true;
+			transform.FindChild("Lightening0").gameObject.SetActive(isInteractive && enableLightening0);
+			transform.FindChild("Lightening1").gameObject.SetActive(isInteractive && enableLightening1);
+			transform.FindChild("Lightening2").gameObject.SetActive(false);
 		}
+
+		transform.FindChild("ConnectionSphere0").gameObject.SetActive(isInteractive);
+		transform.FindChild("ConnectionSphere1").gameObject.SetActive(isInteractive);
+		
+		Vector3 newNode0Pos = node0GO.transform.position;
+		Vector3 newNode1Pos = node1GO.transform.position;
+		
+		// Debug text
+		transform.FindChild("Resistance").FindChild ("AVOWTextBox").gameObject.SetActive(false);
+		//transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = GetID() + " - " + hOrder.ToString();
+					
+		
+		// Otherwise, it doesn't work when they move
+		if (true || !MathUtils.FP.Feq ((oldNode0Pos - newNode0Pos).magnitude, 0) || !MathUtils.FP.Feq ((oldNode1Pos - newNode1Pos).magnitude, 0)) {
+		
+			Lightening lightening0 = transform.FindChild("Lightening0").GetComponent<Lightening>();
+			Lightening lightening1 = transform.FindChild("Lightening1").GetComponent<Lightening>();
+			Lightening lightening2 = transform.FindChild("Lightening2").GetComponent<Lightening>();
+			
+			float pdSize = Mathf.Abs (useV1-useV0);
+
+			// Node0 to connector 0
+//				transform.FindChild("Lightening0").gameObject.SetActive(true);
+			lightening0.startPoint = new Vector3(connector0Pos.x, newNode0Pos.y);
+			lightening0.endPoint = connector0Pos;
+			lightening0.size = lighteningSize * pdSize;
+			lightening0.numStages = 2;
+			lightening0.ConstructMesh();
+
+
+							
+			// Connector1 to node1
+//				transform.FindChild("Lightening1").gameObject.SetActive(true);
+			lightening1.startPoint = new Vector3(connector1Pos.x, newNode1Pos.y);
+			lightening1.endPoint = connector1Pos;
+			lightening1.size = lighteningSize * pdSize;
+			lightening1.numStages = 2;
+			lightening1.ConstructMesh();	
+			
+			// connector0 to connector1
+//				transform.FindChild("Lightening0").gameObject.SetActive(true);
+			lightening2.startPoint = connector0Pos;
+			lightening2.endPoint = connector1Pos;
+			lightening2.size =lighteningSize *  pdSize;
+			lightening2.ConstructMesh();					
+			
+			
+			oldNode0Pos = newNode0Pos;
+			oldNode1Pos = newNode1Pos;
+		}
+		
+		// Put our connection spheres in the right place.
+		float scale = 0.1f * Mathf.Abs (useV1-useV0);
+		Transform connectionSphere0 = transform.FindChild("ConnectionSphere0");
+		Transform connectionSphere1 = transform.FindChild("ConnectionSphere1");
+		connectionSphere0.position = connector0Pos;
+		connectionSphere0.localScale = new Vector3(scale, scale, scale);
+		connectionSphere1.position = connector1Pos;
+		connectionSphere1.localScale = new Vector3(scale, scale, scale);
+
 
 		
 			

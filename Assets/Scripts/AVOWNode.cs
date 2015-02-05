@@ -64,12 +64,9 @@ public class AVOWNode : MonoBehaviour {
 		float newVal = Mathf.Lerp (currentSelectVal, isSelected ? 1 : 0, 0.4f);
 		material.SetFloat("_Intensity", newVal);
 				
-		transform.FindChild("Sphere").position = new Vector3(h0 + 0.5f * hWidth, voltage, 0);
-		transform.FindChild("Sphere").localScale = new Vector3( 0.2f * hWidth,  0.2f * hWidth,  0.2f * hWidth);
-		
-		transform.FindChild("LineNode").position = new Vector3(h0 + 0.5f * hWidth, voltage, 0);
-		transform.FindChild("LineNode").localScale = new Vector3( hWidth,  0.5f * hWidth,  1);
-		transform.FindChild("LineNode").gameObject.SetActive(isInteractive);		
+		transform.position = new Vector3(h0 + 0.5f * hWidth, voltage, 0);
+		transform.localScale = new Vector3( hWidth,  0.5f * hWidth,  1);
+		transform.gameObject.SetActive(isInteractive);		
 	
 	}
 }

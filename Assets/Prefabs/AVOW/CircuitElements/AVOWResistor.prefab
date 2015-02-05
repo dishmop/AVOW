@@ -647,9 +647,11 @@ MonoBehaviour:
   squareGap: .00999999978
   lighteningSize: .5
   isInteractive: 1
+  isInsideGap: 0
   voltage: 1
   type: 1
   visited: 0
+  uiVisitedIndex: 0
   disable: 0
   fwCurrent: 0
   col0: {r: 1, g: 0, b: 0, a: 1}

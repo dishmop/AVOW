@@ -37,7 +37,7 @@ public class AVOWUI : MonoBehaviour {
 	float					minLerpSpeed = 0f;
 	float 					insideLerpSpeed;
 	
-	float hysteresisFactor = 0.7f;
+	float hysteresisFactor = 0.6f;
 			
 	
 	public float maxLighteningDist;

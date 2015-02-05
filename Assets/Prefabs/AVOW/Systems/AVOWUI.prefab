@@ -40,12 +40,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resistorPrefab: {fileID: 100016, guid: f0b3ec3f83404460fbba31843fecbcd3, type: 2}
-  cellPrefab: {fileID: 100002, guid: 1bf68cd89ceda43d1bff59790ceef25b, type: 2}
+  cellPrefab: {fileID: 100018, guid: 1bf68cd89ceda43d1bff59790ceef25b, type: 2}
   cursorCubePrefab: {fileID: 100000, guid: 88c1abdfbc47544a981d1aaa7566a21f, type: 2}
   lighteningPrefab: {fileID: 100000, guid: ad922b5ed1a1644d68f7428a6f6d567b, type: 2}
+  connection0: {fileID: 0}
+  connection1: {fileID: 0}
+  connection0Pos: {x: 0, y: 0, z: 0}
+  connection1Pos: {x: 0, y: 0, z: 0}
+  heldConnection: 0
+  heldGapConnection1: {fileID: 0}
+  newHOrder: 0
+  isInside: 0
+  insideState: 0
   maxLighteningDist: .100000001
   lockCreation: 0
-  previousSecondarySelectedNode: {fileID: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

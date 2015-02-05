@@ -8,6 +8,7 @@ public class AVOWCamControl : MonoBehaviour {
 	public GameObject		topPanel;
 	public float 			zoomSpeed;
 	public bool				ignoreSide = false;
+	public float FOV		= 1.7f;
 	Vector3					prevMousePos = new Vector3();
 	
 	
@@ -75,7 +76,7 @@ public class AVOWCamControl : MonoBehaviour {
 			
 			float vSize0 = size.y;
 			float vSize1 = size.x / Camera.main.aspect;
-			float useVSize = 1.5f * Mathf.Max (vSize0, vSize1);
+			float useVSize = FOV * Mathf.Max (vSize0, vSize1);
 			
 			float currentSize = transform.GetComponent<Camera>().orthographicSize;
 			float newSize = Mathf.Lerp (currentSize, useVSize * 0.5f, prop);
