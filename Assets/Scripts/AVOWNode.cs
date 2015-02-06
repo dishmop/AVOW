@@ -63,6 +63,10 @@ public class AVOWNode : MonoBehaviour {
 		float currentSelectVal = material.GetFloat("_Intensity");
 		float newVal = Mathf.Lerp (currentSelectVal, isSelected ? 1 : 0, 0.4f);
 		material.SetFloat("_Intensity", newVal);
+		
+		// Calc the prop value (use any of the components to get the gap value
+		float useLength = hWidth - 2 * components[0].GetComponent<AVOWComponent>().squareGap;
+		material.SetFloat("_GapProp", useLength / hWidth);
 				
 		transform.position = new Vector3(h0 + 0.5f * hWidth, voltage, 0);
 		transform.localScale = new Vector3( hWidth,  0.5f * hWidth,  1);

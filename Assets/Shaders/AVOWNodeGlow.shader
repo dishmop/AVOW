@@ -1,6 +1,7 @@
 ﻿Shader "Custom/AVOWNodeGlow" {
        Properties {
              _Intensity ("Intensity", Range(0, 1)) = 0
+             _GapProp("GapProp", Range(0,1)) = 0.9
         }
         SubShader {
         	//ZTest Always
@@ -17,6 +18,7 @@
 		        
 		
 		        uniform float _Intensity;
+		        uniform float _GapProp;
 		    
 		
 		        struct v2f {
@@ -43,19 +45,45 @@
 
 		        float4 frag(v2f i) : COLOR
 		        {
-		        	float xVal = i.uv[0] - 0.5;
-		        	float xMul = cos(3.14159 * 3.5 * xVal* xVal * xVal);
+		        	float xVal = abs(2 * (i.uv[0] - 0.5));
+		     //   	float xMul = cos(3.14159 * 3.5 * xVal* xVal * xVal);
+		     //		float xMul =4 *  xVal*xVal;
+		     		float xMul = 1;
+		     		
+		     		if (xVal > _GapProp)
+		     		{
+		     			xMul = CalcCurve(xVal - _GapProp, 0.05);
+		     		}
 		        	float y =  abs(i.uv[1] - 0.5);
-		        	float4 col0 = float4(xMul *  CalcCurve(y, 0.01), xMul * CalcCurve(y, 0.02),  xMul * CalcCurve(y, 0.2),  xMul * CalcCurve(y, 0.02));
-		        	float4 col1 = float4(xMul *  CalcCurve(y, 0.01), xMul * CalcCurve(y, 0.02),  xMul * CalcCurve(y, 0.2),  xMul * CalcCurve(y, 0.2));
-
+		        	float4 col0 = float4(xMul *  CalcCurve(y, 0.01), xMul * CalcCurve(y, 0.02),  xMul * CalcCurve(y, 0.2),  xMul * CalcCurve(y, 0.075));
+		        	float4 col1 = float4(xMul *  CalcCurve(y, 0.01), xMul * CalcCurve(y, 0.02),  xMul * CalcCurve(y, 0.2),  xMul * CalcCurve(y, 0.5));
 
 		        	return   lerp(col0, col1, _Intensity);
 		        	
-		        
-//		        	return lerp(_Color0, _Color1, val);
-
 		        }
+////		        
+//		        float4 frag(v2f i) : COLOR
+//		        {
+//		        	float xVal = abs(2  * ( i.uv[0] - 0.5));
+//		        	
+//		        	float xMul = pow(xVal, 20);
+//		        	
+//		        	float a = 1;
+//		        	float b = 2;
+//		        	
+//		        	xMul = a + xMul * (b - a);
+//		        	
+//		     //   	float xMul = cos(3.14159 * 3.5 * xVal* xVal * xVal);
+//		     //		float xMul =4 *  xVal*xVal;
+////		     		float xMul = 1;
+//
+//		        	float y =  abs(i.uv[1] - 0.5);
+//		        	float4 col0 = float4(xMul *  CalcCurve(y, 0.01), xMul * CalcCurve(y, 0.02),  xMul * CalcCurve(y, 0.2),  xMul * CalcCurve(y, 0.1));
+//		        	float4 col1 = float4(xMul *  CalcCurve(y, 0.01), xMul * CalcCurve(y, 0.02),  xMul * CalcCurve(y, 0.2),  xMul * CalcCurve(y, 0.4));
+//
+//		        	return   lerp(col0, col1, _Intensity);
+//		        	
+//		        }		        
 		        ENDCG
 
             }

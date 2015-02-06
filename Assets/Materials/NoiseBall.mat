@@ -28,7 +28,7 @@ Material:
       data:
         first:
           name: _Freq
-        second: 20
+        second: 50
       data:
         first:
           name: _Speed
@@ -36,7 +36,7 @@ Material:
       data:
         first:
           name: _StaticSpeed
-        second: .0399999991
+        second: .0199999996
       data:
         first:
           name: _DetailScale
@@ -97,7 +97,7 @@ Material:
       data:
         first:
           name: _Color0
-        second: {r: 0, g: .588235259, b: .0527383275, a: 1}
+        second: {r: 0, g: .382352948, b: .0342799164, a: 1}
       data:
         first:
           name: _Color1
