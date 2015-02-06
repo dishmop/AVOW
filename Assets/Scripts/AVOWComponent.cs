@@ -12,7 +12,7 @@ public class AVOWComponent : MonoBehaviour {
 	public float squareGap = 0.02f;
 	public float lighteningSize = 0.5f;
 	public bool isInteractive = true;	
-	public bool isInsideGap = false;
+	public bool showResistance = true;
 	
 	// top bottom, left right 
 	float useH0;
@@ -81,6 +81,7 @@ public class AVOWComponent : MonoBehaviour {
 	// Killing
 	bool removeOnTarget = false;
 	public AVOWCommand onDeadCommand = null;
+	public bool onDeadCommandDoExecutate;	// whether to rint he wexecute or undo commands
 	
 
 	
@@ -128,7 +129,12 @@ public class AVOWComponent : MonoBehaviour {
 		
 		if (resistanceAngle.IsAtTarget()){
 			if (onDeadCommand != null){
-				onDeadCommand.UndoStep();
+				if (onDeadCommandDoExecutate){
+					onDeadCommand.ExecuteStep();
+				}
+				else{
+					onDeadCommand.UndoStep();
+				}
 			}
 			AVOWGraph.singleton.RemoveComponent(gameObject);
 			// DEBUG
@@ -344,7 +350,7 @@ public class AVOWComponent : MonoBehaviour {
 		Vector3 connector1Pos = GetConnectionPos1();
 		
 		if (type == Type.kLoad){
-			transform.FindChild("Resistance").gameObject.SetActive(isInteractive || isInsideGap);
+			transform.FindChild("Resistance").gameObject.SetActive(isInteractive && showResistance);
 			SetupUVs (transform.FindChild("Resistance").gameObject, Mathf.Abs (useV1-useV0));
 			transform.FindChild("Resistance").renderer.material.SetColor("_Color0", col0);
 			transform.FindChild("Resistance").renderer.material.SetColor("_Color1", col1);

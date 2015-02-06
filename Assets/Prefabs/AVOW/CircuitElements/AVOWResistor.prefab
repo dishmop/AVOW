@@ -647,7 +647,7 @@ MonoBehaviour:
   squareGap: .00999999978
   lighteningSize: .5
   isInteractive: 1
-  isInsideGap: 0
+  showResistance: 1
   voltage: 1
   type: 1
   visited: 0
@@ -669,6 +669,7 @@ MonoBehaviour:
   inNodeGO: {fileID: 0}
   outNodeGO: {fileID: 0}
   hasBeenLayedOut: 0
+  onDeadCommandDoExecutate: 0
 --- !u!114 &11400012
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -3,29 +3,40 @@ using System;
 
 public class AVOWCommandRemove : AVOWCommand{
 
-	public GameObject 	nearNodeGO;
-	public GameObject 	farNodeGO;
+	public GameObject 	inNodeGO;
+	public GameObject 	outNodeGO;
 	public GameObject 	removeComponentGO;
 	public Vector3		cursorPos;
 	
+	
+	enum GapType{
+		kUndetermined,
+		kOneOfMany,
+		kOnlyOne
+	}
+	GapType gapType = GapType.kUndetermined;
+	
 	enum UndoStepState{
 		kReplaceComponent,
+		kWidenGap,
 		kFinished
 	}
 	
 	enum ExecuteStepState{
+		kMakeGap,
 		kRemoveComponent,
 		kMergeNodes,
 		kFinished
 	}
 	
-	UndoStepState undoStep = UndoStepState.kReplaceComponent;
-	ExecuteStepState executeStep = ExecuteStepState.kRemoveComponent;
+	UndoStepState undoStep = UndoStepState.kFinished;
+	ExecuteStepState executeStep = ExecuteStepState.kMakeGap;
 	
 	
 	public AVOWCommandRemove(GameObject componentGO, Vector3 pos){
 		removeComponentGO = componentGO;
 		cursorPos = pos;
+		gapType = DetermineType();
 	}
 	
 	public bool IsFinished(){	
@@ -34,68 +45,40 @@ public class AVOWCommandRemove : AVOWCommand{
 
 	public bool ExecuteStep(){
 		switch (executeStep){
+			case ExecuteStepState.kMakeGap:{
+				AVOWComponent component = removeComponentGO.GetComponent<AVOWComponent>();
+				
+				Debug.Log ("Shriking component " + component.GetID() + " of type " + ((gapType == GapType.kOneOfMany) ? "One of many" : "Only one"));
+				
+				component.resistanceAngle.Set((gapType == GapType.kOnlyOne) ? 20 : 70);
+				undoStep = UndoStepState.kWidenGap;
+				executeStep = ExecuteStepState.kRemoveComponent;
+				break;
+			}
 			case ExecuteStepState.kRemoveComponent:{
 		
 				AVOWComponent component = removeComponentGO.GetComponent<AVOWComponent>();
 				
-				// Find the nodes at either end of this component
-				Vector3 connection0Pos = component.GetConnectionPos0();
-				Vector3 connection1Pos = component.GetConnectionPos1();
-				
-				float dist0 = (cursorPos - connection0Pos).magnitude;
-				float dist1 = (cursorPos - connection1Pos).magnitude;
-				
-				if (dist0 < dist1){
-					nearNodeGO = component.node0GO;
-					farNodeGO = component.node1GO;
-				}
-				else{
-					nearNodeGO = component.node1GO;
-					farNodeGO = component.node0GO;
-				}
-				
-				Debug.Log ("NearNode = " + nearNodeGO.GetComponent<AVOWNode>().GetID());
-			     
-			    Debug.Log ("FarNode = " + farNodeGO.GetComponent<AVOWNode>().GetID());
-			           
-				// Remove the component
-				AVOWNode nearNode = nearNodeGO.GetComponent<AVOWNode>();
-				AVOWNode farNode = farNodeGO.GetComponent<AVOWNode>();
-				
-				bool nearIsHeigh = (nearNode.voltage > farNode.voltage);
-				
-				AVOWNode hiNode = (nearIsHeigh) ? nearNode : farNode;
-				AVOWNode loNode = (nearIsHeigh) ? farNode : nearNode;
-				
-				// test if there are any other components beteween these two nodes
-				int count = 0;
-				foreach (GameObject go in hiNode.outComponents){
-					AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
-					if (thisComponent.GetOtherNode(hiNode.gameObject) == loNode.gameObject){
-						count++;
-					}
-				
-				}
-				component.isInteractive = false;
-				// if there is more than just this node beteeen them
-				if (count > 1){
-					component.Kill (89);
-					executeStep = ExecuteStepState.kFinished;
-					return true;
-				}
-				else{
+				inNodeGO = component.inNodeGO;
+				outNodeGO = component.outNodeGO;
+				if (gapType == GapType.kOnlyOne){
 					component.Kill (0);
-					component.onDeadCommand = this;
 					executeStep = ExecuteStepState.kMergeNodes;
-					return false;
-				
+					component.onDeadCommand = this;
+					component.onDeadCommandDoExecutate = true;
 				}
-	
-
+				else{
+					component.Kill (89);
+					executeStep = ExecuteStepState.kRemoveComponent;
+				}
+				undoStep = UndoStepState.kReplaceComponent;
+				
+				break;
 			}
 			// We never actualy tun this code - which is a bug (so we run it in undo instead)
 			case ExecuteStepState.kMergeNodes:{
-				AVOWGraph.singleton.MergeNodes(farNodeGO, nearNodeGO);
+				AVOWGraph.singleton.MergeNodes(inNodeGO, outNodeGO);
+				executeStep = ExecuteStepState.kRemoveComponent;
 				break;
 			}
 			
@@ -105,16 +88,50 @@ public class AVOWCommandRemove : AVOWCommand{
 		
 		
 	}
+	
+	GapType DetermineType(){
+		AVOWComponent component = removeComponentGO.GetComponent<AVOWComponent>();
+		AVOWNode outNode = component.outNodeGO.GetComponent<AVOWNode>();
+		AVOWNode inNode = component.inNodeGO.GetComponent<AVOWNode>();
+		
+		// test if there are any other components beteween these two nodes
+		int count = 0;
+		foreach (GameObject go in outNode.outComponents){
+			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
+			if (thisComponent.GetOtherNode(outNode.gameObject) == inNode.gameObject){
+				count++;
+			}
+			
+		}
+		// if there is more than just this node beteeen them
+		if (count > 1){
+			
+			return GapType.kOneOfMany;
+		}
+		else{
+			return GapType.kOnlyOne;
+			
+		}
+	}
 
 	public bool UndoStep(){
-		// hack
-		AVOWGraph.singleton.MergeNodes(farNodeGO, nearNodeGO);
+		switch (undoStep){
+			case UndoStepState.kWidenGap:{
+				removeComponentGO.GetComponent<AVOWComponent>().resistanceAngle.Set (45);
+				Debug.Log ("UndoStep");
+				break;
+			}
+		
+		}
+	
+	
 		return false;
 	
 	}
 	
+	//not strctly the new one, but hey :)
 	public GameObject GetNewComponent(){
-		return null;
+		return removeComponentGO;
 	}
 	
 	public GameObject GetNewNode(){

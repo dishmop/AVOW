@@ -671,7 +671,7 @@ MonoBehaviour:
   squareGap: .00999999978
   lighteningSize: .5
   isInteractive: 1
-  isInsideGap: 0
+  showResistance: 1
   voltage: 1
   type: 0
   visited: 0
@@ -693,6 +693,7 @@ MonoBehaviour:
   inNodeGO: {fileID: 0}
   outNodeGO: {fileID: 0}
   hasBeenLayedOut: 0
+  onDeadCommandDoExecutate: 0
 --- !u!119 &11900000
 Projector:
   m_ObjectHideFlags: 1

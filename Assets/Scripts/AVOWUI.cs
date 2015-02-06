@@ -6,7 +6,8 @@ public class AVOWUITool{
 	
 	protected float hysteresisFactor = 0.5f;
 	protected float maxLighteningDist = 0.3f;
-	protected 	float 		uiZPos;
+	protected float 		uiZPos;
+	protected GameObject insideCube;
 	
 	
 	
@@ -45,7 +46,7 @@ public class AVOWUITool{
 		foreach (GameObject go in components){
 			AVOWComponent component = go.GetComponent<AVOWComponent>();
 			
-			
+
 			if (!component.isInteractive) continue;
 			
 			float thisDist = 0;
@@ -89,24 +90,19 @@ public class AVOWUITool{
 	
 	
 	// The current compoent is one that we should include in our search (even if it is not strictly connected to this node)
-	protected float FindClosestComponent(Vector3 pos, GameObject currentSelection, float minDist, ref GameObject closestComponent, ref Vector3 closestPos){
+	protected float FindClosestComponentCentre(Vector3 pos, GameObject currentSelection, float minDist, ref GameObject closestComponent, ref Vector3 closestPos){
 		
 		List<GameObject> components = AVOWGraph.singleton.allComponents;
 		
 		foreach (GameObject go in components){
 			AVOWComponent component = go.GetComponent<AVOWComponent>();
 			
-			
+			if (component.type == AVOWComponent.Type.kVoltageSource) continue;
 			if (!component.isInteractive) continue;
 			
 			float thisDist = 0;
-			Vector3 thisPos0 = component.GetConnectionPos0();
-			Vector3 thisPos1 = component.GetConnectionPos1();
-			
-			float dist0 = (pos - thisPos0).magnitude;
-			float dist1 = (pos - thisPos1).magnitude;
+			Vector3 thisPos = 0.5f * (component.GetConnectionPos0() + component.GetConnectionPos1());
 
-			Vector3 thisPos = (dist0 < dist1) ? thisPos0 : thisPos1;
 
 			thisPos.z = uiZPos;
 			thisDist = (thisPos - pos).magnitude;
@@ -185,6 +181,112 @@ public class AVOWUITool{
 		return closestNode ? minDist : maxLighteningDist;
 	}
 	
+	
+	protected void ActiveCubeAtCursor(GameObject cursor){
+		// Create a new cube which will travel to the gap
+		insideCube = AVOWUI.singleton.InstantiateCursorCube();
+		insideCube.transform.position = cursor.transform.position;
+		insideCube.transform.rotation = cursor.transform.rotation;
+		
+		Material[] metalMaterials = new Material[1];
+		metalMaterials[0] = cursor.renderer.materials[0];
+		insideCube.renderer.materials = metalMaterials;
+	}
+	
+	
+	protected void ActiveCubeAtComponent(GameObject component){
+		Transform resistanceTransform = component.transform.FindChild("Resistance");
+		
+		// Create a new cube which will travel to the cursor
+		insideCube = AVOWUI.singleton.InstantiateCursorCube();
+		Vector3 targetScale = new Vector3(resistanceTransform.localScale.x, resistanceTransform.localScale.x, resistanceTransform.localScale.x);
+		
+		insideCube.transform.localScale = targetScale;
+		insideCube.transform.position = resistanceTransform.position +  + 0.5f * targetScale;
+		insideCube.transform.rotation = resistanceTransform.rotation;
+		
+		Material[] metalMaterials = new Material[1];
+		metalMaterials[0] = insideCube.renderer.materials[0];
+		insideCube.renderer.materials = metalMaterials;
+		
+		component.GetComponent<AVOWComponent>().showResistance = false;
+	}
+	
+	protected void RemoveMetal(GameObject cursor){
+		Material[] highlightMaterials = new Material[1];
+		highlightMaterials[0] = cursor.renderer.materials[1];
+		cursor.renderer.materials = highlightMaterials;
+		
+	}
+	
+	// return dist remaining position of cube
+	protected float LerpToComponent(AVOWComponent component, float lerpSpeed){
+		Transform resistanceTransform = component.gameObject.transform.FindChild("Resistance");
+		
+		//Orentation
+		Quaternion targetOrient = resistanceTransform.rotation;
+		Quaternion currentOrient = insideCube.transform.rotation;
+		currentOrient = Quaternion.Slerp(currentOrient, targetOrient, lerpSpeed);
+		insideCube.transform.rotation = currentOrient;
+		
+		// Scale
+		Vector3 targetScale = new Vector3(resistanceTransform.localScale.x, resistanceTransform.localScale.x, resistanceTransform.localScale.x);
+		Vector3 currentScale = insideCube.transform.localScale;
+		currentScale = Vector3.Lerp(currentScale, targetScale, lerpSpeed);
+		insideCube.transform.localScale = new Vector3(currentScale.x, currentScale.x, currentScale.x);
+		
+		// Position
+		Vector3 targetPos = resistanceTransform.position + 0.5f * targetScale;
+		Vector3 currentPos = insideCube.transform.position;
+		currentPos = Vector3.Lerp(currentPos, targetPos, lerpSpeed);
+		insideCube.transform.position = currentPos;
+		
+		return (currentPos - targetPos).magnitude;
+	}
+	
+	// return dist remaining position of cube
+	protected float LerpToCursor(GameObject cursor, float lerpSpeed){
+		
+		Transform cursorTransform = cursor.transform;
+		
+		//Orentation
+		Quaternion targetOrient = cursorTransform.rotation;
+		Quaternion currentOrient = insideCube.transform.rotation;
+		currentOrient = Quaternion.Slerp(currentOrient, targetOrient, lerpSpeed);
+		insideCube.transform.rotation = currentOrient;
+		
+		// Scale
+		Vector3 targetScale = cursorTransform.localScale;
+		Vector3 currentScale = insideCube.transform.localScale;
+		currentScale = Vector3.Lerp(currentScale, targetScale, lerpSpeed);
+		insideCube.transform.localScale = new Vector3(currentScale.x, currentScale.x, currentScale.x);
+		
+		// Position
+		Vector3 targetPos = cursorTransform.position;
+		Vector3 currentPos = insideCube.transform.position;
+		currentPos = Vector3.Lerp(currentPos, targetPos, lerpSpeed);
+		insideCube.transform.position = currentPos;	
+		
+		return (currentPos - targetPos).magnitude;
+	}
+	
+	
+	protected GameObject RejoinToCursor(GameObject cursor){
+		GameObject newCursorCube = AVOWUI.singleton.InstantiateCursorCube();
+		newCursorCube.transform.position = cursor.transform.position;
+		newCursorCube.transform.rotation = cursor.transform.rotation;
+		newCursorCube.transform.localScale = cursor.transform.localScale;
+		
+		GameObject.Destroy(insideCube);
+		insideCube = null;
+		
+		
+		
+		GameObject.Destroy (cursor);
+		return newCursorCube;
+	}
+	
+	
 
 }
 
@@ -206,16 +308,15 @@ public class AVOWUICreateTool :  AVOWUITool{
 
 	
 	public enum InsideGapState{	
-		kNotInside,
-		kNotInsideAndExiting,
+		kOutside,
+		kOutsideAndExiting,
 		kEntering,
 		kFullyInside,
 		kOnNewComponent
 	};
 	
 	public bool			  	isInside = false;
-	public InsideGapState 	insideState = InsideGapState.kNotInside;
-	GameObject				insideCube = null;
+	public InsideGapState 	insideState = InsideGapState.kOutside;
 	float					maxLerpSpeed = 0.5f;
 	float					minLerpSpeed = 0f;
 	float 					insideLerpSpeed;
@@ -243,12 +344,9 @@ public class AVOWUICreateTool :  AVOWUITool{
 	
 	public override void Update () {
 		//		Debug.Log(Time.time + ": UICreateTool Update");
-		bool doCalc = true;
-		while (doCalc){
-			StateUpdate();
-			CalcNewHOrder();
-			doCalc = CommandsUpdate();
-		}
+		StateUpdate();
+		CalcNewHOrder();
+		CommandsUpdate();
 		VizUpdate();
 		
 	}
@@ -277,7 +375,8 @@ public class AVOWUICreateTool :  AVOWUITool{
 		if (!heldConnection){
 			GameObject closestObj = null;
 			Vector3 closestPos = Vector3.zero;
-			float minDist = FindClosestComponent(mouseWorldPos, connection0, maxLighteningDist, ref closestObj, ref closestPos);
+//			float minDist = FindClosestComponent(mouseWorldPos, connection0, maxLighteningDist, ref closestObj, ref closestPos);
+			float minDist = maxLighteningDist;
 			FindClosestNode(mouseWorldPos, null, minDist, connection0, ref closestObj, ref closestPos);
 			connection0 = closestObj;
 			connection0Pos = closestPos;
@@ -350,139 +449,79 @@ public class AVOWUICreateTool :  AVOWUITool{
 		
 		// Manage the inside state machine
 		switch (insideState){
-		case InsideGapState.kNotInside:{
-			if (isInside) {
-				// Create a new cube which will travel to the gap
-				insideCube = AVOWUI.singleton.InstantiateCursorCube();
-				insideCube.transform.position = cursorCube.transform.position;
-				insideCube.transform.rotation = cursorCube.transform.rotation;
-				Material[] metalMaterials = new Material[1];
-				metalMaterials[0] = cursorCube.renderer.materials[0];
-				insideCube.renderer.materials = metalMaterials;
-				
-				
-				// Remove the metal material from the cube that we have
-				Material[] highlightMaterials = new Material[1];
-				highlightMaterials[0] = cursorCube.renderer.materials[1];
-				cursorCube.renderer.materials = highlightMaterials;
-				
-				insideState = InsideGapState.kEntering;
-				insideLerpSpeed = minLerpSpeed;
-			}
-			break;
-		}
-		case InsideGapState.kEntering:{
-			
-			// Move our inside cube to where it needs to be
-			AVOWComponent component = GetHeldCommandComponent();
-			if (component != null && isInside){
-				
-				Transform resistanceTransform = component.gameObject.transform.FindChild("Resistance");
-				
-				//Orentation
-				Quaternion targetOrient = resistanceTransform.rotation;
-				Quaternion currentOrient = insideCube.transform.rotation;
-				currentOrient = Quaternion.Slerp(currentOrient, targetOrient, insideLerpSpeed);
-				insideCube.transform.rotation = currentOrient;
-				
-				// Scale
-				Vector3 targetScale = new Vector3(resistanceTransform.localScale.x, resistanceTransform.localScale.x, resistanceTransform.localScale.x);
-				Vector3 currentScale = insideCube.transform.localScale;
-				currentScale = Vector3.Lerp(currentScale, targetScale, insideLerpSpeed);
-				insideCube.transform.localScale = new Vector3(currentScale.x, currentScale.x, currentScale.x);
-				
-				// Position
-				Vector3 targetPos = resistanceTransform.position + 0.5f * targetScale;
-				Vector3 currentPos = insideCube.transform.position;
-				currentPos = Vector3.Lerp(currentPos, targetPos, insideLerpSpeed);
-				insideCube.transform.position = currentPos;
-				
-				if (MathUtils.FP.Feq((currentPos - targetPos).magnitude, 0, 0.001f)){
-					insideState = InsideGapState.kFullyInside;
+			case InsideGapState.kOutside:{
+				if (isInside) {
+					// Create a new cube which will travel to the gap
+					ActiveCubeAtCursor(cursorCube);
+					
+					
+					// Remove the metal material from the cube that we have
+					RemoveMetal(cursorCube);
+					
+					insideState = InsideGapState.kEntering;
 					insideLerpSpeed = minLerpSpeed;
 				}
+				break;
 			}
-			else{
-				insideState = InsideGapState.kNotInsideAndExiting;
-				insideLerpSpeed = minLerpSpeed;
+			case InsideGapState.kEntering:{
 				
-			}
-			
-			insideLerpSpeed = Mathf.Lerp (insideLerpSpeed, maxLerpSpeed, 0.1f);
-			
-			break;
-		}
-		case InsideGapState.kFullyInside:{
-			AVOWComponent component = GetHeldCommandComponent();
-			if (component == null || !isInside){
-				insideState = InsideGapState.kNotInsideAndExiting;
-				insideLerpSpeed = minLerpSpeed;
+				// Move our inside cube to where it needs to be
+				AVOWComponent component = GetHeldCommandComponent();
+				if (component != null && isInside){
+					float distRemaining = LerpToComponent(component, insideLerpSpeed);
+	
+					if (MathUtils.FP.Feq(distRemaining, 0, 0.001f)){
+						insideState = InsideGapState.kFullyInside;
+						insideLerpSpeed = minLerpSpeed;
+					}
+				}
+				else{
+					insideState = InsideGapState.kOutsideAndExiting;
+					insideLerpSpeed = minLerpSpeed;
+					
+				}
 				
+				insideLerpSpeed = Mathf.Lerp (insideLerpSpeed, maxLerpSpeed, 0.1f);
+				
+				break;
 			}
-			break;
-		}
-		case InsideGapState.kNotInsideAndExiting:{
-			Transform cursorTransform = cursorCube.transform;
-			
-			//Orentation
-			Quaternion targetOrient = cursorTransform.rotation;
-			Quaternion currentOrient = insideCube.transform.rotation;
-			currentOrient = Quaternion.Slerp(currentOrient, targetOrient, insideLerpSpeed);
-			insideCube.transform.rotation = currentOrient;
-			
-			// Scale
-			Vector3 targetScale = cursorTransform.localScale;
-			Vector3 currentScale = insideCube.transform.localScale;
-			currentScale = Vector3.Lerp(currentScale, targetScale, insideLerpSpeed);
-			insideCube.transform.localScale = new Vector3(currentScale.x, currentScale.x, currentScale.x);
-			
-			// Position
-			Vector3 targetPos = cursorTransform.position;
-			Vector3 currentPos = insideCube.transform.position;
-			currentPos = Vector3.Lerp(currentPos, targetPos, insideLerpSpeed);
-			insideCube.transform.position = currentPos;
-			
-			if (MathUtils.FP.Feq((currentPos - targetPos).magnitude, 0, 0.001f)){
-				insideState = InsideGapState.kNotInside;
+			case InsideGapState.kFullyInside:{
+				AVOWComponent component = GetHeldCommandComponent();
+				if (component == null || !isInside){
+					insideState = InsideGapState.kOutsideAndExiting;
+					insideLerpSpeed = minLerpSpeed;
+					
+				}
+				break;
+			}
+			case InsideGapState.kOutsideAndExiting:{
+	
+				float distRemaining = LerpToCursor(cursorCube, insideLerpSpeed);
+				
+				if (MathUtils.FP.Feq(distRemaining, 0, 0.001f)){
+					insideState = InsideGapState.kOutside;
+					
+					// Remake our cursor
+					cursorCube = RejoinToCursor(cursorCube);
+				}
+				AVOWComponent component = GetHeldCommandComponent();
+				if (component != null && isInside){
+					insideState = InsideGapState.kEntering;	
+					insideLerpSpeed = minLerpSpeed;
+				}
+				insideLerpSpeed = Mathf.Lerp (insideLerpSpeed, maxLerpSpeed, 0.1f);
+				break;
+			}			
+			case InsideGapState.kOnNewComponent:{
+				insideState = InsideGapState.kOutside;
 				
 				// Remake our cube
-				GameObject newCursorCube = AVOWUI.singleton.InstantiateCursorCube();
-				newCursorCube.transform.position = cursorCube.transform.position;
-				newCursorCube.transform.rotation = cursorCube.transform.rotation;
-				newCursorCube.transform.localScale = cursorCube.transform.localScale;
-				
-				
-				GameObject.Destroy (cursorCube);
-				cursorCube = newCursorCube;
+				cursorCube = RejoinToCursor(cursorCube);
 				
 				GameObject.Destroy(insideCube);
 				insideCube = null;
+				break;
 			}
-			AVOWComponent component = GetHeldCommandComponent();
-			if (component != null && isInside){
-				insideState = InsideGapState.kEntering;	
-				insideLerpSpeed = minLerpSpeed;
-			}
-			insideLerpSpeed = Mathf.Lerp (insideLerpSpeed, maxLerpSpeed, 0.1f);
-			break;
-		}			
-		case InsideGapState.kOnNewComponent:{
-			insideState = InsideGapState.kNotInside;
-			
-			// Remake our cube
-			GameObject newCursorCube = AVOWUI.singleton.InstantiateCursorCube();
-			newCursorCube.transform.position = cursorCube.transform.position;
-			newCursorCube.transform.rotation = cursorCube.transform.rotation;
-			newCursorCube.transform.localScale = cursorCube.transform.localScale;
-			newCursorCube.transform.parent = AVOWUI.singleton.transform;
-			
-			GameObject.Destroy (cursorCube);
-			cursorCube = newCursorCube;
-			
-			GameObject.Destroy(insideCube);
-			insideCube = null;
-			break;
-		}
 		}	
 		
 	}
@@ -614,60 +653,45 @@ public class AVOWUICreateTool :  AVOWUITool{
 		return (inOrdinalOld != inOrdinalNew || outOrdinalOld != outOrdinalNew);
 	}
 	
-	bool CommandsUpdate(){
-	
-	
-		// if our 0 connection is a node, then doing somethign special for this frame only
-		if (connection0 != null && connection0.GetComponent<AVOWComponent>() != null && heldConnection){
-			AVOWCommandRemove command = new AVOWCommandRemove(connection0, mouseWorldPos);
-			command.ExecuteStep();
-			connection0 = command.farNodeGO;
-			connection1 = command.nearNodeGO;
-		
-			// Should nowredo all out calculations
-			return true;
-		}
-		else{
-			// if we have a command already check if we need to undo it
-			if (heldGapCommand != null){
-				// if the connection1 has changed (which includes us no longer holding anything) then undo our current command
-				if (heldGapConnection1 != connection1 || OrderHasChanged()){
-					heldGapCommand.UndoStep();
-					heldGapCommand = null;
-					
-					string newID = null;
-					string oldID = null;
-					if (connection1)
-						newID = connection1.GetComponent<AVOWComponent>() != null ? connection1.GetComponent<AVOWComponent>().GetID() : connection1.GetComponent<AVOWNode>().GetID();
-					if (heldGapConnection1)
-						oldID = heldGapConnection1.GetComponent<AVOWComponent>() != null ? heldGapConnection1.GetComponent<AVOWComponent>().GetID() : heldGapConnection1.GetComponent<AVOWNode>().GetID();
-					Debug.Log("Undo command. OldID = " + oldID + ", newID = " + newID + ", Time = " + Time.time);
-				}
-			}
-			
-			// If we still have a command, then this command is still valid and nothing more to do - however, if we don't have one, 
-			// then perhaps we should make one?
-			if (heldGapCommand == null && connection1 != null){
-				heldGapConnection1 = connection1;
-				if (connection1.GetComponent<AVOWComponent>()){
-					heldGapCommand = new AVOWCommandSplitAddComponent(connection0, connection1, AVOWUI.singleton.resistorPrefab);
-					Debug.Log("new AVOWCommandSplitAddComponent " + Time.time);
-				}
-				else{
-					heldGapCommand = new AVOWCommandAddComponent(connection0, connection1, AVOWUI.singleton.resistorPrefab);
-					Debug.Log("new AVOWCommandAddComponent from " + connection0.GetComponent<AVOWNode>().GetID() + " to " + connection1.GetComponent<AVOWNode>().GetID() + " time = " + Time.time);
-					
-				}
-				heldGapCommand.ExecuteStep();
-				heldGapCommand.GetNewComponent().GetComponent<AVOWComponent>().hOrder = newHOrder;
+	void CommandsUpdate(){
+		// if we have a command already check if we need to undo it
+		if (heldGapCommand != null){
+			// if the connection1 has changed (which includes us no longer holding anything) then undo our current command
+			if (heldGapConnection1 != connection1 || OrderHasChanged()){
+				heldGapCommand.UndoStep();
+				heldGapCommand = null;
 				
-				// Ned to force the sim to do an update (this would be better if all this logic was in a fixed update and it 
-				// was more tightly controlled
-				AVOWSim.singleton.FixedUpdate();
+				string newID = null;
+				string oldID = null;
+				if (connection1)
+					newID = connection1.GetComponent<AVOWComponent>() != null ? connection1.GetComponent<AVOWComponent>().GetID() : connection1.GetComponent<AVOWNode>().GetID();
+				if (heldGapConnection1)
+					oldID = heldGapConnection1.GetComponent<AVOWComponent>() != null ? heldGapConnection1.GetComponent<AVOWComponent>().GetID() : heldGapConnection1.GetComponent<AVOWNode>().GetID();
+				Debug.Log("Undo command. OldID = " + oldID + ", newID = " + newID + ", Time = " + Time.time);
 			}
-			// no need to redo the calulations, just continue forward to eh visualisation
-			return false;
 		}
+		
+		// If we still have a command, then this command is still valid and nothing more to do - however, if we don't have one, 
+		// then perhaps we should make one?
+		if (heldGapCommand == null && connection1 != null){
+			heldGapConnection1 = connection1;
+			if (connection1.GetComponent<AVOWComponent>()){
+				heldGapCommand = new AVOWCommandSplitAddComponent(connection0, connection1, AVOWUI.singleton.resistorPrefab);
+				Debug.Log("new AVOWCommandSplitAddComponent " + Time.time);
+			}
+			else{
+				heldGapCommand = new AVOWCommandAddComponent(connection0, connection1, AVOWUI.singleton.resistorPrefab);
+				Debug.Log("new AVOWCommandAddComponent from " + connection0.GetComponent<AVOWNode>().GetID() + " to " + connection1.GetComponent<AVOWNode>().GetID() + " time = " + Time.time);
+				
+			}
+			heldGapCommand.ExecuteStep();
+			heldGapCommand.GetNewComponent().GetComponent<AVOWComponent>().hOrder = newHOrder;
+			
+			// Ned to force the sim to do an update (this would be better if all this logic was in a fixed update and it 
+			// was more tightly controlled
+			AVOWSim.singleton.FixedUpdate();
+		}
+
 	}
 	
 	
@@ -906,6 +930,317 @@ public class AVOWUICreateTool :  AVOWUITool{
 	
 }
 
+
+
+
+public class AVOWUIDeleteTool :  AVOWUITool{
+	
+	
+	// New attempt at encoding the state of the UI
+	public GameObject 	connectionGO;
+	public Vector3 		connectionPos;	
+	public bool 		heldConnection;
+	public AVOWCommand 	heldGapCommand;
+	public GameObject	heldGapConnection;
+	
+	Vector3 				mouseWorldPos;
+	
+	GameObject 				cursorCube;
+	GameObject 				lighteningGO;
+	
+	public enum InsideGapState{	
+		kUncreated,
+		kCreateInside,
+		kCreaeOutside,
+		kOutside,
+		kOutsideAndEntering,
+		kInsideAndExiting,
+		kFullyInside,
+		kOnRemove
+	};
+	
+	public bool			  	isInside = true;
+	public InsideGapState 	insideState = InsideGapState.kUncreated;
+	float					maxLerpSpeed = 0.5f;
+	float					minLerpSpeed = 0f;
+	float 					insideLerpSpeed;
+	
+	
+	
+	
+	public override void Start(){
+		cursorCube = AVOWUI.singleton.InstantiateCursorCube();
+		cursorCube.transform.parent = AVOWUI.singleton.transform;
+		
+		// Remove the metal material from the cube that we have
+		RemoveMetal(cursorCube);
+		
+		
+		lighteningGO = AVOWUI.singleton.InstantiateLightening();
+		lighteningGO.transform.parent = AVOWUI.singleton.transform;
+		
+		uiZPos = AVOWUI.singleton.transform.position.z;
+		
+	}
+	
+	
+	public override void Update () {
+		//		Debug.Log(Time.time + ": UICreateTool Update");
+		StateUpdate();
+		CommandsUpdate();
+		VizUpdate();
+		
+	}
+	
+	void StateUpdate(){
+		// Calc the mouse posiiton on world spave
+		Vector3 mousePos = Input.mousePosition;
+		mousePos.z = 0;
+		mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
+		
+		// Get the mouse buttons
+		bool  buttonPressed = (Input.GetMouseButtonDown(0) && !Input.GetKey (KeyCode.LeftControl));
+		bool  buttonReleased = (Input.GetMouseButtonUp(0) && !Input.GetKey (KeyCode.LeftControl));
+		//		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
+		
+		// Set the cursor cubes position
+		mouseWorldPos.z = uiZPos;
+		cursorCube.transform.position = mouseWorldPos;
+		
+		
+		
+		//	Debug.Log("Mouse world pos = " + mouseWorldPos.ToString());
+		
+		
+		// If we don't have a held connection, then we find the closest node and that's all
+		if (!heldConnection){
+			GameObject closestObj = null;
+			Vector3 closestPos = Vector3.zero;
+			//			float minDist = FindClosestComponent(mouseWorldPos, connection0, maxLighteningDist, ref closestObj, ref closestPos);
+			float minDist = maxLighteningDist;
+			FindClosestComponentCentre(mouseWorldPos, connectionGO, maxLighteningDist, ref closestObj, ref closestPos);
+			connectionGO = closestObj;
+			connectionPos = closestPos;
+			
+			if (buttonPressed && connectionGO != null){
+				heldConnection = true;
+			}
+		}
+		else{
+			AVOWComponent component = connectionGO.GetComponent<AVOWComponent>();
+			
+			connectionPos = 0.5f * (component.GetConnectionPos0() + component.GetConnectionPos1());
+			// If not inside the held gap, find the next closest thing - favouring whatever we have connected already
+			if (!isInside){
+
+				if (buttonReleased){
+					heldConnection = false;
+				}
+			}
+			else{
+				if (buttonReleased){
+					heldConnection = false;
+					heldGapCommand.ExecuteStep();
+					AVOWUI.singleton.commands.Push(heldGapCommand);
+					heldGapCommand = null;
+					connectionGO = null;
+				}
+			}
+			
+			
+		}
+		
+		// If we have a gap which we are holding open, check if our mous is inside the gap
+		isInside = false;
+		if (connectionGO != null){
+			AVOWComponent component = connectionGO.GetComponent<AVOWComponent>();
+			isInside = component.IsPointInsideGap(mouseWorldPos);
+		}
+		
+		if (heldConnection) HandleCubeInsideGap();
+	}
+	
+	AVOWComponent GetHeldCommandComponent(){
+		if (heldGapCommand == null) return null;
+		
+		GameObject go = heldGapCommand.GetNewComponent();
+		if (go == null) return null;
+		
+		AVOWComponent component = go.GetComponent<AVOWComponent>();
+		return component;
+	}
+	
+	
+	void HandleCubeInsideGap(){
+		
+		// Manage the inside state machine
+		switch (insideState){
+			case InsideGapState.kUncreated:{
+				insideState = (isInside) ? InsideGapState.kCreateInside : InsideGapState.kCreaeOutside;
+				break;
+			}
+			case InsideGapState.kCreateInside:{
+							
+				// Create a new cube which will travel to the gap
+				ActiveCubeAtComponent(connectionGO);
+
+				
+				insideState = InsideGapState.kInsideAndExiting;
+				
+
+				break;
+			}
+			
+			case InsideGapState.kCreaeOutside:{
+				insideState = InsideGapState.kOutside;
+
+				
+				break;
+			}
+			
+			case InsideGapState.kOutside:{
+				if (isInside) {
+					// Create a new cube which will travel to the gap
+					ActiveCubeAtComponent(connectionGO);
+					
+					
+
+					
+					insideState = InsideGapState.kInsideAndExiting;
+					insideLerpSpeed = minLerpSpeed;
+				}
+				break;
+			}
+			case InsideGapState.kInsideAndExiting:{
+				
+				// Move our inside cube to where it needs to be
+				AVOWComponent component = GetHeldCommandComponent();
+				
+				if (component != null && isInside){
+					float distRemaining = LerpToCursor(cursorCube, insideLerpSpeed);
+					
+					if (MathUtils.FP.Feq(distRemaining, 0, 0.001f)){
+						cursorCube = RejoinToCursor(cursorCube);
+						GameObject.Destroy(insideCube);
+						insideCube = null;
+						insideState = InsideGapState.kFullyInside;
+						insideLerpSpeed = minLerpSpeed;
+					}
+				}
+				else{
+					insideState = InsideGapState.kOutsideAndEntering;
+					insideLerpSpeed = minLerpSpeed;
+					
+				}
+				
+				insideLerpSpeed = Mathf.Lerp (insideLerpSpeed, maxLerpSpeed, 0.1f);
+				
+				break;
+			}
+			case InsideGapState.kFullyInside:{
+				AVOWComponent component = GetHeldCommandComponent();
+				if (component == null || !isInside){
+					insideState = InsideGapState.kOutsideAndEntering;
+					insideLerpSpeed = minLerpSpeed;
+					// Create a new cube which will travel to the gap
+					ActiveCubeAtCursor(cursorCube);
+					
+				}
+				break;
+			}
+			case InsideGapState.kOutsideAndEntering:{
+				
+				float distRemaining = LerpToComponent(connectionGO.GetComponent<AVOWComponent>(), insideLerpSpeed);
+				
+				if (MathUtils.FP.Feq(distRemaining, 0, 0.001f)){
+					insideState = InsideGapState.kOutside;
+					
+					// Remove our insidecube when it gets there
+					GameObject.Destroy(insideCube);
+					insideCube = null;
+					connectionGO.GetComponent<AVOWComponent>().showResistance = true;
+					cursorCube = RejoinToCursor(cursorCube);
+				}
+				AVOWComponent component = GetHeldCommandComponent();
+				if (component != null && isInside){
+					insideState = InsideGapState.kInsideAndExiting;	
+					insideLerpSpeed = minLerpSpeed;
+				}
+				insideLerpSpeed = Mathf.Lerp (insideLerpSpeed, maxLerpSpeed, 0.1f);
+				break;
+			}			
+			case InsideGapState.kOnRemove:{
+				insideState = InsideGapState.kUncreated;
+				
+					
+				GameObject.Destroy(insideCube);
+				insideCube = null;
+				break;
+			}
+		}	
+		
+	}
+	
+	
+	void VizUpdate(){
+		
+		Vector3 lighteningConductorPos = mouseWorldPos;//(isInside) ? insideCube.transform.position : mouseWorldPos;
+		AVOWGraph.singleton.EnableAllLightening();
+			
+		// Lightening to connection 0 - which is always a node
+		if (connectionGO != null){
+			lighteningGO.SetActive(true);
+			Lightening lightening = lighteningGO.GetComponent<Lightening>();
+			lightening.startPoint = lighteningConductorPos;
+			lightening.endPoint = connectionPos;
+			
+			float len = (lightening.startPoint  - lightening.endPoint).magnitude;
+			lightening.numStages = Mathf.Max ((int)(len * 10), 2);
+			lightening.size =  heldConnection ? 0.4f : 0.1f;
+			lightening.ConstructMesh();
+		}
+		else{
+			lighteningGO.SetActive(false);
+		}
+		
+		
+		// If we are connected to something then rotate the cube a bit
+		if (connectionGO != null){
+			cursorCube.transform.Rotate (new Vector3(1, 2, 4));
+		}
+		
+	}
+	
+	
+	void CommandsUpdate(){
+
+		// if we have a command already check if we need to undo it
+		if (heldGapCommand != null && !heldConnection){
+			heldGapCommand.UndoStep();
+			heldGapCommand = null;
+		}
+		
+		// If we still have a command, then this command is still valid and nothing more to do - however, if we don't have one, 
+		// then perhaps we should make one?
+		if (heldGapCommand == null && connectionGO != null && heldConnection){
+			heldGapConnection = connectionGO;
+			AVOWComponent component = connectionGO.GetComponent<AVOWComponent>();
+			
+			heldGapCommand = new AVOWCommandRemove(heldGapConnection, mouseWorldPos);
+			Debug.Log("new AVOWCommandRemove " + Time.time);
+
+			heldGapCommand.ExecuteStep();
+			
+			// Ned to force the sim to do an update (this would be better if all this logic was in a fixed update and it 
+			// was more tightly controlled
+			AVOWSim.singleton.FixedUpdate();
+		}
+
+	}
+	
+		
+}
+
 public class AVOWUI : MonoBehaviour {
 	public static AVOWUI singleton = null;
 	
@@ -987,7 +1322,8 @@ public class AVOWUI : MonoBehaviour {
 		
 		
 		AVOWSim.singleton.Recalc();
-		uiTool = new AVOWUICreateTool();
+		//uiTool = new AVOWUICreateTool();
+		uiTool = new AVOWUIDeleteTool();
 		
 		uiTool.Start();
 		
