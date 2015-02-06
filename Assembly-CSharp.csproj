@@ -50,6 +50,7 @@
      <Compile Include="Assets\Scripts\AVOWCamControl.cs" />
      <Compile Include="Assets\Scripts\AVOWCommand.cs" />
      <Compile Include="Assets\Scripts\AVOWCommandAddComponent.cs" />
+     <Compile Include="Assets\Scripts\AVOWCommandRemove.cs" />
      <Compile Include="Assets\Scripts\AVOWCommandSplitAddComponent.cs" />
      <Compile Include="Assets\Scripts\AVOWComponent.cs" />
      <Compile Include="Assets\Scripts\AVOWGraph.cs" />

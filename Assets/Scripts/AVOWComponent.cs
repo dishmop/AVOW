@@ -121,7 +121,6 @@ public class AVOWComponent : MonoBehaviour {
 	public void Kill(float targetRes){
 		resistanceAngle.Set (targetRes);
 		removeOnTarget = true;
-		AVOWUI.singleton.lockCreation = true;
 	}
 	
 	void CheckForKillResistance(){
@@ -133,7 +132,6 @@ public class AVOWComponent : MonoBehaviour {
 			}
 			AVOWGraph.singleton.RemoveComponent(gameObject);
 			// DEBUG
-			AVOWUI.singleton.lockCreation = false;
 			
 		}
 	}
@@ -186,7 +184,6 @@ public class AVOWComponent : MonoBehaviour {
 	}
 	
 	public void EnableLightening(GameObject nodeGO, bool enable){
-		if (type == Type.kVoltageSource) return;
 		
 		if (nodeGO == node0GO){
 			enableLightening0 = enable;
@@ -366,8 +363,6 @@ public class AVOWComponent : MonoBehaviour {
 			transform.FindChild("Lightening2").gameObject.SetActive(isInteractive);
 		}
 		else{
-			enableLightening0 = true;
-			enableLightening1 = true;
 			transform.FindChild("Lightening0").gameObject.SetActive(isInteractive && enableLightening0);
 			transform.FindChild("Lightening1").gameObject.SetActive(isInteractive && enableLightening1);
 			transform.FindChild("Lightening2").gameObject.SetActive(false);
