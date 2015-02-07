@@ -95,16 +95,24 @@ public class AVOWCommandRemove : AVOWCommand{
 		AVOWNode inNode = component.inNodeGO.GetComponent<AVOWNode>();
 		
 		// test if there are any other components beteween these two nodes
-		int count = 0;
+		int countOut = 0;
 		foreach (GameObject go in outNode.outComponents){
 			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
-			if (thisComponent.GetOtherNode(outNode.gameObject) == inNode.gameObject){
-				count++;
-			}
+//			if (thisComponent.GetOtherNode(outNode.gameObject) == inNode.gameObject){
+			countOut++;
+//			}
+			
+		}
+		int countIn = 0;
+		foreach (GameObject go in inNode.inComponents){
+			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
+			//			if (thisComponent.GetOtherNode(outNode.gameObject) == inNode.gameObject){
+			countIn++;
+			//			}
 			
 		}
 		// if there is more than just this node beteeen them
-		if (count > 1){
+		if (countOut > 1 && countIn > 1){
 			
 			return GapType.kOneOfMany;
 		}

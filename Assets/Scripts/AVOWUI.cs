@@ -209,7 +209,7 @@ public class AVOWUITool{
 		metalMaterials[0] = insideCube.renderer.materials[0];
 		insideCube.renderer.materials = metalMaterials;
 		
-		component.GetComponent<AVOWComponent>().showResistance = false;
+		component.GetComponent<AVOWComponent>().isInteractive = false;
 	}
 	
 	protected void RemoveMetal(GameObject cursor){
@@ -503,6 +503,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 					
 					// Remake our cursor
 					cursorCube = RejoinToCursor(cursorCube);
+					
 				}
 				AVOWComponent component = GetHeldCommandComponent();
 				if (component != null && isInside){
@@ -946,7 +947,8 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 	Vector3 				mouseWorldPos;
 	
 	GameObject 				cursorCube;
-	GameObject 				lighteningGO;
+	GameObject 				lightening0GO;
+	GameObject 				lightening1GO;
 	
 	public enum InsideGapState{	
 		kUncreated,
@@ -956,7 +958,8 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		kOutsideAndEntering,
 		kInsideAndExiting,
 		kFullyInside,
-		kOnRemove
+		kOnRemove,
+		kOnCancel
 	};
 	
 	public bool			  	isInside = true;
@@ -976,8 +979,11 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		RemoveMetal(cursorCube);
 		
 		
-		lighteningGO = AVOWUI.singleton.InstantiateLightening();
-		lighteningGO.transform.parent = AVOWUI.singleton.transform;
+		lightening0GO = AVOWUI.singleton.InstantiateLightening();
+		lightening0GO.transform.parent = AVOWUI.singleton.transform;
+		
+		lightening1GO = AVOWUI.singleton.InstantiateLightening();
+		lightening1GO.transform.parent = AVOWUI.singleton.transform;
 		
 		uiZPos = AVOWUI.singleton.transform.position.z;
 		
@@ -1035,6 +1041,8 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 
 				if (buttonReleased){
 					heldConnection = false;
+					insideState = InsideGapState.kOnCancel;
+					
 				}
 			}
 			else{
@@ -1044,6 +1052,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 					AVOWUI.singleton.commands.Push(heldGapCommand);
 					heldGapCommand = null;
 					connectionGO = null;
+					insideState = InsideGapState.kOnRemove;
 				}
 			}
 			
@@ -1057,7 +1066,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 			isInside = component.IsPointInsideGap(mouseWorldPos);
 		}
 		
-		if (heldConnection) HandleCubeInsideGap();
+		if (heldConnection || insideState == InsideGapState.kOnCancel || insideState == InsideGapState.kOnRemove) HandleCubeInsideGap();
 	}
 	
 	AVOWComponent GetHeldCommandComponent(){
@@ -1083,6 +1092,9 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 							
 				// Create a new cube which will travel to the gap
 				ActiveCubeAtComponent(connectionGO);
+				connectionGO.GetComponent<AVOWComponent>().isInteractive = false;
+			
+				
 
 				
 				insideState = InsideGapState.kInsideAndExiting;
@@ -1119,12 +1131,13 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 				if (component != null && isInside){
 					float distRemaining = LerpToCursor(cursorCube, insideLerpSpeed);
 					
-					if (MathUtils.FP.Feq(distRemaining, 0, 0.001f)){
+					if (MathUtils.FP.Feq(distRemaining, 0, 0.1f)){
 						cursorCube = RejoinToCursor(cursorCube);
 						GameObject.Destroy(insideCube);
 						insideCube = null;
 						insideState = InsideGapState.kFullyInside;
 						insideLerpSpeed = minLerpSpeed;
+						//RemoveMetal(cursorCube)
 					}
 				}
 				else{
@@ -1144,6 +1157,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 					insideLerpSpeed = minLerpSpeed;
 					// Create a new cube which will travel to the gap
 					ActiveCubeAtCursor(cursorCube);
+					RemoveMetal(cursorCube);
 					
 				}
 				break;
@@ -1152,14 +1166,14 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 				
 				float distRemaining = LerpToComponent(connectionGO.GetComponent<AVOWComponent>(), insideLerpSpeed);
 				
-				if (MathUtils.FP.Feq(distRemaining, 0, 0.001f)){
+				if (MathUtils.FP.Feq(distRemaining, 0, 0.01f)){
 					insideState = InsideGapState.kOutside;
 					
 					// Remove our insidecube when it gets there
 					GameObject.Destroy(insideCube);
 					insideCube = null;
-					connectionGO.GetComponent<AVOWComponent>().showResistance = true;
-					cursorCube = RejoinToCursor(cursorCube);
+					connectionGO.GetComponent<AVOWComponent>().isInteractive = true;
+					//cursorCube = RejoinToCursor(cursorCube);
 				}
 				AVOWComponent component = GetHeldCommandComponent();
 				if (component != null && isInside){
@@ -1171,8 +1185,21 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 			}			
 			case InsideGapState.kOnRemove:{
 				insideState = InsideGapState.kUncreated;
+
+			
+				GameObject.Destroy(insideCube);
+				insideCube = null;
+				break;
+			}
+			case InsideGapState.kOnCancel:{
+				insideState = InsideGapState.kUncreated;
 				
-					
+			
+				AVOWComponent component = GetHeldCommandComponent();
+				if (component != null){
+					component.isInteractive = true;
+				}				
+			
 				GameObject.Destroy(insideCube);
 				insideCube = null;
 				break;
@@ -1186,21 +1213,48 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		
 		Vector3 lighteningConductorPos = mouseWorldPos;//(isInside) ? insideCube.transform.position : mouseWorldPos;
 		AVOWGraph.singleton.EnableAllLightening();
+		
+		lightening1GO.SetActive(false);
+			
 			
 		// Lightening to connection 0 - which is always a node
 		if (connectionGO != null){
-			lighteningGO.SetActive(true);
-			Lightening lightening = lighteningGO.GetComponent<Lightening>();
-			lightening.startPoint = lighteningConductorPos;
-			lightening.endPoint = connectionPos;
-			
-			float len = (lightening.startPoint  - lightening.endPoint).magnitude;
-			lightening.numStages = Mathf.Max ((int)(len * 10), 2);
-			lightening.size =  heldConnection ? 0.4f : 0.1f;
-			lightening.ConstructMesh();
+			lightening0GO.SetActive(true);
+			Lightening lightening0 = lightening0GO.GetComponent<Lightening>();
+			if (!isInside || !heldConnection){
+				lightening0.startPoint = lighteningConductorPos;
+				lightening0.endPoint = connectionPos;
+			}
+			else{
+				lightening1GO.SetActive(true);
+				Lightening lightening1 = lightening1GO.GetComponent<Lightening>();
+				
+				// Need to fin the two points on the nodes to connect to
+				Vector3 node0Pos = Vector3.zero;
+				Vector3 node1Pos = Vector3.zero;
+				AVOWComponent component = connectionGO.GetComponent<AVOWComponent>();
+
+				FindClosestPointOnNode(lighteningConductorPos, component.node0GO, ref node0Pos);
+				lightening0.startPoint = lighteningConductorPos;
+				lightening0.endPoint = node0Pos;
+				
+				FindClosestPointOnNode(lighteningConductorPos, component.node1GO, ref node1Pos);
+				lightening1.startPoint = lighteningConductorPos;
+				lightening1.endPoint = node1Pos;
+
+				float len1 = (lightening0.startPoint  - lightening1.endPoint).magnitude;
+				lightening1.numStages = Mathf.Max ((int)(len1 * 10), 2);
+				lightening1.size =  heldConnection ? 0.4f : 0.1f;
+				lightening1.ConstructMesh();
+			}
+			float len0 = (lightening0.startPoint  - lightening0.endPoint).magnitude;
+			lightening0.numStages = Mathf.Max ((int)(len0 * 10), 2);
+			lightening0.size =  heldConnection ? 0.4f : 0.1f;
+			lightening0.ConstructMesh();
 		}
 		else{
-			lighteningGO.SetActive(false);
+			lightening0GO.SetActive(false);
+				
 		}
 		
 		
@@ -1302,15 +1356,15 @@ public class AVOWUI : MonoBehaviour {
 		AVOWGraph graph = AVOWGraph.singleton;
 
 		// Simple start
-		/*
-
 		GameObject node0GO = graph.AddNode ();
 		GameObject node1GO = graph.AddNode ();
 
 				
 		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0GO, node1GO);
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node0GO);
-		*/
+		
+		
+		/*
 		GameObject node0GO = graph.AddNode ();
 		GameObject node1GO = graph.AddNode ();
 		GameObject node2GO = graph.AddNode ();
@@ -1319,15 +1373,24 @@ public class AVOWUI : MonoBehaviour {
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node2GO);	
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node2GO);	
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node2GO, node0GO);	
-		
+		*/
 		
 		AVOWSim.singleton.Recalc();
-		//uiTool = new AVOWUICreateTool();
-		uiTool = new AVOWUIDeleteTool();
+		uiTool = new AVOWUICreateTool();
 		
 		uiTool.Start();
 		
-		
 	}
+	
+	public void SetCreateTool(){
+		uiTool = new AVOWUICreateTool();
+		uiTool.Start();
+	}
+	
+	public void SetDeleteTool(){
+		uiTool = new AVOWUIDeleteTool();
+		uiTool.Start();
+	}
+	
 }
 

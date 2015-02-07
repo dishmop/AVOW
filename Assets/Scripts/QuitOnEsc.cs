@@ -22,6 +22,17 @@ public class QuitOnEsc : MonoBehaviour {
 				AppHelper.Quit();
 			}
 		}
+		
+		Vector3 mousePos = Input.mousePosition;
+		if (mousePos.x < Screen.width * 0.1f){
+			Screen.showCursor = true;
+			
+		}
+		else
+		{
+			Screen.showCursor = false;
+			
+		}
 	
 	}
 }

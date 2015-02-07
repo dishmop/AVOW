@@ -1,13 +1,13 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWCommandRemove.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWUI.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWUI.cs" Line="566" Column="1" />
-      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="1109" Column="5" />
+      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="80" Column="1" />
       <File FileName="Assets/Scripts/Lightening.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Telemetry.cs" Line="1" Column="1" />
       <File FileName="Assets/GearProcedural/Editor/GearInspector.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWCommandRemove.cs" Line="11" Column="21" />
+      <File FileName="Assets/Scripts/AVOWCommandRemove.cs" Line="77" Column="5" />
       <File FileName="Assets/Scripts/AVOWSim.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/SpringValue.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWNode.cs" Line="1" Column="1" />
@@ -15,19 +15,19 @@
       <File FileName="Assets/Scripts/AVOWPusher.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ProjectorScript.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/QuitOnEsc.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="306" Column="9" />
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="462" Column="50" />
       <File FileName="Assets/Scripts/PrefabManager.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Simulator.cs" Line="1" Column="1" />
       <File FileName="Assets/Shaders/AVOWNodeGlow.shader" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWCommandAddComponent.cs" Line="8" Column="23" />
-      <File FileName="Assets/Scripts/AVOWCommandSplitAddComponent.cs" Line="87" Column="5" />
+      <File FileName="Assets/Scripts/AVOWCommandAddComponent.cs" Line="14" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCommandSplitAddComponent.cs" Line="88" Column="5" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Assembly-CSharp" expanded="True">
             <Node name="Scripts" expanded="True">
-              <Node name="AVOWCommandRemove.cs" selected="True" />
+              <Node name="AVOWUI.cs" selected="True" />
             </Node>
             <Node name="Shaders" expanded="True" />
           </Node>
@@ -37,6 +37,8 @@
         <State>
           <Value>component.id</Value>
           <Value>len</Value>
+          <Value>inNode.id</Value>
+          <Value>outNode.id</Value>
         </State>
       </Pad>
     </Pads>
