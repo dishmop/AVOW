@@ -962,7 +962,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		kOnCancel
 	};
 	
-	public bool			  	isInside = true;
+	public bool			  	isOutside = true;
 	public InsideGapState 	insideState = InsideGapState.kUncreated;
 	float					maxLerpSpeed = 0.5f;
 	float					minLerpSpeed = 0f;
@@ -1037,7 +1037,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 			
 			connectionPos = 0.5f * (component.GetConnectionPos0() + component.GetConnectionPos1());
 			// If not inside the held gap, find the next closest thing - favouring whatever we have connected already
-			if (!isInside){
+			if (!isOutside){
 
 				if (buttonReleased){
 					heldConnection = false;
@@ -1060,10 +1060,10 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		}
 		
 		// If we have a gap which we are holding open, check if our mous is inside the gap
-		isInside = false;
+		isOutside = true;
 		if (connectionGO != null){
 			AVOWComponent component = connectionGO.GetComponent<AVOWComponent>();
-			isInside = component.IsPointInsideGap(mouseWorldPos);
+			isOutside = !component.IsPointInsideGap(mouseWorldPos);
 		}
 		
 		if (heldConnection || insideState == InsideGapState.kOnCancel || insideState == InsideGapState.kOnRemove) HandleCubeInsideGap();
@@ -1085,7 +1085,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		// Manage the inside state machine
 		switch (insideState){
 			case InsideGapState.kUncreated:{
-				insideState = (isInside) ? InsideGapState.kCreateInside : InsideGapState.kCreaeOutside;
+				insideState = (isOutside) ? InsideGapState.kCreateInside : InsideGapState.kCreaeOutside;
 				break;
 			}
 			case InsideGapState.kCreateInside:{
@@ -1111,7 +1111,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 			}
 			
 			case InsideGapState.kOutside:{
-				if (isInside) {
+				if (isOutside) {
 					// Create a new cube which will travel to the gap
 					ActiveCubeAtComponent(connectionGO);
 					
@@ -1128,7 +1128,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 				// Move our inside cube to where it needs to be
 				AVOWComponent component = GetHeldCommandComponent();
 				
-				if (component != null && isInside){
+				if (component != null && isOutside){
 					float distRemaining = LerpToCursor(cursorCube, insideLerpSpeed);
 					
 					if (MathUtils.FP.Feq(distRemaining, 0, 0.1f)){
@@ -1152,7 +1152,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 			}
 			case InsideGapState.kFullyInside:{
 				AVOWComponent component = GetHeldCommandComponent();
-				if (component == null || !isInside){
+				if (component == null || !isOutside){
 					insideState = InsideGapState.kOutsideAndEntering;
 					insideLerpSpeed = minLerpSpeed;
 					// Create a new cube which will travel to the gap
@@ -1176,7 +1176,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 					//cursorCube = RejoinToCursor(cursorCube);
 				}
 				AVOWComponent component = GetHeldCommandComponent();
-				if (component != null && isInside){
+				if (component != null && isOutside){
 					insideState = InsideGapState.kInsideAndExiting;	
 					insideLerpSpeed = minLerpSpeed;
 				}
@@ -1221,7 +1221,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		if (connectionGO != null){
 			lightening0GO.SetActive(true);
 			Lightening lightening0 = lightening0GO.GetComponent<Lightening>();
-			if (!isInside || !heldConnection){
+			if (!isOutside || !heldConnection){
 				lightening0.startPoint = lighteningConductorPos;
 				lightening0.endPoint = connectionPos;
 			}
@@ -1306,8 +1306,15 @@ public class AVOWUI : MonoBehaviour {
 	public GameObject cursorCubePrefab;
 	public GameObject lighteningPrefab;
 	
-	AVOWUITool	uiTool;
+	
+	public enum ToolMode{
+		kCreate,
+		kDelete
+	}
+	
+	ToolMode mode = ToolMode.kCreate;
 			
+	AVOWUITool	uiTool;
 	
 
 	public Stack<AVOWCommand> 	commands = new Stack<AVOWCommand>();
@@ -1348,7 +1355,9 @@ public class AVOWUI : MonoBehaviour {
 
 	
 
-	
+	public ToolMode GetUIMode(){
+		return mode;
+	}
 
 	
 	void Start(){
@@ -1362,6 +1371,8 @@ public class AVOWUI : MonoBehaviour {
 				
 		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0GO, node1GO);
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node0GO);
+		
+
 		
 		
 		/*
@@ -1378,6 +1389,8 @@ public class AVOWUI : MonoBehaviour {
 		AVOWSim.singleton.Recalc();
 		uiTool = new AVOWUICreateTool();
 		
+		mode = ToolMode.kCreate;
+		
 		uiTool.Start();
 		
 	}
@@ -1385,11 +1398,13 @@ public class AVOWUI : MonoBehaviour {
 	public void SetCreateTool(){
 		uiTool = new AVOWUICreateTool();
 		uiTool.Start();
+		mode = ToolMode.kCreate;
 	}
 	
 	public void SetDeleteTool(){
 		uiTool = new AVOWUIDeleteTool();
 		uiTool.Start();
+		mode = ToolMode.kDelete;
 	}
 	
 }
