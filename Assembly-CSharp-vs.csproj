@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\GearProcedural\Gear.cs" />
+     <Compile Include="Assets\MeasureDisplay.cs" />
      <Compile Include="Assets\Scripts\AVOWCamControl.cs" />
      <Compile Include="Assets\Scripts\AVOWCommand.cs" />
      <Compile Include="Assets\Scripts\AVOWCommandAddComponent.cs" />
@@ -61,6 +62,9 @@
      <Compile Include="Assets\Scripts\AVOWSim.cs" />
      <Compile Include="Assets\Scripts\AVOWUI.cs" />
      <Compile Include="Assets\Scripts\AVOWUIButton.cs" />
+     <Compile Include="Assets\Scripts\AVOWUICreateTool.cs" />
+     <Compile Include="Assets\Scripts\AVOWUIDeleteTool.cs" />
+     <Compile Include="Assets\Scripts\AVOWUITool.cs" />
      <Compile Include="Assets\Scripts\AmmeterEffect.cs" />
      <Compile Include="Assets\Scripts\AppHelper.cs" />
      <Compile Include="Assets\Scripts\AudioTimeScalar.cs" />
@@ -137,11 +141,12 @@
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Multiply.shader" />
      <None Include="Assets\Shaders\Outline.shader" />
      <None Include="Assets\Tutorial_1\Combiner.shader" />
-     <None Include="Assets\Shaders\AVOWCursorCube.shader" />
+     <None Include="Assets\Shaders\AVOWCursorCubeBlue.shader" />
      <None Include="Assets\Scripts\alglib\gpl2.txt" />
      <None Include="Assets\Tutorial_2\2_Lambert.shader" />
      <None Include="Assets\Shaders\SolidColor_FG.shader" />
      <None Include="Assets\Shaders\noise-simplex.shader" />
+     <None Include="Assets\Shaders\AVOWCursorCubeGreen.shader" />
      <None Include="Assets\Fonts\scified.txt" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
      <None Include="Assets\Shaders\AVOWLightening.shader" />
@@ -166,9 +171,6 @@
      <None Include="Assets\Scripts\alglib\gpl3.txt" />
      <None Include="Assets\Shaders\AVOWResistance.shader" />
      <None Include="Assets\Shaders\AVOWVoltageSource.shader" />
- <Reference Include="Assembly-UnityScript-firstpass">
- <HintPath>/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
- </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/4.6.0/UnityEngine.UI.dll</HintPath>
  </Reference>

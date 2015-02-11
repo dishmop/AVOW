@@ -53,11 +53,12 @@
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Multiply.shader" />
      <None Include="Assets\Shaders\Outline.shader" />
      <None Include="Assets\Tutorial_1\Combiner.shader" />
-     <None Include="Assets\Shaders\AVOWCursorCube.shader" />
+     <None Include="Assets\Shaders\AVOWCursorCubeBlue.shader" />
      <None Include="Assets\Scripts\alglib\gpl2.txt" />
      <None Include="Assets\Tutorial_2\2_Lambert.shader" />
      <None Include="Assets\Shaders\SolidColor_FG.shader" />
      <None Include="Assets\Shaders\noise-simplex.shader" />
+     <None Include="Assets\Shaders\AVOWCursorCubeGreen.shader" />
      <None Include="Assets\Fonts\scified.txt" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
      <None Include="Assets\Shaders\AVOWLightening.shader" />
@@ -93,8 +94,6 @@
  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-UnityScript-firstpass.unityproj">
-      <Project>{871B85E3-F638-C2A9-382B-ABF3C0202A8E}</Project>      <Name>Assembly-UnityScript-firstpass</Name>    </ProjectReference>
     <ProjectReference Include="Assembly-CSharp.csproj">
       <Project>{9723242E-2401-CD4D-4D58-D4B61919ABD7}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
   </ItemGroup>
