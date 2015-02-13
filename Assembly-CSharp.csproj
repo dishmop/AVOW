@@ -54,6 +54,7 @@
      <Compile Include="Assets\Scripts\AVOWCommandRemove.cs" />
      <Compile Include="Assets\Scripts\AVOWCommandSplitAddComponent.cs" />
      <Compile Include="Assets\Scripts\AVOWComponent.cs" />
+     <Compile Include="Assets\Scripts\AVOWGameModes.cs" />
      <Compile Include="Assets\Scripts\AVOWGraph.cs" />
      <Compile Include="Assets\Scripts\AVOWGreenBackground.cs" />
      <Compile Include="Assets\Scripts\AVOWGrid.cs" />

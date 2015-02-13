@@ -24,7 +24,7 @@ public class QuitOnEsc : MonoBehaviour {
 		}
 		
 		Vector3 mousePos = Input.mousePosition;
-		if (mousePos.x < Screen.width * 0.1f){
+		if (mousePos.x < Screen.width * 0.1f || AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kMainMenu){
 			Screen.showCursor = true;
 			
 		}
