@@ -59,6 +59,13 @@ public class AVOWNode : MonoBehaviour {
 
 	void Update(){
 	
+		// Not sure why this happens
+		if (float.IsNaN(h0)){
+			Debug.Log ("Error in node h0");
+			return;
+		}
+		
+	
 		Material material = transform.FindChild("LineNode").FindChild("LineNodeRender").renderer.material;
 		float currentSelectVal = material.GetFloat("_Intensity");
 		float newVal = Mathf.Lerp (currentSelectVal, isSelected ? 1 : 0, 0.4f);

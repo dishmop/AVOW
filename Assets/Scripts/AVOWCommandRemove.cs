@@ -62,7 +62,7 @@ public class AVOWCommandRemove : AVOWCommand{
 				inNodeGO = component.inNodeGO;
 				outNodeGO = component.outNodeGO;
 				if (gapType == GapType.kOnlyOne){
-					component.Kill (0);
+					component.Kill (1);
 					executeStep = ExecuteStepState.kMergeNodes;
 					component.onDeadCommand = this;
 					component.onDeadCommandDoExecutate = true;

@@ -23,11 +23,16 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 	UndoStepState undoStep = UndoStepState.kRemoveComponent;
 	ExecuteStepState executeStep = ExecuteStepState.kMakeGap;
 	
+	public static int debugCount = 0;
 	
 	public AVOWCommandSplitAddComponent(GameObject splitNodeGO, GameObject component, GameObject prefabToUse){
 		nodeGO = splitNodeGO;
 		movedComponent = component;
 		prefab = prefabToUse;
+
+//		Debug.Log (debugCount + " Construct: AVOWCommandSplitAddComponent: splitNodeGO = " + splitNodeGO.GetComponent<AVOWNode>().GetID() + ", component = " + component.GetComponent<AVOWComponent>().GetID());
+
+		debugCount++;
 		
 	}
 	

@@ -47,8 +47,8 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\GearProcedural\Gear.cs" />
-     <Compile Include="Assets\MeasureDisplay.cs" />
      <Compile Include="Assets\Scripts\AVOWCamControl.cs" />
+     <Compile Include="Assets\Scripts\AVOWCircuitCreator.cs" />
      <Compile Include="Assets\Scripts\AVOWCommand.cs" />
      <Compile Include="Assets\Scripts\AVOWCommandAddComponent.cs" />
      <Compile Include="Assets\Scripts\AVOWCommandRemove.cs" />
@@ -58,6 +58,7 @@
      <Compile Include="Assets\Scripts\AVOWGreenBackground.cs" />
      <Compile Include="Assets\Scripts\AVOWGrid.cs" />
      <Compile Include="Assets\Scripts\AVOWNode.cs" />
+     <Compile Include="Assets\Scripts\AVOWObjectives.cs" />
      <Compile Include="Assets\Scripts\AVOWPusher.cs" />
      <Compile Include="Assets\Scripts\AVOWSim.cs" />
      <Compile Include="Assets\Scripts\AVOWUI.cs" />
@@ -95,6 +96,7 @@
      <Compile Include="Assets\Scripts\LevelStartMessage.cs" />
      <Compile Include="Assets\Scripts\Lightening.cs" />
      <Compile Include="Assets\Scripts\MathUtils.cs" />
+     <Compile Include="Assets\Scripts\MeasureDisplay.cs" />
      <Compile Include="Assets\Scripts\MouseDown.cs" />
      <Compile Include="Assets\Scripts\ObjectTracker.cs" />
      <Compile Include="Assets\Scripts\OldUI.cs" />

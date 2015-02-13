@@ -66,9 +66,28 @@ public class AVOWGraph : MonoBehaviour {
 		
 	}
 	
+	public void ForceComponentsToSize(){
+		List<GameObject> listCopy = allComponents.GetRange(0, allComponents.Count);
+		foreach (GameObject go in listCopy){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			float desVal = component.resistanceAngle.GetDesValue();
+			component.resistanceAngle.Force(desVal);
+			component.CheckForKillResistance();
+			
+		}
+	}
 	
 	
 	
+	public bool HasHalfFinishedComponents(){
+		foreach (GameObject go in allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			if (!MathUtils.FP.Feq (component.resistanceAngle.GetValue(), 45) && component.type == AVOWComponent.Type.kLoad){
+				return true;
+			}
+		}
+		return false; 
+	}
 	
 	public GameObject FindVoltageSource(){
 		return allComponents.Find(item => item.GetComponent<AVOWComponent>().type == AVOWComponent.Type.kVoltageSource);
@@ -101,7 +120,7 @@ public class AVOWGraph : MonoBehaviour {
 	// we attach all apart from the anchored component to the new node
 	public GameObject SplitNode(GameObject nodeToSplitGO, AVOWComponent movedComponent){
 
-		Debug.Log ("Split Node: " + nodeToSplitGO.GetComponent<AVOWNode>().GetID() + " - movedComponent = " + movedComponent.GetID ());		
+//		Debug.Log ("Split Node: " + nodeToSplitGO.GetComponent<AVOWNode>().GetID() + " - movedComponent = " + movedComponent.GetID ());		
 		GameObject newNodeGO = AddNode();
 		
 		nodeToSplitGO.GetComponent<AVOWNode>().components.Remove(movedComponent.gameObject);
@@ -111,7 +130,7 @@ public class AVOWGraph : MonoBehaviour {
 		
 		newNodeGO.GetComponent<AVOWNode>().splitFromNode = nodeToSplitGO;
 		nodeToSplitGO.GetComponent<AVOWNode>().splitFromNode = newNodeGO;
-		Debug.Log ("New node " + newNodeGO.GetComponent<AVOWNode>().GetID () + " has splitFromNoe = " + nodeToSplitGO.GetComponent<AVOWNode>().GetID ());
+//		Debug.Log ("New node " + newNodeGO.GetComponent<AVOWNode>().GetID () + " has splitFromNoe = " + nodeToSplitGO.GetComponent<AVOWNode>().GetID ());
 		return newNodeGO;
 	}
 	

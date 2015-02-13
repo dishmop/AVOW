@@ -1,75 +1,49 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/FractionCalc.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWCircuitCreator.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWUITool.cs" Line="4" Column="1" />
-      <File FileName="Assets/Scripts/AVOWUI.cs" Line="52" Column="1" />
-      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Lightening.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Telemetry.cs" Line="1" Column="1" />
-      <File FileName="Assets/GearProcedural/Editor/GearInspector.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWCommandRemove.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWSim.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/SpringValue.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWNode.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWGreenBackground.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWPusher.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ProjectorScript.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/QuitOnEsc.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="389" Column="1" />
-      <File FileName="Assets/Scripts/PrefabManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Simulator.cs" Line="1" Column="1" />
-      <File FileName="Assets/Shaders/AVOWNodeGlow.shader" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWCommandAddComponent.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AppHelper.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCircuitCreator.cs" Line="27" Column="25" />
+      <File FileName="Assets/Scripts/AVOWCommand.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWCommandSplitAddComponent.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWUIButton.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWUICreateTool.cs" Line="68" Column="3" />
-      <File FileName="Assets/Scripts/AVOWUIDeleteTool.cs" Line="79" Column="3" />
-      <File FileName="Assets/Shaders/AVOWLightening.shader" Line="1" Column="1" />
-      <File FileName="Assets/Shaders/AVOWCursorCubeGreen.shader" Line="48" Column="82" />
-      <File FileName="Assets/Shaders/AVOWCursorCubeBlue.shader" Line="22" Column="1" />
-      <File FileName="Assets/Scripts/FractionCalc.cs" Line="36" Column="32" />
+      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCommandAddComponent.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="398" Column="63" />
+      <File FileName="Assets/Scripts/AVOWCommandRemove.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWPusher.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWSim.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWNode.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="71" Column="99" />
+      <File FileName="Assets/Scripts/LevelManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/FractionCalc.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/MathUtils.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/CircuitElementAmmeter.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/CircuitElementVoltmeter.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/CircuitElement.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/MeasureDisplay.cs" Line="1" Column="1" />
+      <File FileName="Assets/AVOWObjectives.cs" Line="141" Column="9" />
+      <File FileName="Assets/Scripts/CircuitElementResistor.cs" Line="80" Column="4" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Assembly-CSharp" expanded="True">
             <Node name="Scripts" expanded="True">
-              <Node name="FractionCalc.cs" selected="True" />
+              <Node name="AVOWCircuitCreator.cs" selected="True" />
             </Node>
           </Node>
         </State>
       </Pad>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
         <State>
-          <Value>component.id</Value>
-          <Value>len</Value>
-          <Value>inNode.id</Value>
-          <Value>outNode.id</Value>
-          <Value>lightening0.startPoint</Value>
-          <Value>lightening0.endPoint</Value>
-          <Value>len0</Value>
+          <Value>results</Value>
         </State>
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/Simulator.cs" line="2070" />
-      <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/ElementSelectButton.cs" line="7" />
-      <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/Simulator.cs" line="135" />
-      <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/ObjectTracker.cs" line="9" />
-      <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/ObjectTracker.cs" line="13" />
-      <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/GameModeManager.cs" line="7" />
-      <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/GameModeManager.cs" line="10" />
-      <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/OnMouseDown.cs" line="16" />
-      <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/LevelManager.cs" line="9" />
-      <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWSim.cs" line="1347" />
-      <Breakpoint file="/Users/dac70/Dropbox/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWSim.cs" line="1381" />
-      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWGraph.cs" line="183" />
-      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWGraph.cs" line="159" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

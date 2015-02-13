@@ -106,7 +106,7 @@ public class CircuitElementVoltmeter : CircuitElement {
 	
 	bool IsOnTarget(){
 		// our epsilon should be the same as the display epsilon
-		return hasTarget && MathUtils.FP.Feq(GetVoltageDiff(), targetVolts, FractionCalc.epsilon);
+		return hasTarget && MathUtils.FP.Feq(GetVoltageDiff(), targetVolts, MathUtils.FP.fracEpsilon);
 	}
 	
 	

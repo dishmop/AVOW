@@ -35,6 +35,78 @@ namespace MathUtils
 		public static bool Fgeq(double a, double b){return Feq(a,b) || a > b;}
 		public static bool Fgeq(float a, float b, float epsilon){return Feq(a,b, epsilon) || a > b;}
 		public static bool Fgeq(double a, double b, double epsilon){return Feq(a,b, epsilon) || a > b;}
+		
+		public static float fracEpsilon  = 0.001f;
+		public static void CalcFraction(float value, out int integer, out int numerator, out int denominator, out bool isNeg){
+			
+			float x = value;
+			isNeg = (x < 0);
+			x = Mathf.Abs(x);
+			integer = Mathf.FloorToInt(x);
+			x -= integer;
+			
+			// Check if we are exactly an integer
+			if (MathUtils.FP.Feq(x, 0, fracEpsilon)){
+				numerator = 0;
+				denominator = 1;
+				return;
+			}
+			if (MathUtils.FP.Feq(x, 1, fracEpsilon)){
+				integer += 1;
+				numerator = 0;
+				denominator = 1;
+				return;
+			}
+			
+			
+			// The lower fraction is 0/1
+			int lower_n = 0;
+			int lower_d = 1;
+			// The upper fraction is 1/1
+			int upper_n = 1;
+			int upper_d = 1;
+			
+			while (true){
+				// The middle fraction is (lower_n + upper_n) / (lower_d + upper_d)
+				int middle_n = lower_n + upper_n;
+				int middle_d = lower_d + upper_d;
+				
+				// If x + error < middle
+				float middleVal = (float)middle_n / (float)middle_d;
+				if (MathUtils.FP.Feq (middleVal, x, fracEpsilon)){
+					numerator = middle_n;
+					denominator = middle_d;
+					return;
+				}
+				if (x < middleVal){
+					// middle is our new upper
+					upper_n = middle_n;
+					upper_d = middle_d;
+				}
+				if (x > middleVal){
+					// middle is our new lower
+					lower_n = middle_n;
+					lower_d = middle_d;
+				}
+				
+			}
+		}		
+		
+		public static int gcf(int a, int b)
+		{
+			while (b != 0)
+			{
+				int temp = b;
+				b = a % b;
+				a = temp;
+			}
+			return a;
+		}
+		
+		public static int lcm(int a, int b)
+		{
+			return (a / gcf(a, b)) * b;
+		}
 	}	
 	
 	#endregion

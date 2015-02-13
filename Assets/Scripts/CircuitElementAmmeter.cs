@@ -150,7 +150,7 @@ public class CircuitElementAmmeter : CircuitElement {
 	
 	
 	bool IsOnTarget(){
-		return hasTarget && MathUtils.FP.Feq(GetMaxCurrent(), targetAmp, FractionCalc.epsilon);
+		return hasTarget && MathUtils.FP.Feq(GetMaxCurrent(), targetAmp, MathUtils.FP.fracEpsilon);
 	}
 	
 	

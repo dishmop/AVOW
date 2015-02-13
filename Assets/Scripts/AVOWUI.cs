@@ -15,6 +15,9 @@ public class AVOWUI : MonoBehaviour {
 	public GameObject cursorGreenCubePrefab;
 	public GameObject lighteningPrefab;
 	
+	AVOWGraph graph = null;
+	
+	
 	
 	public enum ToolMode{
 		kCreate,
@@ -45,7 +48,12 @@ public class AVOWUI : MonoBehaviour {
 	
 
 	void Update(){
-		uiTool.Update();
+		if (AVOWCircuitCreator.singleton.IsFinished()){
+			if (graph == null){
+				Startup();
+			}
+			uiTool.Update();
+		}
 	}
 	
 	public GameObject InstantiateBlueCursorCube(){
@@ -76,19 +84,19 @@ public class AVOWUI : MonoBehaviour {
 	}
 
 	
-	void Start(){
+	void Startup(){
+	
+		graph = AVOWGraph.singleton;
 		
-		AVOWGraph graph = AVOWGraph.singleton;
-
 		// Simple start
 		GameObject node0GO = graph.AddNode ();
 		GameObject node1GO = graph.AddNode ();
-
-				
+		
+		
 		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0GO, node1GO);
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node0GO);
 		
-
+		
 		
 		
 		/*
@@ -108,6 +116,7 @@ public class AVOWUI : MonoBehaviour {
 		mode = ToolMode.kCreate;
 		
 		uiTool.Start();
+
 		
 	}
 	

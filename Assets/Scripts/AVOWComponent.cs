@@ -13,7 +13,6 @@ public class AVOWComponent : MonoBehaviour {
 	public float lighteningSize = 0.5f;
 	public bool isInteractive = true;	
 	public bool showResistance = true;
-	
 	// top bottom, left right 
 	float useH0;
 	float useH1;
@@ -96,11 +95,12 @@ public class AVOWComponent : MonoBehaviour {
 		if (type == Type.kLoad){
 		//	transform.FindChild("Resistance").gameObject.renderer.materials[0].color =  new Color(Random.Range(0f, 1f), Random.Range(0f, 1f),Random.Range(0f, 1f));
 		}
+		transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = "";
 	}
 	
 	public float GetResistance(){
 		if (type != Type.kLoad){
-			Debug.LogError ("Attempting to read resistance from a non-Load type");
+			Debug.Log("Attempting to read resistance from a non-Load type");
 		}
 		return Mathf.Tan (Mathf.Deg2Rad * resistanceAngle.GetValue());
 	}
@@ -124,7 +124,7 @@ public class AVOWComponent : MonoBehaviour {
 		removeOnTarget = true;
 	}
 	
-	void CheckForKillResistance(){
+	public void CheckForKillResistance(){
 		if (!removeOnTarget) return;
 		
 		if (resistanceAngle.IsAtTarget()){
@@ -227,6 +227,7 @@ public class AVOWComponent : MonoBehaviour {
 	}
 	
 	public void ReplaceNode(GameObject existingNodeGO, GameObject newNodeGO){
+//		Debug.Log ("Request replace node :" + existingNodeGO.GetComponent<AVOWNode>().GetID() + " with node " + newNodeGO.GetComponent<AVOWNode>().GetID());
 		if (node0GO == existingNodeGO){
 			SetNode0(newNodeGO);
 		} 
@@ -234,6 +235,10 @@ public class AVOWComponent : MonoBehaviour {
 			SetNode1(newNodeGO);
 		}
 		else{
+			AVOWNode existingNode = existingNodeGO.GetComponent<AVOWNode>();
+			AVOWNode newNode = newNodeGO.GetComponent<AVOWNode>();
+			AVOWNode node0 = node0GO.GetComponent<AVOWNode>();
+			AVOWNode node1 = node1GO.GetComponent<AVOWNode>();
 			Debug.LogError ("Error replacing node " + existingNodeGO.GetComponent<AVOWNode>().GetID() + " with node " + newNodeGO.GetComponent<AVOWNode>().GetID() + " on component " + GetID());
 		}
 	}
@@ -320,6 +325,12 @@ public class AVOWComponent : MonoBehaviour {
 		resistanceAngle.Update();
 		CheckForKillResistance();
 		
+		
+		// NOt sure why this should eveqr happen but...
+		if (float.IsNaN(h0)){
+			return;
+		}
+		
 		float v0 = node0GO.GetComponent<AVOWNode>().voltage;
 		float v1 = node1GO.GetComponent<AVOWNode>().voltage;
 		
@@ -381,9 +392,17 @@ public class AVOWComponent : MonoBehaviour {
 		Vector3 newNode1Pos = node1GO.transform.position;
 		
 		// Debug text
-		transform.FindChild("Resistance").FindChild ("AVOWTextBox").gameObject.SetActive(false);
+		//transform.FindChild("Resistance").FindChild ("AVOWTextBox").gameObject.SetActive(false);
 		//transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = GetID() + " - " + hOrder.ToString();
-					
+		if (!AVOWGraph.singleton.HasHalfFinishedComponents()){
+			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = CreateFracString(hWidth);
+			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().color = new Color(0, 1, 0);
+		}
+		else{
+			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().color = new Color(0.75f, 0.125f, 0f);
+			
+		}
+		
 		
 		// Otherwise, it doesn't work when they move
 		if (true || !MathUtils.FP.Feq ((oldNode0Pos - newNode0Pos).magnitude, 0) || !MathUtils.FP.Feq ((oldNode1Pos - newNode1Pos).magnitude, 0)) {
@@ -424,6 +443,9 @@ public class AVOWComponent : MonoBehaviour {
 			oldNode1Pos = newNode1Pos;
 		}
 		
+		if (float.IsNaN(connector0Pos.x)){
+			Debug.Log ("Error NAN");
+		}
 		// Put our connection spheres in the right place.
 		float scale = 0.1f * Mathf.Abs (useV1-useV0);
 		Transform connectionSphere0 = transform.FindChild("ConnectionSphere0");
@@ -436,6 +458,16 @@ public class AVOWComponent : MonoBehaviour {
 
 		
 			
+	}
+	
+	string CreateFracString(float val){
+		int denominator;
+		int numerator;
+		int integer;
+		bool isNeg;
+		//val *= AVOWCircuitCreator.singleton.currentLCM;
+		MathUtils.FP.CalcFraction(val, out integer, out numerator, out denominator, out isNeg);
+		return (integer * denominator + numerator).ToString() + (MathUtils.FP.Feq (denominator, 1) ? "" : "/" + denominator.ToString() );
 	}
 	
 	public bool IsPointInsideGap(Vector3 pos){

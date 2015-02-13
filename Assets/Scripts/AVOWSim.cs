@@ -29,6 +29,8 @@ public class AVOWSim : MonoBehaviour {
 	public float yMin;
 	public float xMax;
 	public float yMax;
+	// We shouldn't need this
+	public bool errorInBounds;
 	
 	// Set this if we want to force the mouse to pretend it is over a comonent when rejigging the camera
 	public GameObject		mouseOverComponentForce = null;
@@ -99,6 +101,11 @@ public class AVOWSim : MonoBehaviour {
 	
 	
 	public void Recalc(){
+	
+		List<GameObject> components = graph.allComponents;
+		if (components.Count == 0){
+			return;
+		}
 
 		FindLoops();
 		//DebugPrintLoops();
@@ -116,7 +123,9 @@ public class AVOWSim : MonoBehaviour {
 		//DebugPrintGraph();
 		LayoutHOrder();
 		
-		//DebugPrintHOrder();
+		CalcBounds();
+		
+	//	DebugPrintHOrder();
 	}
 	
 	void Awake(){
@@ -173,10 +182,10 @@ public class AVOWSim : MonoBehaviour {
 			AVOWNode node0 = component.node0GO.GetComponent<AVOWNode>();
 			AVOWNode node1 = component.node1GO.GetComponent<AVOWNode>();
 			if (component.GetCurrent(component.node0GO) > 0){
-				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + node0.GetID() + " to " + node1.GetID());
+				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + node0.GetID() + " to " + node1.GetID() + " resistance = " + component.GetResistance() + " current = " + component.fwCurrent);
 			}
 			else{
-				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + node1.GetID() + " to " + node0.GetID());
+				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + node1.GetID() + " to " + node0.GetID() + " resistance = " + component.GetResistance() + " current = " + component.fwCurrent);
 			}
 		}
 	}
@@ -1046,6 +1055,42 @@ public class AVOWSim : MonoBehaviour {
 		}
 	}
 	
+	void CalcBounds(){
+		// Keep track of global bounds of entire diagram (as we will use this if not over ay specific component)
+		xMin = 100;
+		yMin = 100;
+		xMax = -1;
+		yMax = -1;
+		errorInBounds = false;
+		foreach(GameObject go in graph.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			
+			
+			// If this component has never been layed out, then ignore
+			if (!component.hasBeenLayedOut) continue;
+			
+			float lowVoltage = Mathf.Min (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
+			float highVoltage = Mathf.Max (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
+			float lowCurrent = component.h0;
+			float highCurrent = component.h0 + component.hWidth;
+			
+			
+			
+			
+			// Keep track of global bounds
+			if (float.IsNaN(lowCurrent) || float.IsNaN(lowVoltage) || float.IsNaN(highCurrent) || float.IsNaN(highVoltage)){
+				Debug.Log ("Error in bounds");
+				errorInBounds = true;
+				continue;
+			}
+			xMin = Mathf.Min (xMin, lowCurrent);
+			yMin = Mathf.Min (yMin, lowVoltage);
+			xMax = Mathf.Max (xMax, highCurrent);
+			yMax = Mathf.Max (yMax, highVoltage);
+			
+		}
+	}
+	
 	
 	// Records the position of the mouse as a local position in one of the components
 	void RecordMousePos(){
@@ -1059,11 +1104,7 @@ public class AVOWSim : MonoBehaviour {
 		
 		// check which component we are over
 		mouseOverComponent = null;
-		// Keep track of global bounds of entire diagram (as we will use this if not over ay specific component)
-		xMin = 100;
-		yMin = 100;
-		xMax = -1;
-		yMax = -1;
+
 		foreach(GameObject go in graph.allComponents){
 			AVOWComponent component = go.GetComponent<AVOWComponent>();
 			
@@ -1077,14 +1118,7 @@ public class AVOWSim : MonoBehaviour {
 			float highCurrent = component.h0 + component.hWidth;
 			
 
-			
-			
-			// Keep track of global bounds
-			xMin = Mathf.Min (xMin, lowCurrent);
-			yMin = Mathf.Min (yMin, lowVoltage);
-			xMax = Mathf.Max (xMax, highCurrent);
-			yMax = Mathf.Max (yMax, highVoltage);
-			
+	
 			// Only register if over a resistor
 			if (component.type == AVOWComponent.Type.kLoad &&
 				mouseWorldPos.x > lowCurrent && 
@@ -1149,16 +1183,16 @@ public class AVOWSim : MonoBehaviour {
 
 	
 	void CalcMouseOffset(){
-		float xMin = 100;
-		float yMin = 100;
-		float xMax = -1;
-		float yMax = -1;
+		float xMinLocal = 100;
+		float yMinLocal = 100;
+		float xMaxLocal = -1;
+		float yMaxLocal = -1;
 		//Figure out world posiiton of the location in the diagram where the mouse was
 		if (mouseOverComponent != null){
-			xMin = mouseOverComponent.h0;
-			xMax = mouseOverComponent.h0 + mouseOverComponent.hWidth;
-			yMin = Mathf.Min (mouseOverComponent.node0GO.GetComponent<AVOWNode>().voltage, mouseOverComponent.node1GO.GetComponent<AVOWNode>().voltage);
-			yMax = Mathf.Max (mouseOverComponent.node0GO.GetComponent<AVOWNode>().voltage, mouseOverComponent.node1GO.GetComponent<AVOWNode>().voltage);
+			xMinLocal = mouseOverComponent.h0;
+			xMaxLocal = mouseOverComponent.h0 + mouseOverComponent.hWidth;
+			yMinLocal = Mathf.Min (mouseOverComponent.node0GO.GetComponent<AVOWNode>().voltage, mouseOverComponent.node1GO.GetComponent<AVOWNode>().voltage);
+			yMaxLocal = Mathf.Max (mouseOverComponent.node0GO.GetComponent<AVOWNode>().voltage, mouseOverComponent.node1GO.GetComponent<AVOWNode>().voltage);
 			// If a voltage source then need to mirror it all
 //			if (mouseOverComponent.type == AVOWComponent.Type.kVoltageSource){
 //				float temp = xMin;
@@ -1180,15 +1214,15 @@ public class AVOWSim : MonoBehaviour {
 					
 				
 				// Keep track of global bounds
-				xMin = Mathf.Min (xMin, lowCurrent);
-				yMin = Mathf.Min (yMin, lowVoltage);
-				xMax = Mathf.Max (xMax, highCurrent);
-				yMax = Mathf.Max (yMax, highVoltage);
+				xMinLocal = Mathf.Min (xMinLocal, lowCurrent);
+				yMinLocal = Mathf.Min (yMinLocal, lowVoltage);
+				xMaxLocal = Mathf.Max (xMaxLocal, highCurrent);
+				yMaxLocal = Mathf.Max (yMaxLocal, highVoltage);
 				
 			}
 		}
 		
-		Vector3  worldPos = new Vector3(xMin + mouseOverXProp * (xMax - xMin), yMin +mouseOverYProp * (yMax - yMin), 0);
+		Vector3  worldPos = new Vector3(xMinLocal + mouseOverXProp * (xMaxLocal - xMinLocal), yMinLocal +mouseOverYProp * (yMaxLocal - yMinLocal), 0);
 		worldPos.z = 0;
 //		Vector3 screenPos = Camera.main.WorldToScreenPoint( worldPos);
 //		screenPos.z = 0;
