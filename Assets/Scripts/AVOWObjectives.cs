@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class AVOWObjectives : MonoBehaviour {
+	public static AVOWObjectives singleton = null;
 
 	public GameObject		textBoxPrefab;
 	public float 			ySpacing;
@@ -20,10 +21,29 @@ public class AVOWObjectives : MonoBehaviour {
 	int 					currentObjective = 0;
 	Vector3 				basePos;
 	
+	bool 					lastUseLCM;
+	bool					lastShowTotals;
+	bool					lastShowIndividuals;
+	bool					firstTime = true;
+	
 	// Use this for initialization
 	void Start () {
 		basePos = transform.position;
 	
+	}
+	
+	bool TestForConfigChange(){
+		bool ret = false;
+		if (firstTime) ret = true;
+		if (lastUseLCM != AVOWConfig.singleton.useLCM) ret = true;
+		if (lastShowTotals != AVOWConfig.singleton.showTotals) ret = true;
+		if (lastShowIndividuals != AVOWConfig.singleton.showIndividuals) ret = true;
+		lastUseLCM = AVOWConfig.singleton.useLCM;
+		lastShowTotals = AVOWConfig.singleton.showTotals;
+		lastShowIndividuals = AVOWConfig.singleton.showIndividuals;
+		firstTime = false;
+		return ret;
+		
 	}
 	
 	// Update is called once per frame
@@ -33,6 +53,7 @@ public class AVOWObjectives : MonoBehaviour {
 				CreateTextBoxes();
 			}
 			else{
+				ProcessChangeToConfig();
 				SetColors();
 				yOffset.Update();
 				Vector3 pos = transform.position;
@@ -49,7 +70,7 @@ public class AVOWObjectives : MonoBehaviour {
 			return;
 		}
 		
-		total = MathUtils.FP.Feq(goal.Item1, AVOWSim.singleton.xMax);
+		total = MathUtils.FP.Feq(goal.Item1, AVOWCircuitCreator.singleton.GetLCM() * AVOWSim.singleton.xMax);
 		
 		List<float> currentVals = new List<float>();
 		foreach(GameObject go in AVOWGraph.singleton.allComponents){
@@ -61,7 +82,7 @@ public class AVOWObjectives : MonoBehaviour {
 			float target = goal.Item2[i];
 			int remIndex = -1;
 			for (int j = 0; j < currentVals.Count; ++j){
-				float testVal = currentVals[j];
+				float testVal = AVOWCircuitCreator.singleton.GetLCM() * currentVals[j];
 				if (MathUtils.FP.Feq (target, testVal)){
 					remIndex = j;
 					break;
@@ -80,9 +101,9 @@ public class AVOWObjectives : MonoBehaviour {
 	void CreateTextBoxes(){
 		
 		DestroyBoxes();
-		textBoxes = new List<GameObject>[AVOWCircuitCreator.singleton.results.Count];
+		textBoxes = new List<GameObject>[AVOWCircuitCreator.singleton.GetResults().Count];
 		
-		List<Eppy.Tuple<float, List<float>>> results = AVOWCircuitCreator.singleton.results;
+		List<Eppy.Tuple<float, List<float>>> results = AVOWCircuitCreator.singleton.GetResults();
 		for (int i = 0; i < textBoxes.Length; ++i){
 			if (Mathf.Abs(i - currentObjective) > maxList) continue;
 			
@@ -105,7 +126,7 @@ public class AVOWObjectives : MonoBehaviour {
 			newBox.GetComponent<TextMesh>().text = CreateFracString(results[i].Item1);
 			newBox.GetComponent<TextMesh>().color = thisCol;
 			textBoxes[i].Add(newBox);
-			
+						
 			for (int j = 0; j < results[i].Item2.Count; ++j){
 				GameObject newBox2 = GameObject.Instantiate(textBoxPrefab, transform.position + new Vector3(xSpacing * (j + 1), -ySpacing * i, 0), Quaternion.identity) as GameObject;
 				
@@ -131,10 +152,27 @@ public class AVOWObjectives : MonoBehaviour {
 		textBoxes = null;
 	}
 	
+	void ProcessChangeToConfig(){
+		if (TestForConfigChange()){
+			// The LCM usage might have chnaged - so remake
+			CreateTextBoxes();
+			
+			// Set which ones are visible
+			for (int i = 0; i < textBoxes.Length; ++i){
+				if (textBoxes[i] == null) break;
+				textBoxes[i][0].SetActive(AVOWConfig.singleton.showTotals);
+				for (int j = 1; j < textBoxes[i].Count; ++j){
+					textBoxes[i][j].SetActive(AVOWConfig.singleton.showIndividuals);
+				}
+			}
+			
+		}
+	}
+	
 	void SetColors(){
 		bool total;
 		bool[] individual;
-		IsAchieving(AVOWCircuitCreator.singleton.results[currentObjective], out total, out individual);
+		IsAchieving(AVOWCircuitCreator.singleton.GetResults()[currentObjective], out total, out individual);
 		
 		bool IsComplete = true;
 		if (total){
@@ -145,7 +183,6 @@ public class AVOWObjectives : MonoBehaviour {
 			textBoxes[currentObjective][0].GetComponent<TextMesh>().color = colNotYetDoneAndActive;
 		
 		}
-		
 		for (int i = 1; i < textBoxes[currentObjective].Count; ++i){
 			if (individual[i-1]){
 				textBoxes[currentObjective][i].GetComponent<TextMesh>().color = colDone;
@@ -154,10 +191,10 @@ public class AVOWObjectives : MonoBehaviour {
 				textBoxes[currentObjective][i].GetComponent<TextMesh>().color = colNotYetDoneAndActive;
 				IsComplete = false;
 			}
-			
 		}
+
 		if (IsComplete){
-			if (currentObjective < AVOWCircuitCreator.singleton.results.Count-1){
+			if (currentObjective < AVOWCircuitCreator.singleton.GetResults().Count-1){
 				currentObjective++;
 				yOffset.Set(yOffset.GetDesValue() + ySpacing);
 				CreateTextBoxes();
@@ -190,4 +227,13 @@ public class AVOWObjectives : MonoBehaviour {
 		MathUtils.FP.CalcFraction(val, out integer, out numerator, out denominator, out isNeg);
 		return (integer * denominator + numerator).ToString() + (MathUtils.FP.Feq (denominator, 1) ? "" : "/" + denominator.ToString() );
 	}
+	
+	void Awake(){
+		if (singleton != null) Debug.LogError ("Error assigning singleton");
+		singleton = this;
+	}
+	
+	void OnDestroy(){
+	}
+		
 }

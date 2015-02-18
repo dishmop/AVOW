@@ -2647,6 +2647,14 @@ Prefab:
       propertyPath: m_RootOrder
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 38c73b79aa6464928b882825cbd49d38, type: 2}
+      propertyPath: multiplyByLCM
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 38c73b79aa6464928b882825cbd49d38, type: 2}
+      propertyPath: maxNumResistors
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 38c73b79aa6464928b882825cbd49d38, type: 2}
   m_RootGameObject: {fileID: 1612783813}
@@ -3497,6 +3505,10 @@ Prefab:
       propertyPath: m_Name
       value: Display
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 0e12e18c074f04f0cb7c209cc2b4738f, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 0e12e18c074f04f0cb7c209cc2b4738f, type: 2}
   m_RootGameObject: {fileID: 525000705}
@@ -4232,7 +4244,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 3 Resistors (medium)
+  m_Text: 3 Resistors (medium) - 7 goals
 --- !u!222 &381904959
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4253,8 +4265,8 @@ RectTransform:
   m_RootOrder: 3
   m_AnchorMin: {x: .362355411, y: .337000012}
   m_AnchorMax: {x: .666742206, y: .427405298}
-  m_AnchoredPosition: {x: 0, y: .5}
-  m_SizeDelta: {x: 0, y: 2}
+  m_AnchoredPosition: {x: 2.79999995, y: .5}
+  m_SizeDelta: {x: 115.699997, y: 2}
   m_Pivot: {x: .5, y: .5}
 --- !u!1 &383512790
 GameObject:
@@ -4340,6 +4352,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 411553919}
   - 114: {fileID: 411553918}
+  - 114: {fileID: 411553920}
   m_Layer: 0
   m_Name: Global
   m_TagString: Untagged
@@ -4371,6 +4384,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!114 &411553920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 411553917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65c2a8eb5ce5440ddaf088d95f5812c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showTotals: 1
+  showIndividuals: 1
+  noResistorLimit: 0
+  maxNumResistors: 4
+  useLCM: 0
 --- !u!1001 &418877048
 Prefab:
   m_ObjectHideFlags: 0
@@ -6066,8 +6095,8 @@ RectTransform:
   m_RootOrder: 4
   m_AnchorMin: {x: .362355411, y: .214000016}
   m_AnchorMax: {x: .666742206, y: .313000023}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -2}
+  m_AnchoredPosition: {x: 2.79999995, y: 0}
+  m_SizeDelta: {x: 115.699997, y: -2}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &575542286
 MonoBehaviour:
@@ -6147,7 +6176,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 4 Resistors (hard)
+  m_Text: 4 Resistors (hard) - 16 goals
 --- !u!222 &575542288
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6186,8 +6215,8 @@ RectTransform:
   m_RootOrder: 2
   m_AnchorMin: {x: .362355411, y: .45159477}
   m_AnchorMax: {x: .666742206, y: .554810584}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -4}
+  m_AnchoredPosition: {x: 2.79999995, y: 0}
+  m_SizeDelta: {x: 115.699997, y: -4}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &588682332
 MonoBehaviour:
@@ -6267,7 +6296,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 2 Resistors (easy)
+  m_Text: 2 Resistors (easy) - 3 goals
 --- !u!222 &588682334
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -14102,6 +14131,10 @@ Prefab:
       propertyPath: m_RootOrder
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 88b7108798d1944dd8f9cb7b7ab3dba7, type: 2}
+      propertyPath: overrideCanCreate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 88b7108798d1944dd8f9cb7b7ab3dba7, type: 2}
   m_RootGameObject: {fileID: 1813380713}
@@ -15508,8 +15541,8 @@ RectTransform:
   m_RootOrder: 1
   m_AnchorMin: {x: .362355411, y: .565797389}
   m_AnchorMax: {x: .666742206, y: .659000039}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 2.79999995, y: 0}
+  m_SizeDelta: {x: 115.699997, y: 1}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &1473347376
 MonoBehaviour:
@@ -16510,7 +16543,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   filename: LevelPerms
-  currentLCM: 1
 --- !u!4 &1612783815
 Transform:
   m_ObjectHideFlags: 0
@@ -18964,6 +18996,7 @@ MonoBehaviour:
   cursorGreenCubePrefab: {fileID: 100000, guid: 6bb4520b1a7574b9c80bc6414ae9d96f,
     type: 2}
   lighteningPrefab: {fileID: 100000, guid: ad922b5ed1a1644d68f7428a6f6d567b, type: 2}
+  canCreate: 1
 --- !u!4 &1813380715
 Transform:
   m_ObjectHideFlags: 0
@@ -20754,6 +20787,14 @@ Prefab:
       propertyPath: gameOverText
       value: 
       objectReference: {fileID: 167857136}
+    - target: {fileID: 100000, guid: ebfa340a197c241b99aaa75718a4265a, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: ebfa340a197c241b99aaa75718a4265a, type: 2}
+      propertyPath: showTotalOnly
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ebfa340a197c241b99aaa75718a4265a, type: 2}
   m_RootGameObject: {fileID: 757966882}
@@ -20897,8 +20938,8 @@ RectTransform:
   m_RootOrder: 5
   m_AnchorMin: {x: .362355411, y: .0930000022}
   m_AnchorMax: {x: .666742206, y: .194202647}
-  m_AnchoredPosition: {x: 0, y: .5}
-  m_SizeDelta: {x: 0, y: -3}
+  m_AnchoredPosition: {x: 2.79999995, y: .5}
+  m_SizeDelta: {x: 115.699997, y: -3}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &2011887735
 MonoBehaviour:
@@ -20978,7 +21019,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 5 Resistors (very hard)
+  m_Text: 5 Resistors (very hard) - 39 goals
 --- !u!222 &2011887737
 CanvasRenderer:
   m_ObjectHideFlags: 0

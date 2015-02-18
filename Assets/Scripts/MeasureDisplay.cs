@@ -27,7 +27,7 @@ public class MeasureDisplay : MonoBehaviour {
 		
 		if (shouldDisplay == isDisplay && frameDelay < 0){
 			if (shouldDisplay){
-				GetComponent<FractionCalc>().value = AVOWSim.singleton.xMax;// * AVOWCircuitCreator.singleton.currentLCM;;
+				GetComponent<FractionCalc>().value = AVOWSim.singleton.xMax * AVOWCircuitCreator.singleton.GetLCM();// * AVOWCircuitCreator.singleton.currentLCM;;
 				GetComponent<FractionCalc>().color = okCol;
 				
 			}
@@ -37,6 +37,13 @@ public class MeasureDisplay : MonoBehaviour {
 			
 		}
 		
+		if (!AVOWConfig.singleton.showTotals){
+			GetComponent<FractionCalc>().color = new Color(0, 0, 0, 0);
+			transform.parent.FindChild("Display").gameObject.SetActive(false);
+		}		
+		else{
+			transform.parent.FindChild("Display").gameObject.SetActive(true);
+		}
 	
 	}
 }

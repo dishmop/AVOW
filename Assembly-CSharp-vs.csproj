@@ -54,6 +54,7 @@
      <Compile Include="Assets\Scripts\AVOWCommandRemove.cs" />
      <Compile Include="Assets\Scripts\AVOWCommandSplitAddComponent.cs" />
      <Compile Include="Assets\Scripts\AVOWComponent.cs" />
+     <Compile Include="Assets\Scripts\AVOWConfig.cs" />
      <Compile Include="Assets\Scripts\AVOWGameModes.cs" />
      <Compile Include="Assets\Scripts\AVOWGraph.cs" />
      <Compile Include="Assets\Scripts\AVOWGreenBackground.cs" />
@@ -66,6 +67,7 @@
      <Compile Include="Assets\Scripts\AVOWUIButton.cs" />
      <Compile Include="Assets\Scripts\AVOWUICreateTool.cs" />
      <Compile Include="Assets\Scripts\AVOWUIDeleteTool.cs" />
+     <Compile Include="Assets\Scripts\AVOWUIDisabledTool.cs" />
      <Compile Include="Assets\Scripts\AVOWUITool.cs" />
      <Compile Include="Assets\Scripts\AmmeterEffect.cs" />
      <Compile Include="Assets\Scripts\AppHelper.cs" />

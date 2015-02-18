@@ -15,6 +15,9 @@ public class AVOWUI : MonoBehaviour {
 	public GameObject cursorGreenCubePrefab;
 	public GameObject lighteningPrefab;
 	
+	public bool canCreate = true;
+	bool lastCanCreate = true;
+	
 	AVOWGraph graph = null;
 	
 	
@@ -48,6 +51,21 @@ public class AVOWUI : MonoBehaviour {
 	
 
 	void Update(){
+		if (mode == ToolMode.kCreate && lastCanCreate != canCreate && !AVOWGraph.singleton.HasHalfFinishedComponents()){
+			lastCanCreate = canCreate;
+			if (canCreate == false){
+				SetDisableTool();
+			}
+			else{
+				if (mode == ToolMode.kCreate){
+					SetCreateTool();
+				}
+				else{
+					SetDeleteTool();	
+				}
+			}
+		
+		}
 		if (AVOWCircuitCreator.singleton.IsFinished()){
 			if (graph == null){
 				Startup();
@@ -132,6 +150,12 @@ public class AVOWUI : MonoBehaviour {
 		uiTool = new AVOWUIDeleteTool();
 		uiTool.Start();
 		mode = ToolMode.kDelete;
+	}
+	
+	public void SetDisableTool(){
+		uiTool.OnDestroy();
+		uiTool = new AVOWUIDisabledTool();
+		uiTool.Start();
 	}
 	
 }

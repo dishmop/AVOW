@@ -10,21 +10,22 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	
 	public string 		filename = "LevelPerms";
 	
-	public int currentLCM = 1;
 	
 	public enum State{
 		kStart,
 		kProcessing,
 		kFinished
 	}
-	public 	List< Eppy.Tuple<float, List<float>> > results = new List< Eppy.Tuple<float, List<float>> > ();
 	
+	List< Eppy.Tuple<float, List<float>> > fracResults = new List< Eppy.Tuple<float, List<float>> > ();
+	List< Eppy.Tuple<float, List<float>> > lCMResults;
+	
+	int currentLCM = 1;
 	int count = 0;
 	
 	 State state = State.kStart;
 	IEnumerator<Eppy.Tuple<float, List<float>>> it = null;
 	
-	int maxNumResistors = 5;
 	int numUsed = 0;
 	AVOWGraph graph;
 	
@@ -34,14 +35,21 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	
 	Stack<AVOWCommand>	commands = new Stack<AVOWCommand>();
 	
-	
+	public int GetLCM(){
+		return AVOWConfig.singleton.useLCM ? currentLCM : 1;
+	}
 	
 	public bool IsFinished(){
 		return state == State.kFinished;
 	}
 	
 	public string CreateFilename(){
-		return filename + "_" + maxNumResistors.ToString();
+		return filename + "_" + AVOWConfig.singleton.maxNumResistors.ToString();
+	}
+	
+	public List< Eppy.Tuple<float, List<float>> > GetResults(){
+		return AVOWConfig.singleton.useLCM ? lCMResults : fracResults;
+	
 	}
 	
 	
@@ -60,12 +68,12 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	
 		BinaryWriter bw = new BinaryWriter(stream);
 		
-		bw.Write (results.Count);
-		for (int i = 0; i < results.Count; ++i){
-			bw.Write (results[i].Item1);
-			bw.Write (results[i].Item2.Count);
-			for (int j = 0; j < results[i].Item2.Count; ++j){
-				bw.Write (results[i].Item2[j]);
+		bw.Write (fracResults.Count);
+		for (int i = 0; i < fracResults.Count; ++i){
+			bw.Write (fracResults[i].Item1);
+			bw.Write (fracResults[i].Item2.Count);
+			for (int j = 0; j < fracResults[i].Item2.Count; ++j){
+				bw.Write (fracResults[i].Item2[j]);
 			}
 		}
 		
@@ -75,7 +83,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		BinaryReader br = new BinaryReader(stream);
 		
 		int resultsCount = br.ReadInt32();
-		results = new List< Eppy.Tuple<float, List<float>> > ();
+		fracResults = new List< Eppy.Tuple<float, List<float>> > ();
 		for (int i = 0; i < resultsCount; ++i){
 			float val = br.ReadSingle();
 			Eppy.Tuple<float, List<float>> item = new Eppy.Tuple<float, List<float>>(val, new List<float>());
@@ -84,7 +92,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 				float newVal = br.ReadSingle();
 				item.Item2.Add (newVal);
 			}
-			results.Add (item);
+			fracResults.Add (item);
 		}
 		
 		
@@ -149,7 +157,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 			}
 			case State.kProcessing:{
 				if (it.MoveNext()){
-					results.Add (it.Current);
+					fracResults.Add (it.Current);
 					}
 				else{
 					FinaliseResults();
@@ -167,7 +175,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	public void Generate(){
 	
 		foreach (Eppy.Tuple<float, List<float>> item in GenerateIterate()){
-			results.Add(item);
+			fracResults.Add(item);
 			PrintResult(item);
 		}
 		FinaliseResults();
@@ -175,7 +183,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	}
 	
 	void FinaliseResults(){
-		results.Sort ((obj1, obj2) => Compare(obj1, obj2));
+		fracResults.Sort ((obj1, obj2) => Compare(obj1, obj2));
 		
 		// Remove duplicates
 		List<Eppy.Tuple<float, List<float>>> newList = new  List<Eppy.Tuple<float, List<float>>>();
@@ -183,8 +191,8 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		// For some reason we can't test if these tuples are null
 		Eppy.Tuple<float, List<float>> lastObj = new Eppy.Tuple<float, List<float>>(-1, null);
 
-				for (int i = 0; i < results.Count; ++i){
-			Eppy.Tuple<float, List<float>> obj = results[i];
+				for (int i = 0; i < fracResults.Count; ++i){
+			Eppy.Tuple<float, List<float>> obj = fracResults[i];
 			if (!IsSame(lastObj, obj)){
 				newList.Add (obj);
 				lastObj = obj;
@@ -193,7 +201,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		
 
 		// Finally make the results point to the new list
-		results = newList;
+		fracResults = newList;
 		
 		
 	}
@@ -208,11 +216,9 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	}
 	
 	void PostProcess(){
-		// don;t do this
-		return;
 		// find lowest common multiplier
-		currentLCM = CalcDenominator(results[0].Item1);
-		foreach (Eppy.Tuple<float, List<float>> obj in results){
+		currentLCM = CalcDenominator(fracResults[0].Item1);
+		foreach (Eppy.Tuple<float, List<float>> obj in fracResults){
 			currentLCM = MathUtils.FP.lcm(CalcDenominator(obj.Item1), currentLCM);
 			foreach (float val in obj.Item2){
 				currentLCM = MathUtils.FP.lcm(CalcDenominator(val), currentLCM);
@@ -220,19 +226,16 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		}
 		Debug.Log ("Lowest Common Multiplier = " + currentLCM);
 		
-		List<Eppy.Tuple<float, List<float>>> newList = new List<Eppy.Tuple<float, List<float>>>();
+		lCMResults = new List<Eppy.Tuple<float, List<float>>>();
 		
 		// Scale the results by this so everything is an integer
-		foreach (Eppy.Tuple<float, List<float>> obj in results){
+		foreach (Eppy.Tuple<float, List<float>> obj in fracResults){
 			Eppy.Tuple<float, List<float>> newItem = new Eppy.Tuple<float, List<float>>(obj.Item1 * currentLCM, new List<float>());
 			foreach (float val in obj.Item2){
 				newItem.Item2.Add(val * currentLCM);
 			}
-			newList.Add (newItem);
+			lCMResults.Add (newItem);
 		}
-		
-		results = newList;
-		
 	}
 	
 	int Compare(Eppy.Tuple<float, List<float>> obj1, Eppy.Tuple<float, List<float>> obj2){
@@ -269,7 +272,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	
 	public IEnumerable<Eppy.Tuple<float, List<float>>> GenerateIterate(){
 	
-		for (int i = 0; i < maxNumResistors; ++i){
+		for (int i = 0; i < AVOWConfig.singleton.maxNumResistors; ++i){
 			foreach (var x in GenerateIterate (i+1)){
 				yield return x;
 			}
@@ -290,14 +293,14 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	}
 	
 	void PrintResults(){
-		for (int i = 0; i < results.Count; ++i){
-			PrintResult (results[i]);
+		for (int i = 0; i < fracResults.Count; ++i){
+			PrintResult (fracResults[i]);
 		}
 	}
 	
 	void PrintFracResults(){
-		for (int i = 0; i < results.Count; ++i){
-			PrintFracResult (results[i]);
+		for (int i = 0; i < fracResults.Count; ++i){
+			PrintFracResult (fracResults[i]);
 		}
 	}
 	

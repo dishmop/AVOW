@@ -94,8 +94,8 @@ public class AVOWComponent : MonoBehaviour {
 	void Start(){
 		if (type == Type.kLoad){
 		//	transform.FindChild("Resistance").gameObject.renderer.materials[0].color =  new Color(Random.Range(0f, 1f), Random.Range(0f, 1f),Random.Range(0f, 1f));
+			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = "";
 		}
-		transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = "";
 	}
 	
 	public float GetResistance(){
@@ -321,7 +321,7 @@ public class AVOWComponent : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		
+	
 		resistanceAngle.Update();
 		CheckForKillResistance();
 		
@@ -395,13 +395,20 @@ public class AVOWComponent : MonoBehaviour {
 		//transform.FindChild("Resistance").FindChild ("AVOWTextBox").gameObject.SetActive(false);
 		//transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = GetID() + " - " + hOrder.ToString();
 		if (!AVOWGraph.singleton.HasHalfFinishedComponents()){
-			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = CreateFracString(hWidth);
+			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = CreateFracString(hWidth * AVOWCircuitCreator.singleton.GetLCM());
 			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().color = new Color(0, 1, 0);
 		}
 		else{
 			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().color = new Color(0.75f, 0.125f, 0f);
 			
 		}
+		
+		// If we are not displaying individual currents then remove the display
+		if (type == Type.kLoad){
+			transform.FindChild("Resistance").FindChild ("AVOWTextBox").gameObject.SetActive(AVOWConfig.singleton.showIndividuals);
+			transform.FindChild("Resistance").FindChild ("Display").gameObject.SetActive(AVOWConfig.singleton.showIndividuals);
+		}
+		
 		
 		
 		// Otherwise, it doesn't work when they move
