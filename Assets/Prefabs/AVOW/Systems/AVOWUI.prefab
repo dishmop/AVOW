@@ -44,7 +44,9 @@ MonoBehaviour:
   cursorBlueCubePrefab: {fileID: 100000, guid: 88c1abdfbc47544a981d1aaa7566a21f, type: 2}
   cursorGreenCubePrefab: {fileID: 100000, guid: 6bb4520b1a7574b9c80bc6414ae9d96f,
     type: 2}
+  cursorGreyCubePrefab: {fileID: 100000, guid: 8a63c5f9bfac347899c6ae49b2df7c1a, type: 2}
   lighteningPrefab: {fileID: 100000, guid: ad922b5ed1a1644d68f7428a6f6d567b, type: 2}
+  canCreate: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

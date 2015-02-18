@@ -90,6 +90,9 @@ public class AVOWComponent : MonoBehaviour {
 		return null;
 	}
 	
+	public bool IsDying(){
+		return removeOnTarget;
+	}
 	
 	void Start(){
 		if (type == Type.kLoad){

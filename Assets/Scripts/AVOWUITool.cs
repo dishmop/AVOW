@@ -11,6 +11,12 @@ public class AVOWUITool{
 	
 	
 	
+	// Return tru if you don;t want this tool to be snatched away
+	// becuase it is in the middle of doing something
+	public virtual bool IsBeingUsed(){
+		return false;
+	}
+	
 	protected class OrderBlock{
 		
 		public float minOrder = 99;

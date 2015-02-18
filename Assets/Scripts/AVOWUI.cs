@@ -13,6 +13,7 @@ public class AVOWUI : MonoBehaviour {
 	
 	public GameObject cursorBlueCubePrefab;
 	public GameObject cursorGreenCubePrefab;
+	public GameObject cursorGreyCubePrefab;
 	public GameObject lighteningPrefab;
 	
 	public bool canCreate = true;
@@ -51,7 +52,7 @@ public class AVOWUI : MonoBehaviour {
 	
 
 	void Update(){
-		if (mode == ToolMode.kCreate && lastCanCreate != canCreate && !AVOWGraph.singleton.HasHalfFinishedComponents()){
+		if (mode == ToolMode.kCreate && lastCanCreate != canCreate && !uiTool.IsBeingUsed()){
 			lastCanCreate = canCreate;
 			if (canCreate == false){
 				SetDisableTool();
@@ -82,6 +83,12 @@ public class AVOWUI : MonoBehaviour {
 	
 	public GameObject InstantiateGreenCursorCube(){
 		GameObject obj = GameObject.Instantiate(cursorGreenCubePrefab) as GameObject;
+		obj.transform.parent = transform;
+		return obj;
+	}
+	
+	public GameObject InstantiateGreyCursorCube(){
+		GameObject obj = GameObject.Instantiate(cursorGreyCubePrefab) as GameObject;
 		obj.transform.parent = transform;
 		return obj;
 	}

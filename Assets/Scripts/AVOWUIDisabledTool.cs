@@ -39,7 +39,7 @@ public class AVOWUIDisabledTool :  AVOWUITool{
 	}
 	
 	protected override GameObject InstantiateCursorCube(){
-		return AVOWUI.singleton.InstantiateGreenCursorCube();
+		return AVOWUI.singleton.InstantiateGreyCursorCube();
 	}
 	
 	

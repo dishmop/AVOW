@@ -76,6 +76,10 @@ public class AVOWUICreateTool :  AVOWUITool{
 		GameObject.Destroy(insideCube);
 	}
 	
+	public override bool IsBeingUsed(){
+		return heldConnection;
+	}
+	
 	void StateUpdate(){
 		// Calc the mouse posiiton on world spave
 		Vector3 mousePos = Input.mousePosition;

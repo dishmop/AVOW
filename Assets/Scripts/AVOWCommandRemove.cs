@@ -97,11 +97,13 @@ public class AVOWCommandRemove : AVOWCommand{
 		// test if there are any other components beteween these two nodes
 		int countOut = 0;
 		foreach (GameObject go in outNode.outComponents){
-			countOut++;
+			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
+			if (!thisComponent.IsDying()) countOut++;
 		}
 		int countIn = 0;
 		foreach (GameObject go in inNode.inComponents){
-			countIn++;
+			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
+			if (!thisComponent.IsDying()) countIn++;
 		}
 		// if there is more than just this node beteeen them
 		if ((countOut > 1 && countIn > 1) || AVOWGraph.singleton.allComponents.Count == 2){
