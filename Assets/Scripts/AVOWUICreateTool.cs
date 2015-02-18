@@ -96,7 +96,6 @@ public class AVOWUICreateTool :  AVOWUITool{
 		cursorCube.transform.position = mouseWorldPos;
 		
 		
-		
 		//	Debug.Log("Mouse world pos = " + mouseWorldPos.ToString());
 		
 		
@@ -109,8 +108,12 @@ public class AVOWUICreateTool :  AVOWUITool{
 			FindClosestNode(mouseWorldPos, null, minDist, connection0, ref closestObj, ref closestPos);
 			connection0 = closestObj;
 			connection0Pos = closestPos;
+			
+
 			connection1 = null;
 			connection1Pos = Vector3.zero;
+			
+			
 			
 			if (buttonPressed && connection0 != null){
 				heldConnection = true;
@@ -149,10 +152,17 @@ public class AVOWUICreateTool :  AVOWUITool{
 					insideState = InsideGapState.kOnNewComponent;
 				}
 			}
-			
+
 			
 		}
+		// Extend the light bar on this node to touch the conneciton point
+		if (connection0 != null){
+			connection0.GetComponent<AVOWNode>().addConnPos = connection0Pos.x;
+		}
 		
+		if (connection1 != null && connection1.GetComponent<AVOWNode>() != null){
+			connection1.GetComponent<AVOWNode>().addConnPos = connection1Pos.x;
+		}		
 		// If we have a gap which we are holding open, check if our mous is inside the gap
 		isInside = false;
 		AVOWComponent component = GetHeldCommandComponent();
@@ -317,6 +327,16 @@ public class AVOWUICreateTool :  AVOWUITool{
 		else{
 			lightening1GO.SetActive(false);
 		}	
+		AVOWGraph.singleton.ClearAdditionalConnectionPoints();
+		
+		// Extend the light bar on this node to touch the conneciton point
+		if (connection0 != null){
+			connection0.GetComponent<AVOWNode>().addConnPos = connection0PosUse.x;
+		}
+		
+		if (connection1 != null && connection1.GetComponent<AVOWNode>() != null){
+			connection1.GetComponent<AVOWNode>().addConnPos = connection1PosUse.x;
+		}
 		
 		// If we are connected to something then rotate the cube a bit
 		if (connection0 != null){

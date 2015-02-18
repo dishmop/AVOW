@@ -13,7 +13,7 @@ public class AVOWObjectives : MonoBehaviour {
 	public Color			colNotYetDoneAndActive;
 	public Color			colDone;
 	public Color			colDoneAndForgotten;
-	public GameObject		gameOverText;
+	public float			xMax = 0;
 	
 	SpringValue				yOffset = new SpringValue(0, SpringValue.Mode.kAsymptotic);
 	
@@ -24,11 +24,20 @@ public class AVOWObjectives : MonoBehaviour {
 	bool 					lastUseLCM;
 	bool					lastShowTotals;
 	bool					lastShowIndividuals;
+	bool 					lastHideObjectives;
 	bool					firstTime = true;
 	
 	// Use this for initialization
 	void Start () {
 		basePos = transform.position;
+	
+	}
+	
+	public void Restart(){
+		firstTime = true;
+		currentObjective = 0;
+		yOffset.Force(0);
+		CreateTextBoxes();
 	
 	}
 	
@@ -38,9 +47,11 @@ public class AVOWObjectives : MonoBehaviour {
 		if (lastUseLCM != AVOWConfig.singleton.useLCM) ret = true;
 		if (lastShowTotals != AVOWConfig.singleton.showTotals) ret = true;
 		if (lastShowIndividuals != AVOWConfig.singleton.showIndividuals) ret = true;
+		if (lastHideObjectives != AVOWConfig.singleton.hideObjectives) ret = true;
 		lastUseLCM = AVOWConfig.singleton.useLCM;
 		lastShowTotals = AVOWConfig.singleton.showTotals;
 		lastShowIndividuals = AVOWConfig.singleton.showIndividuals;
+		lastHideObjectives = AVOWConfig.singleton.hideObjectives;
 		firstTime = false;
 		return ret;
 		
@@ -59,7 +70,21 @@ public class AVOWObjectives : MonoBehaviour {
 				Vector3 pos = transform.position;
 				transform.position = new Vector3(pos.x, basePos.y+yOffset.GetValue(), pos.z);
 			}
+			CalcBounds();
 		}
+	
+	}
+	
+	void CalcBounds(){
+		if (AVOWConfig.singleton.hideObjectives){
+			xMax = transform.position.x;
+		}
+		else if (AVOWConfig.singleton.showIndividuals)
+			xMax = transform.position.x + xSpacing * ( AVOWConfig.singleton.maxNumResistors);
+		else if (!AVOWConfig.singleton.showIndividuals && AVOWConfig.singleton.showTotals)
+			xMax = transform.position.x + xSpacing * ( 1);
+		else 
+			xMax = transform.position.x;
 	
 	}
 	
@@ -123,7 +148,7 @@ public class AVOWObjectives : MonoBehaviour {
 			GameObject newBox = GameObject.Instantiate(textBoxPrefab, transform.position + new Vector3(0, -ySpacing * i, 0), Quaternion.identity) as GameObject;
 			
 			newBox.transform.parent = transform;
-			newBox.GetComponent<TextMesh>().text = CreateFracString(results[i].Item1);
+			newBox.GetComponent<TextMesh>().text = "(" + CreateFracString(results[i].Item1) + ")";
 			newBox.GetComponent<TextMesh>().color = thisCol;
 			textBoxes[i].Add(newBox);
 						
@@ -160,9 +185,9 @@ public class AVOWObjectives : MonoBehaviour {
 			// Set which ones are visible
 			for (int i = 0; i < textBoxes.Length; ++i){
 				if (textBoxes[i] == null) break;
-				textBoxes[i][0].SetActive(AVOWConfig.singleton.showTotals);
+				textBoxes[i][0].SetActive(AVOWConfig.singleton.showTotals && !AVOWConfig.singleton.hideObjectives);
 				for (int j = 1; j < textBoxes[i].Count; ++j){
-					textBoxes[i][j].SetActive(AVOWConfig.singleton.showIndividuals);
+					textBoxes[i][j].SetActive(AVOWConfig.singleton.showIndividuals && !AVOWConfig.singleton.hideObjectives);
 				}
 			}
 			
@@ -194,13 +219,13 @@ public class AVOWObjectives : MonoBehaviour {
 		}
 
 		if (IsComplete){
+			firstTime = true;
 			if (currentObjective < AVOWCircuitCreator.singleton.GetResults().Count-1){
 				currentObjective++;
 				yOffset.Set(yOffset.GetDesValue() + ySpacing);
-				CreateTextBoxes();
 			}
 			else{
-				gameOverText.SetActive(true);
+				AVOWGameModes.singleton.SetStageComplete();
 			}
 		}
 	}

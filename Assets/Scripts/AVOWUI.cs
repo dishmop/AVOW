@@ -51,6 +51,13 @@ public class AVOWUI : MonoBehaviour {
 	}	
 	
 
+	public void Restart(){
+		uiTool.OnDestroy();
+		graph = null;
+		Update ();
+		
+	}
+	
 	void Update(){
 		if (mode == ToolMode.kCreate && lastCanCreate != canCreate && !uiTool.IsBeingUsed()){
 			lastCanCreate = canCreate;
@@ -71,7 +78,7 @@ public class AVOWUI : MonoBehaviour {
 			if (graph == null){
 				Startup();
 			}
-			uiTool.Update();
+			if (AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kPlayStage) uiTool.Update();
 		}
 	}
 	

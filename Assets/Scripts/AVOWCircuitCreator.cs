@@ -23,7 +23,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	int currentLCM = 1;
 	int count = 0;
 	
-	 State state = State.kStart;
+	State state = State.kStart;
 	IEnumerator<Eppy.Tuple<float, List<float>>> it = null;
 	
 	int numUsed = 0;
@@ -50,6 +50,11 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	public List< Eppy.Tuple<float, List<float>> > GetResults(){
 		return AVOWConfig.singleton.useLCM ? lCMResults : fracResults;
 	
+	}
+	
+	public void Restart(){
+		state = State.kStart;
+		Update ();
 	}
 	
 	

@@ -1,24 +1,32 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWObjectives.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWUI.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWConfig.cs" Line="12" Column="29" />
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="398" Column="151" />
-      <File FileName="Assets/Scripts/AVOWGrid.cs" Line="71" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="44" Column="2" />
+      <File FileName="Assets/Scripts/AVOWConfig.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="93" Column="21" />
+      <File FileName="Assets/Scripts/AVOWGrid.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWObjectives.cs" Line="44" Column="21" />
-      <File FileName="Assets/Scripts/MeasureDisplay.cs" Line="30" Column="104" />
-      <File FileName="Assets/Scripts/AVOWUIButton.cs" Line="15" Column="18" />
-      <File FileName="Assets/Scripts/AVOWUI.cs" Line="61" Column="22" />
-      <File FileName="Assets/Scripts/AVOWCircuitCreator.cs" Line="13" Column="2" />
-      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="99" Column="1" />
+      <File FileName="Assets/Scripts/MeasureDisplay.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUIButton.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCircuitCreator.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUIDeleteTool.cs" Line="171" Column="34" />
+      <File FileName="Assets/Scripts/AVOWCommandRemove.cs" Line="106" Column="44" />
+      <File FileName="Assets/Scripts/AVOWCommandAddComponent.cs" Line="1" Column="1" />
+      <File FileName="Assets/Shaders/AVOWCursorCubeGrey.shader" Line="62" Column="43" />
+      <File FileName="Assets/Scripts/AVOWUICreateTool.cs" Line="80" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUIDisabledTool.cs" Line="36" Column="28" />
+      <File FileName="Assets/Scripts/AVOWUITool.cs" Line="17" Column="3" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Assembly-CSharp" expanded="True">
             <Node name="Scripts" expanded="True">
-              <Node name="AVOWObjectives.cs" selected="True" />
+              <Node name="AVOWUI.cs" selected="True" />
             </Node>
+            <Node name="Shaders" expanded="True" />
           </Node>
         </State>
       </Pad>
@@ -27,12 +35,15 @@
           <Value>results</Value>
           <Value>textBoxes</Value>
           <Value>i</Value>
+          <Value>heldConnection</Value>
         </State>
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWUITool.cs" line="17" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

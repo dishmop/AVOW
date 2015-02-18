@@ -66,6 +66,17 @@ public class AVOWGraph : MonoBehaviour {
 		
 	}
 	
+	public void ClearCircuit(){
+		foreach (GameObject go in allComponents){
+			GameObject.Destroy(go);
+		}
+		foreach (GameObject go in allNodes){
+			GameObject.Destroy(go);
+		}
+		allComponents.Clear ();
+		allNodes.Clear();
+	}
+	
 	public void ForceComponentsToSize(){
 		List<GameObject> listCopy = allComponents.GetRange(0, allComponents.Count);
 		foreach (GameObject go in listCopy){
@@ -171,6 +182,14 @@ public class AVOWGraph : MonoBehaviour {
 		
 	}
 	
+	
+	// Clear any additional conneciton points on the ndoes due to cursors attaching to them
+	public void ClearAdditionalConnectionPoints(){
+		foreach (GameObject go in allNodes){
+			AVOWNode node = go.GetComponent<AVOWNode>();
+			node.addConnPos = -1;
+		}
+	}
 	
 	
 	

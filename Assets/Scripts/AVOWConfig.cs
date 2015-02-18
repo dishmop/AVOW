@@ -7,9 +7,11 @@ public class AVOWConfig : MonoBehaviour {
 
 	public bool showTotals = true;
 	public bool showIndividuals = true;
+	public bool hideObjectives = false;
 	public bool noResistorLimit = false;
 	public int maxNumResistors = 3;
 	public bool useLCM = false;
+	public bool modifiedNodeLengths = false;
 	
 
 	

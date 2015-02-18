@@ -298,7 +298,9 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		
 		
 		// Lightening to connection 0 - which is always a node
+		AVOWGraph.singleton.ClearAdditionalConnectionPoints();
 		if (connectionGO != null){
+			
 			lightening0GO.SetActive(true);
 			Lightening lightening0 = lightening0GO.GetComponent<Lightening>();
 			if (!isOutside || !heldConnection){
@@ -306,13 +308,14 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 				lightening0.endPoint = connectionPos;
 			}
 			else{
+				AVOWComponent component = connectionGO.GetComponent<AVOWComponent>();
+				
 				lightening1GO.SetActive(true);
 				Lightening lightening1 = lightening1GO.GetComponent<Lightening>();
 				
 				// Need to fin the two points on the nodes to connect to
 				Vector3 node0Pos = Vector3.zero;
 				Vector3 node1Pos = Vector3.zero;
-				AVOWComponent component = connectionGO.GetComponent<AVOWComponent>();
 				
 				FindClosestPointOnNode(lighteningConductorPos, component.node0GO, ref node0Pos);
 				lightening0.startPoint = lighteningConductorPos;
@@ -326,18 +329,29 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 				lightening1.numStages = Mathf.Max ((int)(len1 * 10), 2);
 				lightening1.size =  heldConnection ? 0.4f : 0.1f;
 				lightening1.ConstructMesh();
+				
+				
+				// Extend the light bar on this node to touch the conneciton point
+				if (component.node0GO != null){
+					component.node0GO.GetComponent<AVOWNode>().addConnPos = node0Pos.x;
+				}
+				
+				if (component.node1GO != null && component.node1GO.GetComponent<AVOWNode>() != null){
+					component.node1GO.GetComponent<AVOWNode>().addConnPos = node1Pos.x;
+				}	
 			}
 			float len0 = (lightening0.startPoint  - lightening0.endPoint).magnitude;
 			lightening0.numStages = Mathf.Max ((int)(len0 * 10), 2);
 			lightening0.size =  heldConnection ? 0.4f : 0.1f;
 			lightening0.ConstructMesh();
 			if (len0 < 0.01f) lightening1GO.SetActive(false);
+	
 		}
 		else{
 			lightening0GO.SetActive(false);
 			
 		}
-		
+
 		
 		// If we are connected to something then rotate the cube a bit
 		if (connectionGO != null){

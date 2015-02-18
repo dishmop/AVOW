@@ -20,6 +20,7 @@ public class AVOWNode : MonoBehaviour {
 	public float outOrdinalledWidth;// width which has been used up by ordinalled componens
 	public GameObject splitFromNode;	// If we were splitout from another node - this points to that node
 	public bool hasBeenLayedOut;	// false at first and then true after we have been layed out at least once. 
+	public float addConnPos = -1;	// Set this so sometjhing positive if we want to pretend there is something else connected to this node (like a cursor)
 	
 	public float hWidth;
 	
@@ -77,7 +78,39 @@ public class AVOWNode : MonoBehaviour {
 				
 		transform.position = new Vector3(h0 + 0.5f * hWidth, voltage, 0);
 		transform.localScale = new Vector3( hWidth,  0.5f * hWidth,  1);
-		transform.gameObject.SetActive(isInteractive);		
+		transform.gameObject.SetActive(isInteractive);	
+		
+		// Modify the scale and position so we don't extend outside of the connections we have
+		if (AVOWConfig.singleton.modifiedNodeLengths) ApplyMOdifiedLength();
+
 	
+	}
+	
+	void ApplyMOdifiedLength(){
+		// examine list of all conneciton points along this node
+		float minPos = h0 + hWidth;
+		float maxPos = h0;
+		foreach (GameObject go in components){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			if (component.isInteractive){
+				float thisPos = component.h0 + 0.5f * component.hWidth;
+				minPos = Mathf.Min (minPos, thisPos);
+				maxPos = Mathf.Max (maxPos, thisPos);
+			}
+		}	
+		if (addConnPos >= 0){
+			minPos = Mathf.Min (minPos, addConnPos);
+			maxPos = Mathf.Max (maxPos, addConnPos);
+			
+		}
+		float nodeLength = maxPos - minPos;
+		float centrePos = 0.5f * ( minPos + maxPos);
+		
+		transform.localScale = new Vector3( nodeLength,  0.5f * hWidth,  1);
+		transform.position = new Vector3(centrePos, voltage, 0);
+		
+		// Recalc the prop value (use any of the components to get the gap value
+		Material material = transform.FindChild("LineNode").FindChild("LineNodeRender").renderer.material;
+		material.SetFloat("_GapProp", 1);
 	}
 }
