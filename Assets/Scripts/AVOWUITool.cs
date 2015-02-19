@@ -265,6 +265,12 @@ public class AVOWUITool{
 		
 		Transform cursorTransform = cursor.transform;
 		
+		// Hmm seem to get this error sometimes - try and catch it
+		if (insideCube == null){
+			Debug.LogError ("Trying to lerp to null inside cube");
+			return 0;
+		}
+		
 		//Orentation
 		Quaternion targetOrient = cursorTransform.rotation;
 		Quaternion currentOrient = insideCube.transform.rotation;

@@ -59,7 +59,7 @@ public class AVOWUI : MonoBehaviour {
 	}
 	
 	void Update(){
-		if (mode == ToolMode.kCreate && lastCanCreate != canCreate && !uiTool.IsBeingUsed()){
+		if (mode == ToolMode.kCreate && lastCanCreate != canCreate && uiTool != null && !uiTool.IsBeingUsed()){
 			lastCanCreate = canCreate;
 			if (canCreate == false){
 				SetDisableTool();

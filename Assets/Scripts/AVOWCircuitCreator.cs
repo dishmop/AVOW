@@ -356,7 +356,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 				if (MathUtils.FP.Feq (component.hWidth, 0)) continue;
 				item.Item2.Add(component.hWidth);
 			}
-			item.Item2.Sort((obj1, obj2) => obj1.CompareTo(obj2));
+			item.Item2.Sort((obj1, obj2) => obj2.CompareTo(obj1));
 			Debug.Log (count.ToString () + ".......Total current = " + AVOWSim.singleton.xMax);
 			count++;
 			yield return item;
@@ -371,9 +371,10 @@ public class AVOWCircuitCreator : MonoBehaviour {
 					foreach (GameObject go in graph.allComponents){
 						AVOWComponent component = go.GetComponent<AVOWComponent>();
 						if (component.type == AVOWComponent.Type.kVoltageSource) continue;
+						if (MathUtils.FP.Feq (component.hWidth, 0, MathUtils.FP.fracEpsilon)) continue;
 						item.Item2.Add(component.hWidth);
 					}
-					item.Item2.Sort((obj1, obj2) => obj1.CompareTo(obj2));
+					item.Item2.Sort((obj1, obj2) => obj2.CompareTo(obj1));
 					Debug.Log (count.ToString() + ".......Total current = " + AVOWSim.singleton.xMax);
 					count++;
 					if (!AVOWSim.singleton.errorInBounds){

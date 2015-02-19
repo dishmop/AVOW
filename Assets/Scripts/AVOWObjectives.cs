@@ -14,11 +14,11 @@ public class AVOWObjectives : MonoBehaviour {
 	public Color			colDone;
 	public Color			colDoneAndForgotten;
 	public float			xMax = 0;
+	public int 				currentObjective = 0;
 	
 	SpringValue				yOffset = new SpringValue(0, SpringValue.Mode.kAsymptotic);
 	
 	List<GameObject>[]		textBoxes;
-	int 					currentObjective = 0;
 	Vector3 				basePos;
 	
 	bool 					lastUseLCM;
@@ -26,6 +26,8 @@ public class AVOWObjectives : MonoBehaviour {
 	bool					lastShowIndividuals;
 	bool 					lastHideObjectives;
 	bool					firstTime = true;
+	
+	int						lastObjective = -1;
 	
 	// Use this for initialization
 	void Start () {
@@ -64,6 +66,7 @@ public class AVOWObjectives : MonoBehaviour {
 				CreateTextBoxes();
 			}
 			else{
+				ProcessChangeToObjective();
 				ProcessChangeToConfig();
 				SetColors();
 				yOffset.Update();
@@ -100,7 +103,7 @@ public class AVOWObjectives : MonoBehaviour {
 		List<float> currentVals = new List<float>();
 		foreach(GameObject go in AVOWGraph.singleton.allComponents){
 			AVOWComponent component = go.GetComponent<AVOWComponent>();
-			currentVals.Add (component.hWidth);
+			if (component.type == AVOWComponent.Type.kLoad) currentVals.Add (component.hWidth);
 		}
 		
 		for (int i = 0; i < goal.Item2.Count; ++i){
@@ -184,13 +187,29 @@ public class AVOWObjectives : MonoBehaviour {
 			
 			// Set which ones are visible
 			for (int i = 0; i < textBoxes.Length; ++i){
-				if (textBoxes[i] == null) break;
+				if (textBoxes[i] == null) continue;
 				textBoxes[i][0].SetActive(AVOWConfig.singleton.showTotals && !AVOWConfig.singleton.hideObjectives);
 				for (int j = 1; j < textBoxes[i].Count; ++j){
 					textBoxes[i][j].SetActive(AVOWConfig.singleton.showIndividuals && !AVOWConfig.singleton.hideObjectives);
 				}
 			}
 			
+		}
+	}
+	
+	void ProcessChangeToObjective(){
+		if (lastObjective != currentObjective){
+			int maxObjective = AVOWCircuitCreator.singleton.GetResults().Count-1;
+			if (currentObjective > maxObjective){
+				currentObjective = maxObjective;
+				AVOWGameModes.singleton.SetStageComplete();
+			}
+			else{
+				yOffset.Set(yOffset.GetDesValue() + ySpacing * (currentObjective - lastObjective));
+			}
+			lastObjective = currentObjective;
+			// Pretend firs ttime so we re calc everything
+			firstTime = true;
 		}
 	}
 	
@@ -219,14 +238,7 @@ public class AVOWObjectives : MonoBehaviour {
 		}
 
 		if (IsComplete){
-			firstTime = true;
-			if (currentObjective < AVOWCircuitCreator.singleton.GetResults().Count-1){
-				currentObjective++;
-				yOffset.Set(yOffset.GetDesValue() + ySpacing);
-			}
-			else{
-				AVOWGameModes.singleton.SetStageComplete();
-			}
+			currentObjective++;
 		}
 	}
 	

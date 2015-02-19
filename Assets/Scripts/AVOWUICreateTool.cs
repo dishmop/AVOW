@@ -138,6 +138,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 				connection1Pos = closestPos;	
 				if (buttonReleased){
 					heldConnection = false;
+					connection1 = null;
 				}
 			}
 			else{
@@ -277,6 +278,12 @@ public class AVOWUICreateTool :  AVOWUITool{
 				connection0.GetComponent<AVOWNode>().SetSelected(true);
 		}
 		
+		// For some reason, sometimes the inside cube doesn't exist
+		if (isInside && insideCube == null){
+			Debug.LogError("inside cube doesn't exist");
+			return;
+		}
+		
 		Vector3 lighteningConductorPos = (isInside) ? insideCube.transform.position : mouseWorldPos;
 		Vector3 connection0PosUse = (isInside) ? new Vector3(insideCube.transform.position.x, connection0Pos.y, connection0Pos.z) : connection0Pos;
 		Vector3 connection1PosUse = (isInside && connection1 != null && connection1.GetComponent<AVOWComponent>() == null) ? new Vector3(insideCube.transform.position.x, connection1Pos.y, connection1Pos.z) : connection1Pos;
@@ -406,7 +413,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 	void CommandsUpdate(){
 		// if we have a command already check if we need to undo it
 		if (heldGapCommand != null){
-			// if the connection1 has changed (which includes us no longer holding anything) then undo our current command
+			// if the connection1 has changed or we are no longer holding anything- but we were
 			if (heldGapConnection1 != connection1 || OrderHasChanged()){
 				heldGapCommand.UndoStep();
 				heldGapCommand = null;
