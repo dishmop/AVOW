@@ -60,6 +60,7 @@
      <Compile Include="Assets\Scripts\AVOWGreenBackground.cs" />
      <Compile Include="Assets\Scripts\AVOWGrid.cs" />
      <Compile Include="Assets\Scripts\AVOWNode.cs" />
+     <Compile Include="Assets\Scripts\AVOWObjectiveGrid.cs" />
      <Compile Include="Assets\Scripts\AVOWObjectives.cs" />
      <Compile Include="Assets\Scripts\AVOWPusher.cs" />
      <Compile Include="Assets\Scripts\AVOWSim.cs" />
@@ -84,6 +85,7 @@
      <Compile Include="Assets\Scripts\CircuitElementVoltmeter.cs" />
      <Compile Include="Assets\Scripts\CircuitElementWire.cs" />
      <Compile Include="Assets\Scripts\CommentLog.cs" />
+     <Compile Include="Assets\Scripts\DrawnLine.cs" />
      <Compile Include="Assets\Scripts\ElementFactory.cs" />
      <Compile Include="Assets\Scripts\ElementSelectPanel.cs" />
      <Compile Include="Assets\Scripts\EventFilterButton.cs" />
