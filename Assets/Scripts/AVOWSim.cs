@@ -1058,9 +1058,9 @@ public class AVOWSim : MonoBehaviour {
 	void CalcBounds(){
 		// Keep track of global bounds of entire diagram (as we will use this if not over ay specific component)
 		xMin = 100;
-		yMin = 100;
+		yMin = 0;
 		xMax = -1;
-		yMax = -1;
+		yMax = 1;
 		errorInBounds = false;
 		foreach(GameObject go in graph.allComponents){
 			AVOWComponent component = go.GetComponent<AVOWComponent>();

@@ -7,7 +7,7 @@ public class DrawnLine : MonoBehaviour {
 	public Color	lineColor = Color.black;
 	
 	
-	SpringValue drawLenMul = new SpringValue(0, SpringValue.Mode.kAsymptotic);
+	SpringValue drawLenMul = new SpringValue(0, SpringValue.Mode.kLinear, 3);
 	
 	
 	Vector2 lastFromPos = new Vector2(0, 0);
@@ -24,6 +24,10 @@ public class DrawnLine : MonoBehaviour {
 	void Awake () {
 	}
 	
+	public bool IsFinished(){
+		return MathUtils.FP.Feq (drawLenMul.GetValue(), 1);
+	}
+	
 	public void Draw(Vector2 fromPos, Vector2 toPos, Color col){
 		this.fromPos = fromPos;
 		this.toPos = toPos;
@@ -32,6 +36,12 @@ public class DrawnLine : MonoBehaviour {
 		drawLenMul.Force(0);
 		drawLenMul.Set(1);
 		
+	}
+	
+	public void Move(Vector2 fromPos, Vector2 toPos, Color col){
+		this.fromPos = fromPos;
+		this.toPos = toPos;
+		this.lineColor = col;
 	}
 	
 	// Update is called once per frame
@@ -62,7 +72,7 @@ public class DrawnLine : MonoBehaviour {
 		transform.localPosition = new Vector3(fromPos.x, fromPos.y, 0);
 		transform.FindChild("LocalTransform").localScale = new Vector3(1, len, 1);
 		float angle = -Mathf.Atan2(relVec.x, relVec.y);
-		transform.FindChild("LocalTransform").rotation = Quaternion.Euler(0, 0, 180 * angle / Mathf.PI);
+		transform.rotation = Quaternion.Euler(0, 0, 180 * angle / Mathf.PI);
 		
 		float yUV = len;
 		Vector2[] uvs = new Vector2[4];

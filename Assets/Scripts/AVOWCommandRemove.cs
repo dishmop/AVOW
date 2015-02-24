@@ -98,15 +98,20 @@ public class AVOWCommandRemove : AVOWCommand{
 		int countOut = 0;
 		foreach (GameObject go in outNode.outComponents){
 			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
-			if (!thisComponent.IsDying()) countOut++;
+			if (!thisComponent.IsDying() && thisComponent.type == AVOWComponent.Type.kLoad) countOut++;
 		}
 		int countIn = 0;
 		foreach (GameObject go in inNode.inComponents){
 			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
-			if (!thisComponent.IsDying()) countIn++;
+			if (!thisComponent.IsDying() && thisComponent.type == AVOWComponent.Type.kLoad) countIn++;
+		}
+		int totalCount = 0;
+		foreach (GameObject go in AVOWGraph.singleton.allComponents){
+			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
+			if (!thisComponent.IsDying()) totalCount++;
 		}
 		// if there is more than just this node beteeen them
-		if ((countOut > 1 && countIn > 1) || AVOWGraph.singleton.allComponents.Count == 2){
+		if ((countOut > 1 && countIn > 1) || totalCount == 2){
 			
 			return GapType.kOneOfMany;
 		}

@@ -78,9 +78,6 @@ SubShader {
 		float4 frag(v2f i) : COLOR
 		{
 	
-			// Work out the main noise value
-			float4 noisePos;
-
 			float2 i2uv = i.uv.xy;
 			
 
@@ -90,9 +87,7 @@ SubShader {
 			
 			// Make them all animate in the same way
 			//noisePos.y += _Time.y * _Speed;
-			noisePos.x =  i2uv.x;
-			noisePos.y =  i2uv.y;
-			noisePos.z =  19 + _Time.y * staticSpeedParam;
+			float4 noisePos =  float4(i2uv.x, i2uv.y, 19 + _Time.y * staticSpeedParam, 0);
 			
 			noisePos *= _Freq;
 			

@@ -1,21 +1,34 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/DrawnLine.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Shaders/noise-simplex_v04.shader">
     <Files>
-      <File FileName="Assets/Scripts/AVOWObjectiveGrid.cs" Line="19" Column="52" />
-      <File FileName="Assets/Scripts/DrawnLine.cs" Line="12" Column="2" />
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="395" Column="32" />
-      <File FileName="Assets/Scripts/AVOWConfig.cs" Line="15" Column="39" />
+      <File FileName="Assets/Scripts/DrawnLine.cs" Line="25" Column="3" />
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="13" Column="29" />
+      <File FileName="Assets/Scripts/SpringValue.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWObjectives.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCircuitCreator.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWGrid.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUITool.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWGameModes.cs" Line="49" Column="95" />
+      <File FileName="Assets/Scripts/AVOWSim.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWVizObjectives.cs" Line="104" Column="28" />
+      <File FileName="Assets/Scripts/AVOWObjectiveGrid.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWVizTotals.cs" Line="1" Column="1" />
+      <File FileName="Assets/Shaders/noise-simplex_v04.shader" Line="11" Column="12" />
+      <File FileName="Assets/Shaders/DC_Reflect-Glass.shader" Line="1" Column="1" />
+      <File FileName="Assets/Shaders/DC_Reflect-BumpSpec.shader" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCommandRemove.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWBattery.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Lightening.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCommandAddComponent.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUICreateTool.cs" Line="283" Column="23" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="Assembly-CSharp" expanded="True">
-            <Node name="Scripts" expanded="True">
-              <Node name="DrawnLine.cs" selected="True" />
-            </Node>
-          </Node>
-        </State>
+        <State expanded="True" selected="True" />
       </Pad>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
         <State>
@@ -24,14 +37,16 @@
           <Value>i</Value>
           <Value>heldConnection</Value>
           <Value>this</Value>
+          <Value>AVOWCircuitCreator.singleton</Value>
+          <Value>transform.childCount</Value>
         </State>
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWCamControl.cs" line="105" />
-      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWCamControl.cs" line="122" />
+      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWCamControl.cs" line="106" />
+      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWCamControl.cs" line="123" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

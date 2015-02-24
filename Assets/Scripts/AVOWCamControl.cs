@@ -68,7 +68,8 @@ public class AVOWCamControl : MonoBehaviour {
 		// If mouse is not held down
 		float prop = 0.1f;
 		if (!Input.GetMouseButton(0)){
-			Rect bounds = new Rect(AVOWSim.singleton.xMin, AVOWSim.singleton.yMin, AVOWObjectives.singleton.xMax - AVOWSim.singleton.xMin, AVOWSim.singleton.yMax - AVOWSim.singleton.yMin);
+			// the -0.5f si the battery
+			Rect bounds = new Rect(AVOWSim.singleton.xMin - 0.5f, AVOWSim.singleton.yMin,Mathf.Max (AVOWObjectiveGrid.singleton.xMax, AVOWObjectives.singleton.xMax) - AVOWSim.singleton.xMin, AVOWSim.singleton.yMax - AVOWSim.singleton.yMin);
 			
 			
 			Vector2 centre = new Vector2((bounds.xMin + bounds.xMax) * 0.5f + xOffset, (bounds.yMin + bounds.yMax) * 0.5f);

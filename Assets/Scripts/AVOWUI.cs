@@ -126,10 +126,11 @@ public class AVOWUI : MonoBehaviour {
 		
 		
 		graph.PlaceComponent(GameObject.Instantiate(cellPrefab) as GameObject, node0GO, node1GO);
+		
+		// For some reason, we can't just make a graph with nothing in it - we need to make a resisotr
+		// then remove it
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node0GO);
-		
-		
-		
+		graph.allComponents[1].GetComponent<AVOWComponent>().Kill(45);
 		
 		/*
 		GameObject node0GO = graph.AddNode ();

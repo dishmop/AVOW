@@ -29,6 +29,24 @@ public class SpringValue{
 		currentValue = val;
 	}
 	
+	public SpringValue(float val, Mode setMode, float speed ){
+		mode = setMode;
+		desValue = val;
+		currentValue = val;
+		SetSpeed (speed);
+
+	}	
+	
+	
+	public void SetSpeed(float speed){
+		if (mode == Mode.kAsymptotic){
+			asSpeed = speed;
+		}
+		else{
+			linSpeed = speed;
+		}
+	}
+	
 	public void Set(float newVal){
 		desValue = newVal;
 	}

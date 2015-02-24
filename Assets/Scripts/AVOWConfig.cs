@@ -7,14 +7,23 @@ public class AVOWConfig : MonoBehaviour {
 
 	public bool showTotals = true;
 	public bool showIndividuals = true;
-	public bool hideObjectives = false;
+	public bool showObjectives = true;
+	public bool objectivesAsText = true;
+
 	public bool noResistorLimit = false;
-	public int maxNumResistors = 3;
+	public int 	maxNumResistors = 3;
 	public bool useLCM = false;
 	public bool modifiedNodeLengths = false;
-	public bool visualiseTargets = false;
 	
-
+	
+	public bool ShowTextObjectives(){
+		return showObjectives && objectivesAsText;
+	}
+	
+	
+	public bool ShowGraphicObjectives(){
+		return showObjectives && !objectivesAsText;
+	}
 	
 	void Awake(){
 		if (singleton != null) Debug.LogError ("Error assigning singleton");

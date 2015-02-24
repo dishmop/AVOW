@@ -15,6 +15,7 @@ public class AVOWObjectives : MonoBehaviour {
 	public Color			colDoneAndForgotten;
 	public float			xMax = 0;
 	public int 				currentObjective = 0;
+	public bool				isComplete = false;
 	
 	SpringValue				yOffset = new SpringValue(0, SpringValue.Mode.kAsymptotic);
 	
@@ -24,8 +25,9 @@ public class AVOWObjectives : MonoBehaviour {
 	bool 					lastUseLCM;
 	bool					lastShowTotals;
 	bool					lastShowIndividuals;
-	bool 					lastHideObjectives;
+	bool 					lastShowObjectives;
 	bool					firstTime = true;
+	bool					lastObjectivesAsText;
 	
 	int						lastObjective = -1;
 	
@@ -38,8 +40,10 @@ public class AVOWObjectives : MonoBehaviour {
 	public void Restart(){
 		firstTime = true;
 		currentObjective = 0;
+		isComplete = false;
 		yOffset.Force(0);
-		CreateTextBoxes();
+		if (AVOWConfig.singleton.maxNumResistors > 0)
+			CreateTextBoxes();
 	
 	}
 	
@@ -49,11 +53,13 @@ public class AVOWObjectives : MonoBehaviour {
 		if (lastUseLCM != AVOWConfig.singleton.useLCM) ret = true;
 		if (lastShowTotals != AVOWConfig.singleton.showTotals) ret = true;
 		if (lastShowIndividuals != AVOWConfig.singleton.showIndividuals) ret = true;
-		if (lastHideObjectives != AVOWConfig.singleton.hideObjectives) ret = true;
+		if (lastShowObjectives != AVOWConfig.singleton.showObjectives) ret = true;
+		if (lastObjectivesAsText != AVOWConfig.singleton.objectivesAsText) ret = true;
 		lastUseLCM = AVOWConfig.singleton.useLCM;
 		lastShowTotals = AVOWConfig.singleton.showTotals;
 		lastShowIndividuals = AVOWConfig.singleton.showIndividuals;
-		lastHideObjectives = AVOWConfig.singleton.hideObjectives;
+		lastShowObjectives = AVOWConfig.singleton.showObjectives;
+		lastObjectivesAsText = AVOWConfig.singleton.objectivesAsText;
 		firstTime = false;
 		return ret;
 		
@@ -61,11 +67,16 @@ public class AVOWObjectives : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (AVOWConfig.singleton.maxNumResistors == 0){
+			ProcessChangeToConfig();
+			return;
+		}
 		if (AVOWCircuitCreator.singleton.IsFinished()){
 			if (textBoxes == null){
 				CreateTextBoxes();
 			}
 			else{
+				isComplete = TestForComplete();
 				ProcessChangeToObjective();
 				ProcessChangeToConfig();
 				SetColors();
@@ -75,11 +86,14 @@ public class AVOWObjectives : MonoBehaviour {
 			}
 			CalcBounds();
 		}
+		if (isComplete){
+			AVOWBattery.singleton.FreezeBattery();
+		}
 	
 	}
 	
 	void CalcBounds(){
-		if (AVOWConfig.singleton.hideObjectives){
+		if (!AVOWConfig.singleton.ShowTextObjectives()){
 			xMax = transform.position.x;
 		}
 		else if (AVOWConfig.singleton.showIndividuals)
@@ -89,6 +103,20 @@ public class AVOWObjectives : MonoBehaviour {
 		else 
 			xMax = transform.position.x;
 	
+	}
+	
+	public Eppy.Tuple<float, List<float>> GetCurrentGoal(){
+
+		return AVOWCircuitCreator.singleton.GetResults()[currentObjective];
+	}
+	
+	public bool IsValidGoalIndex(int index){
+		return (index >= 0 && index < AVOWCircuitCreator.singleton.GetResults().Count);
+	}
+	
+	public Eppy.Tuple<float, List<float>> GetGoal(int index){
+		
+		return AVOWCircuitCreator.singleton.GetResults()[index];
 	}
 	
 	void IsAchieving(Eppy.Tuple<float, List<float>> goal, out bool total, out bool[] individual){
@@ -188,9 +216,9 @@ public class AVOWObjectives : MonoBehaviour {
 			// Set which ones are visible
 			for (int i = 0; i < textBoxes.Length; ++i){
 				if (textBoxes[i] == null) continue;
-				textBoxes[i][0].SetActive(AVOWConfig.singleton.showTotals && !AVOWConfig.singleton.hideObjectives);
+				textBoxes[i][0].SetActive(AVOWConfig.singleton.showTotals && AVOWConfig.singleton.ShowTextObjectives());
 				for (int j = 1; j < textBoxes[i].Count; ++j){
-					textBoxes[i][j].SetActive(AVOWConfig.singleton.showIndividuals && !AVOWConfig.singleton.hideObjectives);
+					textBoxes[i][j].SetActive(AVOWConfig.singleton.showIndividuals && AVOWConfig.singleton.ShowTextObjectives());
 				}
 			}
 			
@@ -213,17 +241,35 @@ public class AVOWObjectives : MonoBehaviour {
 		}
 	}
 	
+	bool TestForComplete(){
+
+		bool total;
+		bool[] individual;
+		IsAchieving(AVOWCircuitCreator.singleton.GetResults()[currentObjective], out total, out individual);
+		
+		if (!total) return false;
+
+
+				for (int i = 1; i < textBoxes[currentObjective].Count; ++i){
+			if (!individual[i-1]){
+				return false;
+			}
+		}
+		
+		// Is complete
+		currentObjective++;
+		return true;
+	}
+	
 	void SetColors(){
 		bool total;
 		bool[] individual;
 		IsAchieving(AVOWCircuitCreator.singleton.GetResults()[currentObjective], out total, out individual);
 		
-		bool IsComplete = true;
 		if (total){
 			textBoxes[currentObjective][0].GetComponent<TextMesh>().color = colDone;
 		}
 		else{
-			IsComplete = false;
 			textBoxes[currentObjective][0].GetComponent<TextMesh>().color = colNotYetDoneAndActive;
 		
 		}
@@ -233,13 +279,9 @@ public class AVOWObjectives : MonoBehaviour {
 			}
 			else{
 				textBoxes[currentObjective][i].GetComponent<TextMesh>().color = colNotYetDoneAndActive;
-				IsComplete = false;
 			}
 		}
 
-		if (IsComplete){
-			currentObjective++;
-		}
 	}
 	
 

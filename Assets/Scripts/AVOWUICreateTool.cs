@@ -280,7 +280,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 		
 		// For some reason, sometimes the inside cube doesn't exist
 		if (isInside && insideCube == null){
-			Debug.LogError("inside cube doesn't exist");
+			Debug.Log("Error - inside cube doesn't exist");
 			return;
 		}
 		
