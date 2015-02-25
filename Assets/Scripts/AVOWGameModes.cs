@@ -43,6 +43,12 @@ public class AVOWGameModes : MonoBehaviour {
 		if (AVOWBattery.singleton.IsDepleated()){
 			AVOWBattery.singleton.FreezeBattery();
 			state = GameModeState.kGameOver;
+			foreach (GameObject go in AVOWGraph.singleton.allComponents){
+				AVOWComponent component = go.GetComponent<AVOWComponent>();
+				if (component.type == AVOWComponent.Type.kLoad){
+					component.Kill (89);
+				}
+			}
 		}
 		
 		mainMenuPanel.SetActive(state == GameModeState.kMainMenu);

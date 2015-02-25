@@ -132,7 +132,12 @@ public class AVOWUICreateTool :  AVOWUITool{
 			if (!isInside){
 				GameObject closestObj = null;
 				Vector3 closestPos = Vector3.zero;
-				float minDist = FindClosestComponent(mouseWorldPos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos);
+				
+				float minDist = maxLighteningDist;
+				// Only search for components if there is more than just a battery
+				if (AVOWGraph.singleton.allComponents.Count > 1){
+					minDist = FindClosestComponent(mouseWorldPos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos);
+				}
 				minDist = FindClosestNode(mouseWorldPos, connection0, minDist, connection1, ref closestObj, ref closestPos);			
 				connection1 = closestObj;
 				connection1Pos = closestPos;	
@@ -270,7 +275,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 	
 	
 	void VizUpdate(){
-		
+	
 		// if we are holding a node then select that node
 		AVOWGraph.singleton.UnselectAllNodes();
 		if (heldConnection){

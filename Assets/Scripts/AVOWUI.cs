@@ -52,13 +52,22 @@ public class AVOWUI : MonoBehaviour {
 	
 
 	public void Restart(){
-		uiTool.OnDestroy();
+		if (uiTool != null)
+			uiTool.OnDestroy();
 		graph = null;
 		Update ();
 		
 	}
 	
 	void Update(){
+		if (AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kGameOver){
+			if (uiTool != null){		
+				uiTool.OnDestroy();
+				uiTool = null;
+			}
+			return;
+			
+		}
 		if (mode == ToolMode.kCreate && lastCanCreate != canCreate && uiTool != null && !uiTool.IsBeingUsed()){
 			lastCanCreate = canCreate;
 			if (canCreate == false){
@@ -80,6 +89,9 @@ public class AVOWUI : MonoBehaviour {
 			}
 			if (AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kPlayStage) uiTool.Update();
 		}
+
+		
+		
 	}
 	
 	public GameObject InstantiateBlueCursorCube(){

@@ -239,6 +239,8 @@ public class AVOWUITool{
 	protected float LerpToComponent(AVOWComponent component, float lerpSpeed){
 		Transform resistanceTransform = component.gameObject.transform.FindChild("Resistance");
 		
+		if (insideCube == null) return 0;
+		
 		//Orentation
 		Quaternion targetOrient = resistanceTransform.rotation;
 		Quaternion currentOrient = insideCube.transform.rotation;
