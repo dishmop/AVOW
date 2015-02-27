@@ -17,9 +17,19 @@ public class AVOWGameModes : MonoBehaviour {
 	public int level = 0;
 	public GameObject mainMenuPanel;
 	public GameObject dlgPanel;
+	public GameObject sidePanel;
+	public GameObject backStory;
+	
+	
+	enum CameraChoice{
+		kNone,
+		kGameCam,
+		kBackStoryCam,
+	}
 
 	// Use this for initialization
 	void Start () {
+		SelectCamera(CameraChoice.kGameCam);
 
 	
 	}
@@ -58,6 +68,46 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 	
 	public void PlayFree(){
+
+		AVOWTutorialText.singleton.activated = false;
+		SelectCamera(CameraChoice.kGameCam);
+		sidePanel.SetActive(true);
+		backStory.SetActive(false);
+		
+		RestartFreePlayGame();
+	}
+	
+	public void PlayTutorial(){
+
+		
+		AVOWTutorialText.singleton.activated = true;
+		sidePanel.SetActive(false);
+		SelectCamera(CameraChoice.kBackStoryCam);
+		AVOWTutorialManager.singleton.StartTutorial();
+		backStory.SetActive(true);
+		
+		RestartFreePlayGame();
+	}
+	
+	void SelectCamera(CameraChoice cam){
+		// First set them all inactive
+		BackStoryCamera.singleton.gameObject.SetActive(false);
+		AVOWCamControl.singleton.gameObject.SetActive(false);
+		
+		BackStoryCamera.singleton.gameObject.SetActive(false);
+		switch (cam){
+		 	case CameraChoice.kGameCam:{
+				AVOWCamControl.singleton.gameObject.SetActive(true);
+				break;
+		 	}
+		 	case CameraChoice.kBackStoryCam:{
+				BackStoryCamera.singleton.gameObject.SetActive(true);
+				break;
+		 	}
+		}
+	}
+	
+	void RestartFreePlayGame(){
 		AVOWConfig.singleton.maxNumResistors = 0;
 		AVOWConfig.singleton.noResistorLimit = true;
 		AVOWConfig.singleton.showObjectives = false;
@@ -68,6 +118,8 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWVizTotals.singleton.DestroyLines();
 		AVOWBattery.singleton.ResetBattery();
 		AVOWBattery.singleton.FreezeBattery();
+
+
 		state = GameModeState.kPlayStage;
 	}
 
@@ -102,6 +154,7 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWVizObjectives.singleton.Rebuild();
 		AVOWVizTotals.singleton.BuildLines();
 		AVOWBattery.singleton.ResetBattery();
+		AVOWTutorialText.singleton.activated = false;
 		
 		
 		state = GameModeState.kPlayStage;

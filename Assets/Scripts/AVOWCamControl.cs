@@ -3,6 +3,8 @@ using System.Collections;
 
 public class AVOWCamControl : MonoBehaviour {
 
+	public static AVOWCamControl singleton = null;
+
 
 	public GameObject		sidePanel;
 	public GameObject		topPanel;
@@ -151,4 +153,16 @@ public class AVOWCamControl : MonoBehaviour {
 			
 		}
 	}
+	// Use this for initialization
+	void Awake () {
+		if (singleton != null) Debug.LogError ("Error assigning singleton");
+		singleton = this;
+		
+	}
+	
+	
+	void OnDestroy(){
+		
+		singleton = null;
+	}	
 }

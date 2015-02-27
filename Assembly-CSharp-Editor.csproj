@@ -60,7 +60,7 @@
      <None Include="Assets\Shaders\SolidColor_FG.shader" />
      <None Include="Assets\Shaders\noise-simplex.shader" />
      <None Include="Assets\Shaders\AVOWCursorCubeGreen.shader" />
-     <None Include="Assets\Fonts\scified.txt" />
+     <None Include="Assets\Scripts\Fonts\scified.txt" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
      <None Include="Assets\Shaders\AVOWLightening.shader" />
      <None Include="Assets\Tutorial_1\Black.shader" />
@@ -70,7 +70,7 @@
      <None Include="Assets\Shaders\PlasmaBalls_old.shader" />
      <None Include="Assets\Tutorial_2\1_FlatColour.shader" />
      <None Include="Assets\GearProcedural\readme.txt" />
-     <None Include="Assets\Fonts\scifi2k2.txt" />
+     <None Include="Assets\Scripts\Fonts\scifi2k2.txt" />
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Light.shader" />
      <None Include="Assets\Shaders\DC_Reflect-BumpSpec.shader" />
      <None Include="Assets\Shaders\UVAnim.shader" />

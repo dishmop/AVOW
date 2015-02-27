@@ -59,12 +59,15 @@
      <Compile Include="Assets\Scripts\AVOWGameModes.cs" />
      <Compile Include="Assets\Scripts\AVOWGraph.cs" />
      <Compile Include="Assets\Scripts\AVOWGreenBackground.cs" />
+     <Compile Include="Assets\Scripts\AVOWGreySphere.cs" />
      <Compile Include="Assets\Scripts\AVOWGrid.cs" />
      <Compile Include="Assets\Scripts\AVOWNode.cs" />
      <Compile Include="Assets\Scripts\AVOWObjectiveGrid.cs" />
      <Compile Include="Assets\Scripts\AVOWObjectives.cs" />
      <Compile Include="Assets\Scripts\AVOWPusher.cs" />
      <Compile Include="Assets\Scripts\AVOWSim.cs" />
+     <Compile Include="Assets\Scripts\AVOWTutorialManager.cs" />
+     <Compile Include="Assets\Scripts\AVOWTutorialText.cs" />
      <Compile Include="Assets\Scripts\AVOWUI.cs" />
      <Compile Include="Assets\Scripts\AVOWUIButton.cs" />
      <Compile Include="Assets\Scripts\AVOWUICreateTool.cs" />
@@ -76,6 +79,7 @@
      <Compile Include="Assets\Scripts\AmmeterEffect.cs" />
      <Compile Include="Assets\Scripts\AppHelper.cs" />
      <Compile Include="Assets\Scripts\AudioTimeScalar.cs" />
+     <Compile Include="Assets\Scripts\BackStoryCamera.cs" />
      <Compile Include="Assets\Scripts\CamControl.cs" />
      <Compile Include="Assets\Scripts\Circuit.cs" />
      <Compile Include="Assets\Scripts\CircuitElement.cs" />
@@ -158,7 +162,7 @@
      <None Include="Assets\Shaders\SolidColor_FG.shader" />
      <None Include="Assets\Shaders\noise-simplex.shader" />
      <None Include="Assets\Shaders\AVOWCursorCubeGreen.shader" />
-     <None Include="Assets\Fonts\scified.txt" />
+     <None Include="Assets\Scripts\Fonts\scified.txt" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
      <None Include="Assets\Shaders\AVOWLightening.shader" />
      <None Include="Assets\Tutorial_1\Black.shader" />
@@ -168,7 +172,7 @@
      <None Include="Assets\Shaders\PlasmaBalls_old.shader" />
      <None Include="Assets\Tutorial_2\1_FlatColour.shader" />
      <None Include="Assets\GearProcedural\readme.txt" />
-     <None Include="Assets\Fonts\scifi2k2.txt" />
+     <None Include="Assets\Scripts\Fonts\scifi2k2.txt" />
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Light.shader" />
      <None Include="Assets\Shaders\DC_Reflect-BumpSpec.shader" />
      <None Include="Assets\Shaders\UVAnim.shader" />

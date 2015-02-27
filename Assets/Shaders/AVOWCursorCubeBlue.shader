@@ -1,5 +1,6 @@
 ﻿Shader "Custom/AVOWCursorCubeBlue" {
 	Properties {
+		 _Intensity ("Intensity", Range(0, 1)) = 1
 
 	}
 	SubShader {
@@ -16,8 +17,7 @@
 		        #include "UnityCG.cginc"
 		        
 		
-		        float4 _Color0;
-		        float4 _Color1;
+		        float  _Intensity;
 		        		   
 
 		    
@@ -61,7 +61,7 @@
 		        	float4 colTop =		CalcBlueCol(top);
 		        	float4 colBottom = 	CalcBlueCol(bottom);
 		        	
-		        	return colLeft + colRight +  colTop + colBottom;
+		        	return _Intensity * (colLeft + colRight +  colTop + colBottom);
 		        	
 		        
 	//		        	return lerp(_Color0, _Color1, val);

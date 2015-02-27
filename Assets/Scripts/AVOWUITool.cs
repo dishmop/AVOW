@@ -94,6 +94,50 @@ public class AVOWUITool{
 		return closestComponent ? minDist : maxLighteningDist;
 	}
 	
+	// The current compoent is one that we should include in our search (even if it is not strictly connected to this node)
+	protected List<GameObject> FindConnectionSpheres(GameObject nodeGO, GameObject currentSelection){
+		AVOWNode node = nodeGO.GetComponent<AVOWNode>();
+		
+		// Make a copy of the list of compoents
+		// Make a copy of the list of compoents
+		List<GameObject> components = node.components.GetRange(0, node.components.Count);
+		
+		if (currentSelection != null && currentSelection.GetComponent<AVOWComponent>() != null){
+			components.Add(currentSelection);
+		}
+		
+		
+		List<GameObject> retComps = new List<GameObject>();
+		
+		
+		foreach (GameObject go in components){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			
+			
+			if (!component.isInteractive) continue;
+			
+			// Check which of the two connectors to use
+			if (node == component.node0GO.GetComponent<AVOWNode>()){
+				retComps.Add (go.transform.FindChild("ConnectionSphere0").gameObject);
+			}
+			else if (node == component.node1GO.GetComponent<AVOWNode>()){
+				retComps.Add (go.transform.FindChild("ConnectionSphere1").gameObject);
+			}
+			// If it is neither - then check if etierh of the nodes are non-interactive, if so, then it is that one
+			else if (!component.node0GO.GetComponent<AVOWNode>().isInteractive){
+				retComps.Add (go.transform.FindChild("ConnectionSphere0").gameObject);
+			}
+			else if (!component.node1GO.GetComponent<AVOWNode>().isInteractive){
+				retComps.Add (go.transform.FindChild("ConnectionSphere1").gameObject);
+			}
+			else{
+				continue;
+			}
+			
+		}	
+		return retComps;
+	}
+	
 	
 	
 	// The current compoent is one that we should include in our search (even if it is not strictly connected to this node)

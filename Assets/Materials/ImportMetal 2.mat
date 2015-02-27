@@ -66,8 +66,8 @@ Material:
       data:
         first:
           name: _SpecColor
-        second: {r: 1, g: .780730247, b: .308823526, a: 1}
+        second: {r: .566176474, g: .427503437, b: .129054919, a: 1}
       data:
         first:
           name: _ReflectColor
-        second: {r: .242647052, g: .177678674, b: .00713668484, a: 1}
+        second: {r: .875, g: .633620739, b: 0, a: 1}

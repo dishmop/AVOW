@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -225,6 +225,7 @@ public class AVOWObjectives : MonoBehaviour {
 		}
 	}
 	
+	
 	void ProcessChangeToObjective(){
 		if (lastObjective != currentObjective){
 			int maxObjective = AVOWCircuitCreator.singleton.GetResults().Count-1;
@@ -313,6 +314,7 @@ public class AVOWObjectives : MonoBehaviour {
 	}
 	
 	void OnDestroy(){
+		singleton = null;
 	}
 		
 }

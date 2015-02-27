@@ -273,6 +273,43 @@ public class AVOWUICreateTool :  AVOWUITool{
 	}
 	
 	
+	void HandleVizConnectors(){
+		if (connection0 == null || !heldConnection){
+			foreach(GameObject go in AVOWGraph.singleton.allComponents){
+				go.transform.FindChild("ConnectionSphere0").renderer.materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
+				go.transform.FindChild("ConnectionSphere1").renderer.materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
+				go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
+				go.transform.FindChild("ConnectionSphere1").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
+			}
+		}
+		else{
+			List<GameObject> spheres = FindConnectionSpheres(connection0, connection1);
+			foreach(GameObject go in AVOWGraph.singleton.allComponents){
+				GameObject sphere0 = go.transform.FindChild("ConnectionSphere0").gameObject;
+				GameObject sphere1 = go.transform.FindChild("ConnectionSphere1").gameObject;
+				if (spheres.Exists (obj => (obj == sphere0))){
+					sphere0.renderer.materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
+					go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
+				}
+				else{
+					sphere0.renderer.materials[0].SetColor("_Color0", new Color(0, 0.125f, 0));
+					go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(false);
+				}
+				if (spheres.Exists (obj => (obj == sphere1))){
+					sphere1.renderer.materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
+					go.transform.FindChild("ConnectionSphere1").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
+					
+				}
+				else{
+					sphere1.renderer.materials[0].SetColor("_Color0", new Color(0, 0.125f, 0));
+					go.transform.FindChild("ConnectionSphere1").FindChild ("Blob Shadow Projector").gameObject.SetActive(false);
+				}
+			}
+		}
+		//FindConnectionSpheres
+	}
+	
+	
 	
 	void VizUpdate(){
 	
@@ -307,10 +344,15 @@ public class AVOWUICreateTool :  AVOWUITool{
 			lightening0.numStages = Mathf.Max ((int)(len * 10), 2);
 			lightening0.size =  heldConnection ? 0.4f : 0.1f;
 			lightening0.ConstructMesh();
+			
 		}
 		else{
 			lightening0GO.SetActive(false);
 		}
+		
+		// Set the connector spheres on the resitors to be dark if we have a connection 0 and we are not
+		// something we can connect to
+		HandleVizConnectors();
 		
 		// Lightening to connection 1 - which may be a component or a node
 		// don't do this in free mode
