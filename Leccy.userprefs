@@ -8,17 +8,20 @@
       <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWTutorialText.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWGrid.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWConfig.cs" Line="21" Column="29" />
+      <File FileName="Assets/Scripts/AVOWConfig.cs" Line="1" Column="1" />
       <File FileName="Assets/Shaders/AVOWCursorCubeBlue.shader" Line="1" Column="1" />
       <File FileName="Assets/Shaders/AVOWLightening.shader" Line="1" Column="1" />
       <File FileName="Assets/Shaders/AVOWTab.shader" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWObjectives.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWComponent.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWBattery.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWGreySphere.cs" Line="275" Column="39" />
-      <File FileName="Assets/Scripts/AVOWTutorialManager.cs" Line="538" Column="1" />
+      <File FileName="Assets/Scripts/AVOWGreySphere.cs" Line="84" Column="2" />
+      <File FileName="Assets/Scripts/AVOWTutorialManager.cs" Line="91" Column="29" />
       <File FileName="Assets/Shaders/DC_Reflect-Glass.shader" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWUITool.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Lightening.cs" Line="1" Column="1" />
+      <File FileName="Assets/BabyBlueCube.cs" Line="6" Column="1" />
+      <File FileName="Assets/BabyBlueParent.cs" Line="20" Column="3" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -44,7 +47,6 @@
     <BreakpointStore>
       <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWCamControl.cs" line="108" />
       <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWCamControl.cs" line="125" />
-      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWTutorialManager.cs" line="520" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

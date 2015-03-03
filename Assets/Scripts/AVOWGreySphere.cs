@@ -9,7 +9,11 @@ public class AVOWGreySphere : MonoBehaviour {
 	public GameObject otherSphere;
 	public GameObject lightGO;
 	public GameObject massObj;
+	public float beatLerpValue = 0;
 	
+	
+	
+	GameObject babyCube = null;
 	
 	
 	
@@ -18,11 +22,9 @@ public class AVOWGreySphere : MonoBehaviour {
 	public bool enableTrigger = false;
 	public bool heartRestartTrigger =false;
 	
+
 	
-	
-	
-	
-	SpringValue beatIntensity = new SpringValue(0, SpringValue.Mode.kAsymptotic, 10f);
+	SpringValue audioBeatIntensity = new SpringValue(0, SpringValue.Mode.kAsymptotic, 10f);
 	
 	Color	baseRimColor;
 	Color 	baseReflectColor;
@@ -39,6 +41,9 @@ public class AVOWGreySphere : MonoBehaviour {
 	float maxBPM = 60;
 	float maxmaxBPM = 80;
 	bool reachedMax = false;
+	
+	bool switchToSilentBeat = false;
+	float silentBeatIntensity = 0;
 	
 	
 	
@@ -72,6 +77,13 @@ public class AVOWGreySphere : MonoBehaviour {
 		baseReflectColor = renderer.material.GetColor ("_ReflectColour");
 	}
 	
+	public void ActivateSilentBeat(){
+		switchToSilentBeat = true;
+	}
+	
+	public void SetCube(GameObject babyCube){
+		this.babyCube = babyCube;
+	}
 	
 	public void  SetRegularBeats(){
 		if (!regularBeats){
@@ -101,6 +113,12 @@ public class AVOWGreySphere : MonoBehaviour {
 		transform.position += vel * Time.fixedDeltaTime + 0.5f * accn * Time.fixedDeltaTime * Time.fixedDeltaTime;
 		vel += accn * Time.fixedDeltaTime;
 		
+		if (switchToSilentBeat){
+			beatLerpValue = Mathf.Min (beatLerpValue + 0.002f, 1);
+		}
+		CalcSilentBeatIntensity();
+		
+		
 		switch (state){
 			case State.kExpectant:{
 				// We trigger when the two are moving away from each other
@@ -118,9 +136,10 @@ public class AVOWGreySphere : MonoBehaviour {
 				if (otherSphere	!= null){
 					otherSphere.GetComponent<AVOWGreySphere>().otherSphere = gameObject;
 				}
-				break;
+			break;
 			}
 			case State.kHalt:{
+
 				vel = vel * 0.98f;
 				if (Mathf.Abs(vel.x)< 0.001f){
 					state = State.kGoTowards;
@@ -257,13 +276,21 @@ public class AVOWGreySphere : MonoBehaviour {
 					if (Time.fixedTime > beatTime){
 						beatTime = Time.fixedTime + 1.0f / (bpm / 60f);
 						triggerBeat = true;
-						if (bpm < maxBPM || (bpm < maxmaxBPM && heartRestartTrigger)){
-							bpm += 1f;
-							Debug.Log ("BPM = " + bpm.ToString());
+						if (beatLerpValue < 1){
+							if (bpm < maxBPM || (bpm < maxmaxBPM && heartRestartTrigger)){
+								bpm += 1f;
+							}
 						}
-						
-					}
+						// if the lerp value is 1 - then need to reduce our heartrate back down to normal
+						else{
+							if (bpm > 50){
+								bpm -= 2f;
+							}
+							
+						}
+						Debug.Log ("BPM = " + bpm.ToString());
 					
+					}
 				}
 				if (triggerBeat){
 					if (!IsBeating() && !otherSphere.GetComponent<AVOWGreySphere>().IsBeating()){
@@ -276,11 +303,22 @@ public class AVOWGreySphere : MonoBehaviour {
 					reachedMax = true;
 					AVOWTutorialManager.singleton.Trigger();
 				}
-		
+				
+			    
 				break;
 			}
 		}
 	}
+	
+	void CalcSilentBeatIntensity(){
+		// beatTime is the next time there will be a beat
+		// Set up sinwave at the right frequency in sinc with that
+		float bps = bpm/60;
+		silentBeatIntensity = 0.5f + 0.2f * Mathf.Cos(bps*(Time.fixedTime - beatTime) * (2*Mathf.PI) - Mathf.PI / 4);
+		
+	}
+	
+
 	
 	bool IsBeating(){
 		return GetComponent<AudioSource>().isPlaying;
@@ -288,20 +326,24 @@ public class AVOWGreySphere : MonoBehaviour {
 	
 	void Update(){
 		
-		Color rimColor = Color.Lerp(baseRimColor, beatColor, beatIntensity.GetValue());
+		float useBeatIntensity = Mathf.Lerp (audioBeatIntensity.GetValue(), silentBeatIntensity, beatLerpValue);
+		Color rimColor = Color.Lerp(baseRimColor, beatColor, useBeatIntensity);
 		renderer.material.SetColor("_RimColour", rimColor);
 		
-		Color reflectColor = Color.Lerp(baseReflectColor, beatColor, beatIntensity.GetValue());
+		Color reflectColor = Color.Lerp(baseReflectColor, beatColor, useBeatIntensity);
 		renderer.material.SetColor("_ReflectColour", reflectColor);
-		beatIntensity.Update();
+		audioBeatIntensity.Update();
 		
 		if (lightGO != null){
 		
-			Color lightColor = Color.Lerp(baselightColor, beatColor, beatIntensity.GetValue());
+			Color lightColor = Color.Lerp(baselightColor, beatColor, useBeatIntensity);
 			lightGO.GetComponent<Light>().color = lightColor;
 			lightGO.transform.position = 0.5f * (transform.position + otherSphere.transform.position);
-			lightGO.GetComponent<Light>().intensity = beatIntensity.GetValue();
+			lightGO.GetComponent<Light>().intensity = useBeatIntensity;
 		}
+		
+		GetComponent<AudioSource>().volume = 1-beatLerpValue;
+
 	
 	}
 	
@@ -313,6 +355,7 @@ public class AVOWGreySphere : MonoBehaviour {
 	
 	public void StartCourtship(){
 			state = State.kStartCourtship;
+
 	}
 	
 	void OnAudioFilterRead(float[] data, int channels){
@@ -323,7 +366,7 @@ public class AVOWGreySphere : MonoBehaviour {
 		}
 		float val = 15 * total /data.Length; 
 		if (val > 1) val = 1;
-		beatIntensity.Set (val + baseIntensity);
+		audioBeatIntensity.Set (val + baseIntensity);
 		
 	}
 }

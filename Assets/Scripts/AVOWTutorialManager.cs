@@ -10,6 +10,9 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	public GameObject backStory;
 	
+	public GameObject babyCubePrefab;
+	
+	GameObject babyCube = null;
 	
 	List<GameObject>	spheres = new List<GameObject>();
 	
@@ -25,6 +28,11 @@ public class AVOWTutorialManager : MonoBehaviour {
 	float 		worldOfSpheres2Time = 0;
 	float		worldOfSpheres2Duration = 10;
 	float 		danceTime = 0;
+	float 		zoomSpeed = 0;
+	float 		zoomDist = 0;
+	float 		zoomTargetFOV = 2f;
+	
+	float 		midAvoidProp = 0.25f;
 	
 	float inLove5Time = 0;
 	
@@ -49,6 +57,8 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kInLove5,
 		kInLove6,
 		kInLove7,
+		kInLove8,
+		kInLove9,
 		
 		kStop,
 		kNumStates
@@ -66,9 +76,9 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	public void StartTutorial(){
 		state = State.kDebugJumpToDance;
-		state = State.kIntro2;
+		//state = State.kIntro2;
 		//state = State.kTheWorldOfSpheres0;
-		//state = State.kStartup;
+		state = State.kStartup;
 		
 	}
 	public void Trigger(){
@@ -91,6 +101,15 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	}
 	
+	void CreateCube(){
+		if (babyCube != null) return;
+		
+		babyCube = GameObject.Instantiate(babyCubePrefab) as GameObject;
+		babyCube.transform.parent = transform;
+		babyCube.GetComponent<BabyBlueParent>().parent0 = parentSpheres[0];
+		babyCube.GetComponent<BabyBlueParent>().parent1 = parentSpheres[1];
+		GetComponent<AudioSource>().Play();
+	}
 	
 	void WaitForTextToFinish(State nextState){
 		AVOWTutorialText.singleton.AddTrigger();
@@ -105,6 +124,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		SteerSpheresAwayFromCentre();
 		switch(state){
 		
 			case State.kDebugJumpToDance:{
@@ -175,7 +195,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 				CreateRandomSphere();
 				AVOWTutorialText.singleton.AddPause(10);	
 				
-				AVOWTutorialText.singleton.AddText("The spheres floated in the nothingness.");
+				AVOWTutorialText.singleton.AddTextNoLine("The spheres floated in the nothingness . . .");
 				WaitForTextToFinish(State.kTheWorldOfSpheres1);
 			
 				break;
@@ -183,7 +203,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			case State.kTheWorldOfSpheres1:{
 				worldOfSpheres2Time = Time.time + worldOfSpheres2Duration;
 				AVOWTutorialText.singleton.AddPause(4);	
-				AVOWTutorialText.singleton.AddText("For eons, nothing happened");
+				AVOWTutorialText.singleton.AddText(" and for eons, nothing happened");
 			
 				state = State.kTheWorldOfSpheres2;		
 				break;
@@ -219,6 +239,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 				break;
 			}	
 			case State.kInLove2:{
+
 				CreateRandomSpheres();
 				WaitForParentToFinish(State.kInLove3);
 				parentSpheres[0].GetComponent<AVOWGreySphere>().enableTrigger = true;
@@ -241,7 +262,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 					AVOWConfig.singleton.flockAlignCoef = -1f;
 					AVOWConfig.singleton.flockSpeedMod = 0;
 					triggered = false;
-					inLove5Time = Time.fixedTime + 8;
+					inLove5Time = Time.fixedTime + 7;
 				}
 				break;
 			}
@@ -262,11 +283,11 @@ public class AVOWTutorialManager : MonoBehaviour {
 						go.GetComponent<AVOWGreySphere>().heartRestartTrigger = true;
 					}
 	
-					float linSpeed = 0.1f;
-					AVOWConfig.singleton.flockDesDistToOther = Mathf.Min (AVOWConfig.singleton.flockDesDistToOther + linSpeed * 0.5f, 25f);
+					float linSpeed = 0.2f;
+					AVOWConfig.singleton.flockDesDistToOther = Mathf.Min (AVOWConfig.singleton.flockDesDistToOther + linSpeed * 0.5f, 27f);
 					AVOWConfig.singleton.flockDesSpeed = Mathf.Min (AVOWConfig.singleton.flockDesSpeed + linSpeed * 0.25f, 10f);
 					AVOWConfig.singleton.flockHomeCoef = Mathf.Min (AVOWConfig.singleton.flockHomeCoef + linSpeed * 1f, 50f);
-					if (AVOWConfig.singleton.flockHomeCoef == 50f && AVOWConfig.singleton.flockDesDistToOther == 25f){
+					if (AVOWConfig.singleton.flockHomeCoef == 50f && AVOWConfig.singleton.flockDesDistToOther == 27f){
 						state = State.kInLove6;
 					}
 				}
@@ -274,16 +295,73 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}	
 			case State.kInLove6:{
 				UpdateDanceSpiral();
-				float speed = 0.01f;
+				float speed = 0.02f;
 				AVOWConfig.singleton.flockDesSpeed = Mathf.Max (AVOWConfig.singleton.flockDesSpeed - speed, 0.1f);
 				//AVOWConfig.singleton.flockDesSpeed = Mathf.Lerp (AVOWConfig.singleton.flockDesSpeed, 0.1f, speed);
-				if (AVOWConfig.singleton.flockDesSpeed < 0.1f){
+				if (AVOWConfig.singleton.flockDesSpeed < 2f){
+					CreateCube();
+					foreach (GameObject go in parentSpheres){
+						go.GetComponent<AVOWGreySphere>().SetCube(babyCube);
+					}
+					zoomSpeed = 0.0f;
+					zoomDist = BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView;
+				
 					state = State.kInLove7;
 				}
+
 				break;
 			
 			}	
 			case State.kInLove7:{
+				UpdateDanceSpiral();
+				float speed = 0.01f;
+				AVOWConfig.singleton.flockDesSpeed = Mathf.Max (AVOWConfig.singleton.flockDesSpeed - speed, 0.1f);
+				
+				
+				float zoomAccn = 0.001f;
+				if (BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView  > zoomTargetFOV + 0.5f * (zoomDist - zoomTargetFOV)){
+					zoomSpeed += zoomAccn;
+				}
+				else{
+					zoomSpeed -= zoomAccn;
+				}
+				
+				BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView = Mathf.Max (BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView - zoomSpeed, zoomTargetFOV);
+
+				if (AVOWConfig.singleton.flockDesSpeed <= 0.1f && zoomSpeed < 0){
+					babyCube.GetComponent<BabyBlueParent>().StartGrowing();
+					parentSpheres[0].GetComponent<AVOWGreySphere>().ActivateSilentBeat();
+					parentSpheres[1].GetComponent<AVOWGreySphere>().ActivateSilentBeat();
+					zoomSpeed = 0;
+					state = State.kInLove8;
+				}
+				
+				break;
+			}
+			case State.kInLove8:{
+				if (!babyCube.GetComponent<BabyBlueParent>().IsGrown()) break;
+				float zoomAccn = 0.0003f;
+				if (BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView  < zoomTargetFOV + 0.5f * (zoomDist - zoomTargetFOV)){
+					zoomSpeed += zoomAccn;
+				}
+				else{
+					zoomSpeed -= zoomAccn;
+				}
+				BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView = Mathf.Min (BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView + zoomSpeed, 45);
+
+				float linSpeed = 0.1f;
+				AVOWConfig.singleton.flockHomeCoef = Mathf.Max (AVOWConfig.singleton.flockHomeCoef - linSpeed * 1f, 10f);
+				if (zoomSpeed < 0 ){
+					state = State.kInLove9;
+					babyCube.GetComponent<BabyBlueParent>().DestroyLightening();
+				}
+				
+				break;
+			}
+			case State.kInLove9:{
+				float linSpeed = 0.1f;
+				AVOWConfig.singleton.flockHomeCoef = Mathf.Max (AVOWConfig.singleton.flockHomeCoef - linSpeed * 1f, 10f);
+				
 				break;
 			}
 			case State.kStop:{
@@ -301,7 +379,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 		// Make the right hand sphere
 		Vector3 spawnPos = new Vector3(0, 0, 210);
 		GameObject massObj = GameObject.Instantiate(greySphere, spawnPos, Quaternion.identity) as GameObject;
-		massObj.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+		massObj.transform.localScale = new Vector3(0.0f, 0.0f, 0.0f);
 		massObj.transform.parent = backStory.transform.FindChild("WorldOfSpheres");
 		massObj.renderer.material.SetColor("_RimColour", Color.green);
 		parentSpheres.Add(massObj);
@@ -385,8 +463,12 @@ public class AVOWTutorialManager : MonoBehaviour {
 		parentSpheres[1].GetComponent<AVOWGreySphere>().FixedUpdate();
 		parentSpheres[1].transform.position = new Vector3(1.5f, -0.1f, 208.5f);
 		parentSpheres[1].GetComponent<AVOWGreySphere>().vel = new Vector3(1.7f, 0.8f, 0.1f);
-		
 		StartDancing();
+		
+//		parentSpheres[1].GetComponent<AVOWGreySphere>().DoLightening();
+//		parentSpheres[0].GetComponent<AVOWGreySphere>().DoLightening();
+		// debug
+		//CreateCube();
 		state = State.kInLove4;
 	}
 	
@@ -421,6 +503,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 		newSphere0.transform.parent = backStory.transform.FindChild("WorldOfSpheres");
 		newSphere0.GetComponent<AVOWGreySphere>().beatColor = new Color(1f, 0f, 0.1f);
 		newSphere0.name = "Parent0";
+		// debug
 		
 		parentSpheres.Add(newSphere0);
 		
@@ -523,10 +606,6 @@ public class AVOWTutorialManager : MonoBehaviour {
 		}
 		
 		spheres.Add(newSphere);
-		
-		
-
-
 	}
 	
 	bool IsHeadingForCentre(GameObject sphere){
@@ -540,10 +619,26 @@ public class AVOWTutorialManager : MonoBehaviour {
 		Vector3 screenPos1 = Camera.main.WorldToScreenPoint(pos1);
 		float distFromCentre = DistFromLineToPoint2D(screenPos0, screenPos1, new Vector3(Camera.main.pixelWidth * 0.5f, Camera.main.pixelHeight * 0.5f, 0f));
 	//	return false;
-		return (distFromCentre < Camera.main.pixelHeight *0.2f);
-		
-		
-		
+		return (distFromCentre < Camera.main.pixelHeight * midAvoidProp);
+	}
+	
+	void SteerSpheresAwayFromCentre(){
+		foreach (GameObject go in spheres){
+			if (IsHeadingForCentre(go)){
+				// Get vector from line of site of camera towards sphere
+				
+				// First transform sphere into camera coods
+				Vector3 fromSightToSphere = Camera.main.transform.InverseTransformPoint(go.transform.position);
+				
+				fromSightToSphere.z = 0.0025f;
+				
+				fromSightToSphere.Normalize();
+				Vector3 localPushDir =  Camera.main.transform.InverseTransformDirection(fromSightToSphere);
+				go.GetComponent<AVOWGreySphere>().vel += localPushDir * 0.02f;
+				
+				
+			}
+		}
 	}
 	
 	// Line defined by two points, p1 and p2, and point is q0

@@ -11,6 +11,8 @@ public class Lightening : MonoBehaviour {
 	public float		size;
 	public int			numStages;
 	public float		probOfChange;
+	
+//	public float avFeedbackZ;
 
 	int			numPoints;
 	int		 	numVerts;
@@ -22,6 +24,7 @@ public class Lightening : MonoBehaviour {
 	Vector3[]	vertices;
 	Vector2[]	uvs;
 	int[]		tris;
+	
 	
 	
 	
@@ -86,7 +89,7 @@ public class Lightening : MonoBehaviour {
 //				float distStart = (startPoint - basePoints[i]).magnitude;
 //				float distEnd = (endPoint - basePoints[i]).magnitude;
 				Vector3 sd = CalcSD((float)i * 1f/(numPoints-1));
-				points[i] = new Vector3 (GetNormalSample(basePoints[i].x, sd.x), GetNormalSample(basePoints[i].y, sd.y), 0);
+				points[i] = new Vector3 (GetNormalSample(basePoints[i].x, sd.x), GetNormalSample(basePoints[i].y, sd.y), basePoints[i].z);
 			}
 		}
 	}
@@ -245,6 +248,24 @@ public class Lightening : MonoBehaviour {
 //		for (int i = 0; i < numVerts; ++i){
 //			vertices[i].z = (i/2);
 //		}
+
+		// Do a test that all the vertices are nearby - if not we have made an error in the maths (which does happen - for some reason)
+		bool mathError = false;
+		Vector3 centre = 0.5f * (endPoint + startPoint);
+		float maxDist = 10f*(startPoint - endPoint).magnitude;
+		foreach (Vector3 vert in vertices){
+			float distFromCentre = (centre - vert).magnitude;
+			if (distFromCentre > maxDist){
+				mathError = true;
+			}
+		}
+		
+		// If ther was an error, collapse everyything to one point
+		if (mathError){
+			for (int i = 0; i < vertices.Length; ++i){
+				vertices[i] = startPoint;
+			}
+		}
 		
 	}
 	
@@ -262,7 +283,10 @@ public class Lightening : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		UpdateMesh();
-	
+		for (int i = 0; i < vertices.Length-1; ++i){
+			Debug.DrawLine(vertices[i], vertices[i+1], Color.red);
+		}
+		
 	}
 	
 	float GetNormalSample(float mean, float sd){

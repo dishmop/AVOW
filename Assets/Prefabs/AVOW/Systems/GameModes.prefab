@@ -60,6 +60,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   greySphere: {fileID: 100000, guid: ba21d24887660484488ad55ce57ff931, type: 2}
   backStory: {fileID: 0}
+  babyCubePrefab: {fileID: 100002, guid: 6254920d69e964c9083e8c0512222c11, type: 2}
+  state: 2
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

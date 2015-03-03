@@ -46,7 +46,6 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\GearProcedural\Gear.cs" />
      <Compile Include="Assets\Scripts\AVOWBattery.cs" />
      <Compile Include="Assets\Scripts\AVOWCamControl.cs" />
      <Compile Include="Assets\Scripts\AVOWCircuitCreator.cs" />
@@ -79,6 +78,8 @@
      <Compile Include="Assets\Scripts\AmmeterEffect.cs" />
      <Compile Include="Assets\Scripts\AppHelper.cs" />
      <Compile Include="Assets\Scripts\AudioTimeScalar.cs" />
+     <Compile Include="Assets\Scripts\BabyBlueCube.cs" />
+     <Compile Include="Assets\Scripts\BabyBlueParent.cs" />
      <Compile Include="Assets\Scripts\BackStoryCamera.cs" />
      <Compile Include="Assets\Scripts\CamControl.cs" />
      <Compile Include="Assets\Scripts\Circuit.cs" />
@@ -101,6 +102,7 @@
      <Compile Include="Assets\Scripts\FractionCalc.cs" />
      <Compile Include="Assets\Scripts\GUITextDisplay.cs" />
      <Compile Include="Assets\Scripts\GameModeManager.cs" />
+     <Compile Include="Assets\Scripts\GearProcedural\Gear.cs" />
      <Compile Include="Assets\Scripts\Grid.cs" />
      <Compile Include="Assets\Scripts\GridPoint.cs" />
      <Compile Include="Assets\Scripts\LeccyUIButton.cs" />
@@ -171,7 +173,7 @@
      <None Include="Assets\Shaders\DC_Reflect-BumpSpec2.shader" />
      <None Include="Assets\Shaders\PlasmaBalls_old.shader" />
      <None Include="Assets\Tutorial_2\1_FlatColour.shader" />
-     <None Include="Assets\GearProcedural\readme.txt" />
+     <None Include="Assets\Scripts\GearProcedural\readme.txt" />
      <None Include="Assets\Scripts\Fonts\scifi2k2.txt" />
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Light.shader" />
      <None Include="Assets\Shaders\DC_Reflect-BumpSpec.shader" />
