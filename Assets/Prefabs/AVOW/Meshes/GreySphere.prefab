@@ -69,7 +69,7 @@ AudioSource:
   serializedVersion: 3
   m_audioClip: {fileID: 8300000, guid: 164537b9cf45e4d078ded64e2963daa2, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: .5
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -129,9 +129,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vel: {x: 0, y: 0, z: 0}
+  accn: {x: 0, y: 0, z: 0}
   beatColor: {r: 0, g: 0, b: 0, a: 0}
   otherSphere: {fileID: 0}
   lightGO: {fileID: 0}
+  massObj: {fileID: 0}
+  enableTrigger: 0
+  heartRestartTrigger: 0
 --- !u!135 &13500000
 SphereCollider:
   m_ObjectHideFlags: 1

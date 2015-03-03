@@ -1351,6 +1351,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   greySphere: {fileID: 100000, guid: ba21d24887660484488ad55ce57ff931, type: 2}
   backStory: {fileID: 1226278289}
+  state: 2
 --- !u!1 &129955426
 GameObject:
   m_ObjectHideFlags: 0
@@ -3913,6 +3914,13 @@ MonoBehaviour:
   useLCM: 0
   modifiedNodeLengths: 1
   tutorialSpeed: 1
+  flockDesDistToOther: 3
+  flockDesSpeed: 4
+  flockAlignCoef: .200000003
+  flockHomeCoef: 2
+  flockSpeedMod: 1.10000002
+  flockSpiralCoef: 0
+  flockReset: 0
 --- !u!1001 &418877048
 Prefab:
   m_ObjectHideFlags: 0
@@ -17472,7 +17480,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: .300000012
-  far clip plane: 80
+  far clip plane: 50
   field of view: 45
   orthographic: 0
   orthographic size: 5
@@ -17500,6 +17508,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cube: {fileID: 1423878778}
   moveSpeed: .00200000009
+  loveLook: {x: 0, y: 0, z: 0}
   state: 0
 --- !u!1 &2068202903
 GameObject:

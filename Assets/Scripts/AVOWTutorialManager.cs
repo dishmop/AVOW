@@ -24,8 +24,13 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	float 		worldOfSpheres2Time = 0;
 	float		worldOfSpheres2Duration = 10;
+	float 		danceTime = 0;
 	
-	enum State{
+	float inLove5Time = 0;
+	
+	public enum State{
+		kDebugJumpToDance,
+		kDebugResetDance,
 		kOff,
 		kWaitForText,
 		kStartup,
@@ -39,11 +44,16 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kInLove0,
 		kInLove1,
 		kInLove2,
+		kInLove3,
+		kInLove4,
+		kInLove5,
+		kInLove6,
+		kInLove7,
 		
 		kStop,
 		kNumStates
 	}
-	State state = State.kOff;
+	public State state = State.kOff;
 	
 	Vector3[]		cameraStartPositions = new Vector3[(int)State.kNumStates];
 	bool triggered = false;
@@ -55,7 +65,9 @@ public class AVOWTutorialManager : MonoBehaviour {
 	Color			reflectionColor;
 	
 	public void StartTutorial(){
-		state = State.kTheWorldOfSpheres0;
+		state = State.kDebugJumpToDance;
+		state = State.kIntro2;
+		//state = State.kTheWorldOfSpheres0;
 		//state = State.kStartup;
 		
 	}
@@ -86,9 +98,23 @@ public class AVOWTutorialManager : MonoBehaviour {
 		state = State.kWaitForText;
 	}
 	
+	void WaitForParentToFinish(State nextState){
+		waitNextState = nextState;
+		state = State.kWaitForText;
+	}	
+	
 	// Update is called once per frame
 	void Update () {
 		switch(state){
+		
+			case State.kDebugJumpToDance:{
+				DebugJumpToDance();
+				break;
+			}
+			case State.kDebugResetDance:{
+				DebugResetDance();
+				break;
+			}
 			case State.kWaitForText:{
 				if (triggered){
 					triggered = false;
@@ -98,7 +124,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			
 			case State.kStartup:{
-				SetCameraPos();
+				SetCameraPos(state);
 				state = State.kIntro0;
 				break;
 			}
@@ -140,12 +166,12 @@ public class AVOWTutorialManager : MonoBehaviour {
 				break;
 			}
 			case State.kTheWorldOfSpheres0:{
-				SetCameraPos();
+				SetCameraPos(state);
 				SetupFrustrumVectors();
 			
 				BackStoryCamera.singleton.state = BackStoryCamera.State.kStill;
 				BackStoryCamera.singleton.transform.position = new Vector3(0, 0, 200);
-				Random.seed = 1;
+				Random.seed = 3;
 				CreateRandomSphere();
 				AVOWTutorialText.singleton.AddPause(10);	
 				
@@ -157,7 +183,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			case State.kTheWorldOfSpheres1:{
 				worldOfSpheres2Time = Time.time + worldOfSpheres2Duration;
 				AVOWTutorialText.singleton.AddPause(4);	
-				AVOWTutorialText.singleton.AddText("For eons, everyhing remained the same");
+				AVOWTutorialText.singleton.AddText("For eons, nothing happened");
 			
 				state = State.kTheWorldOfSpheres2;		
 				break;
@@ -186,31 +212,194 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kInLove1:{
 				ParentsCourtship();
-				//AVOWTutorialText.singleton.AddText("Two spheres fell in love");
-				state = State.kInLove2;
+				AVOWTutorialText.singleton.AddPause(10);
+				WaitForTextToFinish(State.kInLove2);
+	
 				
 				break;
 			}	
 			case State.kInLove2:{
+				CreateRandomSpheres();
+				WaitForParentToFinish(State.kInLove3);
+				parentSpheres[0].GetComponent<AVOWGreySphere>().enableTrigger = true;
 				break;
-			}		
+			}	
+			case State.kInLove3:{
+				StartDancing();
+				state = State.kInLove4;
+				break;
+			}	
+			case State.kInLove4:{
+				CreateRandomSpheres();
+				UpdateDance();
+				if (Time.fixedTime > danceTime + 10f){
+					parentSpheres[0].GetComponent<AVOWGreySphere>().SetRegularBeats();
+					parentSpheres[1].GetComponent<AVOWGreySphere>().SetRegularBeats();
+				}
+				if (triggered){
+					state = State.kInLove5;
+					AVOWConfig.singleton.flockAlignCoef = -1f;
+					AVOWConfig.singleton.flockSpeedMod = 0;
+					triggered = false;
+					inLove5Time = Time.fixedTime + 8;
+				}
+				break;
+			}
+			case State.kInLove5:{
+				UpdateDanceSpiral();
+				if (Time.fixedTime > inLove5Time){
+					// Test which way we are rotating and set the spiral force to that direction (to ensure we keep going).
+					Vector3 fromHereToHome = parentSpheres[2].transform.position - parentSpheres[0].transform.position;
+					Vector3 vel = parentSpheres[0].GetComponent<AVOWGreySphere>().vel;
+					
+					Vector3 crossRes = Vector3.Cross(fromHereToHome, vel);
+					if (crossRes.z > 0)
+						AVOWConfig.singleton.flockSpiralCoef = -1f;
+					else
+						AVOWConfig.singleton.flockSpiralCoef = 1f;
+				
+					foreach (GameObject go in parentSpheres){
+						go.GetComponent<AVOWGreySphere>().heartRestartTrigger = true;
+					}
+	
+					float linSpeed = 0.1f;
+					AVOWConfig.singleton.flockDesDistToOther = Mathf.Min (AVOWConfig.singleton.flockDesDistToOther + linSpeed * 0.5f, 25f);
+					AVOWConfig.singleton.flockDesSpeed = Mathf.Min (AVOWConfig.singleton.flockDesSpeed + linSpeed * 0.25f, 10f);
+					AVOWConfig.singleton.flockHomeCoef = Mathf.Min (AVOWConfig.singleton.flockHomeCoef + linSpeed * 1f, 50f);
+					if (AVOWConfig.singleton.flockHomeCoef == 50f && AVOWConfig.singleton.flockDesDistToOther == 25f){
+						state = State.kInLove6;
+					}
+				}
+				break;
+			}	
+			case State.kInLove6:{
+				UpdateDanceSpiral();
+				float speed = 0.01f;
+				AVOWConfig.singleton.flockDesSpeed = Mathf.Max (AVOWConfig.singleton.flockDesSpeed - speed, 0.1f);
+				//AVOWConfig.singleton.flockDesSpeed = Mathf.Lerp (AVOWConfig.singleton.flockDesSpeed, 0.1f, speed);
+				if (AVOWConfig.singleton.flockDesSpeed < 0.1f){
+					state = State.kInLove7;
+				}
+				break;
+			
+			}	
+			case State.kInLove7:{
+				break;
+			}
 			case State.kStop:{
 				AVOWTutorialText.singleton.ClearText();
 				state = State.kOff;		
 				break;
 			}
-		}
-		
+		}	
+	
 		ManageObjects();
 	
 	}
 	
+	void StartDancing(){
+		// Make the right hand sphere
+		Vector3 spawnPos = new Vector3(0, 0, 210);
+		GameObject massObj = GameObject.Instantiate(greySphere, spawnPos, Quaternion.identity) as GameObject;
+		massObj.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+		massObj.transform.parent = backStory.transform.FindChild("WorldOfSpheres");
+		massObj.renderer.material.SetColor("_RimColour", Color.green);
+		parentSpheres.Add(massObj);
+		massObj.name = "MassObj";
+		danceTime = Time.fixedTime;
+		
+		parentSpheres[0].GetComponent<AVOWGreySphere>().StartDancing(parentSpheres[2]);
+		parentSpheres[1].GetComponent<AVOWGreySphere>().StartDancing(parentSpheres[2]);
+		
+		
+		Debug.Log ("ParentSpheres:");
+		foreach (GameObject go in parentSpheres){
+			Debug.Log (go.name);
+			Debug.Log (go.transform.position.ToString());
+			Debug.Log (go.GetComponent<AVOWGreySphere>().vel.ToString());
+			Debug.Log  ("");
+			
+		}
+		
+	}
+//		
+//	void UpdateDance(){
+//		foreach (GameObject go in parentSpheres){
+//			AVOWGreySphere sphere = go.GetComponent<AVOWGreySphere>();
+//			sphere.accn = Vector3.zero;
+//			foreach (GameObject otherGO in parentSpheres){
+//				if (otherGO != go){
+//					Vector3 fromHereToThere = otherGO.transform.position - go.transform.position;
+//					float distSq = fromHereToThere.sqrMagnitude;
+//					Vector3 forceDir = Vector3.Normalize(fromHereToThere);
+//					Vector3 force = forceDir * 0.2f/distSq;
+//					sphere.accn += force;
+//				
+//				}
+//			}
+//		}
+//	}
+//	
+
+	void UpdateDance(){
+		float speed = 0.7f;
+		parentSpheres[2].transform.position = new Vector3(2 * Mathf.Sin (speed*(Time.fixedTime - danceTime)), Mathf.Sin (2 * speed*(Time.fixedTime - danceTime)), 210);
+		
+		
+		// Get the camrera following the,
+		Vector3 lookPos = 0.5f * (parentSpheres[0].transform.position +  parentSpheres[1].transform.position);
+		BackStoryCamera.singleton.GetComponent<BackStoryCamera>().SetLoveLook(lookPos);
+		
+		
+	}
+	
+	
+	void UpdateDanceSpiral(){
+		//parentSpheres[2].transform.position = new Vector3(2 * Mathf.Sin (Time.fixedTime - danceTime), Mathf.Sin (2 * (Time.fixedTime - danceTime)), 210);
+		
+		
+		// Get the camrera following the,
+		Vector3 lookPos = 0.5f * (parentSpheres[0].transform.position +  parentSpheres[1].transform.position);
+		BackStoryCamera.singleton.GetComponent<BackStoryCamera>().SetLoveLook(lookPos);
+		
+		
+	}
 	
 	void ParentsCourtship(){
 	
 		foreach (GameObject go in parentSpheres){
 			go.GetComponent<AVOWGreySphere>().StartCourtship();
 		}
+	}
+	
+	void DebugJumpToDance(){
+		SetCameraPos(State.kTheWorldOfSpheres0);
+		SetupFrustrumVectors();
+	
+		SpawnParents ();
+		ParentsCourtship();
+		parentSpheres[0].GetComponent<AVOWGreySphere>().FixedUpdate();
+		parentSpheres[0].transform.position = new Vector3(-1f, -0.2f, 208.93f);
+		parentSpheres[0].GetComponent<AVOWGreySphere>().vel = new Vector3(-1.3f, -0.1f, -0.1f);
+		
+		parentSpheres[1].GetComponent<AVOWGreySphere>().FixedUpdate();
+		parentSpheres[1].transform.position = new Vector3(1.5f, -0.1f, 208.5f);
+		parentSpheres[1].GetComponent<AVOWGreySphere>().vel = new Vector3(1.7f, 0.8f, 0.1f);
+		
+		StartDancing();
+		state = State.kInLove4;
+	}
+	
+	
+	void DebugResetDance(){
+		parentSpheres[0].transform.position = new Vector3(-1.8f, -0.1f, 209.9f);
+		parentSpheres[0].GetComponent<AVOWGreySphere>().vel = new Vector3(-2.8f, -0.6f, -0.4f);
+		
+		parentSpheres[1].transform.position = new Vector3(-2.2f, -0.4f, 210.4f);
+		parentSpheres[1].GetComponent<AVOWGreySphere>().vel = new Vector3(3.2f, 1.2f, 0.4f);
+		
+		
+		state = State.kInLove4;
 	}
 	
 	
@@ -231,7 +420,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 		newSphere0.transform.localScale = new Vector3(scale0, scale0, scale0);
 		newSphere0.transform.parent = backStory.transform.FindChild("WorldOfSpheres");
 		newSphere0.GetComponent<AVOWGreySphere>().beatColor = new Color(1f, 0f, 0.1f);
-		
+		newSphere0.name = "Parent0";
 		
 		parentSpheres.Add(newSphere0);
 		
@@ -242,7 +431,8 @@ public class AVOWTutorialManager : MonoBehaviour {
 		newSphere1.transform.parent = backStory.transform.FindChild("WorldOfSpheres");
 		newSphere1.GetComponent<AVOWGreySphere>().beatColor = new Color(1f, 0.1f, 0f);
 		parentSpheres.Add(newSphere1);
-
+		newSphere1.name = "Parent1";
+		
 		// Calc the velcoties required
 		float xDist = Mathf.Abs(spawnPos0.x - spawnPos1.x);	
 		float desSpeed = 0.5f * xDist / timeForParentsToMeet;
@@ -314,18 +504,24 @@ public class AVOWTutorialManager : MonoBehaviour {
 	void CreateRandomSphere(){
 		// Decide which edge to be on (or rather just off)
 		Camera camera = BackStoryCamera.singleton.GetComponent<Camera>();
-
-		int edge = Random.Range(0, 4);
-		float dist = Random.Range (camera.nearClipPlane, camera.farClipPlane);
-		int tangIndex = (edge + 1) % 4;
-		Vector3 spawnDir = frustOuts[edge] + Random.Range (-1f, 1f) * new Vector3(frustOuts[tangIndex].x, frustOuts[tangIndex].y, 0);
-		Vector3 goOutsideViewDir = -frustNorms[edge];
-		
-		float scale = Random.Range (0.2f, 2.0f);
-		GameObject newSphere = GameObject.Instantiate(greySphere, camera.transform.position + spawnDir * dist + goOutsideViewDir * scale, Quaternion.identity) as GameObject;
-		newSphere.transform.localScale = new Vector3(scale, scale, scale);
+		GameObject newSphere = GameObject.Instantiate(greySphere) as GameObject;
 		newSphere.transform.parent = backStory.transform.FindChild("WorldOfSpheres");
-		newSphere.GetComponent<AVOWGreySphere>().vel = Random.Range (0.3f, 0.5f) * frustNorms[edge] + Random.Range (-0.5f, 0.5f) * new Vector3(0, 0, 1) + Random.Range (-0.5f, 0.5f) * frustNorms[tangIndex];
+		
+		bool calcVel = true;
+		while (calcVel){
+			int edge = Random.Range(0, 4);
+			float dist = Random.Range (camera.nearClipPlane + 3f, camera.farClipPlane);
+			int tangIndex = (edge + 1) % 4;
+			Vector3 spawnDir = frustOuts[edge] + Random.Range (-1f, 1f) * new Vector3(frustOuts[tangIndex].x, frustOuts[tangIndex].y, 0);
+			Vector3 goOutsideViewDir = -frustNorms[edge];
+		
+			float scale = Random.Range (0.2f, 2.0f);
+			newSphere.transform.position = camera.transform.position + spawnDir * dist + goOutsideViewDir * scale;
+			newSphere.transform.localScale = new Vector3(scale, scale, scale);
+			newSphere.GetComponent<AVOWGreySphere>().vel = Random.Range (0.3f, 0.5f) * frustNorms[edge] + Random.Range (-0.5f, 0.5f) * new Vector3(0, 0, 1) + Random.Range (-0.5f, 0.5f) * frustNorms[tangIndex];
+			calcVel = IsHeadingForCentre(newSphere);
+		}
+		
 		spheres.Add(newSphere);
 		
 		
@@ -333,11 +529,36 @@ public class AVOWTutorialManager : MonoBehaviour {
 
 	}
 	
+	bool IsHeadingForCentre(GameObject sphere){
+		
+		// Create two points in space
+		Vector3 pos0 = sphere.transform.position;
+		Vector3 pos1 = pos0 + sphere.GetComponent<AVOWGreySphere>().vel;
+		
+		// Convert to screenspace pos
+		Vector3 screenPos0 = Camera.main.WorldToScreenPoint(pos0);
+		Vector3 screenPos1 = Camera.main.WorldToScreenPoint(pos1);
+		float distFromCentre = DistFromLineToPoint2D(screenPos0, screenPos1, new Vector3(Camera.main.pixelWidth * 0.5f, Camera.main.pixelHeight * 0.5f, 0f));
+	//	return false;
+		return (distFromCentre < Camera.main.pixelHeight *0.2f);
+		
+		
+		
+	}
+	
+	// Line defined by two points, p1 and p2, and point is q0
+	float DistFromLineToPoint2D(Vector3 p1, Vector3 p2, Vector3 q0){
+		float numerator = Mathf.Abs ((p2.y - p1.y) * q0.x - (p2.x - p1.x) * q0.y + p2.x * p1.y - p2.y * p1.x);
+		float denominator = Mathf.Sqrt((p2.y - p1.y) * (p2.y - p1.y) + (p2.x - p1.x) * (p2.x - p1.x));
+		return numerator / denominator;
+	
+	}
+	
 
 
 	
-	void SetCameraPos(){
-		BackStoryCamera.singleton.transform.position = cameraStartPositions[(int)state];
+	void SetCameraPos(State thisState){
+		BackStoryCamera.singleton.transform.position = cameraStartPositions[(int)thisState];
 		BackStoryCamera.singleton.transform.rotation = Quaternion.identity;
 		
 	}

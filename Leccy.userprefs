@@ -2,29 +2,32 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWTutorialManager.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWGameModes.cs" Line="80" Column="26" />
-      <File FileName="Assets/Scripts/BackStoryCamera.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/BackStoryCamera.cs" Line="48" Column="63" />
+      <File FileName="Assets/Scripts/AVOWGameModes.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWUI.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWTutorialText.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWGrid.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWConfig.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWConfig.cs" Line="21" Column="29" />
       <File FileName="Assets/Shaders/AVOWCursorCubeBlue.shader" Line="1" Column="1" />
       <File FileName="Assets/Shaders/AVOWLightening.shader" Line="1" Column="1" />
       <File FileName="Assets/Shaders/AVOWTab.shader" Line="1" Column="1" />
-      <File FileName="Assets/Shaders/DC_Reflect-BumpSpec.shader" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWObjectives.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWComponent.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWBattery.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWTutorialManager.cs" Line="24" Column="11" />
+      <File FileName="Assets/Scripts/AVOWGreySphere.cs" Line="275" Column="39" />
+      <File FileName="Assets/Scripts/AVOWTutorialManager.cs" Line="538" Column="1" />
+      <File FileName="Assets/Shaders/DC_Reflect-Glass.shader" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUITool.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Assembly-CSharp" expanded="True">
-            <Node name="Scripts" expanded="True" />
+            <Node name="Scripts" expanded="True">
+              <Node name="AVOWTutorialManager.cs" selected="True" />
+            </Node>
             <Node name="Shaders" expanded="True" />
-            <Node name="AVOWGreySphere.cs" selected="True" />
           </Node>
         </State>
       </Pad>
@@ -32,6 +35,7 @@
         <State>
           <Value>queuedString</Value>
           <Value>subString</Value>
+          <Value>bpm</Value>
         </State>
       </Pad>
     </Pads>
@@ -40,6 +44,7 @@
     <BreakpointStore>
       <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWCamControl.cs" line="108" />
       <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWCamControl.cs" line="125" />
+      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Leccy/Assets/Scripts/AVOWTutorialManager.cs" line="520" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

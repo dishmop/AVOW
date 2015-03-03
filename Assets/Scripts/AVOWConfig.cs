@@ -16,6 +16,15 @@ public class AVOWConfig : MonoBehaviour {
 	public bool modifiedNodeLengths = false;
 	public float tutorialSpeed = 1;
 	
+	public float flockDesDistToOther = 2f;
+	public float flockDesSpeed = 1f;
+	public float flockAlignCoef = 0.2f;
+	public float flockHomeCoef= 1f;
+	public float flockSpeedMod = 1f;
+	public float flockSpiralCoef = 0;
+		
+	public bool flockReset = false;
+	
 	
 	public bool ShowTextObjectives(){
 		return showObjectives && objectivesAsText;
