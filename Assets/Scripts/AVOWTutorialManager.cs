@@ -28,6 +28,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 	float 		worldOfSpheres2Time = 0;
 	float		worldOfSpheres2Duration = 10;
 	float 		danceTime = 0;
+	Vector3 	danceOffset = Vector3.zero;
 	float 		zoomSpeed = 0;
 	float 		zoomDist = 0;
 	float 		zoomTargetFOV = 2f;
@@ -36,8 +37,19 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	float inLove5Time = 0;
 	
+	// Dance backup stuff
+	float backDesDistToOther;
+	float backDesSpeed;
+	float backAlignCoef;
+	float backHomeCoef;
+	float backSpeedMod;
+	float backSpiralCoef;
+	
+	float love11Drag = 1;
+	
 	public enum State{
 		kDebugJumpToDance,
+		kDebugJumpToDance2,
 		kDebugResetDance,
 		kOff,
 		kWaitForText,
@@ -59,6 +71,8 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kInLove7,
 		kInLove8,
 		kInLove9,
+		kInLove10,
+		kInLove11,
 		
 		kStop,
 		kNumStates
@@ -75,8 +89,8 @@ public class AVOWTutorialManager : MonoBehaviour {
 	Color			reflectionColor;
 	
 	public void StartTutorial(){
-		state = State.kDebugJumpToDance;
-		//state = State.kIntro2;
+		state = State.kDebugJumpToDance2;
+		state = State.kIntro2;
 		//state = State.kTheWorldOfSpheres0;
 		state = State.kStartup;
 		
@@ -87,6 +101,46 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	public void StopTutorial(){
 		state = State.kStop;
+	}
+	
+	void SaveFlockConfig(){
+		backDesDistToOther = AVOWConfig.singleton.flockDesDistToOther;
+		backDesSpeed = AVOWConfig.singleton.flockDesSpeed;
+		backAlignCoef = AVOWConfig.singleton.flockAlignCoef;
+		backHomeCoef = AVOWConfig.singleton.flockHomeCoef;
+		backSpeedMod = AVOWConfig.singleton.flockSpeedMod;
+		backSpiralCoef = AVOWConfig.singleton.flockSpiralCoef;
+		
+	}
+	
+	void RestoreFlockConfigReal(){
+		AVOWConfig.singleton.flockDesDistToOther = backDesDistToOther;
+		AVOWConfig.singleton.flockDesSpeed = backDesSpeed;
+		AVOWConfig.singleton.flockAlignCoef = backAlignCoef;
+		AVOWConfig.singleton.flockHomeCoef = backHomeCoef;
+		AVOWConfig.singleton.flockSpeedMod = backSpeedMod;
+		AVOWConfig.singleton.flockSpiralCoef = backSpiralCoef;
+	}
+	
+//	void RestorePostCreateConfig(){
+//		AVOWConfig.singleton.flockDesDistToOther = 27f;
+//		AVOWConfig.singleton.flockDesSpeed = 0.1f;
+//		AVOWConfig.singleton.flockAlignCoef = 0.2f;
+//		AVOWConfig.singleton.flockHomeCoef = 20f;
+//		AVOWConfig.singleton.flockSpeedMod = 2.2f;
+//		AVOWConfig.singleton.flockSpiralCoef = 0;
+//	}
+//	
+	
+	void RestoreFlockConfig(){
+	
+	
+		AVOWConfig.singleton.flockDesDistToOther = 4f;
+		AVOWConfig.singleton.flockDesSpeed = 4;
+		AVOWConfig.singleton.flockAlignCoef = 0.2f;
+		AVOWConfig.singleton.flockHomeCoef = 3f;
+		AVOWConfig.singleton.flockSpeedMod = 2.2f;
+		AVOWConfig.singleton.flockSpiralCoef = 0;
 	}
 
 	// Use this for initialization
@@ -129,6 +183,10 @@ public class AVOWTutorialManager : MonoBehaviour {
 		
 			case State.kDebugJumpToDance:{
 				DebugJumpToDance();
+				break;
+			}
+			case State.kDebugJumpToDance2:{
+				DebugJumpToDance2();
 				break;
 			}
 			case State.kDebugResetDance:{
@@ -247,6 +305,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}	
 			case State.kInLove3:{
 				StartDancing();
+				SaveFlockConfig();
 				state = State.kInLove4;
 				break;
 			}	
@@ -347,21 +406,47 @@ public class AVOWTutorialManager : MonoBehaviour {
 				else{
 					zoomSpeed -= zoomAccn;
 				}
-				BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView = Mathf.Min (BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView + zoomSpeed, 45);
+				BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView = Mathf.Min (BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView + zoomSpeed, 35);
 
 				float linSpeed = 0.1f;
-				AVOWConfig.singleton.flockHomeCoef = Mathf.Max (AVOWConfig.singleton.flockHomeCoef - linSpeed * 1f, 10f);
+				AVOWConfig.singleton.flockHomeCoef = Mathf.Max (AVOWConfig.singleton.flockHomeCoef - linSpeed * 1f, 20f);
 				if (zoomSpeed < 0 ){
 					state = State.kInLove9;
 					babyCube.GetComponent<BabyBlueParent>().DestroyLightening();
+				
 				}
 				
 				break;
 			}
 			case State.kInLove9:{
 				float linSpeed = 0.1f;
-				AVOWConfig.singleton.flockHomeCoef = Mathf.Max (AVOWConfig.singleton.flockHomeCoef - linSpeed * 1f, 10f);
+				AVOWConfig.singleton.flockHomeCoef = Mathf.Max (AVOWConfig.singleton.flockHomeCoef - linSpeed * 1f, 20f);
+				babyCube.GetComponent<BabyBlueParent>().rotSpeed = Mathf.Max (babyCube.GetComponent<BabyBlueParent>().rotSpeed - 0.01f, 0);
+				if (AVOWConfig.singleton.flockHomeCoef == 20 && babyCube.GetComponent<BabyBlueParent>().rotSpeed == 0){
+					AVOWTutorialText.singleton.AddPause(4);
+					AVOWTutorialText.singleton.AddTextNoLine("I was alive. . .");
+					AVOWTutorialText.singleton.AddPause(6);
+					AVOWTutorialText.singleton.AddText (" and everything was perfect");
+					WaitForTextToFinish(State.kInLove10);
+				}
 				
+				break;
+			}
+			case State.kInLove10:{
+				RestoreFlockConfig();
+				StartDanceThreesome();
+				break;
+			}
+			case State.kInLove11:{
+				float timeToReach = 5;
+				love11Drag = Mathf.Max(love11Drag - 1/(timeToReach*60), 0f);
+				babyCube.GetComponent<DanceThreesome>().SetDrag(love11Drag);
+				parentSpheres[0].GetComponent<DanceThreesome>().SetDrag(love11Drag);
+				parentSpheres[1].GetComponent<DanceThreesome>().SetDrag(love11Drag);
+				
+				babyCube.GetComponent<BabyBlueParent>().rotSpeed = Mathf.Lerp (3, 0, love11Drag);
+				babyCube.GetComponent<BabyBlueParent>().rotSpeed2 = Mathf.Lerp (2, 0, love11Drag);
+				UpdateDance();
 				break;
 			}
 			case State.kStop:{
@@ -375,13 +460,55 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	}
 	
+	void StartDanceThreesome(){
+		Debug.Log ("StartDanceThreesome:");
+		foreach (GameObject go in parentSpheres){
+			Debug.Log (go.name);
+			Debug.Log (go.transform.position.ToString());
+			Debug.Log (go.GetComponent<AVOWGreySphere>().vel.ToString());
+			Debug.Log  ("");
+			
+		}
+		Debug.Log (babyCube.name);
+		Debug.Log (babyCube.transform.position.ToString());
+		Debug.Log (babyCube.GetComponent<DanceThreesome>().GetVelocity().ToString());
+		Debug.Log  ("");
+		
+		parentSpheres[0].GetComponent<DanceThreesome>().ForceVelocity(parentSpheres[0].GetComponent<AVOWGreySphere>().vel);
+		parentSpheres[1].GetComponent<DanceThreesome>().ForceVelocity(parentSpheres[1].GetComponent<AVOWGreySphere>().vel);
+		
+		
+		babyCube.GetComponent<DanceThreesome>().SetDrag(love11Drag);
+		parentSpheres[0].GetComponent<DanceThreesome>().SetDrag(love11Drag);
+		parentSpheres[1].GetComponent<DanceThreesome>().SetDrag(love11Drag);
+		
+		
+		danceTime = Time.fixedTime;
+		danceOffset = parentSpheres[2].transform.position;
+		danceOffset.z = 0;
+		danceOffset.y += 2f; 
+	
+		// Get the normal behaviours turned off (or at least in a kind of dormant hibernation)
+		babyCube.GetComponent<BabyBlueParent>().isActive = false;
+//		babyCube.GetComponent<BabyBlueParent>().rotSpeed = 3;
+//		babyCube.GetComponent<BabyBlueParent>().rotSpeed2 = 2;
+		parentSpheres[0].GetComponent<AVOWGreySphere>().StartDanceThreesome();
+		parentSpheres[1].GetComponent<AVOWGreySphere>().StartDanceThreesome();
+
+		babyCube.GetComponent<DanceThreesome>().Start(parentSpheres[0], parentSpheres[1], parentSpheres[2]);
+		parentSpheres[0].GetComponent<DanceThreesome>().Start(parentSpheres[1], babyCube, parentSpheres[2]);
+		parentSpheres[1].GetComponent<DanceThreesome>().Start(parentSpheres[0], babyCube, parentSpheres[2]);
+		state = State.kInLove11;
+		
+	}
+	
 	void StartDancing(){
 		// Make the right hand sphere
 		Vector3 spawnPos = new Vector3(0, 0, 210);
 		GameObject massObj = GameObject.Instantiate(greySphere, spawnPos, Quaternion.identity) as GameObject;
 		massObj.transform.localScale = new Vector3(0.0f, 0.0f, 0.0f);
 		massObj.transform.parent = backStory.transform.FindChild("WorldOfSpheres");
-		massObj.renderer.material.SetColor("_RimColour", Color.green);
+		massObj.renderer.material.SetColor("_RimColour", Color.white);
 		parentSpheres.Add(massObj);
 		massObj.name = "MassObj";
 		danceTime = Time.fixedTime;
@@ -421,7 +548,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 
 	void UpdateDance(){
 		float speed = 0.7f;
-		parentSpheres[2].transform.position = new Vector3(2 * Mathf.Sin (speed*(Time.fixedTime - danceTime)), Mathf.Sin (2 * speed*(Time.fixedTime - danceTime)), 210);
+		parentSpheres[2].transform.position = danceOffset + new Vector3(2 * Mathf.Sin (speed*(Time.fixedTime - danceTime)), Mathf.Sin (2 * speed*(Time.fixedTime - danceTime)), 210);
 		
 		
 		// Get the camrera following the,
@@ -450,9 +577,40 @@ public class AVOWTutorialManager : MonoBehaviour {
 		}
 	}
 	
+	void DebugJumpToDance2(){
+		SetCameraPos(State.kTheWorldOfSpheres0);
+		SetupFrustrumVectors();
+		SaveFlockConfig();
+		
+		SpawnParents ();
+		ParentsCourtship();
+		parentSpheres[0].GetComponent<AVOWGreySphere>().FixedUpdate();
+		parentSpheres[0].transform.position = new Vector3(-0.7f, -0.1f, 208.9f);
+		parentSpheres[0].GetComponent<AVOWGreySphere>().vel = new Vector3(0.2f, -0.3f, 0.0f);
+		
+		parentSpheres[1].GetComponent<AVOWGreySphere>().FixedUpdate();
+		parentSpheres[1].transform.position = new Vector3(3.2f, 2.1f, 208.5f);
+		parentSpheres[1].GetComponent<AVOWGreySphere>().vel = new Vector3(-0.2f, 0.3f, 0.0f);
+		StartDancing();
+		
+		CreateCube();
+		
+		babyCube.GetComponent<BabyBlueParent>().sizeMul = 1;
+		babyCube.GetComponent<BabyBlueParent>().CreateLightening();
+		babyCube.GetComponent<BabyBlueParent>().DestroyLightening();
+		babyCube.GetComponent<BabyBlueParent>().rotSpeed = 0;
+		babyCube.GetComponent<BabyBlueParent>().Update();
+		StartDanceThreesome();
+		RestoreFlockConfig();
+		
+		//state = State.kInLove4;
+		
+	}
+	
 	void DebugJumpToDance(){
 		SetCameraPos(State.kTheWorldOfSpheres0);
 		SetupFrustrumVectors();
+		SaveFlockConfig();
 	
 		SpawnParents ();
 		ParentsCourtship();

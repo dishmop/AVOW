@@ -1353,7 +1353,7 @@ MonoBehaviour:
   greySphere: {fileID: 100000, guid: ba21d24887660484488ad55ce57ff931, type: 2}
   backStory: {fileID: 1226278289}
   babyCubePrefab: {fileID: 100002, guid: 6254920d69e964c9083e8c0512222c11, type: 2}
-  state: 2
+  state: 3
 --- !u!82 &115811634
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1364,7 +1364,7 @@ AudioSource:
   serializedVersion: 3
   m_audioClip: {fileID: 8300000, guid: bb858f21c67194f17a56c390c3e2472d, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: .400000006
+  m_Volume: .200000003
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -3901,7 +3901,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65c2a8eb5ce5440ddaf088d95f5812c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showTotals: 1
+  showTotals: 0
   showIndividuals: 0
   showObjectives: 1
   objectivesAsText: 0
@@ -9532,6 +9532,10 @@ Prefab:
       propertyPath: backStory
       value: 
       objectReference: {fileID: 1226278289}
+    - target: {fileID: 11400002, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: state
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
   m_RootGameObject: {fileID: 115811630}

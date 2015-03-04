@@ -3,7 +3,8 @@ using System.Collections;
 
 public class BabyBlueCube : MonoBehaviour {
 
-	public float rotSpeed = 10;
+	float rotSpeed;
+	float rotSpeed2;
 
 
 	// Use this for initialization
@@ -14,6 +15,14 @@ public class BabyBlueCube : MonoBehaviour {
 	
 	}
 	
+	public void SetRotSpeed(float speed){	
+		rotSpeed = speed;
+	}
+	public void SetRotSpeed2(float speed){	
+		rotSpeed2 = speed;
+	}
+	
+			
 	void Update(){
 		transform.Rotate (new Vector3(1, 1, 1), rotSpeed, Space.Self);
 	}

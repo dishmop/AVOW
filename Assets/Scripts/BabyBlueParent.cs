@@ -9,6 +9,10 @@ public class BabyBlueParent : MonoBehaviour {
 	public GameObject lighteningPrefab;
 	
 	public float sizeMul = 0;
+	public Vector3	vel = Vector3.zero;
+	
+	public bool isActive  = true;
+	
 	bool enableGrow = false;
 	
 	float underlyingSize;
@@ -17,7 +21,10 @@ public class BabyBlueParent : MonoBehaviour {
 	GameObject lightening0;
 	GameObject lightening1;
 	bool lightingCreated = false;
-
+	
+	public float rotSpeed = 3;
+	public float rotSpeed2 = 0;
+	
 	// Use this for initialization
 	void Start () {
 
@@ -33,6 +40,7 @@ public class BabyBlueParent : MonoBehaviour {
 
 		
 		lightening1 = GameObject.Instantiate(lighteningPrefab, Vector3.zero, Quaternion.identity) as GameObject;
+		lightingCreated = true;
 		
 	}
 	
@@ -74,7 +82,12 @@ public class BabyBlueParent : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	public void Update () {
+		transform.FindChild ("BabyBlueCube").GetComponent<BabyBlueCube>().SetRotSpeed(rotSpeed);
+		transform.FindChild ("BabyBlueCube").GetComponent<BabyBlueCube>().SetRotSpeed2(rotSpeed2);
+		
+		if (!isActive) return;
+		
 		if (enableGrow)
 			sizeMul = Mathf.Min (sizeMul + 0.001f, 1);
 		if (parent0 != null && parent1 != null){
@@ -98,10 +111,11 @@ public class BabyBlueParent : MonoBehaviour {
 		
 		if (!lightingCreated){
 			CreateLightening();
-			lightingCreated = true;
 		}
 		UpdateLightening();
 		
+		
+		transform.position += vel * Time.deltaTime;
 		
 	}
 }

@@ -93,6 +93,7 @@
      <Compile Include="Assets\Scripts\CircuitElementVoltmeter.cs" />
      <Compile Include="Assets\Scripts\CircuitElementWire.cs" />
      <Compile Include="Assets\Scripts\CommentLog.cs" />
+     <Compile Include="Assets\Scripts\DanceThreesome.cs" />
      <Compile Include="Assets\Scripts\DrawnLine.cs" />
      <Compile Include="Assets\Scripts\ElementFactory.cs" />
      <Compile Include="Assets\Scripts\ElementSelectPanel.cs" />

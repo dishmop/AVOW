@@ -44,8 +44,7 @@ public class AVOWGreySphere : MonoBehaviour {
 	
 	bool switchToSilentBeat = false;
 	float silentBeatIntensity = 0;
-	
-	
+
 	
 	
 	enum State{
@@ -62,6 +61,7 @@ public class AVOWGreySphere : MonoBehaviour {
 		kRush,
 		kDance0,
 		kDance1,
+		kDanceThreesome,
 		kFinish
 	}
 	
@@ -92,6 +92,11 @@ public class AVOWGreySphere : MonoBehaviour {
 		}
 	}
 	
+	public void StartDanceThreesome(){
+		state = State.kDanceThreesome;
+	
+	}
+	
 	public void SetExpectant(GameObject sphere, GameObject lightPass){
 		lightGO = lightPass;
 		otherSphere = sphere;
@@ -114,10 +119,11 @@ public class AVOWGreySphere : MonoBehaviour {
 		vel += accn * Time.fixedDeltaTime;
 		
 		if (switchToSilentBeat){
-			beatLerpValue = Mathf.Min (beatLerpValue + 0.002f, 1);
+			beatLerpValue = Mathf.Min (beatLerpValue + 0.001f, 1);
 		}
 		CalcSilentBeatIntensity();
 		
+
 		
 		switch (state){
 			case State.kExpectant:{
@@ -307,6 +313,11 @@ public class AVOWGreySphere : MonoBehaviour {
 			    
 				break;
 			}
+			case State.kDanceThreesome:{
+				vel = Vector3.zero;
+				accn = Vector3.zero;
+				break;
+			}
 		}
 	}
 	
@@ -341,8 +352,8 @@ public class AVOWGreySphere : MonoBehaviour {
 			lightGO.transform.position = 0.5f * (transform.position + otherSphere.transform.position);
 			lightGO.GetComponent<Light>().intensity = useBeatIntensity;
 		}
-		
-		GetComponent<AudioSource>().volume = 1-beatLerpValue;
+			
+		GetComponent<AudioSource>().volume = 0.5f * (1-beatLerpValue);
 
 	
 	}
@@ -354,8 +365,10 @@ public class AVOWGreySphere : MonoBehaviour {
 	}
 	
 	public void StartCourtship(){
-			state = State.kStartCourtship;
-
+		state = State.kStartCourtship;
+		if (name == "MassObj"){
+		}
+		    
 	}
 	
 	void OnAudioFilterRead(float[] data, int channels){
@@ -364,7 +377,7 @@ public class AVOWGreySphere : MonoBehaviour {
 		for (int i = 0; i < data.Length; ++i){
 			total += Mathf.Abs (data[i]);
 		}
-		float val = 15 * total /data.Length; 
+		float val = 20 * total /data.Length; 
 		if (val > 1) val = 1;
 		audioBeatIntensity.Set (val + baseIntensity);
 		
