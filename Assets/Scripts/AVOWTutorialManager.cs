@@ -133,7 +133,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 		largeSphereCount = GenerateSpherePoints(idealLargeSphereCount, steerSphereRadius);
 		
 		state = State.kDebugJumpToDance2;
-		//state = State.kIntro2;
+		state = State.kIntro2;
 		//state = State.kTheWorldOfSpheres0;
 		//state = State.kStartup;
 		
