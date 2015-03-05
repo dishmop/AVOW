@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: NoiseBall
-  m_Shader: {fileID: 4800000, guid: eefbdc3a61af14d1681e6e099dd3cc6f, type: 3}
+  m_Name: BackStoyNoiseBall
+  m_Shader: {fileID: 4800000, guid: 3471a53c69e054a91a91d044177ccef6, type: 3}
   m_ShaderKeywords: []
   m_CustomRenderQueue: -1
   m_SavedProperties:
@@ -28,7 +28,7 @@ Material:
       data:
         first:
           name: _Freq
-        second: 50
+        second: 3
       data:
         first:
           name: _Speed
@@ -36,7 +36,7 @@ Material:
       data:
         first:
           name: _StaticSpeed
-        second: .0199999996
+        second: .200000003
       data:
         first:
           name: _DetailScale
@@ -81,6 +81,10 @@ Material:
         first:
           name: _EnableSquashing
         second: 1
+      data:
+        first:
+          name: _MidPoint
+        second: 0
     m_Colors:
       data:
         first:
@@ -97,7 +101,7 @@ Material:
       data:
         first:
           name: _Color0
-        second: {r: 0, g: .838235259, b: .0751519203, a: 1}
+        second: {r: 0, g: 1, b: .462069035, a: 1}
       data:
         first:
           name: _Color1

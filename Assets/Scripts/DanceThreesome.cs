@@ -55,14 +55,10 @@ public class DanceThreesome : MonoBehaviour {
 		
 		
 		Vector3 thisPos = transform.position;
-		thisPos.z = 0;
 		Vector3 otherPos1 = threesomeObj1.transform.position;
-		otherPos1.z = 0;
 		Vector3 otherPos2 = threesomeObj2.transform.position;
-		otherPos2.z = 0;
 		Vector3 avPos = 0.5f * ( otherPos1 + otherPos2);
 		Vector3 homePos = threesomeHome.transform.position;
-		homePos.z = 0;
 		
 		Vector3 hereToOther1 = otherPos1 - thisPos;
 		Vector3 hereToOther2 = otherPos2 - thisPos;
@@ -97,7 +93,6 @@ public class DanceThreesome : MonoBehaviour {
 			
 		accn = AVOWConfig.singleton.flockAlignCoef * (flockDirComp1 + flockDirComp2) + flockDistComp1 + flockDistComp2 + AVOWConfig.singleton.flockHomeCoef * homingComp;
 		thisVel += accn * Time.fixedDeltaTime;
-		thisVel.z = 0;
 		float currentSpeed = thisVel.magnitude;
 		float desSpeed = AVOWConfig.singleton.flockDesSpeed + speedMod;
 		float useSpeed = Mathf.Lerp (currentSpeed, desSpeed, 0.1f);

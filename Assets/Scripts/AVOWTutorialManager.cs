@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -11,6 +12,10 @@ public class AVOWTutorialManager : MonoBehaviour {
 	public GameObject backStory;
 	
 	public GameObject babyCubePrefab;
+	
+	public float danceFollow3Dist = 10;
+	
+	public GameObject prisonSphere1;
 	
 	GameObject babyCube = null;
 	
@@ -35,7 +40,15 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	float 		midAvoidProp = 0.25f;
 	
-	float inLove5Time = 0;
+	float 		inLove5Time = 0;
+	
+	float 		inLove11Time = 0;
+	
+	int			maxSphereCount = 100;
+	
+	float 		envy2Time = 0;
+	
+	float 		 zoomInTime;
 	
 	// Dance backup stuff
 	float backDesDistToOther;
@@ -46,6 +59,11 @@ public class AVOWTutorialManager : MonoBehaviour {
 	float backSpiralCoef;
 	
 	float love11Drag = 1;
+	
+	int largeSphereCount = -1;
+	int idealLargeSphereCount = 500;
+	Vector3[] sphereTargets;
+	
 	
 	public enum State{
 		kDebugJumpToDance,
@@ -73,11 +91,32 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kInLove9,
 		kInLove10,
 		kInLove11,
-		
+		kEnvy0,
+		kEnvy1,
+		kEnvy2,
+		kEnvy3,
+		kEnvy4,
+		kEnvy5,
+		kZoomIn0,
+		kZoomIn1,
+		kZoomIn2,
 		kStop,
 		kNumStates
 	}
+	
 	public State state = State.kOff;
+	
+	enum SteeringState{
+		kAvoidCentre,
+		kSpheresFromUs,
+		kMakeSphere
+	}
+	
+	SteeringState steeringState = SteeringState.kAvoidCentre;
+	
+	public float steerSphereRadius = 15;
+	public Vector3 steerSphereCentre = new Vector3(0, 0, 210);
+		
 	
 	Vector3[]		cameraStartPositions = new Vector3[(int)State.kNumStates];
 	bool triggered = false;
@@ -89,12 +128,21 @@ public class AVOWTutorialManager : MonoBehaviour {
 	Color			reflectionColor;
 	
 	public void StartTutorial(){
+	
+		
+		largeSphereCount = GenerateSpherePoints(idealLargeSphereCount, steerSphereRadius);
+		
 		state = State.kDebugJumpToDance2;
-		state = State.kIntro2;
+		//state = State.kIntro2;
 		//state = State.kTheWorldOfSpheres0;
-		state = State.kStartup;
+		//state = State.kStartup;
 		
 	}
+	
+	public void TriggerZoomIn(){
+		state = State.kZoomIn0;
+	}
+	
 	public void Trigger(){
 		triggered = true;
 	}
@@ -135,6 +183,17 @@ public class AVOWTutorialManager : MonoBehaviour {
 	void RestoreFlockConfig(){
 	
 	
+		AVOWConfig.singleton.flockDesDistToOther = 4f;
+		AVOWConfig.singleton.flockDesSpeed = 2;
+		AVOWConfig.singleton.flockAlignCoef = 0.2f;
+		AVOWConfig.singleton.flockHomeCoef = 1f;
+		AVOWConfig.singleton.flockSpeedMod = 1f;
+		AVOWConfig.singleton.flockSpiralCoef = 0;
+	}
+	
+	void RestoreFlockConfigOld(){
+		
+		
 		AVOWConfig.singleton.flockDesDistToOther = 4f;
 		AVOWConfig.singleton.flockDesSpeed = 4;
 		AVOWConfig.singleton.flockAlignCoef = 0.2f;
@@ -178,7 +237,15 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		SteerSpheresAwayFromCentre();
+		if (steeringState == SteeringState.kAvoidCentre){
+			SteerSpheresAwayFromCentre();
+		}
+		else if (steeringState == SteeringState.kSpheresFromUs){
+			SteerSpheresFromUs();
+		}
+		else if (steeringState == SteeringState.kMakeSphere){
+			SteerSpheresToSphere();
+		}
 		switch(state){
 		
 			case State.kDebugJumpToDance:{
@@ -249,7 +316,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			
 				BackStoryCamera.singleton.state = BackStoryCamera.State.kStill;
 				BackStoryCamera.singleton.transform.position = new Vector3(0, 0, 200);
-				Random.seed = 3;
+				UnityEngine.Random.seed = 3;
 				CreateRandomSphere();
 				AVOWTutorialText.singleton.AddPause(10);	
 				
@@ -334,9 +401,9 @@ public class AVOWTutorialManager : MonoBehaviour {
 					
 					Vector3 crossRes = Vector3.Cross(fromHereToHome, vel);
 					if (crossRes.z > 0)
-						AVOWConfig.singleton.flockSpiralCoef = -1f;
+						AVOWConfig.singleton.flockSpiralCoef = -2f;
 					else
-						AVOWConfig.singleton.flockSpiralCoef = 1f;
+						AVOWConfig.singleton.flockSpiralCoef = 2f;
 				
 					foreach (GameObject go in parentSpheres){
 						go.GetComponent<AVOWGreySphere>().heartRestartTrigger = true;
@@ -419,6 +486,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 				break;
 			}
 			case State.kInLove9:{
+				CreateRandomSpheres();
 				float linSpeed = 0.1f;
 				AVOWConfig.singleton.flockHomeCoef = Mathf.Max (AVOWConfig.singleton.flockHomeCoef - linSpeed * 1f, 20f);
 				babyCube.GetComponent<BabyBlueParent>().rotSpeed = Mathf.Max (babyCube.GetComponent<BabyBlueParent>().rotSpeed - 0.01f, 0);
@@ -435,9 +503,12 @@ public class AVOWTutorialManager : MonoBehaviour {
 			case State.kInLove10:{
 				RestoreFlockConfig();
 				StartDanceThreesome();
+				inLove11Time = Time.fixedTime + 20f;
 				break;
 			}
 			case State.kInLove11:{
+				CreateRandomSpheres();
+				
 				float timeToReach = 5;
 				love11Drag = Mathf.Max(love11Drag - 1/(timeToReach*60), 0f);
 				babyCube.GetComponent<DanceThreesome>().SetDrag(love11Drag);
@@ -446,9 +517,125 @@ public class AVOWTutorialManager : MonoBehaviour {
 				
 				babyCube.GetComponent<BabyBlueParent>().rotSpeed = Mathf.Lerp (3, 0, love11Drag);
 				babyCube.GetComponent<BabyBlueParent>().rotSpeed2 = Mathf.Lerp (2, 0, love11Drag);
-				UpdateDance();
+				UpdateDanceFollow();
+				if (Time.fixedTime > inLove11Time){
+					state = State.kEnvy0;
+				}
 				break;
 			}
+			case State.kEnvy0:{
+				AVOWTutorialText.singleton.AddTextNoLine("But the other spheres grew fearful of us.");
+				AVOWTutorialText.singleton.AddPause(6);
+				UpdateDanceFollow2();
+
+				state = State.kEnvy1;
+				
+				break;
+			}
+			case State.kEnvy1:{
+				spheresPerSec = 100;
+				maxSphereCount = largeSphereCount;
+				CreateRandomSpheres(false);
+				
+				UpdateDanceFollow2();
+				
+				if (spheres.Count == largeSphereCount){
+					steeringState = SteeringState.kMakeSphere;
+					foreach (GameObject go in spheres){
+						AVOWGreySphere sphere = go.GetComponent<AVOWGreySphere>();
+						sphere.beatColor = new Color(0, 0.5f, 0);
+						sphere.SetRegularBeats();
+						sphere.ActivateSilentBeat();
+						sphere.bpm = 15;
+					}
+					state = State.kEnvy2;
+					envy2Time = Time.fixedTime + 15f;
+				}
+				else{
+					steeringState = SteeringState.kSpheresFromUs;
+				}
+			
+				break;
+			}
+			case State.kEnvy2:{				
+				UpdateDanceFollow2();
+				if (Time.fixedTime > envy2Time){
+					babyCube.GetComponent<BabyBlueParent>().SetToActive();
+					babyCube.GetComponent<BabyBlueParent>().updateSize = false;
+					state = State.kEnvy3;
+				
+				}
+
+				break;
+			}	
+			case State.kEnvy3:{		
+				UpdateDanceFollow3();		
+				float lerpVal = babyCube.GetComponent<BabyBlueParent>().lerpVal * 3;
+				AVOWConfig.singleton.flockDesSpeed = Mathf.Max (AVOWConfig.singleton.flockDesSpeed - 0.01f, 0f);
+				AVOWConfig.singleton.flockSpeedMod = Mathf.Max (AVOWConfig.singleton.flockSpeedMod - 0.01f, 0f);
+				babyCube.GetComponent<DanceThreesome>().SetDrag(lerpVal	);
+				parentSpheres[0].GetComponent<DanceThreesome>().SetDrag( lerpVal	);
+				parentSpheres[1].GetComponent<DanceThreesome>().SetDrag( lerpVal	);
+				
+				parentSpheres[0].GetComponent<DanceThreesome>().ForceVelocity(parentSpheres[0].GetComponent<DanceThreesome>().GetVelocity() * 0.98f);
+				parentSpheres[1].GetComponent<DanceThreesome>().ForceVelocity(parentSpheres[1].GetComponent<DanceThreesome>().GetVelocity() * 0.98f);
+				babyCube.GetComponent<DanceThreesome>().ForceVelocity(babyCube.GetComponent<DanceThreesome>().GetVelocity() * 0.98f);
+				babyCube.GetComponent<BabyBlueParent>().rotSpeed = Mathf.Max (babyCube.GetComponent<BabyBlueParent>().rotSpeed - 0.001f, 0.1f);
+				babyCube.GetComponent<BabyBlueParent>().rotSpeed2 = Mathf.Max (babyCube.GetComponent<BabyBlueParent>().rotSpeed2 - 0.001f, 0.1f);
+				
+				parentSpheres[2].transform.position = Vector3.Lerp (parentSpheres[2].transform.position , steerSphereCentre, 0.01f);
+				BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView = Mathf.Min (BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView + zoomSpeed, 45);
+				if ((babyCube.transform.position - BackStoryCamera.singleton.transform.position).magnitude > danceFollow3Dist * 0.9){
+					state = State.kEnvy4;
+				}
+			
+				break;
+			}	
+			case State.kEnvy4:{				
+				UpdateDanceFollow3();
+				
+				// Choose two spheres
+				int numSpheres = 2;
+				int numToIgnore = 0;
+				GameObject[] nearSpheres = GetNearestSpheresToCamera(numSpheres, numToIgnore);
+				
+				// NOw select a random two
+				GameObject bullet1 = nearSpheres[UnityEngine.Random.Range(0, numSpheres/2)];
+				GameObject bullet2 = nearSpheres[UnityEngine.Random.Range(numSpheres/2, numSpheres)];
+				
+				bullet1.GetComponent<AVOWGreySphere>().ShootAt(parentSpheres[0]);
+				bullet2.GetComponent<AVOWGreySphere>().ShootAt(parentSpheres[1]);
+				state = State.kEnvy5;
+				break;
+			}	
+			case State.kEnvy5:{		
+				UpdateDanceFollow3();
+
+				break;
+			}	
+			case State.kZoomIn0:{		
+				UpdateDanceFollow4();
+				zoomInTime = Time.fixedTime + 10f;
+				state = State.kZoomIn1;
+				break;
+			}
+			case State.kZoomIn1:{		
+				UpdateDanceFollow4();
+				if (Time.fixedTime > zoomInTime){
+					state = State.kZoomIn2;
+				}
+			
+				break;
+			}
+			case State.kZoomIn2:{		
+				UpdateDanceFollow4();
+				prisonSphere1.SetActive(true);
+				Color thisCol = prisonSphere1.renderer.material.GetColor ("_Color0");
+				thisCol.a = Mathf.Min (thisCol.a + 0.001f, 1f);
+				prisonSphere1.renderer.material.SetColor ("_Color0", thisCol);
+				prisonSphere1.renderer.material.SetFloat ("_MidPoint", BackStoryCamera.singleton.transform.position.y);
+				break;			
+			}				
 			case State.kStop:{
 				AVOWTutorialText.singleton.ClearText();
 				state = State.kOff;		
@@ -458,6 +645,28 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 		ManageObjects();
 	
+	}
+	
+	GameObject[] GetNearestSpheresToCamera(int numSpheres, int numToIgnore){
+		
+		Vector3 camPos = BackStoryCamera.singleton.transform.position;
+		
+		foreach (GameObject go in spheres){
+			float dist = (camPos - go.transform.position).sqrMagnitude;
+			go.GetComponent<AVOWGreySphere>().distSqToCam = dist;
+		}
+
+		GameObject[] tempSpheres = new GameObject[spheres.Count];
+		spheres.CopyTo(tempSpheres);
+		
+		Array.Sort(tempSpheres, (obj1, obj2) => obj1.GetComponent<AVOWGreySphere>().distSqToCam.CompareTo(obj2.GetComponent<AVOWGreySphere>().distSqToCam));
+		
+		GameObject[] results = new GameObject[numSpheres];
+		Array.Copy(tempSpheres, numToIgnore, results, 0, numSpheres);
+		
+		
+		return results;
+		
 	}
 	
 	void StartDanceThreesome(){
@@ -474,9 +683,9 @@ public class AVOWTutorialManager : MonoBehaviour {
 		Debug.Log (babyCube.GetComponent<DanceThreesome>().GetVelocity().ToString());
 		Debug.Log  ("");
 		
-		parentSpheres[0].GetComponent<DanceThreesome>().ForceVelocity(parentSpheres[0].GetComponent<AVOWGreySphere>().vel);
-		parentSpheres[1].GetComponent<DanceThreesome>().ForceVelocity(parentSpheres[1].GetComponent<AVOWGreySphere>().vel);
-		
+		parentSpheres[0].GetComponent<DanceThreesome>().ForceVelocity(parentSpheres[0].GetComponent<AVOWGreySphere>().vel + new Vector3(0, 0, 1));
+		parentSpheres[1].GetComponent<DanceThreesome>().ForceVelocity(parentSpheres[1].GetComponent<AVOWGreySphere>().vel + new Vector3(0, 0, 1));
+		babyCube.GetComponent<DanceThreesome>().ForceVelocity(new Vector3(0, 0, 1));
 		
 		babyCube.GetComponent<DanceThreesome>().SetDrag(love11Drag);
 		parentSpheres[0].GetComponent<DanceThreesome>().SetDrag(love11Drag);
@@ -527,6 +736,34 @@ public class AVOWTutorialManager : MonoBehaviour {
 		}
 		
 	}
+	
+	Vector3 CalcSpherePos(float t, float p, float r){
+		return r * new Vector3(Mathf.Sin(t)*Mathf.Cos (p), Mathf.Sin (t) * Mathf.Sin (p), Mathf.Cos (t));
+		
+	}
+	
+	int GenerateSpherePoints(int N, float r){
+		sphereTargets = new Vector3[N];
+		
+		int index= 0;
+		float a = 4 * Mathf.PI / N;
+		float d = Mathf.Sqrt(a);
+		float mt = Mathf.RoundToInt(Mathf.PI/d);
+		float dt = Mathf.PI / mt;
+		float dp = a / dt;
+		for (int m = 0; m < mt; ++m){
+			float t = Mathf.PI * (m + 0.5f) / mt;
+			float mp = Mathf.RoundToInt(2 * Mathf.PI * Mathf.Sin(t)/dp);	// This is ambiguous
+			for (int n = 0; n < mp; ++n){
+				float p = 2 * Mathf.PI * n / mp;
+				sphereTargets[index++] = CalcSpherePos(t, p, r);
+			}
+		}
+		
+		return index;
+		
+	}
+	
 //		
 //	void UpdateDance(){
 //		foreach (GameObject go in parentSpheres){
@@ -555,8 +792,84 @@ public class AVOWTutorialManager : MonoBehaviour {
 		Vector3 lookPos = 0.5f * (parentSpheres[0].transform.position +  parentSpheres[1].transform.position);
 		BackStoryCamera.singleton.GetComponent<BackStoryCamera>().SetLoveLook(lookPos);
 		
+
+		
+		
 		
 	}
+	
+	
+	void UpdateDanceFollow(){
+		float speed = 0.7f;
+		parentSpheres[2].transform.position = danceOffset + new Vector3(2 * Mathf.Sin (speed*(Time.fixedTime - danceTime)), Mathf.Sin (2 * speed*(Time.fixedTime - danceTime)), 210);
+		
+		float danceFollowDist = 8;
+		
+		// Get the camrera following the,
+		Vector3 lookPos = babyCube.transform.position;
+		Vector3 bePos = babyCube.transform.position  - babyCube.GetComponent<DanceThreesome>().GetVelocity().normalized * danceFollowDist;
+		BackStoryCamera.singleton.GetComponent<BackStoryCamera>().SetEnvyFollow(lookPos, bePos);
+	}
+	
+	
+	void UpdateDanceFollow2(){
+		float speed = 0.7f;
+		parentSpheres[2].transform.position = danceOffset + new Vector3(2 * Mathf.Sin (speed*(Time.fixedTime - danceTime)), Mathf.Sin (2 * speed*(Time.fixedTime - danceTime)), 210 + Mathf.Sin (3 * speed*(Time.fixedTime - danceTime)));
+		
+		float danceFollowDist = 8;
+		
+		// Get the camrera following the,
+		Vector3 lookPos = babyCube.transform.position;
+		Vector3 bePos = babyCube.transform.position  - babyCube.GetComponent<DanceThreesome>().GetVelocity().normalized * danceFollowDist;
+		BackStoryCamera.singleton.GetComponent<BackStoryCamera>().SetEnvyFollow(lookPos, bePos);
+	}
+	
+	void UpdateDanceFollow3(){
+		float danceFollowDist = 8;
+		
+		// Get the camrera following the,
+		Vector3 lookPos = babyCube.transform.position;
+		Vector3 bePos2 = babyCube.transform.position  - babyCube.GetComponent<DanceThreesome>().GetVelocity().normalized * danceFollowDist;
+		
+		
+		
+		
+		float speed = 0.7f;
+		
+		// Get the camrera following the,
+		Vector3 fromLookToHere = BackStoryCamera.singleton.transform.position - lookPos;
+		float dist = fromLookToHere.magnitude;
+		
+		Vector3 distVel = 0.025f * fromLookToHere.normalized * (danceFollow3Dist - dist);
+		
+		Vector3 bePos3 = BackStoryCamera.singleton.transform.position  + BackStoryCamera.singleton.transform.TransformDirection(new Vector3(0.3f, 0.1f, 0)) + distVel;
+		
+		float lerpVel = babyCube.GetComponent<DanceThreesome>().GetVelocity().magnitude;
+		
+		BackStoryCamera.singleton.GetComponent<BackStoryCamera>().SetEnvyFollow(lookPos, Vector3.Lerp (bePos3, bePos2, lerpVel));
+	}
+	
+	
+	void UpdateDanceFollow4(){
+		float speed = 0.7f;
+		
+		// Get the camrera following the,
+		Vector3 lookPos = babyCube.transform.position;
+		Vector3 fromLookToHere = BackStoryCamera.singleton.transform.position - lookPos;
+		float dist = fromLookToHere.magnitude;
+		
+		
+		Vector3 distVel = 0.12f * fromLookToHere.normalized * (danceFollow3Dist - dist);
+		
+		Vector3 bePos3 = BackStoryCamera.singleton.transform.position  + BackStoryCamera.singleton.transform.TransformDirection(new Vector3(0.3f, 0.1f, 0)) + distVel;
+		
+		BackStoryCamera.singleton.GetComponent<BackStoryCamera>().SetEnvyFollow(lookPos, bePos3);
+	}
+	
+	
+	
+
+
 	
 	
 	void UpdateDanceSpiral(){
@@ -593,6 +906,14 @@ public class AVOWTutorialManager : MonoBehaviour {
 		parentSpheres[1].GetComponent<AVOWGreySphere>().vel = new Vector3(-0.2f, 0.3f, 0.0f);
 		StartDancing();
 		
+		
+		// set up heart
+		parentSpheres[0].GetComponent<AVOWGreySphere>().SetRegularBeats();
+		parentSpheres[1].GetComponent<AVOWGreySphere>().SetRegularBeats();
+		parentSpheres[0].GetComponent<AVOWGreySphere>().ActivateSilentBeat();
+		parentSpheres[1].GetComponent<AVOWGreySphere>().ActivateSilentBeat();
+		
+		
 		CreateCube();
 		
 		babyCube.GetComponent<BabyBlueParent>().sizeMul = 1;
@@ -602,8 +923,11 @@ public class AVOWTutorialManager : MonoBehaviour {
 		babyCube.GetComponent<BabyBlueParent>().Update();
 		StartDanceThreesome();
 		RestoreFlockConfig();
+		foreach (GameObject go in parentSpheres){
+			go.GetComponent<AVOWGreySphere>().SetCube(babyCube);
+		}
 		
-		//state = State.kInLove4;
+		inLove11Time = Time.fixedTime + 10f;
 		
 	}
 	
@@ -685,10 +1009,14 @@ public class AVOWTutorialManager : MonoBehaviour {
 	}
 	
 	void CreateRandomSpheres(){
+		CreateRandomSpheres(true);
+	}
+	
+	void CreateRandomSpheres(bool doRemoval){
 		if (Time.fixedTime > sphereTime){
-			RemoveDepartedSpheres();
+			if (doRemoval) RemoveDepartedSpheres();
 			sphereTime = Time.fixedTime + 1f/spheresPerSec;
-			if (spheres.Count < 100){
+			if (spheres.Count < maxSphereCount){
 				CreateRandomSphere();
 				
 			}
@@ -748,18 +1076,28 @@ public class AVOWTutorialManager : MonoBehaviour {
 		GameObject newSphere = GameObject.Instantiate(greySphere) as GameObject;
 		newSphere.transform.parent = backStory.transform.FindChild("WorldOfSpheres");
 		
+		Vector3[] frustOutsLocal = new Vector3[4];
+		Vector3[] frustNormsLocal = new Vector3[4];
+		
+		for (int i = 0; i < 4; ++i){
+			frustOutsLocal[i] = camera.transform.TransformDirection(frustOuts[i]);
+			frustNormsLocal[i] = camera.transform.TransformDirection(frustNorms[i]);
+			
+		}
+		
 		bool calcVel = true;
 		while (calcVel){
-			int edge = Random.Range(0, 4);
-			float dist = Random.Range (camera.nearClipPlane + 3f, camera.farClipPlane);
+			int edge = UnityEngine.Random.Range(0, 4);
+			float dist = UnityEngine.Random.Range (camera.nearClipPlane + 3f, camera.farClipPlane);
 			int tangIndex = (edge + 1) % 4;
-			Vector3 spawnDir = frustOuts[edge] + Random.Range (-1f, 1f) * new Vector3(frustOuts[tangIndex].x, frustOuts[tangIndex].y, 0);
-			Vector3 goOutsideViewDir = -frustNorms[edge];
+			Vector3 spawnDir = frustOutsLocal[edge] + UnityEngine.Random.Range (-1f, 1f) * new Vector3(frustOutsLocal[tangIndex].x, frustOutsLocal[tangIndex].y, 0);
+			Vector3 goOutsideViewDir = -frustNormsLocal[edge];
 		
-			float scale = Random.Range (0.2f, 2.0f);
+			//float scale = Random.Range (0.2f, 2.0f);
+			float scale = 1f;
 			newSphere.transform.position = camera.transform.position + spawnDir * dist + goOutsideViewDir * scale;
 			newSphere.transform.localScale = new Vector3(scale, scale, scale);
-			newSphere.GetComponent<AVOWGreySphere>().vel = Random.Range (0.3f, 0.5f) * frustNorms[edge] + Random.Range (-0.5f, 0.5f) * new Vector3(0, 0, 1) + Random.Range (-0.5f, 0.5f) * frustNorms[tangIndex];
+			newSphere.GetComponent<AVOWGreySphere>().vel = UnityEngine.Random.Range (0.3f, 0.5f) * frustNormsLocal[edge] + UnityEngine.Random.Range (-0.5f, 0.5f) * new Vector3(0, 0, 1) + UnityEngine.Random.Range (-0.5f, 0.5f) * frustNormsLocal[tangIndex];
 			calcVel = IsHeadingForCentre(newSphere);
 		}
 		
@@ -796,6 +1134,88 @@ public class AVOWTutorialManager : MonoBehaviour {
 				
 				
 			}
+		}
+	}
+	
+	void SteerSpheresToSphere(){
+		SteerSpheresFromUs();
+		for (int i = 0; i < spheres.Count; ++i){
+			GameObject go = spheres[i];
+			if (go.GetComponent<AVOWGreySphere>().disableSphering) continue;
+			
+			// Get Vector from this sphere to target
+			Vector3 hereToTarget = sphereTargets[i]  + steerSphereCentre -  go.transform.position;
+
+			Vector3 accn = 0.5f * hereToTarget;
+			go.GetComponent<AVOWGreySphere>().vel += accn * Time.fixedDeltaTime;
+			
+			// Dampen the velocity
+			go.GetComponent<AVOWGreySphere>().vel *= 0.98f;
+			
+		}
+	}
+	
+	void SteerSpheresFromUs(){
+		for (int i = 0; i < spheres.Count; ++i){
+			GameObject go = spheres[i];
+			if (go.GetComponent<AVOWGreySphere>().disableSphering) continue;
+			
+			// Create vectors pointing from spheres to cube and its parents
+			Vector3 fromCubeToHere = go.transform.position - babyCube.transform.position;
+			Vector3 fromParent0ToHere = go.transform.position - parentSpheres[0].transform.position;
+			Vector3 fromParent1ToHere = go.transform.position - parentSpheres[1].transform.position;
+			float fromCubeToHereDist = fromCubeToHere.magnitude;
+			float fromParent0ToHereDist = fromParent0ToHere.magnitude;
+			float fromParent1ToHereDist = fromParent1ToHere.magnitude;
+			
+
+			float cubeForce = 1/(fromCubeToHereDist * fromCubeToHereDist);
+			float parent0Force = 1/(fromParent0ToHereDist * fromParent0ToHereDist);
+			float parent1Force = 1/(fromParent1ToHereDist * fromParent1ToHereDist);
+
+			if (fromCubeToHereDist > 8){
+				cubeForce = 0;
+			}
+			if (fromParent0ToHereDist > 8){
+				parent0Force = 0;
+			}
+			if (fromParent1ToHereDist > 8){
+				parent1Force = 0;
+			}
+			
+//			float cubeForce = 1/(fromCubeToHereDist );
+//			float parent0Force = 1/(fromParent0ToHereDist);
+//			float parent1Force = 1/(fromParent1ToHereDist );
+			
+			Vector3 accn = fromCubeToHere.normalized * cubeForce + fromParent0ToHere.normalized * parent0Force + fromParent1ToHere.normalized * parent1Force;
+
+			go.GetComponent<AVOWGreySphere>().vel += 250f * accn * Time.fixedDeltaTime;
+			
+			// Dampen the velocity
+			if (go.GetComponent<AVOWGreySphere>().vel.magnitude > 1){
+				go.GetComponent<AVOWGreySphere>().vel *= 0.98f;
+			}
+			
+		}
+	}
+	
+	void SteerSpheresToSphereOld(){
+		foreach (GameObject go in spheres){
+			// Get Vector from centre to sphere
+			Vector3 centreToSphere = go.transform.position - steerSphereCentre;
+			float currentDist = centreToSphere.magnitude;
+			// Size it by the distance we have still to travel
+			centreToSphere.Normalize();
+			
+			Vector3 accn = centreToSphere * (steerSphereRadius - currentDist);
+			go.GetComponent<AVOWGreySphere>().vel += accn * Time.fixedDeltaTime;
+			
+			// Dampen the velocity in the direction of the radious of the sphere
+			float dotResult = Vector3.Dot(centreToSphere, go.GetComponent<AVOWGreySphere>().vel);
+			Vector3 radialVel = centreToSphere * dotResult;
+			go.GetComponent<AVOWGreySphere>().vel -= radialVel * 0.05f;
+			//go.GetComponent<AVOWGreySphere>().vel *= 0.99f;
+			
 		}
 	}
 	
@@ -845,6 +1265,11 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	void OnDestroy(){
 		singleton = null;
+	}
+	
+	void OnGUI(){
+	
+		GUI.Box (new Rect(50, 50, 500, 30), state.ToString());
 	}
 	
 }

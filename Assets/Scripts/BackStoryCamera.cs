@@ -9,12 +9,17 @@ public class BackStoryCamera : MonoBehaviour {
 	public float moveSpeed = 0.1f;
 	
 	public Vector3 loveLook;
+	public Vector3 bePos;
+	
+	
+	float envyRampUp = 0;
 	
 	
 	public enum State{
 		kStill,
 		kOrbitCube,
-		kLoveLook
+		kLoveLook,
+		kEnvyFollow
 		
 	}
 	public State state = State.kStill;
@@ -28,6 +33,12 @@ public class BackStoryCamera : MonoBehaviour {
 	public void SetLoveLook(Vector3 loveLookPos){
 		loveLook = loveLookPos;
 		state = State.kLoveLook;
+	}
+	
+	public void SetEnvyFollow(Vector3 envyLookPos, Vector3 envyBePos){
+		loveLook = envyLookPos;
+		bePos = envyBePos;
+		state = State.kEnvyFollow;
 	}
 	
 	
@@ -46,6 +57,17 @@ public class BackStoryCamera : MonoBehaviour {
 				Quaternion currRot = transform.rotation; 	
 				Quaternion desRot = Quaternion.LookRotation( loveLook - transform.position);
 				transform.rotation = Quaternion.Lerp(currRot, desRot, 0.02f);
+				break;
+			}
+			case State.kEnvyFollow:{
+				float envyLerp = Mathf.Lerp(0, 0.1f, envyRampUp);
+				Quaternion currRot = transform.rotation; 	
+				// Get the current up direction
+				Vector3 thisUp = transform.TransformDirection(new Vector3 (0, 1, 0));
+				Quaternion desRot = Quaternion.LookRotation( loveLook - transform.position, thisUp);
+				transform.rotation = Quaternion.Lerp(currRot, desRot, envyLerp);
+				transform.position = Vector3.Lerp (transform.position, bePos, envyLerp);
+				envyRampUp = Mathf.Min (envyRampUp + 0.01f, 1f);
 				break;
 			}
 		}

@@ -1,3 +1,127 @@
 Base path: /Applications/Unity/Unity.app/Contents
 Pipe name: \\.\pipe\UnityShaderCompiler-1--1585929816
 Cmd: getPlatforms
+Cmd: preprocess
+  insize=1963 outsize=447 ok=1
+Cmd: preprocess
+  insize=1961 outsize=445 ok=1
+Cmd: preprocess
+  insize=1958 outsize=442 ok=1
+Cmd: preprocess
+  insize=1957 outsize=441 ok=1
+Cmd: preprocess
+  insize=1506 outsize=439 ok=1
+Cmd: compileSnippet
+  error: 2 plat 0 at (76): swizzle mask element not present in operand "z"
+  api=0 type=0 insize=1366 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=1501 outsize=439 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1361 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1361 outsize=4882 kw= ok=1
+Cmd: preprocess
+  insize=1531 outsize=438 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1391 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1391 outsize=4946 kw= ok=1
+Cmd: preprocess
+  insize=1484 outsize=439 ok=1
+Cmd: compileSnippet
+  error: 2 plat 0 at (76): syntax error, unexpected '.', expecting identifier or template identifier or type identifier at token "." type name expected at token "."
+  error: 2 plat 0 at (81): cast not allowed; syntax error, unexpected ';', expecting ',' or ')' at token ";" type name expected at token ";"
+  error: 2 plat 0 at (84): invalid type in type constructor; syntax error, unexpected ';', expecting ',' or ')' at token ";" type name expected at token ";"
+  api=0 type=0 insize=1344 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=1481 outsize=439 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1341 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1341 outsize=4946 kw= ok=1
+Cmd: preprocess
+  insize=1556 outsize=439 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1416 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  error: 2 plat 0 at (86): array index out of bounds; cannot index a non-array value
+  api=0 type=1 insize=1416 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=1555 outsize=439 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1415 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1415 outsize=5035 kw= ok=1
+Cmd: preprocess
+  insize=1560 outsize=439 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1420 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1420 outsize=5053 kw= ok=1
+Cmd: preprocess
+  insize=1560 outsize=439 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1420 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1420 outsize=5052 kw= ok=1
+Cmd: preprocess
+  insize=1563 outsize=439 ok=1
+Cmd: compileSnippet
+  error: 2 plat 0 at (85): syntax error, unexpected integer constant, expecting ',' or ')' at token "<int-const>" type name expected at token "<int-const>"
+  api=0 type=0 insize=1423 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=1564 outsize=439 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1424 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1424 outsize=5043 kw= ok=1
+Cmd: preprocess
+  insize=1560 outsize=439 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1420 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1420 outsize=5054 kw= ok=1
+Cmd: preprocess
+  insize=1568 outsize=439 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1428 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1428 outsize=5074 kw= ok=1
+Cmd: preprocess
+  insize=1569 outsize=439 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1429 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1429 outsize=5082 kw= ok=1
+Cmd: preprocess
+  insize=1568 outsize=439 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1428 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1428 outsize=5076 kw= ok=1
+Cmd: preprocess
+  insize=1569 outsize=439 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1429 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  error: 2 plat 0 at (85): variable/member "pos" has semantic "POSITION" which is not visible in this profile; variable/member "pos" has semantic "POSITION" which is not visible in this profile
+  api=0 type=1 insize=1429 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=1568 outsize=439 ok=1
+Cmd: preprocess
+  insize=1569 outsize=439 ok=1
+Cmd: compileSnippet
+  error: 2 plat 0 at (85): variable/member "pos" has semantic "POSITION" which is not visible in this profile; variable/member "pos" has semantic "POSITION" which is not visible in this profile
+  api=0 type=1 insize=1429 outsize=0 kw= ok=0
+Cmd: preprocess
+  insize=1645 outsize=473 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1471 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1471 outsize=5106 kw= ok=1
+Cmd: preprocess
+  insize=1645 outsize=473 ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=1471 outsize=504 kw= ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=1471 outsize=5107 kw= ok=1

@@ -25,6 +25,7 @@ public class BabyBlueCube : MonoBehaviour {
 			
 	void Update(){
 		transform.Rotate (new Vector3(1, 1, 1), rotSpeed, Space.Self);
+		transform.Rotate (new Vector3(0, 0, 1), rotSpeed2, Space.Self);
 	}
 
 }

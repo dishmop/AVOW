@@ -97,11 +97,11 @@ Material:
       data:
         first:
           name: _Color0
-        second: {r: .13202852, g: .816176474, b: .731248796, a: 1}
+        second: {r: .209504738, g: .91911763, b: .831028819, a: 1}
       data:
         first:
           name: _Color1
-        second: {r: 0, g: .0305272862, b: .632352948, a: 1}
+        second: {r: 0, g: .0365617499, b: .757352948, a: .254901975}
       data:
         first:
           name: _BkColor

@@ -13,9 +13,14 @@ public class BabyBlueParent : MonoBehaviour {
 	
 	public bool isActive  = true;
 	
+	public float lerpVal = 1;
+	
+	public bool updateSize = true;
+	
 	bool enableGrow = false;
 	
 	float underlyingSize;
+	
 	
 	
 	GameObject lightening0;
@@ -46,6 +51,16 @@ public class BabyBlueParent : MonoBehaviour {
 	
 	public bool IsGrown(){
 		return sizeMul >= 1f;
+	}
+	
+	public void SetToActive(){
+		isActive = true;
+		lerpVal = 0;
+	}
+	
+	public void NullParents(){
+		parent0 = null;
+		parent1 = null;
 	}
 	
 	
@@ -100,14 +115,18 @@ public class BabyBlueParent : MonoBehaviour {
 			Vector3 midPoint = parent0.transform.position + from0CentreTo0Edge + 0.5f * from0To1Edges;
 
 			
-			transform.position = midPoint;
+			transform.position = Vector3.Lerp (transform.position, midPoint, lerpVal);
 			Vector3 lookDir = parent0.transform.position - transform.position;
 			transform.rotation = Quaternion.LookRotation(lookDir, new Vector3(0, 0, -1));
 			
-			underlyingSize = 0.25f * from0To1Edges.magnitude * 0.5f;
-			float scale =  underlyingSize * sizeMul;
-			transform.localScale = new Vector3(scale, scale, scale);
+			if (updateSize){
+				underlyingSize = 0.25f * from0To1Edges.magnitude * 0.5f;
+				float scale =  underlyingSize * sizeMul;
+				transform.localScale = new Vector3(scale, scale, scale);
+			}
 		}
+		
+		lerpVal = Mathf.Min (lerpVal + 0.001f, 1);
 		
 		if (!lightingCreated){
 			CreateLightening();

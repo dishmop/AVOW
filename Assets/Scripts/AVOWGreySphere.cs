@@ -10,11 +10,17 @@ public class AVOWGreySphere : MonoBehaviour {
 	public GameObject lightGO;
 	public GameObject massObj;
 	public float beatLerpValue = 0;
+	public float bpm = 45;
+	public bool disableSphering = false;
+	public float distSqToCam = -1;
 	
 	
+	
+	bool beatsActive = true;
 	
 	GameObject babyCube = null;
 	
+	GameObject shootTarget;
 	
 	
 	
@@ -35,7 +41,7 @@ public class AVOWGreySphere : MonoBehaviour {
 	
 	bool isPrimeBeater = false;
 	
-	float bpm = 45;
+
 	float beatTime = 0;
 	bool regularBeats = false;
 	float maxBPM = 60;
@@ -45,7 +51,9 @@ public class AVOWGreySphere : MonoBehaviour {
 	bool switchToSilentBeat = false;
 	float silentBeatIntensity = 0;
 
+	Vector3 bounceVel;
 	
+
 	
 	enum State{
 		kNormal,
@@ -62,15 +70,35 @@ public class AVOWGreySphere : MonoBehaviour {
 		kDance0,
 		kDance1,
 		kDanceThreesome,
-		kFinish
+		kHeatUp0,
+		kShoot0,
+		kShoot1,
+		kBounced,
+		kFinish,
+		kShoot2
 	}
 	
 	State state = State.kNormal;
 	
 	float waitUntil = 0;
 	
+	public void ShootAt(GameObject target){
+		state = State.kHeatUp0;
+		shootTarget = target;
+		beatsActive = false;
+		regularBeats = false;
+		disableSphering = true;
+	}
 	
-
+	public void ActivateBounce(Vector3 newVel){
+		state = State.kBounced;
+		bounceVel = newVel;
+		vel = newVel;
+		babyCube.GetComponent<BabyBlueParent>().NullParents();
+		
+		
+	}
+	
 	// Use this for initialization
 	void Start () {
 		baseRimColor = renderer.material.GetColor("_RimColour");
@@ -90,6 +118,10 @@ public class AVOWGreySphere : MonoBehaviour {
 			regularBeats = true;
 			beatTime = Time.fixedTime + 1.0f / (bpm / 60f);
 		}
+	}
+	
+	public void SetToNormal(){
+		state = State.kNormal;
 	}
 	
 	public void StartDanceThreesome(){
@@ -318,7 +350,71 @@ public class AVOWGreySphere : MonoBehaviour {
 				accn = Vector3.zero;
 				break;
 			}
+			case State.kHeatUp0:{
+				Color col = renderer.material.GetColor("_RimColour");
+				Color newCol = Color.Lerp(col, GetHeatColor(), 0.02f);
+				renderer.material.SetColor("_RimColour", newCol);
+				renderer.material.SetColor("_ReflectColour", newCol);
+				if (MathUtils.FP.Feq(col.r, newCol.r, 0.003f) && MathUtils.FP.Feq(col.g, newCol.g, 0.003f) && MathUtils.FP.Feq(col.b, newCol.b, 0.003f)){
+					state = State.kShoot0;
+				}
+				AVOWTutorialManager.singleton.danceFollow3Dist = 10;
+				AVOWTutorialManager.singleton.TriggerZoomIn();
+				
+			    
+				break;
+			}
+			case State.kShoot0:{
+				Vector3 fromHereToTarget = shootTarget.transform.position - transform.position;
+				fromHereToTarget.Normalize();
+				vel = 30 * fromHereToTarget;
+				state = State.kShoot1;
+			
+				break;
+			}
+			case State.kShoot1:{	
+				// Test for collision
+				Vector3 fromHereToTarget = shootTarget.transform.position - transform.position;
+				float dist = fromHereToTarget.magnitude;
+				if (dist < 0.5f * (transform.localScale.x + shootTarget.transform.localScale.x)){
+					float randSize = 10f;
+					Vector3 randVec = new Vector3(UnityEngine.Random.Range (-randSize, randSize), UnityEngine.Random.Range (-randSize, randSize), UnityEngine.Random.Range (-randSize, randSize));
+					// Remove the component in the direction of travel
+					Vector3 normTravelDir = fromHereToTarget / dist;
+					float dotResult = Vector3.Dot (randVec, normTravelDir);
+					randVec -= normTravelDir * dotResult;
+					shootTarget.GetComponent<AVOWGreySphere>().ActivateBounce(vel + randVec);
+					vel *= 0.8f;
+					accn = Vector3.zero;
+					state = State.kShoot2;
+				}
+			    
+				break;
+			}
+			case State.kShoot2:{	
+				Color rimCol = renderer.material.GetColor("_RimColour");
+				Color refCol = renderer.material.GetColor("_ReflectColour");
+			
+				Color newRimCol = Color.Lerp(rimCol, baseRimColor, 0.02f);
+				Color newRefCol = Color.Lerp(rimCol, baseReflectColor, 0.02f);
+				
+				renderer.material.SetColor("_RimColour", newRimCol);
+				renderer.material.SetColor("_ReflectColour", newRefCol);
+				
+				beatsActive = true;
+				regularBeats = true;
+				disableSphering = false;
+				
+
+			
+			break;
+			}
 		}
+	}
+	
+	Color GetHeatColor(){
+		return Color.white;
+		//return new Color(0, 0, 0.125f);
 	}
 	
 	void CalcSilentBeatIntensity(){
@@ -336,21 +432,22 @@ public class AVOWGreySphere : MonoBehaviour {
 	}
 	
 	void Update(){
-		
-		float useBeatIntensity = Mathf.Lerp (audioBeatIntensity.GetValue(), silentBeatIntensity, beatLerpValue);
-		Color rimColor = Color.Lerp(baseRimColor, beatColor, useBeatIntensity);
-		renderer.material.SetColor("_RimColour", rimColor);
-		
-		Color reflectColor = Color.Lerp(baseReflectColor, beatColor, useBeatIntensity);
-		renderer.material.SetColor("_ReflectColour", reflectColor);
-		audioBeatIntensity.Update();
-		
-		if (lightGO != null){
-		
-			Color lightColor = Color.Lerp(baselightColor, beatColor, useBeatIntensity);
-			lightGO.GetComponent<Light>().color = lightColor;
-			lightGO.transform.position = 0.5f * (transform.position + otherSphere.transform.position);
-			lightGO.GetComponent<Light>().intensity = useBeatIntensity;
+		if (beatsActive){
+			float useBeatIntensity = Mathf.Lerp (audioBeatIntensity.GetValue(), silentBeatIntensity, beatLerpValue);
+			Color rimColor = Color.Lerp(baseRimColor, beatColor, useBeatIntensity);
+			renderer.material.SetColor("_RimColour", rimColor);
+			
+			Color reflectColor = Color.Lerp(baseReflectColor, beatColor, useBeatIntensity);
+			renderer.material.SetColor("_ReflectColour", reflectColor);
+			audioBeatIntensity.Update();
+			
+			if (lightGO != null){
+			
+				Color lightColor = Color.Lerp(baselightColor, beatColor, useBeatIntensity);
+				lightGO.GetComponent<Light>().color = lightColor;
+				lightGO.transform.position = 0.5f * (transform.position + otherSphere.transform.position);
+				lightGO.GetComponent<Light>().intensity = useBeatIntensity;
+			}
 		}
 			
 		GetComponent<AudioSource>().volume = 0.5f * (1-beatLerpValue);
