@@ -71,6 +71,7 @@ public class AVOWGreySphere : MonoBehaviour {
 		kDance1,
 		kDanceThreesome,
 		kHeatUp0,
+		kHeatUp1,
 		kShoot0,
 		kShoot1,
 		kBounced,
@@ -88,6 +89,13 @@ public class AVOWGreySphere : MonoBehaviour {
 		beatsActive = false;
 		regularBeats = false;
 		disableSphering = true;
+	}
+	
+	public void ReadyToElectrify(){
+		state = State.kHeatUp1;
+		beatsActive = false;
+		regularBeats = false;
+
 	}
 	
 	public void ActivateBounce(Vector3 newVel){
@@ -316,13 +324,13 @@ public class AVOWGreySphere : MonoBehaviour {
 						triggerBeat = true;
 						if (beatLerpValue < 1){
 							if (bpm < maxBPM || (bpm < maxmaxBPM && heartRestartTrigger)){
-								bpm += 2f;
+								bpm += 4f;
 							}
 						}
 						// if the lerp value is 1 - then need to reduce our heartrate back down to normal
 						else{
 							if (bpm > 50){
-								bpm -= 2f;
+								bpm -= 4f;
 							}
 							
 						}
@@ -363,6 +371,13 @@ public class AVOWGreySphere : MonoBehaviour {
 			    
 				break;
 			}
+			case State.kHeatUp1:{
+				Color col = renderer.material.GetColor("_RimColour");
+				Color newCol = Color.Lerp(col, GetHeatColor(), 0.001f);
+				renderer.material.SetColor("_RimColour", newCol);
+				renderer.material.SetColor("_ReflectColour", newCol);				
+				break;
+			}			
 			case State.kShoot0:{
 				Vector3 fromHereToTarget = shootTarget.transform.position - transform.position;
 				fromHereToTarget.Normalize();
@@ -412,7 +427,7 @@ public class AVOWGreySphere : MonoBehaviour {
 	}
 	
 	Color GetHeatColor(){
-		return Color.white;
+		return Color.cyan;
 		//return new Color(0, 0, 0.125f);
 	}
 	
@@ -449,7 +464,7 @@ public class AVOWGreySphere : MonoBehaviour {
 			}
 		}
 			
-		GetComponent<AudioSource>().volume = 0.5f * (1-beatLerpValue);
+		GetComponent<AudioSource>().volume = 0.3f * (1-beatLerpValue);
 
 	
 	}
@@ -473,7 +488,7 @@ public class AVOWGreySphere : MonoBehaviour {
 		for (int i = 0; i < data.Length; ++i){
 			total += Mathf.Abs (data[i]);
 		}
-		float val = 20 * total /data.Length; 
+		float val = 30 * total /data.Length; 
 		if (val > 1) val = 1;
 		audioBeatIntensity.Set (val + baseIntensity);
 		

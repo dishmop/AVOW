@@ -48,10 +48,21 @@
 
 		        float4 frag(v2f i) : COLOR
 		        {
-		        	float x = abs(i.uv[0] - 0.5);
+		        	float xx = i.uv[0] - 0.5;
+		        	float yy = i.uv[1] - 0.5;
 		        	
-		        	float4 col = float4(CalcCurve(x, 0.01), CalcCurve(x, 0.01), CalcCurve(x, 0.2), _Alpha * CalcCurve(x, 0.1));
-		        	return col;
+		        	if (yy <= 0){
+			        	float x = abs(xx);
+			        	
+			        	float4 col = float4(CalcCurve(x, 0.01), CalcCurve(x, 0.01), CalcCurve(x, 0.2), _Alpha * CalcCurve(x, 0.1));
+			        	return col;
+			        }
+			        else{
+			        	float x = sqrt(xx * xx + yy * yy);
+			        	
+			        	float4 col = float4(CalcCurve(x, 0.01), CalcCurve(x, 0.01), CalcCurve(x, 0.2), _Alpha * CalcCurve(x, 0.1));
+			        	return col;//float4(1, 0, 0, 1);
+			        }
 		        	
 		        
 //		        	return lerp(_Color0, _Color1, val);

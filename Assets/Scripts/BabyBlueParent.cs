@@ -18,8 +18,8 @@ public class BabyBlueParent : MonoBehaviour {
 	public bool updateSize = true;
 	
 	
-	Vector3 debugStartPos = new Vector3(10, 0, 200);
-	Vector3 debugEndPos = new Vector3(10, 10, 200);
+	Vector3 debugStartPos = new Vector3(0, 0, 210);
+	Vector3 debugEndPos = new Vector3(0, 10, 210);
 	
 	
 	bool enableGrow = false;
@@ -42,7 +42,7 @@ public class BabyBlueParent : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-	
+//	
 //		squareLightening[0] = GameObject.Instantiate(lighteningPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 //		
 //		
@@ -63,6 +63,13 @@ public class BabyBlueParent : MonoBehaviour {
 	public void SetFall(){
 		isFalling = true;
 	}
+	
+	
+	public void Land(){
+		isFalling = false;
+		vel = Vector3.zero;
+	}
+	
 	
 	public void StartGrowing(){
 		enableGrow = true;
@@ -184,8 +191,8 @@ public class BabyBlueParent : MonoBehaviour {
 			
 			squareLightening[i].GetComponent<Lightening>().startPoint = corners[i];
 			squareLightening[i].GetComponent<Lightening>().endPoint = toPos;
-			squareLightening[i].GetComponent<Lightening>().size = 5;
-			squareLightening[i].GetComponent<Lightening>().numStages = 8;
+			squareLightening[i].GetComponent<Lightening>().size = 3;
+			squareLightening[i].GetComponent<Lightening>().numStages = 15;
 			squareLightening[i].GetComponent<Lightening>().ConstructMesh();
 			squareLightening[i].name = "SquareLightening" + i.ToString();
 			

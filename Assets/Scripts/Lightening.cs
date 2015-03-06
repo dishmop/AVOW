@@ -134,15 +134,17 @@ public class Lightening : MonoBehaviour {
 	
 	void ConstructArrays(){
 	
+		// We add 4 verts (and 2 tris) at either end to roudn the off
+	
 		numPoints = numStages + 1;
 		points = new Vector3[numPoints];
 		basePoints = new Vector3[numPoints];
 		
-		numVerts = (numStages + 1) * 2;
+		numVerts = (numStages + 5) * 2;
 		vertices = new Vector3[numVerts];
 		uvs = new Vector2[numVerts];
 		
-		numTris = numStages * 2;
+		numTris = (numStages + 4) * 2;
 		numTriIndicies = numTris * 3;
 		
 		tris = new int[numTriIndicies];
@@ -153,19 +155,38 @@ public class Lightening : MonoBehaviour {
 		
 		// At each vertex, we alternate the u from 0 to 1
 		// every second vertex we alternate v from 0 to 1
-		for (int i = 0; i < numVerts; ++i){
+		uvs[0] = new Vector2(0, 1f);
+		uvs[1] = new Vector2(1, 1f);
+		uvs[2] = new Vector2(0, 0.5f);
+		uvs[3] = new Vector2(1, 0.5f);
+		for (int i = 4; i < numVerts-4; ++i){
 			float u = i % 2;
-			float v = (i/2) % 2;
+			float v = 0.5f * ((i/2) % 2);
 			uvs[i] = new Vector2(u, v);
 		}
+		uvs[numVerts-4] = new Vector2(0, 0.5f);
+		uvs[numVerts-3] = new Vector2(1, 0.5f);
+		uvs[numVerts-2] = new Vector2(0, 1f);
+		uvs[numVerts-1] = new Vector2(1, 1f);		
 	}
 	
 	void FillTriangles(){
 
-		
 		int triIndex = 0;
+
+		// Tri 1
+		tris[triIndex++] = 0;
+		tris[triIndex++] = 3;
+		tris[triIndex++] = 1;
+		
+		// Tri 2
+		tris[triIndex++] = 0;
+		tris[triIndex++] = 2;
+		tris[triIndex++] = 3;
+
+				
 		for (int i = 0; i < numStages; ++i){
-			int firstVertIndex = i * 2;
+			int firstVertIndex = 4 + i * 2;
 			// Tri 1
 			tris[triIndex++] = firstVertIndex;
 			tris[triIndex++] = firstVertIndex + 3;
@@ -176,6 +197,17 @@ public class Lightening : MonoBehaviour {
 			tris[triIndex++] = firstVertIndex + 2;
 			tris[triIndex++] = firstVertIndex + 3;
 		}
+		int vertIndex = 4 + (numStages+1) * 2;
+		
+		// Tri 1
+		tris[triIndex++] = vertIndex;
+		tris[triIndex++] = vertIndex + 3;
+		tris[triIndex++] = vertIndex + 1;
+		
+		// Tri 2
+		tris[triIndex++] = vertIndex;
+		tris[triIndex++] = vertIndex + 2;
+		tris[triIndex++] = vertIndex + 3;	
 
 	
 	}
@@ -209,14 +241,22 @@ public class Lightening : MonoBehaviour {
 		prevLength.Normalize();
 		Vector3 prevHalfWidth = size * 0.5f * localX;
 		
-		vertices[0] = points[0] - prevHalfWidth;
-		vertices[1] = points[0] + prevHalfWidth;
+		// Do the round at the end
+		
+		vertices[0] = points[0] - prevLength * size * 0.5f - prevHalfWidth;
+		vertices[1] = points[0] - prevLength * size * 0.5f + prevHalfWidth;
+		vertices[2] = points[0] - prevHalfWidth;
+		vertices[3] = points[0] + prevHalfWidth;
+		
+		// Now start the shaft
+		vertices[4] = points[0] - prevHalfWidth;
+		vertices[5] = points[0] + prevHalfWidth;
 		
 		// Start at 1 because we've already done the first pair
 		Vector3 nextLength = new Vector3(0, 0, 0);
 		Vector3 nextHalfWidth = new Vector3(0, 0, 0);
-		for (int i = 1; i < numStages; ++i){
-			nextLength = points[i+1] - points[i];
+		for (int i = 3; i < numStages + 2; ++i){
+			nextLength = points[i+1-2] - points[i-2];
 			nextLength.Normalize();
 			nextHalfWidth = size * 0.5f * localX;
 			
@@ -225,8 +265,8 @@ public class Lightening : MonoBehaviour {
 			int vi1 = vi0 + 1;
 			
 			// Work out positions of vertices if there were no other stasges to consider
-			vertices[vi0] = points[i] - nextHalfWidth;
-			vertices[vi1] = points[i] + nextHalfWidth;
+			vertices[vi0] = points[i-2] - nextHalfWidth;
+			vertices[vi1] = points[i-2] + nextHalfWidth;
 			
 			
 			// If the two "length" vectors are nearly parallel, then just leave them as they are
@@ -253,12 +293,12 @@ public class Lightening : MonoBehaviour {
 
 
 				// Test the cente lione
-				Vector2 prevP2 = points[i-1];
-				Vector2 prevR2 = points[i] - points[i-1];
+				Vector2 prevP2 = points[i-1-2];
+				Vector2 prevR2 = points[i-2] - points[i-1-2];
 				prevR2.Normalize();
 				Vector2 halfWidthPrev2 =  new Vector3(size * 0.5f * prevR2.y, -size * 0.5f * prevR2.x);
-				Vector2 nextP2 = points[i];
-				Vector2 nextR2 = points[i + 1] - points[i];
+				Vector2 nextP2 = points[i-2];
+				Vector2 nextR2 = points[i + 1-2] - points[i-2];
 				nextR2.Normalize();
 				Vector2 halfWidthNext2 =  new Vector3(size * 0.5f * nextR2.y, -size * 0.5f * nextR2.x);
 				
@@ -272,8 +312,18 @@ public class Lightening : MonoBehaviour {
 		}
 		
 		// Do the last two points
-		vertices[numVerts-2] = points[numStages] - nextHalfWidth;
-		vertices[numVerts-1] = points[numStages] + nextHalfWidth;
+		vertices[numVerts-6] = points[numStages] - nextHalfWidth;
+		vertices[numVerts-5] = points[numStages] + nextHalfWidth;
+		
+		// Do the round at the end
+		prevLength = points[numStages] - points[numStages-1];
+		prevLength.Normalize();
+		
+		vertices[numVerts-4] = points[numStages] - nextHalfWidth;
+		vertices[numVerts-3] = points[numStages] + nextHalfWidth;
+		vertices[numVerts-2] = points[numStages] + size * 0.5f * prevLength - nextHalfWidth;
+		vertices[numVerts-1] = points[numStages] + size * 0.5f * prevLength + nextHalfWidth;
+		
 		
 
 		
@@ -283,13 +333,13 @@ public class Lightening : MonoBehaviour {
 	void Update () {
 		HandleOrientation();
 //		UpdateMesh();
-		for (int i = 0; i < vertices.Length-1; ++i){
-			Debug.DrawLine(transform.position + vertices[i], transform.position + vertices[i+1], Color.green);
-		}
-
-		for (int i = 0; i < points.Length-1; ++i){
-			Debug.DrawLine(transform.position + points[i], transform.position + points[i+1], Color.red);
-		}
+//		for (int i = 0; i < vertices.Length-1; ++i){
+//			Debug.DrawLine(transform.position + vertices[i], transform.position + vertices[i+1], Color.green);
+//		}
+//
+//		for (int i = 0; i < points.Length-1; ++i){
+//			Debug.DrawLine(transform.position + points[i], transform.position + points[i+1], Color.red);
+//		}
 		
 
 	// Rotate around the axies from start to end

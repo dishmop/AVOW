@@ -2,164 +2,38 @@ Base path: /Applications/Unity/Unity.app/Contents
 Pipe name: \\.\pipe\UnityShaderCompiler-1--1585929816
 Cmd: getPlatforms
 Cmd: preprocess
-  insize=1357 outsize=380 ok=1
-Cmd: preprocess
-  insize=1351 outsize=374 ok=1
-Cmd: preprocess
-  insize=1354 outsize=377 ok=1
-Cmd: preprocess
-  insize=1350 outsize=373 ok=1
-Cmd: preprocess
-  insize=1350 outsize=373 ok=1
-Cmd: preprocess
-  insize=1354 outsize=377 ok=1
-Cmd: preprocess
-  insize=1352 outsize=375 ok=1
-Cmd: preprocess
-  insize=1350 outsize=373 ok=1
-Cmd: preprocess
-  insize=1448 outsize=419 ok=1
+  insize=1565 outsize=419 ok=1
 Cmd: compileSnippet
-  api=0 type=0 insize=1328 outsize=328 kw= ok=1
+  api=0 type=0 insize=1445 outsize=328 kw= ok=1
 Cmd: compileSnippet
-  api=0 type=1 insize=1328 outsize=557 kw= ok=1
+  api=0 type=1 insize=1445 outsize=686 kw= ok=1
 Cmd: preprocess
-  insize=1793 outsize=352 ok=1
+  insize=1566 outsize=419 ok=1
 Cmd: compileSnippet
-  api=0 type=0 insize=1740 outsize=328 kw= ok=1
+  api=0 type=0 insize=1446 outsize=328 kw= ok=1
 Cmd: compileSnippet
-  api=0 type=1 insize=1740 outsize=1484 kw= ok=1
+  api=0 type=1 insize=1446 outsize=686 kw= ok=1
 Cmd: preprocess
-  insize=1450 outsize=421 ok=1
-Cmd: preprocess
-  insize=1794 outsize=353 ok=1
-Cmd: preprocess
-  insize=1792 outsize=351 ok=1
-Cmd: preprocess
-  insize=1796 outsize=351 ok=1
+  insize=1799 outsize=418 ok=1
 Cmd: compileSnippet
-  api=0 type=0 insize=1744 outsize=328 kw= ok=1
+  api=0 type=0 insize=1679 outsize=328 kw= ok=1
 Cmd: compileSnippet
-  api=0 type=1 insize=1744 outsize=1487 kw= ok=1
+  api=0 type=1 insize=1679 outsize=1078 kw= ok=1
 Cmd: preprocess
-  insize=1796 outsize=351 ok=1
+  insize=1799 outsize=419 ok=1
 Cmd: compileSnippet
-  api=0 type=0 insize=1744 outsize=328 kw= ok=1
+  api=0 type=0 insize=1679 outsize=328 kw= ok=1
 Cmd: compileSnippet
-  api=0 type=1 insize=1744 outsize=1461 kw= ok=1
+  api=0 type=1 insize=1679 outsize=1078 kw= ok=1
 Cmd: preprocess
-  insize=1795 outsize=351 ok=1
+  insize=1814 outsize=419 ok=1
 Cmd: compileSnippet
-  api=0 type=0 insize=1743 outsize=328 kw= ok=1
+  api=0 type=0 insize=1694 outsize=328 kw= ok=1
 Cmd: compileSnippet
-  api=0 type=1 insize=1743 outsize=1470 kw= ok=1
+  api=0 type=1 insize=1694 outsize=719 kw= ok=1
 Cmd: preprocess
-  insize=1794 outsize=351 ok=1
+  insize=1820 outsize=419 ok=1
 Cmd: compileSnippet
-  api=0 type=0 insize=1742 outsize=328 kw= ok=1
+  api=0 type=0 insize=1700 outsize=328 kw= ok=1
 Cmd: compileSnippet
-  api=0 type=1 insize=1742 outsize=1477 kw= ok=1
-Cmd: preprocess
-  insize=1795 outsize=351 ok=1
-Cmd: preprocess
-  insize=1794 outsize=351 ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=1742 outsize=328 kw= ok=1
-Cmd: compileSnippet
-  api=0 type=1 insize=1742 outsize=1484 kw= ok=1
-Cmd: preprocess
-  insize=1796 outsize=353 ok=1
-Cmd: preprocess
-  insize=1796 outsize=353 ok=1
-Cmd: preprocess
-  insize=1802 outsize=359 ok=1
-Cmd: preprocess
-  insize=1803 outsize=360 ok=1
-Cmd: preprocess
-  insize=1801 outsize=358 ok=1
-Cmd: preprocess
-  insize=1814 outsize=358 ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=1755 outsize=328 kw= ok=1
-Cmd: compileSnippet
-  error: 2 plat 0 at (0): Arithmetic instruction limit of 64 exceeded; 69 arithmetic instructions needed to compile program
-  error: 1 plat 0 at (36): implicit cast from "float4" to "float2"
-  api=0 type=1 insize=1755 outsize=0 kw= ok=0
-Cmd: preprocess
-  insize=1801 outsize=358 ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=1742 outsize=328 kw= ok=1
-Cmd: compileSnippet
-  error: 2 plat 0 at (0): Arithmetic instruction limit of 64 exceeded; 65 arithmetic instructions needed to compile program
-  error: 1 plat 0 at (36): implicit cast from "float4" to "float2"
-  api=0 type=1 insize=1742 outsize=0 kw= ok=0
-Cmd: preprocess
-  insize=1814 outsize=358 ok=1
-Cmd: compileSnippet
-  error: 1 plat 0 at (36): implicit cast from "float4" to "float2"
-  error: 2 plat 0 at (53): function "frag" has no return statement
-  error: 2 plat 0 at (65): syntax error, unexpected reserved word "return" at token "return" type name expected at token "return" cast not allowed
-  api=0 type=0 insize=1755 outsize=0 kw= ok=0
-Cmd: preprocess
-  insize=1812 outsize=358 ok=1
-Cmd: compileSnippet
-  error: 1 plat 0 at (36): implicit cast from "float4" to "float2"
-  error: 2 plat 0 at (53): function "frag" has no return statement
-  error: 2 plat 0 at (65): syntax error, unexpected reserved word "return" at token "return" type name expected at token "return" cast not allowed
-  api=0 type=0 insize=1753 outsize=0 kw= ok=0
-Cmd: preprocess
-  insize=1819 outsize=358 ok=1
-Cmd: compileSnippet
-  error: 1 plat 0 at (36): implicit cast from "float4" to "float2"
-  error: 2 plat 0 at (65): syntax error, unexpected reserved word "return" at token "return" type name expected at token "return" cast not allowed
-  api=0 type=0 insize=1760 outsize=0 kw= ok=0
-Cmd: preprocess
-  insize=1813 outsize=358 ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=1754 outsize=328 kw= ok=1
-Cmd: compileSnippet
-  error: 2 plat 0 at (0): Arithmetic instruction limit of 64 exceeded; 67 arithmetic instructions needed to compile program
-  error: 1 plat 0 at (36): implicit cast from "float4" to "float2"
-  api=0 type=1 insize=1754 outsize=0 kw= ok=0
-Cmd: preprocess
-  insize=1801 outsize=358 ok=1
-Cmd: preprocess
-  insize=1794 outsize=351 ok=1
-Cmd: preprocess
-  insize=1452 outsize=423 ok=1
-Cmd: preprocess
-  insize=1450 outsize=421 ok=1
-Cmd: preprocess
-  insize=1452 outsize=423 ok=1
-Cmd: preprocess
-  insize=1450 outsize=421 ok=1
-Cmd: preprocess
-  insize=1448 outsize=419 ok=1
-Cmd: preprocess
-  insize=1799 outsize=351 ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=1747 outsize=328 kw= ok=1
-Cmd: compileSnippet
-  api=0 type=1 insize=1747 outsize=1524 kw= ok=1
-Cmd: preprocess
-  insize=1802 outsize=351 ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=1750 outsize=328 kw= ok=1
-Cmd: compileSnippet
-  api=0 type=1 insize=1750 outsize=1517 kw= ok=1
-Cmd: preprocess
-  insize=1803 outsize=351 ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=1751 outsize=328 kw= ok=1
-Cmd: compileSnippet
-  api=0 type=1 insize=1751 outsize=1149 kw= ok=1
-Cmd: preprocess
-  insize=1794 outsize=351 ok=1
-Cmd: preprocess
-  insize=1790 outsize=347 ok=1
-Cmd: preprocess
-  insize=1646 outsize=472 ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=1472 outsize=504 kw= ok=1
-Cmd: compileSnippet
-  api=0 type=1 insize=1472 outsize=5113 kw= ok=1
+  api=0 type=1 insize=1700 outsize=1078 kw= ok=1
