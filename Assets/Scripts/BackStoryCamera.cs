@@ -19,7 +19,8 @@ public class BackStoryCamera : MonoBehaviour {
 		kStill,
 		kOrbitCube,
 		kLoveLook,
-		kEnvyFollow
+		kEnvyFollow,
+		kEnvyFollowUp
 		
 	}
 	public State state = State.kStill;
@@ -40,6 +41,13 @@ public class BackStoryCamera : MonoBehaviour {
 		bePos = envyBePos;
 		state = State.kEnvyFollow;
 	}
+	
+	
+	public void SetEnvyFollowUp(Vector3 envyLookPos, Vector3 envyBePos){
+		loveLook = envyLookPos;
+		bePos = envyBePos;
+		state = State.kEnvyFollowUp;
+	}	
 	
 	
 	// Update is called once per frame
@@ -70,9 +78,19 @@ public class BackStoryCamera : MonoBehaviour {
 				envyRampUp = Mathf.Min (envyRampUp + 0.01f, 1f);
 				break;
 			}
+			case State.kEnvyFollowUp:{
+				float envyLerp = Mathf.Lerp(0, 0.1f, envyRampUp);
+				Quaternion currRot = transform.rotation; 	
+				// Get the current up direction
+				Quaternion desRot = Quaternion.LookRotation( loveLook - transform.position);
+				transform.rotation = Quaternion.Lerp(currRot, desRot, envyLerp);
+				transform.position = Vector3.Lerp (transform.position, bePos, envyLerp);
+				envyRampUp = Mathf.Min (envyRampUp + 0.01f, 1f);
+				break;
+			}			
 		}
 		
-	
+		
 	}
 	
 	void LookAtCube(){

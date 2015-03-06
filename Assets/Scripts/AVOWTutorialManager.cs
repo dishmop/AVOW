@@ -12,10 +12,13 @@ public class AVOWTutorialManager : MonoBehaviour {
 	public GameObject backStory;
 	
 	public GameObject babyCubePrefab;
+	public GameObject babyCubePrefabMid;
+	public GameObject babyCubePrefabAfter;
 	
 	public float danceFollow3Dist = 10;
 	
 	public GameObject prisonSphere1;
+
 	
 	GameObject babyCube = null;
 	
@@ -59,6 +62,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 	float backSpiralCoef;
 	
 	float love11Drag = 1;
+	float electTime;
 	
 	int largeSphereCount = -1;
 	int idealLargeSphereCount = 500;
@@ -100,6 +104,13 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kZoomIn0,
 		kZoomIn1,
 		kZoomIn2,
+		kElectrify0,
+		kElectrify0A,
+		kElectrify1,
+		kElectrify2,
+		kElectrify3,
+		kElectrify4,
+		kElectrify5,
 		kStop,
 		kNumStates
 	}
@@ -133,7 +144,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 		largeSphereCount = GenerateSpherePoints(idealLargeSphereCount, steerSphereRadius);
 		
 		state = State.kDebugJumpToDance2;
-		state = State.kIntro2;
+		//state = State.kIntro2;
 		//state = State.kTheWorldOfSpheres0;
 		//state = State.kStartup;
 		
@@ -379,7 +390,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			case State.kInLove4:{
 				CreateRandomSpheres();
 				UpdateDance();
-				if (Time.fixedTime > danceTime + 10f){
+				if (Time.fixedTime > danceTime + 7f){
 					parentSpheres[0].GetComponent<AVOWGreySphere>().SetRegularBeats();
 					parentSpheres[1].GetComponent<AVOWGreySphere>().SetRegularBeats();
 				}
@@ -491,10 +502,10 @@ public class AVOWTutorialManager : MonoBehaviour {
 				AVOWConfig.singleton.flockHomeCoef = Mathf.Max (AVOWConfig.singleton.flockHomeCoef - linSpeed * 1f, 20f);
 				babyCube.GetComponent<BabyBlueParent>().rotSpeed = Mathf.Max (babyCube.GetComponent<BabyBlueParent>().rotSpeed - 0.01f, 0);
 				if (AVOWConfig.singleton.flockHomeCoef == 20 && babyCube.GetComponent<BabyBlueParent>().rotSpeed == 0){
-					AVOWTutorialText.singleton.AddPause(4);
-					AVOWTutorialText.singleton.AddTextNoLine("I was alive. . .");
-					AVOWTutorialText.singleton.AddPause(6);
-					AVOWTutorialText.singleton.AddText (" and everything was perfect");
+					AVOWTutorialText.singleton.AddPause(3);
+					AVOWTutorialText.singleton.AddText("I was alive.");
+					AVOWTutorialText.singleton.AddPause(1);
+					maxSphereCount = 200;
 					WaitForTextToFinish(State.kInLove10);
 				}
 				
@@ -524,7 +535,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 				break;
 			}
 			case State.kEnvy0:{
-				AVOWTutorialText.singleton.AddTextNoLine("But the other spheres grew fearful of us.");
+				AVOWTutorialText.singleton.AddTextNoLine("But the other spheres were afraid of us.");
 				AVOWTutorialText.singleton.AddPause(6);
 				UpdateDanceFollow2();
 
@@ -549,7 +560,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 						sphere.bpm = 15;
 					}
 					state = State.kEnvy2;
-					envy2Time = Time.fixedTime + 15f;
+					envy2Time = Time.fixedTime + 10f;
 				}
 				else{
 					steeringState = SteeringState.kSpheresFromUs;
@@ -580,12 +591,12 @@ public class AVOWTutorialManager : MonoBehaviour {
 				parentSpheres[0].GetComponent<DanceThreesome>().ForceVelocity(parentSpheres[0].GetComponent<DanceThreesome>().GetVelocity() * 0.98f);
 				parentSpheres[1].GetComponent<DanceThreesome>().ForceVelocity(parentSpheres[1].GetComponent<DanceThreesome>().GetVelocity() * 0.98f);
 				babyCube.GetComponent<DanceThreesome>().ForceVelocity(babyCube.GetComponent<DanceThreesome>().GetVelocity() * 0.98f);
-				babyCube.GetComponent<BabyBlueParent>().rotSpeed = Mathf.Max (babyCube.GetComponent<BabyBlueParent>().rotSpeed - 0.001f, 0.1f);
-				babyCube.GetComponent<BabyBlueParent>().rotSpeed2 = Mathf.Max (babyCube.GetComponent<BabyBlueParent>().rotSpeed2 - 0.001f, 0.1f);
+				babyCube.GetComponent<BabyBlueParent>().rotSpeed = Mathf.Max (babyCube.GetComponent<BabyBlueParent>().rotSpeed - 0.01f, -0.1f);
+				babyCube.GetComponent<BabyBlueParent>().rotSpeed2 = Mathf.Max (babyCube.GetComponent<BabyBlueParent>().rotSpeed2 - 0.01f, -0.1f);
 				
 				parentSpheres[2].transform.position = Vector3.Lerp (parentSpheres[2].transform.position , steerSphereCentre, 0.01f);
 				BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView = Mathf.Min (BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView + zoomSpeed, 45);
-				if ((babyCube.transform.position - BackStoryCamera.singleton.transform.position).magnitude > danceFollow3Dist * 0.9){
+				if ((babyCube.transform.position - BackStoryCamera.singleton.transform.position).magnitude > danceFollow3Dist * 0.8){
 					state = State.kEnvy4;
 				}
 			
@@ -615,7 +626,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}	
 			case State.kZoomIn0:{		
 				UpdateDanceFollow4();
-				zoomInTime = Time.fixedTime + 10f;
+				zoomInTime = Time.fixedTime + 0f;
 				state = State.kZoomIn1;
 				break;
 			}
@@ -628,14 +639,101 @@ public class AVOWTutorialManager : MonoBehaviour {
 				break;
 			}
 			case State.kZoomIn2:{		
-				UpdateDanceFollow4();
+				UpdateDanceFollow5();
 				prisonSphere1.SetActive(true);
 				Color thisCol = prisonSphere1.renderer.material.GetColor ("_Color0");
 				thisCol.a = Mathf.Min (thisCol.a + 0.001f, 1f);
 				prisonSphere1.renderer.material.SetColor ("_Color0", thisCol);
 				prisonSphere1.renderer.material.SetFloat ("_MidPoint", BackStoryCamera.singleton.transform.position.y);
-				break;			
-			}				
+				if (thisCol.a == 1f){
+					state = State.kElectrify0;
+				}
+			    break;			
+			}	
+			case State.kElectrify0:{
+				UpdateDanceFollow5();
+				GameObject[] squareSpheres = FindSquareSpheres();
+				babyCube.GetComponent<BabyBlueParent>().Electrify(squareSpheres);
+				state = State.kElectrify0A;
+				electTime = Time.fixedTime + 0.5f;
+				break;
+			}	
+			case State.kElectrify0A:{
+				UpdateDanceFollow5();
+				if (Time.fixedTime > electTime){
+					state = State.kElectrify1;
+				}
+				break;
+			}					
+			case State.kElectrify1:{
+				UpdateDanceFollow6();
+				danceFollow3Dist = 2;
+//				GameObject newCubeParent = GameObject.Instantiate(babyCubePrefabMid) as GameObject;
+//				GameObject newCube = newCubeParent.transform.FindChild("BabyBlueCube").gameObject;
+//				GameObject oldCube = babyCube.transform.FindChild("BabyBlueCube").gameObject;
+//				newCube.transform.parent = oldCube.transform.parent;
+//				newCube.transform.position = oldCube.transform.position;
+//				newCube.transform.localScale = oldCube.transform.localScale;
+//				newCube.transform.rotation = oldCube.transform.rotation;
+//				newCube.GetComponent<BabyBlueCube>().ReinitialiseRotation();
+//				GameObject.Destroy(oldCube);
+//				GameObject.Destroy(newCubeParent);
+				
+				state = State.kElectrify2;
+				//babyCube.transform.FindChild("BabyBlueCube").renderer.materials
+				break;
+			}	
+			case State.kElectrify2:{
+				UpdateDanceFollow6();
+				if ((BackStoryCamera.singleton.transform.position - babyCube.transform.position).magnitude < 10f){
+					state = State.kElectrify3;
+				}
+				break;
+			}
+			case State.kElectrify3:{
+				UpdateDanceFollow6();
+				float intensity = babyCube.transform.FindChild("BabyBlueCube").renderer.materials[0].GetFloat("_Intensity");
+				babyCube.transform.FindChild("BabyBlueCube").renderer.materials[0].SetFloat("_Intensity", intensity + 0.04f);
+				if (intensity > 10f){
+					GameObject newCubeParent = GameObject.Instantiate(babyCubePrefabAfter) as GameObject;
+					GameObject newCube = newCubeParent.transform.FindChild("BabyBlueCube").gameObject;
+					GameObject oldCube = babyCube.transform.FindChild("BabyBlueCube").gameObject;
+					newCube.transform.parent = oldCube.transform.parent;
+					newCube.transform.position = oldCube.transform.position;
+					newCube.transform.localScale =oldCube.transform.localScale;
+					newCube.transform.rotation =oldCube.transform.rotation;
+					newCube.GetComponent<BabyBlueCube>().ReinitialiseRotation();
+					newCube.renderer.materials[1].SetFloat("_Intensity", 10);
+				
+					GameObject.Destroy(oldCube);
+					GameObject.Destroy(newCubeParent);
+					babyCube.GetComponent<BabyBlueParent>().StopSquareLightening();
+//					babyCube.GetComponent<BabyBlueParent>().rotSpeed = 3;
+//					babyCube.GetComponent<BabyBlueParent>().rotSpeed2 = 1;
+					state = State.kElectrify4;
+				}
+				break;
+			}	
+			case State.kElectrify4:{
+				UpdateDanceFollow6();
+				float intensity = babyCube.transform.FindChild("BabyBlueCube").renderer.materials[1].GetFloat("_Intensity");
+				babyCube.transform.FindChild("BabyBlueCube").renderer.materials[1].SetFloat("_Intensity", intensity - 0.05f);
+				if (intensity <= 0.25f){
+					state = State.kElectrify5;
+				}
+				
+				
+				break;
+			}		
+			case State.kElectrify5:{
+				UpdateDanceFollow6();
+				babyCube.GetComponent<BabyBlueParent>().SetFall();
+				Vector3 pos = prisonSphere1.transform.position;
+				pos.y = babyCube.transform.position.y* 0.8f;
+				prisonSphere1.transform.position = pos;
+				
+				break;
+			}	
 			case State.kStop:{
 				AVOWTutorialText.singleton.ClearText();
 				state = State.kOff;		
@@ -645,6 +743,40 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 		ManageObjects();
 	
+	}
+	
+	GameObject[] FindSquareSpheres(){
+		Vector3[] corners = new Vector3[8];
+		GameObject[] squareSpheres = new GameObject[8];
+		float[] dist = new float[8];
+		
+		corners[0] = steerSphereCentre + steerSphereRadius * new Vector3(1, 1, 1);
+		corners[1] = steerSphereCentre + steerSphereRadius * new Vector3(1, 1, -1);
+		corners[2] = steerSphereCentre + steerSphereRadius * new Vector3(1, -1, 1);
+		corners[3] = steerSphereCentre + steerSphereRadius * new Vector3(1, -1, -1);
+		corners[4] = steerSphereCentre + steerSphereRadius * new Vector3(-1, 1, 1);
+		corners[5] = steerSphereCentre + steerSphereRadius * new Vector3(-1, 1, -1);
+		corners[6] = steerSphereCentre + steerSphereRadius * new Vector3(-1, -1, 1);
+		corners[7] = steerSphereCentre + steerSphereRadius * new Vector3(-1, -1, -1);
+		
+		for (int i = 0; i < 8; ++i){
+			dist[i] = 500;
+		}
+		
+		foreach(GameObject go in spheres){
+			Vector3 spherePos = go.transform.position;
+			for (int i = 0; i < 8; ++i){
+				float thisDist = (spherePos - corners[i]).sqrMagnitude;
+				if (thisDist < dist[i]){
+					dist[i] = thisDist;
+					squareSpheres[i] = go;
+				}
+			}
+		
+		}
+		return squareSpheres;
+		
+		
 	}
 	
 	GameObject[] GetNearestSpheresToCamera(int numSpheres, int numToIgnore){
@@ -867,7 +999,39 @@ public class AVOWTutorialManager : MonoBehaviour {
 	}
 	
 	
+	void UpdateDanceFollow5(){
+		float speed = 0.7f;
+		
+		// Get the camrera following the,
+		Vector3 lookPos = babyCube.transform.position;
+		Vector3 fromLookToHere = BackStoryCamera.singleton.transform.position - lookPos;
+		float dist = fromLookToHere.magnitude;
+		
+		
+		Vector3 distVel = 0.02f * fromLookToHere.normalized * (danceFollow3Dist - dist);
+		
+		Vector3 bePos3 = BackStoryCamera.singleton.transform.position  + BackStoryCamera.singleton.transform.TransformDirection(new Vector3(0.3f, 0.1f, 0)) + distVel;
+		
+		BackStoryCamera.singleton.GetComponent<BackStoryCamera>().SetEnvyFollow(lookPos, bePos3);
+	}
 	
+	
+	
+	void UpdateDanceFollow6(){
+		float speed = 0.7f;
+		
+		// Get the camrera following the,
+		Vector3 lookPos = babyCube.transform.position;
+		Vector3 fromLookToHere = BackStoryCamera.singleton.transform.position - lookPos;
+		float dist = fromLookToHere.magnitude;
+		
+		
+		Vector3 distVel = 0.07f * fromLookToHere.normalized * (danceFollow3Dist - dist);
+		
+		Vector3 bePos3 = BackStoryCamera.singleton.transform.position  + BackStoryCamera.singleton.transform.TransformDirection(new Vector3(0.03f, 0.01f, 0)) + distVel;
+		
+		BackStoryCamera.singleton.GetComponent<BackStoryCamera>().SetEnvyFollow(lookPos, bePos3);
+	}
 
 
 	
@@ -928,6 +1092,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 		}
 		
 		inLove11Time = Time.fixedTime + 10f;
+		//state = State.kElectrify1;
 		
 	}
 	
@@ -1088,7 +1253,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 		bool calcVel = true;
 		while (calcVel){
 			int edge = UnityEngine.Random.Range(0, 4);
-			float dist = UnityEngine.Random.Range (camera.nearClipPlane + 3f, camera.farClipPlane);
+			float dist = UnityEngine.Random.Range (camera.nearClipPlane + 3f, 50);
 			int tangIndex = (edge + 1) % 4;
 			Vector3 spawnDir = frustOutsLocal[edge] + UnityEngine.Random.Range (-1f, 1f) * new Vector3(frustOutsLocal[tangIndex].x, frustOutsLocal[tangIndex].y, 0);
 			Vector3 goOutsideViewDir = -frustNormsLocal[edge];

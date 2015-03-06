@@ -17,9 +17,17 @@ public class BabyBlueParent : MonoBehaviour {
 	
 	public bool updateSize = true;
 	
+	
+	Vector3 debugStartPos = new Vector3(10, 0, 200);
+	Vector3 debugEndPos = new Vector3(10, 10, 200);
+	
+	
 	bool enableGrow = false;
 	
 	float underlyingSize;
+	
+	GameObject[] squareSpheres;
+	GameObject[] squareLightening = new GameObject[8];
 	
 	
 	
@@ -30,10 +38,30 @@ public class BabyBlueParent : MonoBehaviour {
 	public float rotSpeed = 3;
 	public float rotSpeed2 = 0;
 	
+	bool isFalling; 
+	
 	// Use this for initialization
 	void Start () {
-
 	
+//		squareLightening[0] = GameObject.Instantiate(lighteningPrefab, Vector3.zero, Quaternion.identity) as GameObject;
+//		
+//		
+//		squareLightening[0].GetComponent<Lightening>().startPoint = debugStartPos;
+//		squareLightening[0].GetComponent<Lightening>().endPoint = debugEndPos;
+//		squareLightening[0].GetComponent<Lightening>().size = 1;
+//		squareLightening[0].GetComponent<Lightening>().numStages = 5;
+//		squareLightening[0].GetComponent<Lightening>().ConstructMesh();
+	
+	}
+	
+	public void StopSquareLightening(){
+		foreach(GameObject go in squareLightening){
+			GameObject.Destroy(go);
+		}
+	}
+	
+	public void SetFall(){
+		isFalling = true;
 	}
 	
 	public void StartGrowing(){
@@ -96,10 +124,90 @@ public class BabyBlueParent : MonoBehaviour {
 		lightening1  = null;
 	}
 	
+	
+	public void UpdateSquareLightening(){
+		Quaternion rot = transform.FindChild ("BabyBlueCube").rotation;
+		Vector3[] corners = new Vector3[8];
+		float size = 0.5f * transform.localScale.x;
+		corners[0] = size * new Vector3(1, 1, 1);
+		corners[1] = size * new Vector3(1, 1, -1);
+		corners[2] = size * new Vector3(1, -1, 1);
+		corners[3] = size * new Vector3(1, -1, -1);
+		corners[4] = size * new Vector3(-1, 1, 1);
+		corners[5] = size * new Vector3(-1, 1, -1);
+		corners[6] = size * new Vector3(-1, -1, 1);
+		corners[7] = size * new Vector3(-1, -1, -1);
+		
+		for (int i = 0; i < 8; ++i){
+			corners[i] = transform.position + rot * corners[i] ;
+		}
+		
+		for (int i = 0; i < 8; ++i){
+			
+			squareLightening[i].GetComponent<Lightening>().startPoint = corners[i];
+			squareLightening[i].GetComponent<Lightening>().ConstructMesh();
+			
+		}
+		
+		
+	}
+	
+	
+	
+	public void Electrify(GameObject[] spheres){
+		Quaternion rot = transform.FindChild ("BabyBlueCube").rotation;
+		
+		squareSpheres = spheres;
+		Vector3[] corners = new Vector3[8];
+		float size = 0.5f * transform.localScale.x;
+		corners[0] = size * new Vector3(1, 1, 1);
+		corners[1] = size * new Vector3(1, 1, -1);
+		corners[2] = size * new Vector3(1, -1, 1);
+		corners[3] = size * new Vector3(1, -1, -1);
+		corners[4] = size * new Vector3(-1, 1, 1);
+		corners[5] = size * new Vector3(-1, 1, -1);
+		corners[6] = size * new Vector3(-1, -1, 1);
+		corners[7] = size * new Vector3(-1, -1, -1);
+		
+		for (int i = 0; i < 8; ++i){
+			corners[i] = transform.position + rot * corners[i] ;
+		}
+		
+		for (int i = 0; i < 8; ++i){
+		
+			Vector3 fromSphereToCube = transform.position - spheres[i].transform.position;
+			fromSphereToCube.Normalize();
+			Vector3 toPos = spheres[i].transform.position + 0.5f * spheres[i].transform.localScale.x * fromSphereToCube;
+
+			squareLightening[i] = GameObject.Instantiate(lighteningPrefab, Vector3.zero, Quaternion.identity) as GameObject;
+			
+			
+			squareLightening[i].GetComponent<Lightening>().startPoint = corners[i];
+			squareLightening[i].GetComponent<Lightening>().endPoint = toPos;
+			squareLightening[i].GetComponent<Lightening>().size = 5;
+			squareLightening[i].GetComponent<Lightening>().numStages = 8;
+			squareLightening[i].GetComponent<Lightening>().ConstructMesh();
+			squareLightening[i].name = "SquareLightening" + i.ToString();
+			
+		}
+		
+		transform.FindChild ("BabyBlueCube").GetComponent<BabyBlueCube>().ReinitialiseRotation();
+		
+	}
+	
+	
 	// Update is called once per frame
 	public void Update () {
 		transform.FindChild ("BabyBlueCube").GetComponent<BabyBlueCube>().SetRotSpeed(rotSpeed);
 		transform.FindChild ("BabyBlueCube").GetComponent<BabyBlueCube>().SetRotSpeed2(rotSpeed2);
+		
+		// Debug
+//		if (squareLightening[0] != null){
+//			squareLightening[0].GetComponent<Lightening>().startPoint = debugStartPos;
+//			squareLightening[0].GetComponent<Lightening>().endPoint = debugEndPos;
+//			squareLightening[0].GetComponent<Lightening>().ConstructMesh();
+//			
+//		}	
 		
 		if (!isActive) return;
 		
@@ -136,5 +244,21 @@ public class BabyBlueParent : MonoBehaviour {
 		
 		transform.position += vel * Time.deltaTime;
 		
+		if (squareLightening[0] != null){
+			rotSpeed = Mathf.Max(rotSpeed - 0.01f, 0f);
+			rotSpeed2 = Mathf.Max(rotSpeed2 - 0.01f, 0f);
+			
+			transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.identity, 0.01f);
+			UpdateSquareLightening();
+		}
+		
+		if (isFalling){
+			vel.y -= 3.81f * Time.fixedDeltaTime;
+		}
+		
+		
+		
+	
 	}
+	
 }

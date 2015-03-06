@@ -30,7 +30,7 @@ GameObject:
   - 114: {fileID: 11400000}
   - 114: {fileID: 11400004}
   m_Layer: 0
-  m_Name: BabyCube
+  m_Name: BabyCube 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -73,7 +73,8 @@ Renderer:
   m_LightmapIndex: 255
   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
   m_Materials:
-  - {fileID: 2100000, guid: b38cc799d77ee4df2a48352cc1671742, type: 2}
+  - {fileID: 2100000, guid: fd4ab4fa2b34e4a418b4e0a19b8a16ed, type: 2}
+  - {fileID: 2100000, guid: 43b211105166447aebd40b2e82e5a2e5, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -132,6 +133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3438925878f4e4a1fafabd8f765d2784, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotOnInit: 0
 --- !u!114 &11400004
 MonoBehaviour:
   m_ObjectHideFlags: 1

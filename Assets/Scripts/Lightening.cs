@@ -12,6 +12,7 @@ public class Lightening : MonoBehaviour {
 	public int			numStages;
 	public float		probOfChange;
 	
+
 //	public float avFeedbackZ;
 
 	int			numPoints;
@@ -25,6 +26,10 @@ public class Lightening : MonoBehaviour {
 	Vector2[]	uvs;
 	int[]		tris;
 	
+	Vector3 localX;
+	Vector3 localY;
+	Vector3 localZ;
+	
 	
 	
 	
@@ -35,8 +40,19 @@ public class Lightening : MonoBehaviour {
 	
 	}
 	
-	public void ConstructMesh(){
+	void HandleOrientation(){
+		//transform.rotation = Quaternion.identity;
+//		transform.Rotate(endPoint - startPoint, 1f);
+//		
+//		Quaternion quat = Quaternion.LookRotation(endPoint - startPoint, Camera.main.transform.position - transform.position);
+//		transform.rotation = new Quaternion(quat
+		
+	}
 	
+	
+	public void ConstructMesh(){
+		transform.position = startPoint;
+		HandleOrientation();
 		ConstructArrays();
 		FillBasePoints();
 		FillPoints(false);
@@ -67,9 +83,21 @@ public class Lightening : MonoBehaviour {
 	}
 	
 	void FillBasePoints(){
+		Vector3 hereToCam = Camera.main.transform.position - transform.position;
+		
+		// If we are looking at it head on, make it disspear
+//		float dotRes = 1 - Mathf.Abs (Vector3.Dot (hereToCam.normalized, (endPoint - startPoint).normalized));
+//		renderer.material.SetFloat("_Alpha", dotRes);
+//		
+		
+	
+		localY = (endPoint - startPoint).normalized;
+		localX = Vector3.Cross(localY, hereToCam).normalized;
+		localZ = Vector3.Cross (localY, localX);
+		
 		// Create the points
 		for (int i = 0; i < numPoints; ++i){
-			basePoints[i] = startPoint + i * (endPoint - startPoint) / numStages;
+			basePoints[i] =  i * (endPoint - startPoint) / numStages;
 		}
 	}
 	
@@ -83,13 +111,13 @@ public class Lightening : MonoBehaviour {
 		// Set up defaults
 		
 		float sdScalar = 0.02f * (startPoint - endPoint).magnitude;
-		midSD = new Vector3(sdScalar, sdScalar, 0);
+		midSD = new Vector3(sdScalar, sdScalar, sdScalar);
 		for (int i = 0; i < numPoints; ++i){
 			if (!useRandom || Random.Range (0f, 1f) < probOfChange){
 //				float distStart = (startPoint - basePoints[i]).magnitude;
 //				float distEnd = (endPoint - basePoints[i]).magnitude;
 				Vector3 sd = CalcSD((float)i * 1f/(numPoints-1));
-				points[i] = new Vector3 (GetNormalSample(basePoints[i].x, sd.x), GetNormalSample(basePoints[i].y, sd.y), basePoints[i].z);
+				points[i] = basePoints[i] + GetNormalSample(0, sd.x) * localX;
 			}
 		}
 	}
@@ -179,7 +207,8 @@ public class Lightening : MonoBehaviour {
 		
 		Vector3 prevLength = points[1] - points[0];
 		prevLength.Normalize();
-		Vector3 prevHalfWidth = new Vector3(size * 0.5f * prevLength.y, -size * 0.5f * prevLength.x, 0);
+		Vector3 prevHalfWidth = size * 0.5f * localX;
+		
 		vertices[0] = points[0] - prevHalfWidth;
 		vertices[1] = points[0] + prevHalfWidth;
 		
@@ -189,7 +218,7 @@ public class Lightening : MonoBehaviour {
 		for (int i = 1; i < numStages; ++i){
 			nextLength = points[i+1] - points[i];
 			nextLength.Normalize();
-			nextHalfWidth = new Vector3(size * 0.5f * nextLength.y, -size * 0.5f * nextLength.x, 0);
+			nextHalfWidth = size * 0.5f * localX;
 			
 			// Calc vertex indices we are going to write into
 			int vi0 = i * 2;
@@ -198,6 +227,7 @@ public class Lightening : MonoBehaviour {
 			// Work out positions of vertices if there were no other stasges to consider
 			vertices[vi0] = points[i] - nextHalfWidth;
 			vertices[vi1] = points[i] + nextHalfWidth;
+			
 			
 			// If the two "length" vectors are nearly parallel, then just leave them as they are
 			// otherwise, adjust them to be at the intersectoin of the two stages
@@ -208,20 +238,20 @@ public class Lightening : MonoBehaviour {
 				// Previous stage
 				Vector3 prevV0 = vertices[vi0-2];
 				Vector3 prevR0 = prevLength;
-				Vector2 prevV1 = vertices[vi1-2];
-				Vector2 prevR1 = prevLength;
+				Vector3 prevV1 = vertices[vi1-2];
+				Vector3 prevR1 = prevLength;
 				
 				// Next stage
 				Vector3 nextV0 = vertices[vi0];
 				Vector3 nextR0 = nextLength;
-				Vector2 nextV1 = vertices[vi1];
-				Vector2 nextR1 = nextLength;	
+				Vector3 nextV1 = vertices[vi1];
+				Vector3 nextR1 = nextLength;	
 				
 				// Find intersection of the two pairs of lines
 				vertices[vi0] = FindIntersetion(prevV0, prevR0, nextV0, nextR0);
 				vertices[vi1] = FindIntersetion(prevV1, prevR1, nextV1, nextR1);
-				
-				
+
+
 				// Test the cente lione
 				Vector2 prevP2 = points[i-1];
 				Vector2 prevR2 = points[i] - points[i-1];
@@ -237,6 +267,7 @@ public class Lightening : MonoBehaviour {
 
 				
 			}
+
 			prevLength = nextLength;			
 		}
 		
@@ -244,32 +275,28 @@ public class Lightening : MonoBehaviour {
 		vertices[numVerts-2] = points[numStages] - nextHalfWidth;
 		vertices[numVerts-1] = points[numStages] + nextHalfWidth;
 		
-		// Set the z to help debug
-//		for (int i = 0; i < numVerts; ++i){
-//			vertices[i].z = (i/2);
-//		}
 
-		// Do a test that all the vertices are nearby - if not we have made an error in the maths (which does happen - for some reason)
-		bool mathError = false;
-		Vector3 centre = 0.5f * (endPoint + startPoint);
-		float maxDist = 10f*(startPoint - endPoint).magnitude;
-		foreach (Vector3 vert in vertices){
-			float distFromCentre = (centre - vert).magnitude;
-			if (distFromCentre > maxDist){
-				mathError = true;
-			}
-		}
-		
-		// If ther was an error, collapse everyything to one point
-		if (mathError){
-			for (int i = 0; i < vertices.Length; ++i){
-				vertices[i] = startPoint;
-			}
-		}
 		
 	}
 	
-	Vector3 FindIntersetion(Vector3 p0, Vector3 r0, Vector3 p1, Vector3 r1){
+	// Update is called once per frame
+	void Update () {
+		HandleOrientation();
+//		UpdateMesh();
+		for (int i = 0; i < vertices.Length-1; ++i){
+			Debug.DrawLine(transform.position + vertices[i], transform.position + vertices[i+1], Color.green);
+		}
+
+		for (int i = 0; i < points.Length-1; ++i){
+			Debug.DrawLine(transform.position + points[i], transform.position + points[i+1], Color.red);
+		}
+		
+
+	// Rotate around the axies from start to end
+		
+	}
+	
+	Vector3 FindIntersetionOld(Vector3 p0, Vector3 r0, Vector3 p1, Vector3 r1){
 		float numerator = (p1.x-p0.x)*r0.y - (p1.y-p0.y)*r0.x;
 		float denominator = r1.y*r0.x-r1.x*r0.y;
 		if (MathUtils.FP.Feq(denominator, 0)){
@@ -280,14 +307,26 @@ public class Lightening : MonoBehaviour {
 		return p1 + lambda1 * r1;
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		UpdateMesh();
-		for (int i = 0; i < vertices.Length-1; ++i){
-			Debug.DrawLine(vertices[i], vertices[i+1], Color.red);
-		}
+	Vector3 FindIntersetion(Vector3 p, Vector3 u, Vector3 q, Vector3 v){
+		Vector3 w = p - q;
+
+		float a = Vector3.Dot (u, u);
+		float b = Vector3.Dot (u, v);
+		float c = Vector3.Dot (v, v);
+		float d = Vector3.Dot (u, w);
+		float e = Vector3.Dot (v, w);
 		
+		float s = (b * e - c * d) / (a * c - b * b);
+		float t = (a * e - b * d) / (a * c - b * b);
+		
+		Vector3 ip = p + s * u;
+		Vector3 iq = q + t * v;
+		return 0.5f * (ip + iq);
+		
+
 	}
+	
+
 	
 	float GetNormalSample(float mean, float sd){
 		float u1 = Random.Range(0f, 1f);

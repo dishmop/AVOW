@@ -84,7 +84,7 @@ SubShader {
 
 			
 			float4 col =  lerp(_Color0, _Color1, nsThis);
-			float alpha = 1-(abs(i.uv.y - _MidPoint) / 80);
+			float alpha = 1-(abs(i.uv.y - _MidPoint) / 150);
 			col.a = alpha * col.a;
 			return col;
 		}

@@ -1,10 +1,10 @@
-﻿Shader "Custom/AVOWCursorCubeBlue" {
+﻿Shader "Custom/AVOWCursorCubeBlueNoCull" {
 	Properties {
 		 _Intensity ("Intensity", Float) = 1
 
 	}
 	SubShader {
-			//Cull Off
+			Cull Off
 			ZTest Always
 	    	Blend SrcAlpha One // additive blending
 			Tags {"Queue"="Transparent"}

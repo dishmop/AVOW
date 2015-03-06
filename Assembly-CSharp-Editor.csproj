@@ -83,6 +83,7 @@
      <None Include="Assets\Tutorial_1\VertexColorLerp.shader" />
      <None Include="Assets\Shaders\noise-simplex_v05.shader" />
      <None Include="Assets\Shaders\AVOWTab.shader" />
+     <None Include="Assets\Shaders\AVOWCursorCubeBlueNoCull.shader" />
      <None Include="Assets\Scripts\alglib\gpl3.txt" />
      <None Include="Assets\Shaders\AVOWResistance.shader" />
      <None Include="Assets\Shaders\AVOWCursorCubeGrey.shader" />

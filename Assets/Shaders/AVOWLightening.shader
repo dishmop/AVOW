@@ -1,9 +1,12 @@
 ﻿Shader "Custom/AVOWLightening" {
        Properties {
+       		_Alpha ("Alpha", Float) = 1
         }
+        
         SubShader {
-        	ZTest Always
+        		ZTest Off
             	Blend SrcAlpha One // additive blending
+            	Cull Off
 			Tags {"Queue"="Transparent"}
 			
             Pass {
@@ -17,6 +20,8 @@
 		
 		        float4 _Color0;
 		        float4 _Color1;
+		        
+		        uniform float _Alpha;
 		    
 		
 		        struct v2f {
@@ -45,7 +50,7 @@
 		        {
 		        	float x = abs(i.uv[0] - 0.5);
 		        	
-		        	float4 col = float4(CalcCurve(x, 0.01), CalcCurve(x, 0.01), CalcCurve(x, 0.2), CalcCurve(x, 0.1));
+		        	float4 col = float4(CalcCurve(x, 0.01), CalcCurve(x, 0.01), CalcCurve(x, 0.2), _Alpha * CalcCurve(x, 0.1));
 		        	return col;
 		        	
 		        

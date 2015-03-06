@@ -1293,7 +1293,7 @@ MeshFilter:
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 100000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-  m_PrefabInternal: {fileID: 1124733303}
+  m_PrefabInternal: {fileID: 1763805829}
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 115811632}
@@ -1312,7 +1312,7 @@ MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 11400000, guid: c1264dd9d156a4a159e03b56f33f6b37,
     type: 2}
-  m_PrefabInternal: {fileID: 1124733303}
+  m_PrefabInternal: {fileID: 1763805829}
   m_GameObject: {fileID: 115811630}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -1330,7 +1330,7 @@ MonoBehaviour:
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-  m_PrefabInternal: {fileID: 1124733303}
+  m_PrefabInternal: {fileID: 1763805829}
   m_GameObject: {fileID: 115811630}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 595.349976, y: 233, z: 0}
@@ -1343,7 +1343,7 @@ MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 11400002, guid: c1264dd9d156a4a159e03b56f33f6b37,
     type: 2}
-  m_PrefabInternal: {fileID: 1124733303}
+  m_PrefabInternal: {fileID: 1763805829}
   m_GameObject: {fileID: 115811630}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -1353,7 +1353,9 @@ MonoBehaviour:
   greySphere: {fileID: 100000, guid: ba21d24887660484488ad55ce57ff931, type: 2}
   backStory: {fileID: 1226278289}
   babyCubePrefab: {fileID: 100002, guid: 6254920d69e964c9083e8c0512222c11, type: 2}
-  danceFollow3Dist: 50
+  babyCubePrefabMid: {fileID: 100002, guid: 801374bb62bdf4ed9ac81cb0c89c9e34, type: 2}
+  babyCubePrefabAfter: {fileID: 100002, guid: 599bb7c98a8ad477b80cebce294d49fd, type: 2}
+  danceFollow3Dist: 40
   prisonSphere1: {fileID: 1061268910}
   state: 3
   steerSphereRadius: 15
@@ -1361,8 +1363,9 @@ MonoBehaviour:
 --- !u!82 &115811634
 AudioSource:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_PrefabParentObject: {fileID: 8200000, guid: c1264dd9d156a4a159e03b56f33f6b37,
+    type: 2}
+  m_PrefabInternal: {fileID: 1763805829}
   m_GameObject: {fileID: 115811630}
   m_Enabled: 1
   serializedVersion: 3
@@ -8928,7 +8931,7 @@ Transform:
   m_GameObject: {fileID: 1061268910}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 210}
-  m_LocalScale: {x: 35, y: 500, z: 35}
+  m_LocalScale: {x: 80, y: 500, z: 80}
   m_Children: []
   m_Father: {fileID: 1226278290}
   m_RootOrder: 0
@@ -9547,82 +9550,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 1659196628}
   m_GameObject: {fileID: 1115843604}
   m_Mesh: {fileID: 4300000, guid: 78edd30dd366842a88a0150de7b3d1f5, type: 3}
---- !u!1001 &1124733303
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 595.349976
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 233
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: m_RootOrder
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: mainMenuPanel
-      value: 
-      objectReference: {fileID: 237336754}
-    - target: {fileID: 11400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: dlgPanel
-      value: 
-      objectReference: {fileID: 249423737}
-    - target: {fileID: 11400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: sidePanel
-      value: 
-      objectReference: {fileID: 1064961990}
-    - target: {fileID: 11400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: backStory
-      value: 
-      objectReference: {fileID: 1226278289}
-    - target: {fileID: 11400002, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: backStory
-      value: 
-      objectReference: {fileID: 1226278289}
-    - target: {fileID: 11400002, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: state
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400002, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: danceFollow3Dist
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400002, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-      propertyPath: prisonSphere1
-      value: 
-      objectReference: {fileID: 1061268910}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
-  m_RootGameObject: {fileID: 115811630}
-  m_IsPrefabParent: 0
-  m_IsExploded: 1
 --- !u!1 &1129529542
 GameObject:
   m_ObjectHideFlags: 0
@@ -14465,6 +14392,86 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   okCol: {r: 0, g: 1, b: .131034374, a: 1}
   notOkCol: {r: .573529422, g: .261054784, b: 0, a: 1}
+--- !u!1001 &1763805829
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 595.349976
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 233
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: m_RootOrder
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: mainMenuPanel
+      value: 
+      objectReference: {fileID: 237336754}
+    - target: {fileID: 11400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: dlgPanel
+      value: 
+      objectReference: {fileID: 249423737}
+    - target: {fileID: 11400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: sidePanel
+      value: 
+      objectReference: {fileID: 1064961990}
+    - target: {fileID: 11400000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: backStory
+      value: 
+      objectReference: {fileID: 1226278289}
+    - target: {fileID: 11400002, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: backStory
+      value: 
+      objectReference: {fileID: 1226278289}
+    - target: {fileID: 11400002, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: prisonSphere1
+      value: 
+      objectReference: {fileID: 1061268910}
+    - target: {fileID: 11400002, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: babyCubePrefabMid
+      value: 
+      objectReference: {fileID: 100002, guid: 801374bb62bdf4ed9ac81cb0c89c9e34, type: 2}
+    - target: {fileID: 11400002, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: babyCubePrefabAfter
+      value: 
+      objectReference: {fileID: 100002, guid: 599bb7c98a8ad477b80cebce294d49fd, type: 2}
+    - target: {fileID: 11400002, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: danceFollow3Dist
+      value: 40
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+  m_RootGameObject: {fileID: 115811630}
+  m_IsPrefabParent: 0
+  m_IsExploded: 1
 --- !u!1 &1764957101
 GameObject:
   m_ObjectHideFlags: 0
@@ -17627,7 +17634,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: .300000012
-  far clip plane: 80
+  far clip plane: 200
   field of view: 45
   orthographic: 0
   orthographic size: 5

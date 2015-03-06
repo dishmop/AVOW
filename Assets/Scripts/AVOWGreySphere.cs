@@ -316,7 +316,7 @@ public class AVOWGreySphere : MonoBehaviour {
 						triggerBeat = true;
 						if (beatLerpValue < 1){
 							if (bpm < maxBPM || (bpm < maxmaxBPM && heartRestartTrigger)){
-								bpm += 1f;
+								bpm += 2f;
 							}
 						}
 						// if the lerp value is 1 - then need to reduce our heartrate back down to normal
@@ -358,7 +358,6 @@ public class AVOWGreySphere : MonoBehaviour {
 				if (MathUtils.FP.Feq(col.r, newCol.r, 0.003f) && MathUtils.FP.Feq(col.g, newCol.g, 0.003f) && MathUtils.FP.Feq(col.b, newCol.b, 0.003f)){
 					state = State.kShoot0;
 				}
-				AVOWTutorialManager.singleton.danceFollow3Dist = 10;
 				AVOWTutorialManager.singleton.TriggerZoomIn();
 				
 			    
