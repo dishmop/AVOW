@@ -537,7 +537,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 34157579}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -250, z: 210}
+  m_LocalPosition: {x: .860000014, y: -250, z: 211.139999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2099582799}
@@ -1428,7 +1428,7 @@ MonoBehaviour:
   babyCubePrefabAfter: {fileID: 100002, guid: 599bb7c98a8ad477b80cebce294d49fd, type: 2}
   danceFollow3Dist: 40
   prisonSphere1: {fileID: 1061268910}
-  state: 3
+  state: 4
   steerSphereRadius: 15
   steerSphereCentre: {x: 0, y: 0, z: 210}
 --- !u!82 &115811634
@@ -14540,6 +14540,10 @@ Prefab:
       propertyPath: danceFollow3Dist
       value: 40
       objectReference: {fileID: 0}
+    - target: {fileID: 11400002, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: state
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
   m_RootGameObject: {fileID: 115811630}
@@ -14733,7 +14737,7 @@ AudioSource:
   serializedVersion: 3
   m_audioClip: {fileID: 8300000, guid: 1ded3d149bd3f4cf3ba70c73b4e6d02d, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: .282000005
+  m_Volume: .300000012
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -16013,6 +16017,7 @@ GameObject:
   - 224: {fileID: 1901854986}
   - 222: {fileID: 1901854985}
   - 114: {fileID: 1901854984}
+  - 114: {fileID: 1901854987}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -16065,6 +16070,17 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: .5, y: .5}
+--- !u!114 &1901854987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1901854983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c1ffe48ba20f449f96a78e250523860, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1905652116
 GameObject:
   m_ObjectHideFlags: 0
@@ -17765,6 +17781,7 @@ MonoBehaviour:
   moveSpeed: .00200000009
   loveLook: {x: 0, y: 0, z: 0}
   bePos: {x: 0, y: 0, z: 0}
+  ctrlLerpVal: 0
   state: 0
 --- !u!1 &2068202903
 GameObject:

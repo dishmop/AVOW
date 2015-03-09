@@ -64,8 +64,11 @@ public class AVOWTutorialManager : MonoBehaviour {
 	float backSpeedMod;
 	float backSpiralCoef;
 	
+	bool outro3Flag;
+	
 	float love11Drag = 1;
 	float electTime;
+	
 	
 	int largeSphereCount = -1;
 	int idealLargeSphereCount = 500;
@@ -76,6 +79,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kDebugJumpToDance,
 		kDebugJumpToDance2,
 		kDebugResetDance,
+		kDebugJumpToOutro,
 		kOff,
 		kWaitForText,
 		kStartup,
@@ -102,6 +106,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kEnvy1,
 		kEnvy2,
 		kEnvy3,
+		kEnvy3a,
 		kEnvy4,
 		kEnvy5,
 		kZoomIn0,
@@ -116,6 +121,14 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kElectrify5,
 		kElectrify6,
 		kLand0,
+		kLand1,
+		kOutro0,
+		kOutro1,
+		kOutro2,
+		kOutro3,
+		kOutro4,
+		kOutro5,
+		kOutro6,
 		kStop,
 		kNumStates
 	}
@@ -139,18 +152,22 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	State waitNextState = State.kOff;
 	
-	SpringValue		lightIntensity = new SpringValue(0, SpringValue.Mode.kLinear, 0.1f);
+	SpringValue		lightIntensityIntro = new SpringValue(0, SpringValue.Mode.kLinear, 0.1f);
+	SpringValue		lightIntensityOutro = new SpringValue(0, SpringValue.Mode.kLinear, 0.1f);
 	SpringValue 	cubeBrightness = new SpringValue(0, SpringValue.Mode.kAsymptotic, 20);
 	Color			reflectionColor;
 	Color			rustColor;
+	
+	bool 			triggerOutroLighting = false;
 	
 	public void StartTutorial(){
 	
 		
 		largeSphereCount = GenerateSpherePoints(idealLargeSphereCount, steerSphereRadius);
 		
-		//state = State.kDebugJumpToDance2;
-		state = State.kIntro2;
+		state = State.kDebugJumpToDance2;
+		state = State.kDebugJumpToOutro;
+		//state = State.kIntro2;
 		//state = State.kTheWorldOfSpheres0;
 		//state = State.kStartup;
 		
@@ -228,6 +245,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 		// Set up camera posiitons
 		cameraStartPositions[(int)State.kStartup] = new Vector3(0, 2.3f, 104.2f);
 		cameraStartPositions[(int)State.kTheWorldOfSpheres0] = new Vector3(0, 0, 200);
+		cameraStartPositions[(int)State.kOutro0] = new Vector3(0, 2.3f, 104.2f);
 		
 	
 	}
@@ -278,6 +296,10 @@ public class AVOWTutorialManager : MonoBehaviour {
 				DebugResetDance();
 				break;
 			}
+			case State.kDebugJumpToOutro:{
+				DebugJumpToOutro();
+				break;
+			}
 			case State.kWaitForText:{
 				if (triggered){
 					triggered = false;
@@ -321,8 +343,8 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kIntro2:{
 
-				lightIntensity.Set (0);
-				lightIntensity.SetSpeed(0.25f);
+				lightIntensityIntro.Set (0);
+				lightIntensityIntro.SetSpeed(0.25f);
 				backStory.transform.FindChild("Music").GetComponent<AudioSource>().Play();
 				AVOWTutorialText.singleton.AddPause(3);	
 				WaitForTextToFinish(State.kTheWorldOfSpheres0);
@@ -542,7 +564,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 				break;
 			}
 			case State.kEnvy0:{
-				AVOWTutorialText.singleton.AddTextNoLine("But the other spheres were afraid of us.");
+				AVOWTutorialText.singleton.AddText("But the other spheres were afraid of us.");
 				AVOWTutorialText.singleton.AddPause(6);
 				UpdateDanceFollow2();
 
@@ -604,11 +626,21 @@ public class AVOWTutorialManager : MonoBehaviour {
 				parentSpheres[2].transform.position = Vector3.Lerp (parentSpheres[2].transform.position , steerSphereCentre, 0.01f);
 				BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView = Mathf.Min (BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView + zoomSpeed, 45);
 				if ((babyCube.transform.position - BackStoryCamera.singleton.transform.position).magnitude > danceFollow3Dist * 0.8){
-					state = State.kEnvy4;
+					state = State.kEnvy3a;
+					AVOWTutorialText.singleton.AddText("The spheres that made me were cast out.");
+					envy2Time = Time.fixedTime + 7f;
+				
 				}
 			
 				break;
 			}	
+			case State.kEnvy3a:{				
+				UpdateDanceFollow3();
+				if (Time.fixedTime > envy2Time){
+					state = State.kEnvy4;
+				}
+				break;
+			}
 			case State.kEnvy4:{				
 				UpdateDanceFollow3();
 				
@@ -647,6 +679,8 @@ public class AVOWTutorialManager : MonoBehaviour {
 					}
 					
 				}
+			
+			
 			
 				break;
 			}
@@ -733,7 +767,9 @@ public class AVOWTutorialManager : MonoBehaviour {
 				babyCube.transform.FindChild("BabyBlueCube").renderer.materials[1].SetFloat("_Intensity", intensity - 0.05f);
 				if (intensity <= 0.5f){
 					state = State.kElectrify5;
-					electrify5Time = Time.fixedTime + 5;
+					electrify5Time = Time.fixedTime + 8;
+					AVOWTutorialText.singleton.AddText("I was shackled in gold and I fell.");
+					lightIntensityOutro.Set (1);
 				}
 				
 				
@@ -747,7 +783,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 				break;
 			}
 			case State.kElectrify6:{
-				UpdateDanceFollow6();
+				UpdateDanceFollow7();
 				babyCube.GetComponent<BabyBlueParent>().SetFall();
 				Vector3 pos = prisonSphere1.transform.position;
 				pos.y = babyCube.transform.position.y* 0.95f;
@@ -757,20 +793,97 @@ public class AVOWTutorialManager : MonoBehaviour {
 					babyCube.transform.FindChild("BabyBlueCube").renderer.materials[1].SetFloat("_Intensity", intensity - 0.05f);
 				}
 				
+				if (babyCube.transform.position.y - 0.5f * babyCube.transform.localScale.x < -200){
+					triggerOutroLighting = true;
+				}
 				if (babyCube.transform.position.y - 0.5f * babyCube.transform.localScale.x < -250){
 					Vector3 newPos = babyCube.transform.position;
-					newPos.y = -250 + babyCube.transform.localScale.x ;
+					newPos.y = -250 + 0.5f * babyCube.transform.localScale.x ;
 					babyCube.GetComponent<BabyBlueParent>().vel = Vector3.zero;
 					babyCube.transform.position  = newPos;
+					electrify5Time = Time.fixedTime + 7;
 					state = State.kLand0;
 				}
 				break;
 			}	
 			case State.kLand0:{
-				danceFollow3Dist = 4;
+				danceFollow3Dist = 1.5f;
 				UpdateDanceFollow7();
 				babyCube.GetComponent<BabyBlueParent>().Land();
 				Debug.Log ("Ground = " + babyCube.transform.position.y);
+				if (Time.fixedTime > electrify5Time){
+					state = State.kLand1;
+				}
+				break;
+			}
+			case State.kLand1:{
+				UpdateDanceFollow7();
+				lightIntensityOutro.Set (0);
+				if (lightIntensityOutro.IsAtTarget()){
+					SetCameraPos(State.kOutro0);
+					BackStoryCamera.singleton.StartOrbit();
+					lightIntensityIntro.Set (1);
+					state = State.kOutro0;
+				}
+				break;
+			}
+			case State.kOutro0:{	
+				if (lightIntensityIntro.IsAtTarget()){
+					AVOWTutorialText.singleton.AddText("I have been here ever since.");
+					AVOWTutorialText.singleton.AddPause(3);
+					AVOWTutorialText.singleton.AddText("I am Cube - an idea...and an idea cannot move physical things on its own. I need your help.");
+				
+					WaitForTextToFinish(State.kOutro1);
+				}
+				break;
+			}
+			case State.kOutro1:{
+				BackStoryCamera.singleton.StartControl();
+				state = State.kOutro2;
+				break;
+			}
+			case State.kOutro2:{
+				if (BackStoryCamera.singleton.state == BackStoryCamera.State.kControl1){
+					AVOWTutorialText.singleton.AddText("Try...see if you can move me.");
+					state = State.kOutro3;
+					electrify5Time = Time.fixedTime + 20;
+				}
+				break;
+			}
+			case State.kOutro3:{
+				if (BackStoryCamera.singleton.ctrlLerpVal > 0.5f){
+					AVOWTutorialText.singleton.AddText("That's good, try moving me around some more.");
+					state = State.kOutro4;
+				}
+				if (Time.fixedTime > electrify5Time && !outro3Flag){
+					outro3Flag = true;
+					AVOWTutorialText.singleton.AddText("Try moving your mouse to make me move.");
+				}
+				
+				break;
+			}
+			case State.kOutro4:{
+				if (BackStoryCamera.singleton.ctrlLerpVal > 0.99f){
+					AVOWTutorialText.singleton.AddText("You've got it! - I think with your help I can be free.");
+					AVOWTutorialText.singleton.AddPause(4);
+					lightIntensityIntro.Set (0);
+					WaitForTextToFinish(State.kOutro5);
+				}
+				
+				break;
+			}		
+			case State.kOutro5:{
+				if (lightIntensityIntro.IsAtTarget()){
+				state = State.kOutro6;		
+					
+				}
+			
+				break;
+			}	
+			case State.kOutro6:{
+				AVOWGameModes.singleton.GoToMain();
+				state = State.kOff;		
+				
 				break;
 			}
 			case State.kStop:{
@@ -782,6 +895,13 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 		ManageObjects();
 	
+	}
+	
+	void  DebugJumpToOutro(){
+		SetCameraPos(State.kOutro0);
+		BackStoryCamera.singleton.StartOrbit();
+		lightIntensityIntro.Set (1);
+		state = State.kOutro0;
 	}
 	
 	GameObject[] FindSquareSpheres(){
@@ -1073,19 +1193,18 @@ public class AVOWTutorialManager : MonoBehaviour {
 	}
 
 	void UpdateDanceFollow7(){
-		float speed = 0.7f;
+		float revPerSecond = 0.02f;
 		
 		// Get the camrera following the,
 		Vector3 lookPos = babyCube.transform.position;
-		Vector3 fromLookToHere = BackStoryCamera.singleton.transform.position - lookPos;
-		float dist = fromLookToHere.magnitude;
 		
+		Vector3 target = babyCube.transform.position + new Vector3(danceFollow3Dist * Mathf.Sin (revPerSecond * Time.fixedTime * 2 * Mathf.PI), 1, danceFollow3Dist * Mathf.Cos (revPerSecond * Time.fixedTime * 2 * Mathf.PI));
 		
-		Vector3 distVel = 0.12f * fromLookToHere.normalized * (danceFollow3Dist - dist);
+		Vector3 hereToTarget = target - BackStoryCamera.singleton.transform.position;
+		Vector3 distVel =  0.12f * hereToTarget;
+		Vector3 bePos3 = BackStoryCamera.singleton.transform.position + distVel;//  + BackStoryCamera.singleton.transform.TransformDirection(new Vector3(0.03f, 0.0f, 0)) + distVel;
 		
-		Vector3 bePos3 = lookPos  + new Vector3(0, 1, 1) * danceFollow3Dist;
-		
-		BackStoryCamera.singleton.GetComponent<BackStoryCamera>().SetEnvyFollow(lookPos, bePos3);
+		BackStoryCamera.singleton.GetComponent<BackStoryCamera>().SetEnvyFollowUp(lookPos, bePos3);
 	}
 	
 	
@@ -1457,25 +1576,29 @@ public class AVOWTutorialManager : MonoBehaviour {
 	}
 	
 	public void TriggerLight(){
-		cubeBrightness.Force (lightIntensity.GetValue());
+		cubeBrightness.Force (lightIntensityIntro.GetValue());
 		cubeBrightness.Set (0);
 	
 	}
 	
 	void BrightenScene(){
-		lightIntensity.Set (1);
+		lightIntensityIntro.Set (1);
 	}
 	
 	
 	void ManageObjects(){
-		lightIntensity.Update ();
+		lightIntensityIntro.Update ();
+		lightIntensityOutro.Update();
 		cubeBrightness.Update ();
 		backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").renderer.materials[2].SetFloat("_Intensity", cubeBrightness.GetValue());
-		backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").renderer.materials[1].SetColor ("_TintColor", rustColor * lightIntensity.GetValue());
-		backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").renderer.materials[0].SetColor ("_ReflectColor", reflectionColor * lightIntensity.GetValue());
+		backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").renderer.materials[1].SetColor ("_TintColor", rustColor * lightIntensityIntro.GetValue());
+		backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").renderer.materials[0].SetColor ("_ReflectColor", reflectionColor * lightIntensityIntro.GetValue());
 		
-		backStory.transform.FindChild("Intro").FindChild("Floor").FindChild("Point light").GetComponent<Light>().intensity = 2 * lightIntensity.GetValue();
-		
+		backStory.transform.FindChild("Intro").FindChild("Floor").FindChild("Point light").GetComponent<Light>().intensity = 2 * lightIntensityIntro.GetValue();
+		backStory.transform.FindChild("Outro").FindChild("Floor").FindChild("Point light").GetComponent<Light>().intensity = 2 * lightIntensityOutro.GetValue();
+		if (babyCube != null && babyCube.transform.FindChild("BabyBlueCube").renderer.materials.Length == 2 && triggerOutroLighting){
+			babyCube.transform.FindChild("BabyBlueCube").renderer.materials[0].SetColor ("_ReflectColor", reflectionColor * lightIntensityOutro.GetValue());
+		}
 		
 	}
 	
@@ -1488,9 +1611,9 @@ public class AVOWTutorialManager : MonoBehaviour {
 		singleton = null;
 	}
 	
-	void OnGUI(){
-	
-		GUI.Box (new Rect(50, 50, 500, 30), state.ToString());
-	}
+//	void OnGUI(){
+//	
+//		GUI.Box (new Rect(50, 50, 500, 30), state.ToString());
+//	}
 	
 }

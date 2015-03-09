@@ -152,6 +152,7 @@
      <Compile Include="Assets\Scripts\alglib\src\solvers.cs" />
      <Compile Include="Assets\Scripts\alglib\src\specialfunctions.cs" />
      <Compile Include="Assets\Scripts\alglib\src\statistics.cs" />
+     <Compile Include="Assets\TutorialTextPanel.cs" />
      <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />
      <None Include="Assets\Shaders\PlasmaBalls_new.shader" />
      <None Include="Assets\Shaders\SolidColor.shader" />
