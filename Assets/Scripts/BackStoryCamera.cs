@@ -159,7 +159,7 @@ public class BackStoryCamera : MonoBehaviour {
 				transform.position = pos;
 				
 				transform.rotation = Quaternion.LookRotation(cubeLookPos - transform.position);
-				AVOWTutorialManager.singleton.backStory.transform.FindChild("Music").GetComponent<AudioSource>().volume = 0.3f * (1 - (dist / 20));
+				AVOWBackStoryCutscene.singleton.backStory.transform.FindChild("Music").GetComponent<AudioSource>().volume = 0.3f * (1 - (dist / 20));
 			
 
 				break;

@@ -151,7 +151,7 @@ public class AVOWTutorialText : MonoBehaviour {
 				break;
 			}
 			case kTriggerKey:{
-				AVOWTutorialManager.singleton.Trigger();
+				AVOWBackStoryCutscene.singleton.Trigger();
 				break;
 			}
 		}
@@ -173,7 +173,7 @@ public class AVOWTutorialText : MonoBehaviour {
 				textBox.GetComponent<Text>().text = displayedString.ToString() + closingString + highlightString;
 				if (highlightLetter != " " && highlightLetter != "\n"){
 					if (!GetComponent<AudioSource>().isPlaying) GetComponent<AudioSource>().Play();
-					AVOWTutorialManager.singleton.TriggerLight();
+					AVOWBackStoryCutscene.singleton.TriggerLight();
 				}
 			}
 			float timeDeltaRaw = (1.0f/AVOWConfig.singleton.tutorialSpeed)* 1.0f/lettersPerSecond;

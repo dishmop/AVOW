@@ -34,6 +34,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 	float 					insideLerpSpeed;
 	
 	Vector3 				mouseWorldPos;
+	Vector3					ghostMousePos;
 	
 	GameObject 				cursorCube;
 	GameObject 				lightening0GO;
@@ -98,7 +99,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 		
 		//	Debug.Log("Mouse world pos = " + mouseWorldPos.ToString());
 		
-		
+		ghostMousePos = Vector3.zero;
 		// If we don't have a held connection, then we find the closest node and that's all
 		if (!heldConnection){
 			GameObject closestObj = null;
@@ -135,10 +136,11 @@ public class AVOWUICreateTool :  AVOWUITool{
 				
 				float minDist = maxLighteningDist;
 				// Only search for components if there is more than just a battery
+				ghostMousePos = mouseWorldPos + (mouseWorldPos - connection0Pos) * 0.85f;
 				if (AVOWGraph.singleton.allComponents.Count > 1){
-					minDist = FindClosestComponent(mouseWorldPos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos);
+					minDist = FindClosestComponent(ghostMousePos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos);
 				}
-				minDist = FindClosestNode(mouseWorldPos, connection0, minDist, connection1, ref closestObj, ref closestPos);			
+				minDist = FindClosestNode(ghostMousePos, connection0, minDist, connection1, ref closestObj, ref closestPos);			
 				connection1 = closestObj;
 				connection1Pos = closestPos;	
 				if (buttonReleased){
@@ -379,7 +381,22 @@ public class AVOWUICreateTool :  AVOWUITool{
 			AVOWSim.singleton.mouseOverComponentForce = connection1;
 		}
 		else{
-			lightening1GO.SetActive(false);
+			if (!isInside && connection0 != null & heldConnection){
+				lightening1GO.SetActive(true);
+				
+				Lightening lightening1 = lightening1GO.GetComponent<Lightening>();
+				lightening1.startPoint = lighteningConductorPos;
+				float dist = (ghostMousePos - lighteningConductorPos).magnitude;
+				lightening1.endPoint = ghostMousePos + new Vector3(Random.Range (-0.25f * dist, 0.25f * dist), Random.Range (-0.25f * dist, 0.25f * dist), 0);
+				
+				float len = (lightening1.startPoint  - lightening1.endPoint).magnitude;
+				lightening1.numStages = Mathf.Max ((int)(len * 10), 2);
+				lightening1.size = 0.1f;
+				lightening1.ConstructMesh();
+			}
+			else{
+				lightening1GO.SetActive(false);
+			}
 		}	
 		AVOWGraph.singleton.ClearAdditionalConnectionPoints();
 		

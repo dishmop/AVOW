@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class AVOWGameModes : MonoBehaviour {
@@ -77,13 +77,23 @@ public class AVOWGameModes : MonoBehaviour {
 		RestartFreePlayGame();
 	}
 	
-	public void PlayTutorial(){
+	public void PlayTutorial1(){
+		
+		AVOWTutorialText.singleton.activated = true;
+		SelectCamera(CameraChoice.kGameCam);
+		sidePanel.SetActive(false);
+		backStory.SetActive(false);
+		
+		RestartFreePlayGame();
+	}
+	
+	public void PlayBackStory(){
 
 		
 		AVOWTutorialText.singleton.activated = true;
 		sidePanel.SetActive(false);
 		SelectCamera(CameraChoice.kBackStoryCam);
-		AVOWTutorialManager.singleton.StartTutorial();
+		AVOWBackStoryCutscene.singleton.StartTutorial();
 		backStory.SetActive(true);
 		
 		RestartFreePlayGame();

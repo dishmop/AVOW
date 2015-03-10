@@ -244,7 +244,7 @@ public class AVOWGreySphere : MonoBehaviour {
 			}
 			case State.kDance0:{
 				if (enableTrigger){
-					AVOWTutorialManager.singleton.Trigger();
+					AVOWBackStoryCutscene.singleton.Trigger();
 					enableTrigger = false;
 				}
 				break;
@@ -296,7 +296,7 @@ public class AVOWGreySphere : MonoBehaviour {
 				
 				if (AVOWConfig.singleton.flockReset){
 					AVOWConfig.singleton.flockReset = false;
-					AVOWTutorialManager.singleton.state = AVOWTutorialManager.State.kDebugResetDance;
+					AVOWBackStoryCutscene.singleton.state = AVOWBackStoryCutscene.State.kDebugResetDance;
 				}
 				
 				// We trigger when the two have been moving towards one another and how are moving away
@@ -347,7 +347,7 @@ public class AVOWGreySphere : MonoBehaviour {
 				
 				if (bpm >= maxBPM && !reachedMax){
 					reachedMax = true;
-					AVOWTutorialManager.singleton.Trigger();
+					AVOWBackStoryCutscene.singleton.Trigger();
 				}
 				
 			    
@@ -366,7 +366,7 @@ public class AVOWGreySphere : MonoBehaviour {
 				if (MathUtils.FP.Feq(col.r, newCol.r, 0.003f) && MathUtils.FP.Feq(col.g, newCol.g, 0.003f) && MathUtils.FP.Feq(col.b, newCol.b, 0.003f)){
 					state = State.kShoot0;
 				}
-				AVOWTutorialManager.singleton.TriggerZoomIn();
+				AVOWBackStoryCutscene.singleton.TriggerZoomIn();
 				
 			    
 				break;

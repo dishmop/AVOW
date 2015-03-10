@@ -79,7 +79,7 @@ Material:
       data:
         first:
           name: _ReflectColour
-        second: {r: 0, g: 0, b: 0, a: .258823544}
+        second: {r: 0, g: 0, b: 0, a: .470588237}
       data:
         first:
           name: _RimColour
