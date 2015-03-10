@@ -201,7 +201,7 @@ public class BackStoryCamera : MonoBehaviour {
 				
 				float distMoved = (lastCubePos - cube.transform.position).magnitude;
 				ctrlLerpVal = Mathf.Min (ctrlLerpVal + distMoved / 100, 1);
-				Debug.Log ("ctrlLerpVal = " + ctrlLerpVal + " distMoved / 1000 = " + distMoved / 100000);
+//				Debug.Log ("ctrlLerpVal = " + ctrlLerpVal + " distMoved / 1000 = " + distMoved / 100000);
 				
 				
 				//LookAtCube();

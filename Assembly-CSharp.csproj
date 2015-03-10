@@ -137,6 +137,7 @@
      <Compile Include="Assets\Scripts\Tuple2.cs" />
      <Compile Include="Assets\Scripts\Tuple3.cs" />
      <Compile Include="Assets\Scripts\Tuple4.cs" />
+     <Compile Include="Assets\Scripts\TutorialTextPanel.cs" />
      <Compile Include="Assets\Scripts\UI.cs" />
      <Compile Include="Assets\Scripts\UIMesh.cs" />
      <Compile Include="Assets\Scripts\alglib\src\alglibinternal.cs" />
@@ -152,7 +153,6 @@
      <Compile Include="Assets\Scripts\alglib\src\solvers.cs" />
      <Compile Include="Assets\Scripts\alglib\src\specialfunctions.cs" />
      <Compile Include="Assets\Scripts\alglib\src\statistics.cs" />
-     <Compile Include="Assets\TutorialTextPanel.cs" />
      <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />
      <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />

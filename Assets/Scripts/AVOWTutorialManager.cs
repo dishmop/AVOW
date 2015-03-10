@@ -768,7 +768,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 				if (intensity <= 0.5f){
 					state = State.kElectrify5;
 					electrify5Time = Time.fixedTime + 8;
-					AVOWTutorialText.singleton.AddText("I was shackled in gold and I fell.");
+					AVOWTutorialText.singleton.AddText("I was shackled in gold");
 					lightIntensityOutro.Set (1);
 				}
 				
@@ -831,7 +831,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 				if (lightIntensityIntro.IsAtTarget()){
 					AVOWTutorialText.singleton.AddText("I have been here ever since.");
 					AVOWTutorialText.singleton.AddPause(3);
-					AVOWTutorialText.singleton.AddText("I am Cube - an idea...and an idea cannot move physical things on its own. I need your help.");
+					AVOWTutorialText.singleton.AddText("I am Cube - an idea...and an idea cannot move physical things on its own. I doubt even you could move me now.");
 				
 					WaitForTextToFinish(State.kOutro1);
 				}
@@ -844,27 +844,28 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kOutro2:{
 				if (BackStoryCamera.singleton.state == BackStoryCamera.State.kControl1){
-					AVOWTutorialText.singleton.AddText("Try...see if you can move me.");
+					AVOWTutorialText.singleton.AddText("You can try if you want....");
 					state = State.kOutro3;
 					electrify5Time = Time.fixedTime + 20;
 				}
 				break;
 			}
 			case State.kOutro3:{
-				if (BackStoryCamera.singleton.ctrlLerpVal > 0.5f){
-					AVOWTutorialText.singleton.AddText("That's good, try moving me around some more.");
+				if (BackStoryCamera.singleton.ctrlLerpVal > 0.05f){
+					AVOWTutorialText.singleton.AddText("I think I felt some movement there. Do it again.");
 					state = State.kOutro4;
 				}
 				if (Time.fixedTime > electrify5Time && !outro3Flag){
 					outro3Flag = true;
-					AVOWTutorialText.singleton.AddText("Try moving your mouse to make me move.");
+					AVOWTutorialText.singleton.AddText("Moving your mouse might nudge me.");
 				}
 				
 				break;
 			}
 			case State.kOutro4:{
-				if (BackStoryCamera.singleton.ctrlLerpVal > 0.99f){
-					AVOWTutorialText.singleton.AddText("You've got it! - I think with your help I can be free.");
+				if (BackStoryCamera.singleton.ctrlLerpVal > 0.7f){
+					BackStoryCamera.singleton.ctrlLerpVal = 1;
+					AVOWTutorialText.singleton.AddText("That feels nice. Thank you. However, these walls are all around me. Even if you can move me, I don't know how to get out.");
 					AVOWTutorialText.singleton.AddPause(4);
 					lightIntensityIntro.Set (0);
 					WaitForTextToFinish(State.kOutro5);
