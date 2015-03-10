@@ -1614,7 +1614,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	
 //	void OnGUI(){
 //	
-//		GUI.Box (new Rect(50, 50, 500, 30), state.ToString());
+//		GUI.Box (new Rect(50, 50, 500, 30), "BackStory: " + state.ToString());
 //	}
 	
 }

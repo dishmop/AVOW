@@ -22,8 +22,10 @@ public class AVOWConfig : MonoBehaviour {
 	public float flockHomeCoef= 1f;
 	public float flockSpeedMod = 1f;
 	public float flockSpiralCoef = 0;
-		
 	public bool flockReset = false;
+	
+	public bool tutDisableConnections = false;
+	public bool tutDisableUIButtons = false;
 	
 	
 	public bool ShowTextObjectives(){

@@ -152,6 +152,7 @@ public class AVOWTutorialText : MonoBehaviour {
 			}
 			case kTriggerKey:{
 				AVOWBackStoryCutscene.singleton.Trigger();
+				AVOWTutorialManager.singleton.Trigger();
 				break;
 			}
 		}
@@ -174,6 +175,7 @@ public class AVOWTutorialText : MonoBehaviour {
 				if (highlightLetter != " " && highlightLetter != "\n"){
 					if (!GetComponent<AudioSource>().isPlaying) GetComponent<AudioSource>().Play();
 					AVOWBackStoryCutscene.singleton.TriggerLight();
+					AVOWUI.singleton.TriggerLight();
 				}
 			}
 			float timeDeltaRaw = (1.0f/AVOWConfig.singleton.tutorialSpeed)* 1.0f/lettersPerSecond;

@@ -19,6 +19,7 @@ public class AVOWGameModes : MonoBehaviour {
 	public GameObject dlgPanel;
 	public GameObject sidePanel;
 	public GameObject backStory;
+	public GameObject tutorialText;
 	
 	
 	enum CameraChoice{
@@ -30,6 +31,7 @@ public class AVOWGameModes : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		SelectCamera(CameraChoice.kGameCam);
+		tutorialText.SetActive(true);
 
 	
 	}
@@ -81,8 +83,9 @@ public class AVOWGameModes : MonoBehaviour {
 		
 		AVOWTutorialText.singleton.activated = true;
 		SelectCamera(CameraChoice.kGameCam);
-		sidePanel.SetActive(false);
+		sidePanel.SetActive(true);
 		backStory.SetActive(false);
+		AVOWTutorialManager.singleton.StartTutorial();
 		
 		RestartFreePlayGame();
 	}

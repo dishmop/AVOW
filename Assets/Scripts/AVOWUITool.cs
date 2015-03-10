@@ -10,6 +10,9 @@ public class AVOWUITool{
 	protected GameObject insideCube;
 	
 	
+	public virtual GameObject GetCursorCube(){
+		return null;
+	}
 	
 	// Return tru if you don;t want this tool to be snatched away
 	// becuase it is in the middle of doing something

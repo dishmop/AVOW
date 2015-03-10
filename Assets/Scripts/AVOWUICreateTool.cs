@@ -64,6 +64,10 @@ public class AVOWUICreateTool :  AVOWUITool{
 		
 	}
 	
+	public override GameObject GetCursorCube(){
+		return cursorCube;
+	}
+	
 	
 	protected override GameObject InstantiateCursorCube(){
 		return AVOWUI.singleton.InstantiateBlueCursorCube();		
@@ -95,6 +99,8 @@ public class AVOWUICreateTool :  AVOWUITool{
 		// Set the cursor cubes position
 		mouseWorldPos.z = uiZPos;
 		cursorCube.transform.position = mouseWorldPos;
+		
+		if (AVOWConfig.singleton.tutDisableConnections) return;
 		
 		
 		//	Debug.Log("Mouse world pos = " + mouseWorldPos.ToString());

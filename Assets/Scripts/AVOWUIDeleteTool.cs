@@ -38,6 +38,9 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 	float 					insideLerpSpeed;
 	
 	
+	public override GameObject GetCursorCube(){
+		return cursorCube;
+	}
 	
 	
 	public override void Start(){

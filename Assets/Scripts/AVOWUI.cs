@@ -21,6 +21,8 @@ public class AVOWUI : MonoBehaviour {
 	
 	AVOWGraph graph = null;
 	
+	SpringValue cubeBrightness = new SpringValue(0, SpringValue.Mode.kAsymptotic);
+	float lastFlashTime = 0;
 	
 	
 	public enum ToolMode{
@@ -59,7 +61,22 @@ public class AVOWUI : MonoBehaviour {
 		
 	}
 	
+	public GameObject GetCursorCube(){
+		return (uiTool != null) ? uiTool.GetCursorCube() : null;
+	}
+	
 	void Update(){
+		if (Time.fixedTime > lastFlashTime + 0.5f){
+			cubeBrightness.Set (1);
+			cubeBrightness.SetSpeed(2);
+		}
+		cubeBrightness.Update ();
+		
+		if (uiTool != null){
+			int numMaterials = uiTool.GetCursorCube().GetComponent<Renderer>().materials.Length;
+			uiTool.GetCursorCube().GetComponent<Renderer>().materials[numMaterials - 1].SetFloat("_Intensity", cubeBrightness.GetValue());
+		}
+		
 		if (AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kGameOver){
 			if (uiTool != null){		
 				uiTool.OnDestroy();
@@ -91,6 +108,14 @@ public class AVOWUI : MonoBehaviour {
 		}
 
 		
+		
+	}
+	
+	public void TriggerLight(){
+		cubeBrightness.Force (1);
+		cubeBrightness.Set (0);
+		cubeBrightness.SetSpeed(10);
+		lastFlashTime = Time.fixedTime;
 		
 	}
 	
