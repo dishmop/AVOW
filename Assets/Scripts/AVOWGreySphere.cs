@@ -109,8 +109,8 @@ public class AVOWGreySphere : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		baseRimColor = renderer.material.GetColor("_RimColour");
-		baseReflectColor = renderer.material.GetColor ("_ReflectColour");
+		baseRimColor = GetComponent<Renderer>().material.GetColor("_RimColour");
+		baseReflectColor = GetComponent<Renderer>().material.GetColor ("_ReflectColour");
 	}
 	
 	public void ActivateSilentBeat(){
@@ -359,10 +359,10 @@ public class AVOWGreySphere : MonoBehaviour {
 				break;
 			}
 			case State.kHeatUp0:{
-				Color col = renderer.material.GetColor("_RimColour");
+				Color col = GetComponent<Renderer>().material.GetColor("_RimColour");
 				Color newCol = Color.Lerp(col, GetHeatColor(), 0.02f);
-				renderer.material.SetColor("_RimColour", newCol);
-				renderer.material.SetColor("_ReflectColour", newCol);
+				GetComponent<Renderer>().material.SetColor("_RimColour", newCol);
+				GetComponent<Renderer>().material.SetColor("_ReflectColour", newCol);
 				if (MathUtils.FP.Feq(col.r, newCol.r, 0.003f) && MathUtils.FP.Feq(col.g, newCol.g, 0.003f) && MathUtils.FP.Feq(col.b, newCol.b, 0.003f)){
 					state = State.kShoot0;
 				}
@@ -372,10 +372,10 @@ public class AVOWGreySphere : MonoBehaviour {
 				break;
 			}
 			case State.kHeatUp1:{
-				Color col = renderer.material.GetColor("_RimColour");
+				Color col = GetComponent<Renderer>().material.GetColor("_RimColour");
 				Color newCol = Color.Lerp(col, GetHeatColor(), 0.001f);
-				renderer.material.SetColor("_RimColour", newCol);
-				renderer.material.SetColor("_ReflectColour", newCol);				
+				GetComponent<Renderer>().material.SetColor("_RimColour", newCol);
+				GetComponent<Renderer>().material.SetColor("_ReflectColour", newCol);				
 				break;
 			}			
 			case State.kShoot0:{
@@ -406,14 +406,14 @@ public class AVOWGreySphere : MonoBehaviour {
 				break;
 			}
 			case State.kShoot2:{	
-				Color rimCol = renderer.material.GetColor("_RimColour");
-				Color refCol = renderer.material.GetColor("_ReflectColour");
+				Color rimCol = GetComponent<Renderer>().material.GetColor("_RimColour");
+				Color refCol = GetComponent<Renderer>().material.GetColor("_ReflectColour");
 			
 				Color newRimCol = Color.Lerp(rimCol, baseRimColor, 0.02f);
 				Color newRefCol = Color.Lerp(rimCol, baseReflectColor, 0.02f);
 				
-				renderer.material.SetColor("_RimColour", newRimCol);
-				renderer.material.SetColor("_ReflectColour", newRefCol);
+				GetComponent<Renderer>().material.SetColor("_RimColour", newRimCol);
+				GetComponent<Renderer>().material.SetColor("_ReflectColour", newRefCol);
 				
 				beatsActive = true;
 				regularBeats = true;
@@ -449,10 +449,10 @@ public class AVOWGreySphere : MonoBehaviour {
 		if (beatsActive){
 			float useBeatIntensity = Mathf.Lerp (audioBeatIntensity.GetValue(), silentBeatIntensity, beatLerpValue);
 			Color rimColor = Color.Lerp(baseRimColor, beatColor, useBeatIntensity);
-			renderer.material.SetColor("_RimColour", rimColor);
+			GetComponent<Renderer>().material.SetColor("_RimColour", rimColor);
 			
 			Color reflectColor = Color.Lerp(baseReflectColor, beatColor, useBeatIntensity);
-			renderer.material.SetColor("_ReflectColour", reflectColor);
+			GetComponent<Renderer>().material.SetColor("_ReflectColour", reflectColor);
 			audioBeatIntensity.Update();
 			
 			if (lightGO != null){

@@ -82,8 +82,8 @@ public class DrawnLine : MonoBehaviour {
 		uvs[3] = new Vector2(0, 0);
 		
 		transform.FindChild("LocalTransform").FindChild ("DrawnLineMesh").GetComponent<MeshFilter>().mesh.uv = uvs;
-		Color test = 	transform.FindChild("LocalTransform").FindChild ("DrawnLineMesh").renderer.material.GetColor("_Color");
-		transform.FindChild("LocalTransform").FindChild ("DrawnLineMesh").renderer.material.SetColor("_Color", lineColor);
+		Color test = 	transform.FindChild("LocalTransform").FindChild ("DrawnLineMesh").GetComponent<Renderer>().material.GetColor("_Color");
+		transform.FindChild("LocalTransform").FindChild ("DrawnLineMesh").GetComponent<Renderer>().material.SetColor("_Color", lineColor);
 		
 	}
 		

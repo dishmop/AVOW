@@ -26,7 +26,7 @@ Shader "Custom/DC_Reflect-Glass" {
         // Use surface shader with function called "surf"
         // Use the inbuilt BlinnPhong lighting model
         // Use alpha blending
-        #pragma surface surf BlinnPhong alpha
+        #pragma surface surf BlinnPhong alpha keepalpha
  
         // Access the Shaderlab properties
         sampler2D _MainTex;
@@ -67,7 +67,7 @@ Shader "Custom/DC_Reflect-Glass" {
             // Rim lighting is emissive lighting based on angle between surface normal and view direction.
             // You get more reflection at glancing angles
             half intensity = 1.0 - saturate(dot (normalize(IN.viewDir), o.Normal));
-            o.Emission += intensity * _RimColour.rgb;
+            o.Emission += intensity * _RimColour.rgb * _ReflectColour.a;
         }
         ENDCG
     } 

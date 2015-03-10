@@ -5,7 +5,7 @@ public class QuitOnEsc : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		Screen.showCursor = false;
+		Cursor.visible = false;
 		
 	//	Time.timeScale = 0.1f;
 	
@@ -28,12 +28,12 @@ public class QuitOnEsc : MonoBehaviour {
 			AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kMainMenu || 
 			AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kStageComplete ||
 		    AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kGameOver ){
-			Screen.showCursor = true;
+			Cursor.visible = true;
 			
 		}
 		else
 		{
-			Screen.showCursor = false;
+			Cursor.visible = false;
 			
 		}
 	

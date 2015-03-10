@@ -249,8 +249,8 @@ public class AVOWUITool{
 		insideCube.transform.rotation = cursor.transform.rotation;
 		
 		Material[] metalMaterials = new Material[1];
-		metalMaterials[0] = cursor.renderer.materials[0];
-		insideCube.renderer.materials = metalMaterials;
+		metalMaterials[0] = cursor.GetComponent<Renderer>().materials[0];
+		insideCube.GetComponent<Renderer>().materials = metalMaterials;
 	}
 	
 	
@@ -266,16 +266,16 @@ public class AVOWUITool{
 		insideCube.transform.rotation = resistanceTransform.rotation;
 		
 		Material[] metalMaterials = new Material[1];
-		metalMaterials[0] = insideCube.renderer.materials[0];
-		insideCube.renderer.materials = metalMaterials;
+		metalMaterials[0] = insideCube.GetComponent<Renderer>().materials[0];
+		insideCube.GetComponent<Renderer>().materials = metalMaterials;
 		
 		component.GetComponent<AVOWComponent>().isInteractive = false;
 	}
 	
 	protected void RemoveMetal(GameObject cursor){
 		Material[] highlightMaterials = new Material[1];
-		highlightMaterials[0] = cursor.renderer.materials[1];
-		cursor.renderer.materials = highlightMaterials;
+		highlightMaterials[0] = cursor.GetComponent<Renderer>().materials[1];
+		cursor.GetComponent<Renderer>().materials = highlightMaterials;
 		
 	}
 	

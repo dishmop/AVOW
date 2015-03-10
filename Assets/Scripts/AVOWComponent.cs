@@ -366,8 +366,8 @@ public class AVOWComponent : MonoBehaviour {
 		if (type == Type.kLoad){
 			transform.FindChild("Resistance").gameObject.SetActive(isInteractive && showResistance);
 			SetupUVs (transform.FindChild("Resistance").gameObject, Mathf.Abs (useV1-useV0));
-			transform.FindChild("Resistance").renderer.material.SetColor("_Color0", col0);
-			transform.FindChild("Resistance").renderer.material.SetColor("_Color1", col1);
+			transform.FindChild("Resistance").GetComponent<Renderer>().material.SetColor("_Color0", col0);
+			transform.FindChild("Resistance").GetComponent<Renderer>().material.SetColor("_Color1", col1);
 			transform.FindChild("Resistance").position = new Vector3(useH0  + squareGap, Mathf.Min (useV0, useV1) + squareGap, 0);
 
 			float xScale = useH1 -useH0 - 2 * squareGap;
@@ -527,8 +527,8 @@ public class AVOWComponent : MonoBehaviour {
 		
 		go.GetComponent<MeshFilter>().mesh.uv = uvs;
 
-		go.renderer.material.SetFloat("_NormalRotationCos", Mathf.Cos(radRot - piBy8));
-		go.renderer.material.SetFloat("_NormalRotationSin", Mathf.Sin(radRot - piBy8));
+		go.GetComponent<Renderer>().material.SetFloat("_NormalRotationCos", Mathf.Cos(radRot - piBy8));
+		go.GetComponent<Renderer>().material.SetFloat("_NormalRotationSin", Mathf.Sin(radRot - piBy8));
 		
 	
 	}

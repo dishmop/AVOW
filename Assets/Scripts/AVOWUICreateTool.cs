@@ -276,8 +276,8 @@ public class AVOWUICreateTool :  AVOWUITool{
 	void HandleVizConnectors(){
 		if (connection0 == null || !heldConnection){
 			foreach(GameObject go in AVOWGraph.singleton.allComponents){
-				go.transform.FindChild("ConnectionSphere0").renderer.materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
-				go.transform.FindChild("ConnectionSphere1").renderer.materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
+				go.transform.FindChild("ConnectionSphere0").GetComponent<Renderer>().materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
+				go.transform.FindChild("ConnectionSphere1").GetComponent<Renderer>().materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
 				go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
 				go.transform.FindChild("ConnectionSphere1").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
 			}
@@ -288,20 +288,20 @@ public class AVOWUICreateTool :  AVOWUITool{
 				GameObject sphere0 = go.transform.FindChild("ConnectionSphere0").gameObject;
 				GameObject sphere1 = go.transform.FindChild("ConnectionSphere1").gameObject;
 				if (spheres.Exists (obj => (obj == sphere0))){
-					sphere0.renderer.materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
+					sphere0.GetComponent<Renderer>().materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
 					go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
 				}
 				else{
-					sphere0.renderer.materials[0].SetColor("_Color0", new Color(0, 0.125f, 0));
+					sphere0.GetComponent<Renderer>().materials[0].SetColor("_Color0", new Color(0, 0.125f, 0));
 					go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(false);
 				}
 				if (spheres.Exists (obj => (obj == sphere1))){
-					sphere1.renderer.materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
+					sphere1.GetComponent<Renderer>().materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
 					go.transform.FindChild("ConnectionSphere1").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
 					
 				}
 				else{
-					sphere1.renderer.materials[0].SetColor("_Color0", new Color(0, 0.125f, 0));
+					sphere1.GetComponent<Renderer>().materials[0].SetColor("_Color0", new Color(0, 0.125f, 0));
 					go.transform.FindChild("ConnectionSphere1").FindChild ("Blob Shadow Projector").gameObject.SetActive(false);
 				}
 			}

@@ -1,12 +1,12 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWTutorialManager.cs">
     <Files>
       <File FileName="Assets/Scripts/Lightening.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWTutorialManager.cs" Line="121" Column="10" />
+      <File FileName="Assets/Scripts/AVOWTutorialManager.cs" Line="170" Column="3" />
       <File FileName="Assets/Scripts/AVOWGreySphere.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/BabyBlueCube.cs" Line="12" Column="23" />
-      <File FileName="Assets/Scripts/BackStoryCamera.cs" Line="53" Column="1" />
+      <File FileName="Assets/Scripts/BabyBlueCube.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/BackStoryCamera.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/DanceThreesome.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWConfig.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWComponent.cs" Line="1" Column="1" />
@@ -16,6 +16,7 @@
       <File FileName="Assets/Shaders/AVOWCursorCubeBlue.shader" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWTutorialText.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/BabyBlueParent.cs" Line="1" Column="1" />
+      <File FileName="Assets/Shaders/DC_Reflect-Glass.shader" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">

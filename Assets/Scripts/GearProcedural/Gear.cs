@@ -67,7 +67,7 @@ public class Gear : MonoBehaviour {
 		df = (tCount - 2.5f) * prefs.modul*0.5f;
 		float angle = 360.0f/tCount,
 			 offset = prefs.modul*2.25f;
-		mesh.subMeshCount = renderer.sharedMaterials.Length;
+		mesh.subMeshCount = GetComponent<Renderer>().sharedMaterials.Length;
 		pointsLenght = 0;
 		foreach (Point pnt in points) { 
 			pointsLenght++; vp=pnt.mat*0; }
@@ -298,7 +298,7 @@ public class Gear : MonoBehaviour {
 					// update mesh
 			if (mesh.vertices.Length != vp)
 				mesh.Clear(); 
-		 	mesh.subMeshCount = renderer.sharedMaterials.Length;
+		 	mesh.subMeshCount = GetComponent<Renderer>().sharedMaterials.Length;
 			mesh.vertices = new Vector3[v.Length];
 			mesh.vertices = v;
 			for (int i=0; i<mesh.subMeshCount; i++){
@@ -429,10 +429,10 @@ public class Gear : MonoBehaviour {
 	
 	void OnEnable () 	{
 		UpdateGear();
-		if (renderer.sharedMaterial == null) {
-			renderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
-			if (renderer.sharedMaterial != null)
-				renderer.sharedMaterial.color = Color.grey;
+		if (GetComponent<Renderer>().sharedMaterial == null) {
+			GetComponent<Renderer>().sharedMaterial = new Material(Shader.Find("Diffuse"));
+			if (GetComponent<Renderer>().sharedMaterial != null)
+				GetComponent<Renderer>().sharedMaterial.color = Color.grey;
 		}
 	}
 

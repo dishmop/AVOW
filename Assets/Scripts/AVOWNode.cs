@@ -67,7 +67,7 @@ public class AVOWNode : MonoBehaviour {
 		}
 		
 	
-		Material material = transform.FindChild("LineNode").FindChild("LineNodeRender").renderer.material;
+		Material material = transform.FindChild("LineNode").FindChild("LineNodeRender").GetComponent<Renderer>().material;
 		float currentSelectVal = material.GetFloat("_Intensity");
 		float newVal = Mathf.Lerp (currentSelectVal, isSelected ? 1 : 0, 0.4f);
 		material.SetFloat("_Intensity", newVal);
@@ -110,7 +110,7 @@ public class AVOWNode : MonoBehaviour {
 		transform.position = new Vector3(centrePos, voltage, 0);
 		
 		// Recalc the prop value (use any of the components to get the gap value
-		Material material = transform.FindChild("LineNode").FindChild("LineNodeRender").renderer.material;
+		Material material = transform.FindChild("LineNode").FindChild("LineNodeRender").GetComponent<Renderer>().material;
 		material.SetFloat("_GapProp", 1);
 	}
 }

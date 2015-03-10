@@ -279,7 +279,7 @@ public class GearInspector : Editor {
 		EditorGUILayout.LabelField("Textures in Renderer:");
 		EditorGUILayout.BeginHorizontal();
 		int matCount = 0;
-		foreach(Material m in g.renderer.sharedMaterials) {
+		foreach(Material m in g.GetComponent<Renderer>().sharedMaterials) {
 			GUILayout.Label(matCount.ToString(), GUILayout.MaxWidth(10f));
 			GUILayout.Label(m.mainTexture, GUILayout.Width(50f), GUILayout.Height(50f));
 			matCount++;
@@ -297,11 +297,11 @@ public class GearInspector : Editor {
 				point = points.GetArrayElementAtIndex(i),
 				mat   = point.FindPropertyRelative("mat");
 			if (mat == null) break;
-			if (mat.intValue > g.renderer.sharedMaterials.Length-1) mat.intValue = 0;
+			if (mat.intValue > g.GetComponent<Renderer>().sharedMaterials.Length-1) mat.intValue = 0;
 			EditorGUILayout.BeginHorizontal();
 			InfoField(" "+ indexes[2].ToString(),colors[++indexes[2]], 15f);
-			GUILayout.Label(g.renderer.sharedMaterials[mat.intValue].mainTexture, GUILayout.Width(40f), labelHeight);
-			GUILayout.Label(g.renderer.sharedMaterials[mat.intValue].name,GUILayout.Width(120f), labelHeight);
+			GUILayout.Label(g.GetComponent<Renderer>().sharedMaterials[mat.intValue].mainTexture, GUILayout.Width(40f), labelHeight);
+			GUILayout.Label(g.GetComponent<Renderer>().sharedMaterials[mat.intValue].name,GUILayout.Width(120f), labelHeight);
 			for (int j=0; j < matCount; j++)
 				if (GUILayout.Button(j.ToString(), GUILayout.MaxWidth(35f))) mat.intValue = j;
 			EditorGUILayout.LabelField(" ");
