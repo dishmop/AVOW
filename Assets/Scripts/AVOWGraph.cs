@@ -269,8 +269,28 @@ public class AVOWGraph : MonoBehaviour {
 		}		
 	}
 	
+	// Return the number of Loads which are either 
+	// completly there or on their way to being there
+	public int GetNumConfirmedLoads(){
+		int count = 0;
+		foreach (GameObject go in AVOWGraph.singleton.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			if (MathUtils.FP.Feq (component.resistanceAngle.GetDesValue(), 45)){
+				count++;
+			}
+		}
+		return count;
+	}
 	
 	
+	public bool HasNonInteractiveComponents(){
+		foreach (GameObject go in AVOWGraph.singleton.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			if (!component.isInteractive || component.IsDying())
+				return true;
+		}
+		return false;
+	}
 	
 	public void ClearVisitedFlags(){
 		foreach (GameObject componentGO in allComponents){

@@ -57,12 +57,12 @@ public class DanceThreesome : MonoBehaviour {
 		Vector3 thisPos = transform.position;
 		Vector3 otherPos1 = threesomeObj1.transform.position;
 		Vector3 otherPos2 = threesomeObj2.transform.position;
-		Vector3 avPos = 0.5f * ( otherPos1 + otherPos2);
+//		Vector3 avPos = 0.5f * ( otherPos1 + otherPos2);
 		Vector3 homePos = threesomeHome.transform.position;
 		
 		Vector3 hereToOther1 = otherPos1 - thisPos;
 		Vector3 hereToOther2 = otherPos2 - thisPos;
-		Vector3 hereToAv = avPos - thisPos;
+		//Vector3 hereToAv = avPos - thisPos;
 		Vector3 hereToHome = homePos - thisPos;
 		
 		float distToOther1 = hereToOther1.magnitude;

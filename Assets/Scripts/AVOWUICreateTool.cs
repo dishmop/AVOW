@@ -81,9 +81,30 @@ public class AVOWUICreateTool :  AVOWUITool{
 		GameObject.Destroy(insideCube);
 	}
 	
-	public override bool IsBeingUsed(){
+	public override bool IsHolding(){
 		return heldConnection;
 	}
+	
+	public override int GetNumConnections(){
+		int count = 0;
+		if (connection0 != null) count++;
+		if (connection1 != null) count++;
+		return count; 
+	}
+	
+	
+	
+	public override GameObject GetConnection(int index){
+		if (index == 0) return connection0;
+		if (index == 1) return connection1;
+		return null;
+	}
+	
+	public override bool IsInsideGap(){
+		return isInside;
+	}
+	
+
 	
 	void StateUpdate(){
 		// Calc the mouse posiiton on world spave
@@ -92,15 +113,20 @@ public class AVOWUICreateTool :  AVOWUITool{
 		mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
 		
 		// Get the mouse buttons
-		bool  buttonPressed = (Input.GetMouseButtonDown(0) && !Input.GetKey (KeyCode.LeftControl));
-		bool  buttonReleased = (Input.GetMouseButtonUp(0) && !Input.GetKey (KeyCode.LeftControl));
+		bool  buttonPressed = (!AVOWConfig.singleton.tutDisableButtton && Input.GetMouseButtonDown(0));
+		bool  buttonReleased = (!AVOWConfig.singleton.tutDisableButtton && Input.GetMouseButtonUp(0));
 		//		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
 		
 		// Set the cursor cubes position
 		mouseWorldPos.z = uiZPos;
 		cursorCube.transform.position = mouseWorldPos;
 		
-		if (AVOWConfig.singleton.tutDisableConnections) return;
+		if (AVOWConfig.singleton.tutDisableConnections) 
+		{
+			connection0 = null;
+			connection1 = null;
+			return;
+		}
 		
 		
 		//	Debug.Log("Mouse world pos = " + mouseWorldPos.ToString());
@@ -143,6 +169,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 				float minDist = maxLighteningDist;
 				// Only search for components if there is more than just a battery
 				ghostMousePos = mouseWorldPos + (mouseWorldPos - connection0Pos) * 0.85f;
+				ghostMousePos.x = mouseWorldPos.x;
 				if (AVOWGraph.singleton.allComponents.Count > 1){
 					minDist = FindClosestComponent(ghostMousePos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos);
 				}
@@ -156,17 +183,26 @@ public class AVOWUICreateTool :  AVOWUITool{
 			}
 			else{
 				if (buttonReleased){
-					heldConnection = false;
-					heldGapCommand.ExecuteStep();
-					AVOWUI.singleton.commands.Push(heldGapCommand);
-					heldGapCommand = null;
-					heldGapConnection1 = null;
-					connection1 = null;
-					connection0 = null;
-					insideState = InsideGapState.kOnNewComponent;
+					if (!AVOWConfig.singleton.tutDisableConstruction){
+						heldConnection = false;
+						heldGapCommand.ExecuteStep();
+						AVOWUI.singleton.commands.Push(heldGapCommand);
+						heldGapCommand = null;
+						heldGapConnection1 = null;
+						connection1 = null;
+						connection0 = null;
+						insideState = InsideGapState.kOnNewComponent;
+					}
+					else{
+						heldConnection = false;
+						connection1 = null;
+					}
 				}
 			}
-
+			if (AVOWConfig.singleton.tutDisableSecondConnections){
+				connection1 = null;
+			}
+			
 			
 		}
 		// Extend the light bar on this node to touch the conneciton point

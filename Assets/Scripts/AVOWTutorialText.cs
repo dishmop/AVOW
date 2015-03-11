@@ -10,6 +10,7 @@ public class AVOWTutorialText : MonoBehaviour {
 	public bool			activated = false;
 	public SpringValue	border  = new SpringValue(1, SpringValue.Mode.kLinear,0.25f);
 	public float		defaultLettersPerSecond = 5;
+	public float 		forceCompleteSpeed = 1000;
 	public GameObject 	textBox;
 	public GameObject 	panel;
 	
@@ -17,6 +18,7 @@ public class AVOWTutorialText : MonoBehaviour {
 	public Color		highlightColor;
 	
 	float				lettersPerSecond = 0;
+	float 				lastNonForcedSpeed = 0;
 	
 	float				nextletterTime = 0;
 	string 				closingString = "</color>";
@@ -35,13 +37,37 @@ public class AVOWTutorialText : MonoBehaviour {
 		
 	}
 	
+	
+	public void InturruptText(string text){
+		if (queuedString.Length > 5){
+			queuedString.Length = 0;
+			queuedString.Append("...\n\n");
+			ForceTextCompletion();
+			queuedString.Append(text + "\n\n");
+		}
+		else{
+			ForceTextCompletion();
+			AddText (text);
+		}
+		Debug.Log("InturruptText: text = " + queuedString.ToString());
+		
+		
+	}
+	
 	public void AddTextNoLine(string text){
 		queuedString.Append(text);
 		
 	}
 	
 	public void AddTrigger(){
-		queuedString.Append ("["+kTriggerKey+"=" + "0]");
+		// We should insert this before any new line characters which are at the end of the queue
+		string thisString = queuedString.ToString();
+		int index = thisString.Length-1;
+		while (index >= 0){
+			if (thisString[index] != '\n') break;
+			index--;
+		}
+		queuedString.Insert(index+1, "["+kTriggerKey+"=" + "0]");
 	}
 	
 	public void AddPause(float seconds){
@@ -62,6 +88,18 @@ public class AVOWTutorialText : MonoBehaviour {
 		lettersPerSecond = defaultLettersPerSecond;
 		ClearDisplayString();
 	}
+	
+	public void ForceTextCompletion(){
+		if (lettersPerSecond != forceCompleteSpeed){
+			lastNonForcedSpeed = lettersPerSecond;
+		}
+		nextletterTime = Time.time;
+		lettersPerSecond = forceCompleteSpeed;
+		SetSpeed(lastNonForcedSpeed);
+//		string tempString = queuedString.ToString();
+//		Debug.Log("ForceTextCompletion (" + lettersPerSecond.ToString() + "): text = " + tempString);
+	}
+	
 	
 
 	// Use this for initialization
@@ -89,6 +127,7 @@ public class AVOWTutorialText : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+//		Debug.Log (lettersPerSecond.ToString() + ": " + queuedString.ToString());
 		HandleBorder();
 		HandleText();
 	}
@@ -119,7 +158,7 @@ public class AVOWTutorialText : MonoBehaviour {
 			string subString = totalString.Substring(1, index-1);
 			bool ok = ParseCommand(subString);
 			if (!ok){
-				Debug.LogError("NError parsing command" + subString);
+				Debug.LogError("Error parsing command" + subString);
 			}
 			return true;
 		}
@@ -148,7 +187,8 @@ public class AVOWTutorialText : MonoBehaviour {
 			case kSpeedKey:{
 				lettersPerSecond = float.Parse (data);
 				if (lettersPerSecond < 0) lettersPerSecond = defaultLettersPerSecond;
-				break;
+				Debug.Log("ParseCommand(kSpeedKey): " + lettersPerSecond.ToString());
+			    break;
 			}
 			case kTriggerKey:{
 				AVOWBackStoryCutscene.singleton.Trigger();
@@ -160,39 +200,44 @@ public class AVOWTutorialText : MonoBehaviour {
 		
 	}
 	
+	
+	
 	void HandleText(){
-		bool mayHaveSpecial = true;
-		while (mayHaveSpecial && queuedString.Length > 0 && Time.time > nextletterTime){
-			mayHaveSpecial = HandleSpecials();
-		}
-		if (Time.time > nextletterTime){
-			if (queuedString.Length > 0){
-				if (highlightLetter != null) displayedString.Append(highlightLetter);
-				highlightLetter = queuedString.ToString().Substring(0, 1);
-				highlightString = "<color=" + CreateColorString(highlightColor) + ">" + highlightLetter + "</color>";
-				queuedString.Remove(0,1);
-				textBox.GetComponent<Text>().text = displayedString.ToString() + closingString + highlightString;
-				if (highlightLetter != " " && highlightLetter != "\n"){
-					if (!GetComponent<AudioSource>().isPlaying) GetComponent<AudioSource>().Play();
-					AVOWBackStoryCutscene.singleton.TriggerLight();
-					AVOWUI.singleton.TriggerLight();
+		while (Time.time > nextletterTime){
+			bool mayHaveSpecial = true;
+			while (mayHaveSpecial && queuedString.Length > 0 && Time.time > nextletterTime){
+				mayHaveSpecial = HandleSpecials();
+			}
+			if (Time.time > nextletterTime){
+				if (queuedString.Length > 0){
+					if (highlightLetter != null) displayedString.Append(highlightLetter);
+					highlightLetter = queuedString.ToString().Substring(0, 1);
+					highlightString = "<color=" + CreateColorString(highlightColor) + ">" + highlightLetter + "</color>";
+					queuedString.Remove(0,1);
+					textBox.GetComponent<Text>().text = displayedString.ToString() + closingString + highlightString;
+					if (highlightLetter != " " && highlightLetter != "\n"){
+						if (!GetComponent<AudioSource>().isPlaying) GetComponent<AudioSource>().Play();
+						AVOWBackStoryCutscene.singleton.TriggerLight();
+						AVOWUI.singleton.TriggerLight();
+					}
+				}
+				float timeDeltaRaw = (1.0f/AVOWConfig.singleton.tutorialSpeed)* 1.0f/lettersPerSecond;
+				float timeDelta = Random.Range(0.1f * timeDeltaRaw, 2.0f * timeDeltaRaw);
+				if (highlightLetter == "," || highlightLetter == "-"){
+					nextletterTime = Time.time + 2 * timeDelta;
+				}
+				else if (highlightLetter == "."){
+					nextletterTime = Time.time + 5 * timeDelta;
+				}
+				else if (highlightLetter == "\n"){
+					nextletterTime = Time.time + 5 * timeDelta;
+				}			
+				else{
+					nextletterTime = Time.time + 1 * timeDelta;
 				}
 			}
-			float timeDeltaRaw = (1.0f/AVOWConfig.singleton.tutorialSpeed)* 1.0f/lettersPerSecond;
-			float timeDelta = Random.Range(0.1f * timeDeltaRaw, 2.0f * timeDeltaRaw);
-			if (highlightLetter == "," || highlightLetter == "-"){
-				nextletterTime = Time.time + 2 * timeDelta;
-			}
-			else if (highlightLetter == "."){
-				nextletterTime = Time.time + 5 * timeDelta;
-			}
-			else if (highlightLetter == "\n"){
-				nextletterTime = Time.time + 5 * timeDelta;
-			}			
-			else{
-				nextletterTime = Time.time + 1 * timeDelta;
-			}
 		}
+
 		
 	}
 	

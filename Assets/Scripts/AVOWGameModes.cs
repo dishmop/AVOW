@@ -96,7 +96,7 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWTutorialText.singleton.activated = true;
 		sidePanel.SetActive(false);
 		SelectCamera(CameraChoice.kBackStoryCam);
-		AVOWBackStoryCutscene.singleton.StartTutorial();
+		AVOWBackStoryCutscene.singleton.StartBackStory();
 		backStory.SetActive(true);
 		
 		RestartFreePlayGame();
@@ -182,6 +182,9 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 	
 	public void GoToMain(){
+		AVOWBackStoryCutscene.singleton.StopBackStory();
+		AVOWTutorialManager.singleton.StopTutorial();
+		
 		state = GameModeState.kMainMenu;
 	}
 	

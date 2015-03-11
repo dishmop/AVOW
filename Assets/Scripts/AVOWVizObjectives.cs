@@ -13,8 +13,8 @@ public class AVOWVizObjectives : MonoBehaviour {
 	public float successDelayTime = 0;
 
 	
-	AVOWObjectiveGrid	grid;
-	DrawnLine			line;
+//	AVOWObjectiveGrid	grid;
+//	DrawnLine			line;
 	
 	public int displayedObjective = -1;
 	
@@ -109,8 +109,8 @@ public class AVOWVizObjectives : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		grid = gridGOPrefab.GetComponent<AVOWObjectiveGrid>();
-		line = lineGOPrefab.GetComponent<DrawnLine>();
+//		grid = gridGOPrefab.GetComponent<AVOWObjectiveGrid>();
+//		line = lineGOPrefab.GetComponent<DrawnLine>();
 	
 	}
 	

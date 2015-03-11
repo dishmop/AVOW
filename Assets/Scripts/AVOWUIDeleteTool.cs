@@ -78,6 +78,10 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		
 	}
 	
+	public override bool IsInsideGap(){
+		return !isOutside;
+	}
+	
 	protected override GameObject InstantiateCursorCube(){
 		return AVOWUI.singleton.InstantiateGreenCursorCube();
 	}
@@ -89,8 +93,8 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
 		
 		// Get the mouse buttons
-		bool  buttonPressed = (Input.GetMouseButtonDown(0) && !Input.GetKey (KeyCode.LeftControl));
-		bool  buttonReleased = (Input.GetMouseButtonUp(0) && !Input.GetKey (KeyCode.LeftControl));
+		bool  buttonPressed = (!AVOWConfig.singleton.tutDisableButtton && Input.GetMouseButtonDown(0));
+		bool  buttonReleased = (!AVOWConfig.singleton.tutDisableButtton && Input.GetMouseButtonUp(0));
 		//		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
 		
 		// Set the cursor cubes position

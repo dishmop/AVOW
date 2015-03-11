@@ -26,6 +26,9 @@ public class AVOWConfig : MonoBehaviour {
 	
 	public bool tutDisableConnections = false;
 	public bool tutDisableUIButtons = false;
+	public bool tutDisableButtton = false;
+	public bool tutDisableSecondConnections = false;
+	public bool tutDisableConstruction = false;
 	
 	
 	public bool ShowTextObjectives(){

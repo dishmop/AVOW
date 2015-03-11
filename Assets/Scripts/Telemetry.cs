@@ -1007,7 +1007,7 @@ public class Telemetry : MonoBehaviour {
 		
 	};
 	
-	EventType[] eventTypes = new EventType[(int)Event.kNumEvents];
+//	EventType[] eventTypes = new EventType[(int)Event.kNumEvents];
 	
 	
 	public enum PlaybackState{

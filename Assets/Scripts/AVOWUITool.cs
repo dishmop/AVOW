@@ -16,7 +16,19 @@ public class AVOWUITool{
 	
 	// Return tru if you don;t want this tool to be snatched away
 	// becuase it is in the middle of doing something
-	public virtual bool IsBeingUsed(){
+	public virtual bool IsHolding(){
+		return false;
+	}
+	
+	public virtual int GetNumConnections(){
+		return 0;
+	}
+	
+	public virtual GameObject GetConnection(int index){
+		return null;
+	}
+	
+	public virtual bool IsInsideGap(){
 		return false;
 	}
 	

@@ -160,7 +160,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	
 	bool 			triggerOutroLighting = false;
 	
-	public void StartTutorial(){
+	public void StartBackStory(){
 	
 		
 		largeSphereCount = GenerateSpherePoints(idealLargeSphereCount, steerSphereRadius);
@@ -181,8 +181,12 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 		triggered = true;
 	}
 	
-	public void StopTutorial(){
+	public void StopBackStory(){
 		state = State.kStop;
+	}
+	
+	public bool IsRunning(){
+		return state != State.kOff;
 	}
 	
 	void SaveFlockConfig(){
@@ -238,7 +242,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		string name = backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[0].name;
+//		string name = backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[0].name;
 		reflectionColor = backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[0].GetColor ("_ReflectColor");
 		rustColor = backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[1].GetColor ("_TintColor");
 		
@@ -1124,10 +1128,6 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 		Vector3 bePos2 = babyCube.transform.position  - babyCube.GetComponent<DanceThreesome>().GetVelocity().normalized * danceFollowDist;
 		
 		
-		
-		
-		float speed = 0.7f;
-		
 		// Get the camrera following the,
 		Vector3 fromLookToHere = BackStoryCamera.singleton.transform.position - lookPos;
 		float dist = fromLookToHere.magnitude;
@@ -1143,7 +1143,6 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	
 	
 	void UpdateDanceFollow4(){
-		float speed = 0.7f;
 		
 		// Get the camrera following the,
 		Vector3 lookPos = babyCube.transform.position;
@@ -1160,8 +1159,6 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	
 	
 	void UpdateDanceFollow5(){
-		float speed = 0.7f;
-		
 		// Get the camrera following the,
 		Vector3 lookPos = babyCube.transform.position;
 		Vector3 fromLookToHere = BackStoryCamera.singleton.transform.position - lookPos;
@@ -1178,8 +1175,6 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	
 	
 	void UpdateDanceFollow6(){
-		float speed = 0.7f;
-		
 		// Get the camrera following the,
 		Vector3 lookPos = babyCube.transform.position;
 		Vector3 fromLookToHere = BackStoryCamera.singleton.transform.position - lookPos;

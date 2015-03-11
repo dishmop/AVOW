@@ -18,15 +18,15 @@ public class BabyBlueParent : MonoBehaviour {
 	public bool updateSize = true;
 	
 	
-	Vector3 debugStartPos = new Vector3(0, 0, 210);
-	Vector3 debugEndPos = new Vector3(0, 10, 210);
+//	Vector3 debugStartPos = new Vector3(0, 0, 210);
+//	Vector3 debugEndPos = new Vector3(0, 10, 210);
 	
 	
 	bool enableGrow = false;
 	
 	float underlyingSize;
 	
-	GameObject[] squareSpheres;
+//	GameObject[] squareSpheres;
 	GameObject[] squareLightening = new GameObject[8];
 	
 	
@@ -164,7 +164,7 @@ public class BabyBlueParent : MonoBehaviour {
 	public void Electrify(GameObject[] spheres){
 		Quaternion rot = transform.FindChild ("BabyBlueCube").rotation;
 		
-		squareSpheres = spheres;
+//		squareSpheres = spheres;
 		Vector3[] corners = new Vector3[8];
 		float size = 0.5f * transform.localScale.x;
 		corners[0] = size * new Vector3(1, 1, 1);

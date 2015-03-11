@@ -61,9 +61,11 @@ public class AVOWUI : MonoBehaviour {
 		
 	}
 	
-	public GameObject GetCursorCube(){
-		return (uiTool != null) ? uiTool.GetCursorCube() : null;
+	
+	public AVOWUITool  GetUITool(){
+		return uiTool;
 	}
+	
 	
 	void Update(){
 		if (Time.fixedTime > lastFlashTime + 0.5f){
@@ -85,7 +87,7 @@ public class AVOWUI : MonoBehaviour {
 			return;
 			
 		}
-		if (mode == ToolMode.kCreate && lastCanCreate != canCreate && uiTool != null && !uiTool.IsBeingUsed()){
+		if (mode == ToolMode.kCreate && lastCanCreate != canCreate && uiTool != null && !uiTool.IsHolding()){
 			lastCanCreate = canCreate;
 			if (canCreate == false){
 				SetDisableTool();

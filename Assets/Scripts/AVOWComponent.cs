@@ -24,9 +24,9 @@ public class AVOWComponent : MonoBehaviour {
 	bool enableLightening2;
 	
 	
-	Vector3 oldNode0Pos = new Vector3(0, 0, 0);
-	Vector3 oldNode1Pos = new Vector3(0, 0, 0);
-	
+//	Vector3 oldNode0Pos = new Vector3(0, 0, 0);
+//	Vector3 oldNode1Pos = new Vector3(0, 0, 0);
+//	
 			
 	public float voltage;
 	public enum Type{
@@ -238,11 +238,11 @@ public class AVOWComponent : MonoBehaviour {
 			SetNode1(newNodeGO);
 		}
 		else{
-			AVOWNode existingNode = existingNodeGO.GetComponent<AVOWNode>();
-			AVOWNode newNode = newNodeGO.GetComponent<AVOWNode>();
-			AVOWNode node0 = node0GO.GetComponent<AVOWNode>();
-			AVOWNode node1 = node1GO.GetComponent<AVOWNode>();
-			Debug.LogError ("Error replacing node " + existingNodeGO.GetComponent<AVOWNode>().GetID() + " with node " + newNodeGO.GetComponent<AVOWNode>().GetID() + " on component " + GetID());
+//			AVOWNode existingNode = existingNodeGO.GetComponent<AVOWNode>();
+//			AVOWNode newNode = newNodeGO.GetComponent<AVOWNode>();
+//			AVOWNode node0 = node0GO.GetComponent<AVOWNode>();
+//			AVOWNode node1 = node1GO.GetComponent<AVOWNode>();
+//			Debug.LogError ("Error replacing node " + existingNodeGO.GetComponent<AVOWNode>().GetID() + " with node " + newNodeGO.GetComponent<AVOWNode>().GetID() + " on component " + GetID());
 		}
 	}
 	
@@ -415,7 +415,7 @@ public class AVOWComponent : MonoBehaviour {
 		
 		
 		// Otherwise, it doesn't work when they move
-		if (true || !MathUtils.FP.Feq ((oldNode0Pos - newNode0Pos).magnitude, 0) || !MathUtils.FP.Feq ((oldNode1Pos - newNode1Pos).magnitude, 0)) {
+		if (true) {
 		
 			Lightening lightening0 = transform.FindChild("Lightening0").GetComponent<Lightening>();
 			Lightening lightening1 = transform.FindChild("Lightening1").GetComponent<Lightening>();
@@ -449,8 +449,8 @@ public class AVOWComponent : MonoBehaviour {
 			lightening2.ConstructMesh();					
 			
 			
-			oldNode0Pos = newNode0Pos;
-			oldNode1Pos = newNode1Pos;
+//			oldNode0Pos = newNode0Pos;
+//			oldNode1Pos = newNode1Pos;
 		}
 		
 		if (float.IsNaN(connector0Pos.x)){

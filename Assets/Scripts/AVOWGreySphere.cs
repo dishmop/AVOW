@@ -39,8 +39,8 @@ public class AVOWGreySphere : MonoBehaviour {
 	float baseIntensity = 0;
 	bool movingTowards  = false;
 	
-	bool isPrimeBeater = false;
-	
+//	bool isPrimeBeater = false;
+//	
 
 	float beatTime = 0;
 	bool regularBeats = false;
@@ -51,7 +51,7 @@ public class AVOWGreySphere : MonoBehaviour {
 	bool switchToSilentBeat = false;
 	float silentBeatIntensity = 0;
 
-	Vector3 bounceVel;
+//	Vector3 bounceVel;
 	
 
 	
@@ -100,7 +100,7 @@ public class AVOWGreySphere : MonoBehaviour {
 	
 	public void ActivateBounce(Vector3 newVel){
 		state = State.kBounced;
-		bounceVel = newVel;
+//		bounceVel = newVel;
 		vel = newVel;
 		babyCube.GetComponent<BabyBlueParent>().NullParents();
 		
@@ -141,7 +141,7 @@ public class AVOWGreySphere : MonoBehaviour {
 		lightGO = lightPass;
 		otherSphere = sphere;
 		state = State.kExpectant;
-		isPrimeBeater = true;
+//		isPrimeBeater = true;
 		
 		baselightColor = lightGO.GetComponent<Light>().color;
 	}
@@ -410,7 +410,7 @@ public class AVOWGreySphere : MonoBehaviour {
 				Color refCol = GetComponent<Renderer>().material.GetColor("_ReflectColour");
 			
 				Color newRimCol = Color.Lerp(rimCol, baseRimColor, 0.02f);
-				Color newRefCol = Color.Lerp(rimCol, baseReflectColor, 0.02f);
+				Color newRefCol = Color.Lerp(refCol, baseReflectColor, 0.02f);
 				
 				GetComponent<Renderer>().material.SetColor("_RimColour", newRimCol);
 				GetComponent<Renderer>().material.SetColor("_ReflectColour", newRefCol);

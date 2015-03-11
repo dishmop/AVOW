@@ -1616,6 +1616,9 @@ MonoBehaviour:
   flockReset: 0
   tutDisableConnections: 0
   tutDisableUIButtons: 0
+  tutDisableButtton: 0
+  tutDisableSecondConnections: 0
+  tutDisableConstruction: 0
 --- !u!1001 &418877048
 Prefab:
   m_ObjectHideFlags: 0
@@ -4305,7 +4308,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f34773e0172b4446190a06d46b8cfd7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  distMovedThreshold: 3
+  ctrlDistMovedThreshold: 2
+  holdDistMovedThreshold: .75
+  timeoutTime: 10
+  thresholdInOutGapCount: 8
 --- !u!4 &1404304742
 Transform:
   m_ObjectHideFlags: 0
@@ -5390,6 +5396,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   activated: 1
   defaultLettersPerSecond: 10
+  forceCompleteSpeed: 1000
   textBox: {fileID: 319309965}
   panel: {fileID: 1901854983}
   textColor: {r: .364943773, g: .499142349, b: .992647052, a: 1}

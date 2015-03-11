@@ -28,7 +28,7 @@ public class Lightening : MonoBehaviour {
 	
 	Vector3 localX;
 	Vector3 localY;
-	Vector3 localZ;
+//	Vector3 localZ;
 	
 	
 	
@@ -93,7 +93,7 @@ public class Lightening : MonoBehaviour {
 	
 		localY = (endPoint - startPoint).normalized;
 		localX = Vector3.Cross(localY, hereToCam).normalized;
-		localZ = Vector3.Cross (localY, localX);
+//		localZ = Vector3.Cross (localY, localX);
 		
 		// Create the points
 		for (int i = 0; i < numPoints; ++i){
