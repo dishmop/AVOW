@@ -75,6 +75,10 @@ public class AVOWUI : MonoBehaviour {
 		cubeBrightness.Update ();
 		
 		if (uiTool != null){
+			GameObject temp = uiTool.GetCursorCube();
+			if (temp == null){
+				Debug.LogError("Temo = null");
+			}
 			int numMaterials = uiTool.GetCursorCube().GetComponent<Renderer>().materials.Length;
 			uiTool.GetCursorCube().GetComponent<Renderer>().materials[numMaterials - 1].SetFloat("_Intensity", cubeBrightness.GetValue());
 		}

@@ -24,6 +24,11 @@ public class AVOWUIDisabledTool :  AVOWUITool{
 		GameObject.Destroy(cursorCube);
 	}
 	
+	public override GameObject GetCursorCube(){
+		return cursorCube;
+	}
+	
+	
 	
 	
 	public override void Update () {

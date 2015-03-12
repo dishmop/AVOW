@@ -85,9 +85,10 @@ public class AVOWGameModes : MonoBehaviour {
 		SelectCamera(CameraChoice.kGameCam);
 		sidePanel.SetActive(true);
 		backStory.SetActive(false);
+		
 		AVOWTutorialManager.singleton.StartTutorial();
 		
-		RestartFreePlayGame();
+		RestartTutorialGame();
 	}
 	
 	public void PlayBackStory(){
@@ -119,7 +120,22 @@ public class AVOWGameModes : MonoBehaviour {
 		 	}
 		}
 	}
-	
+	void RestartTutorialGame(){
+		AVOWConfig.singleton.maxNumResistors = 0;
+		AVOWConfig.singleton.noResistorLimit = true;
+		AVOWConfig.singleton.showObjectives = false;
+		AVOWGraph.singleton.ClearCircuit();
+		AVOWCircuitCreator.singleton.Restart();
+		AVOWUI.singleton.Restart();
+		AVOWObjectives.singleton.Restart();
+		AVOWVizTotals.singleton.DestroyLines();
+		AVOWBattery.singleton.ResetBattery();
+		AVOWBattery.singleton.FreezeBattery();
+		
+		
+		state = GameModeState.kPlayStage;
+	}
+		
 	void RestartFreePlayGame(){
 		AVOWConfig.singleton.maxNumResistors = 0;
 		AVOWConfig.singleton.noResistorLimit = true;

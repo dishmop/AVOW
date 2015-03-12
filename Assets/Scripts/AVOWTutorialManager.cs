@@ -38,6 +38,11 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kWaitForConstruction,
 		kReleasedOutside,
 		kConstructed,
+		kConnectonBarsSetup,
+		kConnectionBarsWait,
+		kConnectionBars1,
+		kConnectionBars2,
+		kBarsChangeShape,
 		kStop
 	}
 	
@@ -383,9 +388,6 @@ public class AVOWTutorialManager : MonoBehaviour {
 				if (AVOWUI.singleton.GetUITool().GetNumConnections() == 2){
 					state = State.kOpenGap;
 				}
-				
-		
-			
 				break;
 			}
 			case State.kPressMousePrematureRelease:{
@@ -486,11 +488,72 @@ public class AVOWTutorialManager : MonoBehaviour {
 			case State.kConstructed:{
 				if (onEnterState){
 					AVOWTutorialText.singleton.InturruptText("You have made your first resistance square.");
+					AVOWConfig.singleton.tutDisableConstruction = true;
+					SetTextTrigger();
+				}
+				if (onTextTrigger){
+					state = State.kConnectonBarsSetup;
 				}
 				break;
 			}
-			
-		case State.kStop:{
+			case State.kConnectonBarsSetup:{
+				if (onEnterState){
+					AVOWTutorialText.singleton.InturruptText("Find the two connection points again.");
+					SetupConnectionTrigger();
+					SetTextTrigger();
+				}
+				if (onTextTrigger){
+					state = State.kConnectionBarsWait;
+				}
+				break;
+			}	
+			case State.kConnectionBarsWait:{
+				if (onEnterState){
+					SetTimerTrigger(timeoutTime);
+				}
+				if (CountConnectionTrigger() == 1){
+					state = State.kConnectionBars1;
+				}
+				if (CountConnectionTrigger () == 2){
+					state = State.kConnectionBars2;
+				}
+				if (onTimeTrigger){
+					state = State.kConnectonBarsSetup;
+				}
+				break;
+			}			
+			case State.kConnectionBars1:{
+				if (onEnterState){
+					AVOWTutorialText.singleton.InturruptText("You found one, see if you can find the other.");
+				}
+				
+				if (CountConnectionTrigger () == 2){
+					state = State.kConnectionBars2;
+				}
+				break;
+			}	
+			case State.kConnectionBars2:{
+				if (onEnterState){
+					AVOWTutorialText.singleton.InturruptText("You found them both.");
+					AVOWTutorialText.singleton.AddPause(2);
+					SetTextTrigger();
+				}
+				if (onTextTrigger){
+					state = State.kBarsChangeShape;
+				}
+				break;
+			}
+			case State.kBarsChangeShape:{
+				if (onEnterState){
+					AVOWTutorialText.singleton.AddText("The connection points have become horizontal connection bars.");
+					SetTextTrigger();
+				}
+				if (onTextTrigger){
+				//	state = State.kPressMouseSetup;
+				}
+				break;
+			}
+			case State.kStop:{
 				SetupExitTutFlags();
 				AVOWTutorialText.singleton.ClearText();
 				state = State.kOff;
