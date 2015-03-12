@@ -1,0 +1,31 @@
+How to make the square spiral textures.
+------------------------------------
+
+Place the two script files; SpiralSquare_Specular.scm and SpiralSquare.scm in the folder ~/Library/Application Support/GIMP/2.8/scripts
+
+Get gimp to refresh scripts (Filters->Script-fu->Refresh Scripts)
+
+The specular texture is what we use as our defuse texture in the shader
+
+Make the specular texture
+----------------------------
+Open RivetSpecular.png in Gimp and then go to File->Create->Text->Spiral Square Specular
+
+This will generate a 1024X1024 image
+
+
+Now open Blemish_Specular.png and paste this into a background layer of the image we just generated. Set the opacity of the generated image to be 60%.
+
+Export as PNG to assets dir.
+
+Make the Normal map
+Open RivetNormal.png and then run the script File->Create->Text->Spiral Square
+
+This will generate a 1024X1024 image
+
+Now open BlemishNormal.png and paste this into the background (no need to adjust the opacity).
+
+Save in assets.
+
+Ensure the when this is imported it is imported as a normal map and "Create from greyscale" is disabled. 
+

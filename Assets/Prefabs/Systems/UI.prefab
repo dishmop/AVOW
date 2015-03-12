@@ -1,0 +1,148 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &100000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 400000}
+  - 114: {fileID: 11400000}
+  - 82: {fileID: 8200000}
+  m_Layer: 0
+  m_Name: UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &400000
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+--- !u!82 &8200000
+AudioSource:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_audioClip: {fileID: 8300000, guid: bb858f21c67194f17a56c390c3e2472d, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: .25
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c671af08a912e4b9caaa22d15a31ae6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridGO: {fileID: 0}
+  circuitGO: {fileID: 0}
+  levelSerialiserGO: {fileID: 0}
+  simulationGO: {fileID: 0}
+  factoryGO: {fileID: 100000, guid: 4c3fb6e393b664fa8ae4c8a52cc275ba, type: 2}
+  newDrawPoint:
+    x: 10
+    y: 13
+  oldDrawPoint:
+    x: 10
+    y: 13
+  levelToSave: Trash
+  levelsToLoad:
+  - {fileID: 4900000, guid: 2f809e82a53cd443f8ffb2dd7ea6749b, type: 3}
+  - {fileID: 4900000, guid: da371028293bf43debf0c2c6ac379a6c, type: 3}
+  - {fileID: 4900000, guid: 01b044be77e65435e8f7a69b89587f94, type: 3}
+  - {fileID: 4900000, guid: 0a78abf6ef9f147a7bc01aa04cc365f3, type: 3}
+  - {fileID: 4900000, guid: 7aaf8b20c0d1540aca20ed19fbf21721, type: 3}
+  - {fileID: 4900000, guid: caea36956f4aa434a8a3275ff784c71a, type: 3}
+  - {fileID: 4900000, guid: 67b6e0e09b85a4a14ad7cc1a57589dba, type: 3}
+  - {fileID: 4900000, guid: 5ef168e1ccb024d06a8c860f9c191865, type: 3}
+  - {fileID: 4900000, guid: 7e4b5047a78254a469960b49d352d60c, type: 3}
+  - {fileID: 4900000, guid: 68eae94e313ce4b62a8602a5579d4549, type: 3}
+  - {fileID: 4900000, guid: 4083d1e116bb94816a8c9ee65cecdc75, type: 3}
+  - {fileID: 4900000, guid: 73f019acc1b994a998571f87203adf8f, type: 3}
+  currentLevelIndex: 0
+  loadLevelOnStartup: 1
+  enableEditor: 1
+  toolbarRect:
+    serializedVersion: 2
+    x: 25
+    y: 25
+    width: 1200
+    height: 30
+  numNonEditButtons: 6
+  inputMode: 0
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 100000}
+  m_IsPrefabParent: 1
+  m_IsExploded: 1
