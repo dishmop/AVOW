@@ -328,7 +328,22 @@ public class AVOWGraph : MonoBehaviour {
 		singleton = null;
 	}	
 	
-	void Update(){
+	public bool HasUnconfirmedComponents(){
+		return (GetNumConfirmedLoads() != allComponents.Count-1);
+	
+	}
+	
+	void FixedUpdate(){
+	
+		// If all our components are "confirmed" then we get each component to save the positions of their
+		// connectoin points - as these will be used by the UI when attaching to avoid oscillations
+		if (!HasUnconfirmedComponents()){
+			foreach (GameObject go in allComponents){
+				AVOWComponent component = go.GetComponent<AVOWComponent>();
+				component.BakeConfirmedConnectionPositions();
+			}
+		}
+		
 		
 	}
 	

@@ -121,8 +121,8 @@ public class AVOWGameModes : MonoBehaviour {
 		}
 	}
 	void RestartTutorialGame(){
-		AVOWConfig.singleton.maxNumResistors = 0;
-		AVOWConfig.singleton.noResistorLimit = true;
+		AVOWConfig.singleton.maxNumResistors = 5;
+		AVOWConfig.singleton.noResistorLimit = false;
 		AVOWConfig.singleton.showObjectives = false;
 		AVOWGraph.singleton.ClearCircuit();
 		AVOWCircuitCreator.singleton.Restart();

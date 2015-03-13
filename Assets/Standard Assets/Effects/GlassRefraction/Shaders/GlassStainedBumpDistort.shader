@@ -5,6 +5,7 @@
 Shader "FX/Glass/Stained BumpDistort" {
 Properties {
 	_BumpAmt  ("Distortion", range (0,128)) = 10
+	_Color ("Color", Color) = (1,1,1,1)
 	_MainTex ("Tint Color (RGB)", 2D) = "white" {}
 	_BumpMap ("Normalmap", 2D) = "bump" {}
 }
@@ -16,6 +17,7 @@ Category {
 
 
 	SubShader {
+	
 
 		// This pass grabs the screen behind the object into a texture.
 		// We can access the result in the next pass as _GrabTexture
@@ -52,6 +54,7 @@ struct v2f {
 float _BumpAmt;
 float4 _BumpMap_ST;
 float4 _MainTex_ST;
+float4 _Color;
 
 v2f vert (appdata_t v)
 {
@@ -86,7 +89,7 @@ half4 frag (v2f i) : SV_Target
 	half4 tint = tex2D(_MainTex, i.uvmain);
 	col *= tint;
 	UNITY_APPLY_FOG(i.fogCoord, col);
-	return col;
+	return col * _Color * 3;
 }
 ENDCG
 		}

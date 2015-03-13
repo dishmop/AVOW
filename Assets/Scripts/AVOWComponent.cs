@@ -23,6 +23,12 @@ public class AVOWComponent : MonoBehaviour {
 	bool enableLightening1;
 	bool enableLightening2;
 	
+	float lighteningZDepth;
+	
+	// Used to keep a track of where our last stable (confirmed) connecton positions were
+	Vector3 confirmedPos0 = Vector3.zero;
+	Vector3 confirmedPos1 = Vector3.zero;
+	
 	
 //	Vector3 oldNode0Pos = new Vector3(0, 0, 0);
 //	Vector3 oldNode1Pos = new Vector3(0, 0, 0);
@@ -99,6 +105,7 @@ public class AVOWComponent : MonoBehaviour {
 		//	transform.FindChild("Resistance").gameObject.renderer.materials[0].color =  new Color(Random.Range(0f, 1f), Random.Range(0f, 1f),Random.Range(0f, 1f));
 			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = "";
 		}
+		lighteningZDepth = transform.position.z - 0.01f;
 	}
 	
 	public float GetResistance(){
@@ -166,6 +173,14 @@ public class AVOWComponent : MonoBehaviour {
 			return new Vector3(hMid, node0VPos - connectorProp * (node1VPos - node0VPos), transform.position.z);
 		}
 	}
+	
+	public Vector3 GetConfirmedConnectionPos0(){
+		return confirmedPos0;
+	}
+	
+	public Vector3 GetConfirmedConnectionPos1(){
+		return confirmedPos1;
+	}
 		
 	public Vector3 GetConnectionPos1(){
 		float hMid = (h0 + 0.5f * hWidth);
@@ -191,6 +206,12 @@ public class AVOWComponent : MonoBehaviour {
 		
 		return top + connectorProp * (bottom - top);
 	}
+	
+	public void BakeConfirmedConnectionPositions(){
+		confirmedPos0 = GetConnectionPos0();
+		confirmedPos1 = GetConnectionPos1();
+	}
+	
 	
 	public void EnableLightening(GameObject nodeGO, bool enable){
 		
@@ -365,11 +386,13 @@ public class AVOWComponent : MonoBehaviour {
 		
 		if (type == Type.kLoad){
 			transform.FindChild("Resistance").gameObject.SetActive(isInteractive && showResistance);
+			transform.FindChild("BlackSquare").gameObject.SetActive(isInteractive && showResistance);
 			SetupUVs (transform.FindChild("Resistance").gameObject, Mathf.Abs (useV1-useV0));
 			transform.FindChild("Resistance").GetComponent<Renderer>().material.SetColor("_Color0", col0);
 			transform.FindChild("Resistance").GetComponent<Renderer>().material.SetColor("_Color1", col1);
 			transform.FindChild("Resistance").position = new Vector3(useH0  + squareGap, Mathf.Min (useV0, useV1) + squareGap, 0);
-
+			transform.FindChild("BlackSquare").position =  new Vector3(useH0, Mathf.Min (useV0, useV1), 0.01f);
+			
 			float xScale = useH1 -useH0 - 2 * squareGap;
 			float yScale = Mathf.Abs (useV1-useV0) - 2 * squareGap;
 			
@@ -377,6 +400,7 @@ public class AVOWComponent : MonoBehaviour {
 			yScale = Mathf.Max (yScale, 0);
 			
 			transform.FindChild("Resistance").localScale = new Vector3(xScale, yScale, 1);
+			transform.FindChild("BlackSquare").localScale = new Vector3(useH1 -useH0, useH1 -useH0, 1);
 			
 			transform.FindChild("Lightening0").gameObject.SetActive(isInteractive && enableLightening0);
 			transform.FindChild("Lightening1").gameObject.SetActive(isInteractive && enableLightening1);
@@ -425,8 +449,8 @@ public class AVOWComponent : MonoBehaviour {
 
 			// Node0 to connector 0
 //				transform.FindChild("Lightening0").gameObject.SetActive(true);
-			lightening0.startPoint = new Vector3(connector0Pos.x, newNode0Pos.y);
-			lightening0.endPoint = connector0Pos;
+			lightening0.startPoint = new Vector3(connector0Pos.x, newNode0Pos.y, lighteningZDepth);
+			lightening0.endPoint = connector0Pos + new Vector3(0, 0, lighteningZDepth);
 			lightening0.size = lighteningSize * pdSize;
 			lightening0.numStages = 2;
 			lightening0.ConstructMesh();
@@ -435,16 +459,16 @@ public class AVOWComponent : MonoBehaviour {
 							
 			// Connector1 to node1
 //				transform.FindChild("Lightening1").gameObject.SetActive(true);
-			lightening1.startPoint = new Vector3(connector1Pos.x, newNode1Pos.y);
-			lightening1.endPoint = connector1Pos;
+			lightening1.startPoint = new Vector3(connector1Pos.x, newNode1Pos.y, lighteningZDepth);
+			lightening1.endPoint = connector1Pos + new Vector3(0, 0, lighteningZDepth);
 			lightening1.size = lighteningSize * pdSize;
 			lightening1.numStages = 2;
 			lightening1.ConstructMesh();	
 			
 			// connector0 to connector1
 //				transform.FindChild("Lightening0").gameObject.SetActive(true);
-			lightening2.startPoint = connector0Pos;
-			lightening2.endPoint = connector1Pos;
+			lightening2.startPoint = connector0Pos + new Vector3(0, 0, lighteningZDepth);;
+			lightening2.endPoint = connector1Pos + new Vector3(0, 0, lighteningZDepth);;
 			lightening2.size =lighteningSize *  pdSize;
 			lightening2.ConstructMesh();					
 			

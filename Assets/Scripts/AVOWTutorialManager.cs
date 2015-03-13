@@ -8,12 +8,13 @@ public class AVOWTutorialManager : MonoBehaviour {
 	public float ctrlDistMovedThreshold;
 	public float holdDistMovedThreshold;
 	public float timeoutTime;
-	public float thresholdInOutGapCount;
+	public int thresholdInOutGapCount;
 	
 
 	enum State{
 	
 		kOff,
+		kDebugPostFirstSquare,
 		kIntro0,
 		kIntro1,
 		kIntro2,
@@ -25,9 +26,9 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kPressMouseSetup,
 		kPressMouseWait,
 		kPressMouseWaitTooLong,
-		kPressMouseHoldAndMove0,
-		kPressMouseHoldAndMove1,
-		kPressMouseMovedFar,
+//		kPressMouseHoldAndMove0,
+//		kPressMouseHoldAndMove1,
+//		kPressMouseMovedFar,
 		kPressMouseToOtherConnection,
 		kPressMouseToOtherConnectionWait,
 		kPressMousePrematureRelease,
@@ -43,6 +44,15 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kConnectionBars1,
 		kConnectionBars2,
 		kBarsChangeShape,
+		kCreateSecondSquare,
+		kSecondSquareCreated,
+		kTimeoutOnSecondSquare,
+		kCreateSeriesSquare0,
+		kCreateSeriesSquare1,
+		kCreateSeriesSquare2,
+		kCreateSeriesSquare3,
+		kConstructedSeries,
+		kCreateSeriesSquareLostGap,
 		kStop
 	}
 	
@@ -81,13 +91,14 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	// The "Has done" flags
 	bool hasDoneFindTheConnectionSetup0;
-	bool hasDonePressMouseMovedFar;
+//	bool hasDonePressMouseMovedFar;
 	bool hasDoneIntro1;
-	bool hasDonePressMouseHoldAndMove0;
-//	bool hasDonePressMouseHoldAndMove1;
+//	bool hasDonePressMouseHoldAndMove0;
 	bool hasDonePressMouseToOtherConnection;
 	bool hasDoneInOutGapExplain;
 	bool hasDoneReleasedOutside;
+	bool hasDoneCreatedSeriesSquare0;
+	bool hasDoneCreatedSeriesSquare1;
 	
 	public void Trigger(){
 		textTriggerExtern = true;
@@ -95,6 +106,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	public void StartTutorial(){
 		state = State.kIntro0;
+		//state = State.kDebugPostFirstSquare;
 	}
 	
 	public void StopTutorial(){
@@ -141,31 +153,37 @@ public class AVOWTutorialManager : MonoBehaviour {
 	}
 	
 	void SetupInitialTutFlags(){
-		AVOWConfig.singleton.tutDisableButtton = true;
+
+
+		AVOWConfig.singleton.tutDisableMouseButtton = true;
 		AVOWConfig.singleton.tutDisableConnections = true;
 		AVOWConfig.singleton.tutDisableUIButtons = true;
-		AVOWConfig.singleton.tutDisableSecondConnections = true;
-		AVOWConfig.singleton.tutDisableConstruction = true;
+		AVOWConfig.singleton.tutDisable2ndBarConnections = true;
+		AVOWConfig.singleton.tutDisable2ndComponentConnections = true;
+		AVOWConfig.singleton.tutDisableBarConstruction = true;
+		AVOWConfig.singleton.tutDisableComponentConstruction = true;
 		
 		hasDoneFindTheConnectionSetup0 = false;
-		hasDonePressMouseMovedFar = false;
+//		hasDonePressMouseMovedFar = false;
 		hasDoneIntro1 = false;
-		hasDonePressMouseHoldAndMove0 = false;
-//		hasDonePressMouseHoldAndMove1 = false;
+//		hasDonePressMouseHoldAndMove0 = false;
 		hasDonePressMouseToOtherConnection = false;
 		hasDoneInOutGapExplain = false;
 		hasDoneReleasedOutside = false;
+		hasDoneCreatedSeriesSquare0 = false;
+		hasDoneCreatedSeriesSquare1 = false;
 
-		inOutGapCount = 0;
-		lastIsInside = false;
+		inOutGapCount = thresholdInOutGapCount;
 	}
 	
 	void SetupExitTutFlags(){
-		AVOWConfig.singleton.tutDisableButtton = false;
+		AVOWConfig.singleton.tutDisableMouseButtton = false;
 		AVOWConfig.singleton.tutDisableConnections = false;
 		AVOWConfig.singleton.tutDisableUIButtons = false;
-		AVOWConfig.singleton.tutDisableSecondConnections = false;
-		AVOWConfig.singleton.tutDisableConstruction = false;
+		AVOWConfig.singleton.tutDisable2ndBarConnections = false;
+		AVOWConfig.singleton.tutDisable2ndComponentConnections = false;
+		AVOWConfig.singleton.tutDisableBarConstruction = false;
+		AVOWConfig.singleton.tutDisableComponentConstruction = false;
 		
 
 	}	
@@ -192,6 +210,17 @@ public class AVOWTutorialManager : MonoBehaviour {
 		
 	
 		switch (state){
+			case State.kDebugPostFirstSquare:{
+				SetupInitialTutFlags();
+				AVOWConfig.singleton.tutDisableMouseButtton = false;
+				AVOWConfig.singleton.tutDisableConnections = false;
+				AVOWConfig.singleton.tutDisable2ndBarConnections = false;
+				
+				AVOWUI.singleton.PlaceResistor(AVOWGraph.singleton.allNodes[0], AVOWGraph.singleton.allNodes[1]);
+				state = State.kConnectonBarsSetup;
+			
+				break;
+			}
 			case State.kIntro0:{	
 				SetupInitialTutFlags();
 				AVOWTutorialText.singleton.AddPause(3);
@@ -284,7 +313,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 				break;
 			}
 			case State.kPressMouseSetup:{
-				if (HasCreatedSquare()){
+				if (AVOWGraph.singleton.GetNumConfirmedLoads() == 1){
 					state = State.kConstructed;
 				}
 				else if (onEnterState){
@@ -295,20 +324,22 @@ public class AVOWTutorialManager : MonoBehaviour {
 					state = State.kPressMouseWait;
 				}
 				if (AVOWUI.singleton.GetUITool().IsHolding()){
-					state = State.kPressMouseHoldAndMove0;
+					//state = State.kPressMouseHoldAndMove0;
+					state = State.kPressMouseToOtherConnection;
 				}
 				break;
 			}
 			case State.kPressMouseWait:{
 				if (onEnterState){
-					AVOWConfig.singleton.tutDisableButtton = false;
+					AVOWConfig.singleton.tutDisableMouseButtton = false;
 					SetTimerTrigger(10);
 				}
 				if (onTimeTrigger){
 					state = State.kPressMouseWaitTooLong;
 				}
 				if (AVOWUI.singleton.GetUITool().IsHolding()){
-			    	state = State.kPressMouseHoldAndMove0;
+			    	//state = State.kPressMouseHoldAndMove0;
+					state = State.kPressMouseToOtherConnection;
 				}
 				break;
 			}	
@@ -319,49 +350,49 @@ public class AVOWTutorialManager : MonoBehaviour {
 				}
 				break;
 			}
-			case State.kPressMouseHoldAndMove0:{	
-				if (hasDonePressMouseMovedFar){
-					state = State.kPressMouseToOtherConnection;
-					break;
-				}
-				if (onEnterState){
-					AVOWTutorialText.singleton.InturruptText("Now, keep the mouse button held down and move far away from the connection point.");
-					SetTextTrigger(hasDonePressMouseHoldAndMove0);
-				}	
-				if (!AVOWUI.singleton.GetUITool().IsHolding()){
-					state = State.kPressMousePrematureRelease;
-				}
-				if (onTextTrigger){
-					hasDonePressMouseHoldAndMove0 = true;
-					state = State.kPressMouseHoldAndMove1;
-				}
-			    break;
-			}
-			case State.kPressMouseHoldAndMove1:{	
-				if (!AVOWUI.singleton.GetUITool().IsHolding()){
-					state = State.kPressMousePrematureRelease;
-				}
-				float sparkLen = (AVOWUI.singleton.GetUITool().GetConnection(0).transform.position - AVOWUI.singleton.GetUITool().GetCursorCube().transform.position).magnitude;
-				if (sparkLen > holdDistMovedThreshold){
-					state = State.kPressMouseMovedFar;
-				}
-				break;
-			}			
-			case State.kPressMouseMovedFar:{	
-				if (onEnterState){
-					AVOWTutorialText.singleton.InturruptText("Good.");
-					AVOWTutorialText.singleton.AddText("While the button is held, you will stay attached to your connection point even when far away.");
-					SetTextTrigger();
-				}
-				if (onTextTrigger){
-					hasDonePressMouseMovedFar = true;
-					state = State.kPressMouseToOtherConnection;
-				}
-				if (!AVOWUI.singleton.GetUITool().IsHolding()){
-					state = State.kPressMousePrematureRelease;
-				}
-				break;
-			}
+//			case State.kPressMouseHoldAndMove0:{	
+//				if (hasDonePressMouseMovedFar){
+//					state = State.kPressMouseToOtherConnection;
+//					break;
+//				}
+//				if (onEnterState){
+//					AVOWTutorialText.singleton.InturruptText("Now, keep the mouse button held down and move far away from the connection point.");
+//					SetTextTrigger(hasDonePressMouseHoldAndMove0);
+//				}	
+//				if (!AVOWUI.singleton.GetUITool().IsHolding()){
+//					state = State.kPressMousePrematureRelease;
+//				}
+//				if (onTextTrigger){
+//					hasDonePressMouseHoldAndMove0 = true;
+//					state = State.kPressMouseHoldAndMove1;
+//				}
+//			    break;
+//			}
+//			case State.kPressMouseHoldAndMove1:{	
+//				if (!AVOWUI.singleton.GetUITool().IsHolding()){
+//					state = State.kPressMousePrematureRelease;
+//				}
+//				float sparkLen = (AVOWUI.singleton.GetUITool().GetConnection(0).transform.position - AVOWUI.singleton.GetUITool().GetCursorCube().transform.position).magnitude;
+//				if (sparkLen > holdDistMovedThreshold){
+//					state = State.kPressMouseMovedFar;
+//				}
+//				break;
+//			}			
+//			case State.kPressMouseMovedFar:{	
+//				if (onEnterState){
+//					AVOWTutorialText.singleton.InturruptText("Good.");
+//					AVOWTutorialText.singleton.AddText("While the button is held, you will stay attached to your connection point even when far away.");
+//					SetTextTrigger();
+//				}
+//				if (onTextTrigger){
+//					hasDonePressMouseMovedFar = true;
+//					state = State.kPressMouseToOtherConnection;
+//				}
+//				if (!AVOWUI.singleton.GetUITool().IsHolding()){
+//					state = State.kPressMousePrematureRelease;
+//				}
+//				break;
+//			}
 
 			case State.kPressMouseToOtherConnection:{	
 				if (onEnterState){
@@ -383,7 +414,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			case State.kPressMouseToOtherConnectionWait:{
 				if (onEnterState){
 					AVOWTutorialText.singleton.AddText(" that's hidden in the wall.");
-					AVOWConfig.singleton.tutDisableSecondConnections = false;
+					AVOWConfig.singleton.tutDisable2ndBarConnections = false;
 				}
 				if (AVOWUI.singleton.GetUITool().GetNumConnections() == 2){
 					state = State.kOpenGap;
@@ -461,9 +492,9 @@ public class AVOWTutorialManager : MonoBehaviour {
 			case State.kWaitForConstruction:{
 				if (onEnterState){
 					AVOWTutorialText.singleton.AddText("Go inside the gap and release the mouse button to fix the resistance square there.");
-					AVOWConfig.singleton.tutDisableConstruction = false;
+					AVOWConfig.singleton.tutDisableBarConstruction = false;
 				}
-				if (HasCreatedSquare()){
+				if (AVOWGraph.singleton.GetNumConfirmedLoads() == 1){
 					state = State.kConstructed;
 				}	
 				else if (!AVOWUI.singleton.GetUITool().IsHolding()){
@@ -488,7 +519,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			case State.kConstructed:{
 				if (onEnterState){
 					AVOWTutorialText.singleton.InturruptText("You have made your first resistance square.");
-					AVOWConfig.singleton.tutDisableConstruction = true;
+					AVOWConfig.singleton.tutDisableBarConstruction = true;
 					SetTextTrigger();
 				}
 				if (onTextTrigger){
@@ -498,13 +529,16 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kConnectonBarsSetup:{
 				if (onEnterState){
-					AVOWTutorialText.singleton.InturruptText("Find the two connection points again.");
+					AVOWTutorialText.singleton.InturruptText("Find the two connection points again - see they have changed shape.");
 					SetupConnectionTrigger();
 					SetTextTrigger();
 				}
+
 				if (onTextTrigger){
 					state = State.kConnectionBarsWait;
 				}
+				// Keep track even when not triggering
+				CountConnectionTrigger();
 				break;
 			}	
 			case State.kConnectionBarsWait:{
@@ -545,12 +579,107 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kBarsChangeShape:{
 				if (onEnterState){
-					AVOWTutorialText.singleton.AddText("The connection points have become horizontal connection bars.");
+					AVOWTutorialText.singleton.AddText("The connection points have become horizontal 'connection bars'.");
+					AVOWTutorialText.singleton.AddPause(2);
 					SetTextTrigger();
 				}
 				if (onTextTrigger){
-				//	state = State.kPressMouseSetup;
+					state = State.kCreateSecondSquare;
 				}
+				break;
+			}
+			case State.kCreateSecondSquare:{
+				if (onEnterState){
+					AVOWConfig.singleton.tutDisableBarConstruction = false;
+					AVOWTutorialText.singleton.AddText("Try making a second resistance square between the two connection bars.");
+					SetTimerTrigger(timeoutTime);
+				}
+				if (AVOWGraph.singleton.GetNumConfirmedLoads() == 2){
+					state = State.kSecondSquareCreated;
+				}
+				if (onTimeTrigger){
+					state = State.kTimeoutOnSecondSquare;
+				}
+				break;
+			}
+			case State.kSecondSquareCreated:{
+				if (onEnterState){
+					AVOWConfig.singleton.tutDisableBarConstruction = true;
+					AVOWTutorialText.singleton.InturruptText("Good - you've created your second resistance square.");
+					AVOWTutorialText.singleton.AddPause (2);
+					SetTextTrigger();
+				}
+				if (onTextTrigger){
+					state = State.kCreateSeriesSquare0;
+				}
+				break;
+			}
+			case State.kTimeoutOnSecondSquare:{
+				AVOWTutorialText.singleton.AddText("Go near a connection bar, press and hold the mouse button and place the loose spark over the other connection bar. Then move me inside the gap that has been created and release the mouse button.");
+				state = State.kCreateSecondSquare;
+
+				break;
+			}
+			case State.kCreateSeriesSquare0:{
+				if (onEnterState){
+					AVOWTutorialText.singleton.AddText("As well as placing squares between two connection bars, you can also place them between a bar and a square that is connected to it.");
+					SetTextTrigger(hasDoneCreatedSeriesSquare0);
+				}
+				if (onTextTrigger){
+					hasDoneCreatedSeriesSquare0 = true;
+					state = State.kCreateSeriesSquare1;
+				}
+				break;
+			}
+			case State.kCreateSeriesSquare1:{
+				if (onEnterState){
+					AVOWTutorialText.singleton.AddText("Go near a connection bar, press and hold the mouse button - notice that some of the green spheres inside the resistance squares remain green whlie the others go black.");
+					AVOWTutorialText.singleton.AddText("Place the loose spark over a lit green sphere.");
+					AVOWConfig.singleton.tutDisable2ndComponentConnections = false;
+					AVOWConfig.singleton.tutDisableComponentConstruction = false;
+					SetTextTrigger(hasDoneCreatedSeriesSquare1);
+				}
+				if (onTextTrigger){
+					hasDoneCreatedSeriesSquare1 = true;
+					state = State.kCreateSeriesSquare2;
+				}
+				break;
+			}	
+			case State.kCreateSeriesSquare2:{
+				if (onEnterState){
+					AVOWConfig.singleton.tutDisableBarConstruction = false;
+				}
+				if (AVOWUI.singleton.GetUITool().GetNumConnections() == 2){
+					state = State.kCreateSeriesSquare3;
+				}
+				if (AVOWGraph.singleton.GetNumConfirmedLoads() == 3){
+					state = State.kConstructedSeries;
+				}
+	
+				break;
+			}	
+			case State.kCreateSeriesSquare3:{
+				if (onEnterState){
+					AVOWTutorialText.singleton.InturruptText("Good, now move me inside the gap and release the mouse button to fix the square in place.");
+				}
+				if (AVOWGraph.singleton.GetNumConfirmedLoads() == 3){
+					state = State.kConstructedSeries;
+				}
+				else if (AVOWUI.singleton.GetUITool().GetNumConnections() != 2){
+					state = State.kCreateSeriesSquareLostGap;
+				}
+
+				break;
+			}
+			case State.kConstructedSeries:{
+				if (onEnterState){
+					AVOWTutorialText.singleton.InturruptText("You have made your third resistance square.");
+				}
+				break;
+			}	
+			case State.kCreateSeriesSquareLostGap:{
+				AVOWTutorialText.singleton.InturruptText("You have lost the gap you made.");
+				state = State.kCreateSeriesSquare1;		
 				break;
 			}
 			case State.kStop:{
@@ -565,9 +694,6 @@ public class AVOWTutorialManager : MonoBehaviour {
 			
 	}
 	
-	bool HasCreatedSquare(){
-		return AVOWGraph.singleton.GetNumConfirmedLoads() > 0;
-	}
 	
 	
 	bool OnInOutGapTrigger(){
@@ -595,7 +721,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			if (foundConnection1 != null) return 1;
 			else return 0;
 		}
-		else{
+		else if (AVOWUI.singleton.GetUITool().GetNumConnections() == 1){
 			GameObject currentConnection = AVOWUI.singleton.GetUITool().GetConnection(0);
 			if (foundConnection1 == null){
 				foundConnection1 = currentConnection;
@@ -610,6 +736,11 @@ public class AVOWTutorialManager : MonoBehaviour {
 					return 2;
 				}
 			}
+		}
+		else{
+			foundConnection1 = AVOWUI.singleton.GetUITool().GetConnection(0);
+			foundConnection2 = AVOWUI.singleton.GetUITool().GetConnection(1);
+			return 2;
 		}
 		
 	}

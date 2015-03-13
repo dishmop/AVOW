@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -93,8 +93,8 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
 		
 		// Get the mouse buttons
-		bool  buttonPressed = (!AVOWConfig.singleton.tutDisableButtton && Input.GetMouseButtonDown(0));
-		bool  buttonReleased = (!AVOWConfig.singleton.tutDisableButtton && Input.GetMouseButtonUp(0));
+		bool  buttonPressed = (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButtonDown(0));
+		bool  buttonReleased = (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButtonUp(0));
 		//		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
 		
 		// Set the cursor cubes position

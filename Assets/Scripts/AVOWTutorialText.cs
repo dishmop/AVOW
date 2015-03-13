@@ -133,7 +133,7 @@ public class AVOWTutorialText : MonoBehaviour {
 	}
 	
 	void HandleBorder(){
-		border.Set (activated ? 0.15f : 0);
+		border.Set (activated ? 0.2f : 0);
 		border.Update ();
 		ApplyBorder();
 	}

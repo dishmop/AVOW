@@ -10,6 +10,10 @@ public class BackStoryCamera : MonoBehaviour {
 	
 	public Vector3 loveLook;
 	public Vector3 bePos;
+	public float mouseMul = 10;
+	
+	
+	Vector3 	mousePos = Vector3.zero;
 	
 	float ctrlSpeed = 0.00f;
 	
@@ -79,6 +83,7 @@ public class BackStoryCamera : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		UpdateMousePos();
 	
 		if (oldState != state){
 			oldState = state;
@@ -151,7 +156,7 @@ public class BackStoryCamera : MonoBehaviour {
 				}
 				else{
 					state = State.kControl1;
-					lastMousePos = Input.mousePosition;
+					lastMousePos = mousePos;
 					ctrlDist = (transform.position - cube.transform.position).magnitude;
 				}
 				Vector3 pos = transform.position;
@@ -166,7 +171,6 @@ public class BackStoryCamera : MonoBehaviour {
 			}
 			case State.kControl1:{	
 				Vector3 lastCubePos = cube.transform.position;
-				Vector3 mousePos = Input.mousePosition;
 				
 				Vector3 mouseDelta = mousePos - lastMousePos;
 				lastMousePos = mousePos;
@@ -211,6 +215,16 @@ public class BackStoryCamera : MonoBehaviour {
 		
 		
 	}
+	
+	Vector2 GetMouseDelta(){
+		return new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+	}
+	
+	void UpdateMousePos(){
+		Vector2 delta = GetMouseDelta() * mouseMul;
+		mousePos += new Vector3(delta.x, delta.y, 0);
+	}
+	
 	
 	void LookAtCube(){
 		transform.rotation = Quaternion.LookRotation(cube.transform.position - transform.position);

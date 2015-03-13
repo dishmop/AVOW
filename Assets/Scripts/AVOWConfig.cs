@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class AVOWConfig : MonoBehaviour {
@@ -26,9 +26,11 @@ public class AVOWConfig : MonoBehaviour {
 	
 	public bool tutDisableConnections = false;
 	public bool tutDisableUIButtons = false;
-	public bool tutDisableButtton = false;
-	public bool tutDisableSecondConnections = false;
-	public bool tutDisableConstruction = false;
+	public bool tutDisableMouseButtton = false;
+	public bool tutDisableBarConstruction = false;
+	public bool tutDisable2ndComponentConnections = false;
+	public bool tutDisable2ndBarConnections = false;
+	public bool tutDisableComponentConstruction = false;
 	
 	
 	public bool ShowTextObjectives(){

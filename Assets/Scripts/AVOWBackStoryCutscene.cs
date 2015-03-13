@@ -165,8 +165,8 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 		
 		largeSphereCount = GenerateSpherePoints(idealLargeSphereCount, steerSphereRadius);
 		
-		state = State.kDebugJumpToDance2;
-		state = State.kDebugJumpToOutro;
+		//state = State.kDebugJumpToDance2;
+		//state = State.kDebugJumpToOutro;
 		//state = State.kIntro2;
 		//state = State.kTheWorldOfSpheres0;
 		state = State.kStartup;
@@ -274,6 +274,25 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 		waitNextState = nextState;
 		state = State.kWaitForText;
 	}	
+	
+	void DestroySpheres(){
+		foreach (GameObject go in spheres){
+			GameObject.Destroy(go);
+		}
+		spheres.Clear();
+		
+		foreach (GameObject go in parentSpheres){
+			GameObject.Destroy(go);
+		}
+		parentSpheres.Clear();
+		
+		if (babyCube != null){
+			if (babyCube.GetComponent<DanceThreesome>() != null){
+				babyCube.GetComponent<DanceThreesome>().isActive = false;
+			}
+			
+		}
+	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -772,7 +791,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 				if (intensity <= 0.5f){
 					state = State.kElectrify5;
 					electrify5Time = Time.fixedTime + 8;
-					AVOWTutorialText.singleton.AddText("and I was shackled in gold.");
+					AVOWTutorialText.singleton.AddText("I was shackled in gold.");
 					lightIntensityOutro.Set (1);
 				}
 				
@@ -806,6 +825,9 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 					babyCube.GetComponent<BabyBlueParent>().vel = Vector3.zero;
 					babyCube.transform.position  = newPos;
 					electrify5Time = Time.fixedTime + 7;
+					prisonSphere1.SetActive(false);
+					
+					DestroySpheres();
 					state = State.kLand0;
 				}
 				break;
@@ -893,6 +915,9 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 			}
 			case State.kStop:{
 				AVOWTutorialText.singleton.ClearText();
+				DestroySpheres();
+				GameObject.Destroy(babyCube);
+				babyCube = null;
 				state = State.kOff;		
 				break;
 			}
@@ -1590,8 +1615,8 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 		backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[1].SetColor ("_TintColor", rustColor * lightIntensityIntro.GetValue());
 		backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[0].SetColor ("_ReflectColor", reflectionColor * lightIntensityIntro.GetValue());
 		
-		backStory.transform.FindChild("Intro").FindChild("Floor").FindChild("Point light").GetComponent<Light>().intensity = 2 * lightIntensityIntro.GetValue();
-		backStory.transform.FindChild("Outro").FindChild("Floor").FindChild("Point light").GetComponent<Light>().intensity = 2 * lightIntensityOutro.GetValue();
+		backStory.transform.FindChild("Intro").FindChild("Floor").FindChild("Point light").GetComponent<Light>().intensity = 3 * lightIntensityIntro.GetValue();
+		backStory.transform.FindChild("Outro").FindChild("Floor").FindChild("Point light").GetComponent<Light>().intensity = 3 * lightIntensityOutro.GetValue();
 		if (babyCube != null && babyCube.transform.FindChild("BabyBlueCube").GetComponent<Renderer>().materials.Length == 2 && triggerOutroLighting){
 			babyCube.transform.FindChild("BabyBlueCube").GetComponent<Renderer>().materials[0].SetColor ("_ReflectColor", reflectionColor * lightIntensityOutro.GetValue());
 		}

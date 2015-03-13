@@ -173,7 +173,7 @@ public class AVOWUI : MonoBehaviour {
 		// For some reason, we can't just make a graph with nothing in it - we need to make a resisotr
 		// then remove it
 		graph.PlaceComponent(GameObject.Instantiate(resistorPrefab) as GameObject, node1GO, node0GO);
-		graph.allComponents[1].GetComponent<AVOWComponent>().Kill(45);
+		//graph.allComponents[1].GetComponent<AVOWComponent>().Kill(45);
 		
 		/*
 		GameObject node0GO = graph.AddNode ();
@@ -194,6 +194,12 @@ public class AVOWUI : MonoBehaviour {
 		uiTool.Start();
 
 		
+	}
+	
+	public GameObject PlaceResistor(GameObject node0GO, GameObject node1GO){
+		GameObject newResistor = GameObject.Instantiate(resistorPrefab) as GameObject;
+		graph.PlaceComponent(newResistor, node0GO, node1GO);	
+		return newResistor;
 	}
 	
 	public void SetCreateTool(){

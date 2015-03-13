@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -39,6 +39,11 @@ public class AVOWUICreateTool :  AVOWUITool{
 	GameObject 				cursorCube;
 	GameObject 				lightening0GO;
 	GameObject 				lightening1GO;
+	
+	// We store a length of the current 0 connection and it only updates
+	// when we have no "temporary" compoents in the graph
+	// This stops oscilation when in the middle of making one
+	float					confirmedConnectionHeight;
 	
 	
 	public override void Start(){
@@ -107,14 +112,15 @@ public class AVOWUICreateTool :  AVOWUITool{
 
 	
 	void StateUpdate(){
+	
 		// Calc the mouse posiiton on world spave
 		Vector3 mousePos = Input.mousePosition;
 		mousePos.z = 0;
 		mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
 		
 		// Get the mouse buttons
-		bool  buttonPressed = (!AVOWConfig.singleton.tutDisableButtton && Input.GetMouseButtonDown(0));
-		bool  buttonReleased = (!AVOWConfig.singleton.tutDisableButtton && Input.GetMouseButtonUp(0));
+		bool  buttonPressed = (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButtonDown(0));
+		bool  buttonReleased = (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButtonUp(0));
 		//		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
 		
 		// Set the cursor cubes position
@@ -161,6 +167,10 @@ public class AVOWUICreateTool :  AVOWUITool{
 			// Update our connection posiiton on our node we are connected to
 			FindClosestPointOnNode(mouseWorldPos, connection0, ref connection0Pos);
 			
+			if (!AVOWGraph.singleton.HasUnconfirmedComponents()){
+				confirmedConnectionHeight = connection0Pos.y ;
+			}
+			
 			// If not inside the held gap, find the next closest thing - favouring whatever we have connected already
 			if (!isInside){
 				GameObject closestObj = null;
@@ -168,12 +178,13 @@ public class AVOWUICreateTool :  AVOWUITool{
 				
 				float minDist = maxLighteningDist;
 				// Only search for components if there is more than just a battery
-				ghostMousePos = mouseWorldPos + (mouseWorldPos - connection0Pos) * 0.85f;
-				ghostMousePos.x = mouseWorldPos.x;
-				if (AVOWGraph.singleton.allComponents.Count > 1){
+				ghostMousePos = mouseWorldPos + new Vector3(0, (mouseWorldPos.y - confirmedConnectionHeight) * 0.85f, 0);
+				if (AVOWGraph.singleton.allComponents.Count > 1 && !AVOWConfig.singleton.tutDisable2ndComponentConnections){
 					minDist = FindClosestComponent(ghostMousePos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos);
 				}
-				minDist = FindClosestNode(ghostMousePos, connection0, minDist, connection1, ref closestObj, ref closestPos);			
+				if (!AVOWConfig.singleton.tutDisable2ndBarConnections){
+					minDist = FindClosestNode(ghostMousePos, connection0, minDist, connection1, ref closestObj, ref closestPos);			
+				}
 				connection1 = closestObj;
 				connection1Pos = closestPos;	
 				if (buttonReleased){
@@ -183,7 +194,18 @@ public class AVOWUICreateTool :  AVOWUITool{
 			}
 			else{
 				if (buttonReleased){
-					if (!AVOWConfig.singleton.tutDisableConstruction){
+					// do logic to see if the thing should be creared
+					// If a node to node connection
+					bool okToCreate = true;
+					if (connection1.GetComponent<AVOWNode>() != null && AVOWConfig.singleton.tutDisableBarConstruction){
+						okToCreate = false;
+					}
+					
+					// If  anode to component connection
+					if (connection1.GetComponent<AVOWComponent>() != null && AVOWConfig.singleton.tutDisableComponentConstruction){
+						okToCreate = false;
+					}
+					if (okToCreate){
 						heldConnection = false;
 						heldGapCommand.ExecuteStep();
 						AVOWUI.singleton.commands.Push(heldGapCommand);
@@ -199,12 +221,12 @@ public class AVOWUICreateTool :  AVOWUITool{
 					}
 				}
 			}
-			if (AVOWConfig.singleton.tutDisableSecondConnections){
-				connection1 = null;
-			}
+
 			
 			
 		}
+//		Debug.DrawLine(mouseWorldPos, ghostMousePos, Color.red);
+			
 		// Extend the light bar on this node to touch the conneciton point
 		if (connection0 != null){
 			connection0.GetComponent<AVOWNode>().addConnPos = connection0Pos.x;
@@ -320,8 +342,8 @@ public class AVOWUICreateTool :  AVOWUITool{
 	void HandleVizConnectors(){
 		if (connection0 == null || !heldConnection){
 			foreach(GameObject go in AVOWGraph.singleton.allComponents){
-				go.transform.FindChild("ConnectionSphere0").GetComponent<Renderer>().materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
-				go.transform.FindChild("ConnectionSphere1").GetComponent<Renderer>().materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
+				go.transform.FindChild("ConnectionSphere0").GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
+				go.transform.FindChild("ConnectionSphere1").GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
 				go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
 				go.transform.FindChild("ConnectionSphere1").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
 			}
@@ -332,20 +354,20 @@ public class AVOWUICreateTool :  AVOWUITool{
 				GameObject sphere0 = go.transform.FindChild("ConnectionSphere0").gameObject;
 				GameObject sphere1 = go.transform.FindChild("ConnectionSphere1").gameObject;
 				if (spheres.Exists (obj => (obj == sphere0))){
-					sphere0.GetComponent<Renderer>().materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
+					sphere0.GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
 					go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
 				}
 				else{
-					sphere0.GetComponent<Renderer>().materials[0].SetColor("_Color0", new Color(0, 0.125f, 0));
+					sphere0.GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 0.125f, 0));
 					go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(false);
 				}
 				if (spheres.Exists (obj => (obj == sphere1))){
-					sphere1.GetComponent<Renderer>().materials[0].SetColor("_Color0", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
+					sphere1.GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
 					go.transform.FindChild("ConnectionSphere1").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
 					
 				}
 				else{
-					sphere1.GetComponent<Renderer>().materials[0].SetColor("_Color0", new Color(0, 0.125f, 0));
+					sphere1.GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 0.125f, 0));
 					go.transform.FindChild("ConnectionSphere1").FindChild ("Blob Shadow Projector").gameObject.SetActive(false);
 				}
 			}
@@ -423,7 +445,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 			AVOWSim.singleton.mouseOverComponentForce = connection1;
 		}
 		else{
-			if (!isInside && connection0 != null & heldConnection){
+			if (!isInside && connection0 != null && heldConnection){
 				lightening1GO.SetActive(true);
 				
 				Lightening lightening1 = lightening1GO.GetComponent<Lightening>();
