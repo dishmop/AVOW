@@ -11,6 +11,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 	public GameObject 	connection1;
 	public Vector3 		connection0Pos;
 	public Vector3 		connection1Pos;	
+	public int			connection1WhichPoint = -1;	// WHich node we are attached to (if connection1 is a component)
 	public bool 		heldConnection;
 	public AVOWCommand 	heldGapCommand;
 	public GameObject 	heldGapConnection1;
@@ -180,7 +181,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 				// Only search for components if there is more than just a battery
 				ghostMousePos = mouseWorldPos + new Vector3(0, (mouseWorldPos.y - confirmedConnectionHeight) * 0.85f, 0);
 				if (AVOWGraph.singleton.allComponents.Count > 1 && !AVOWConfig.singleton.tutDisable2ndComponentConnections){
-					minDist = FindClosestComponent(ghostMousePos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos);
+					minDist = FindClosestComponent(ghostMousePos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos, ref connection1WhichPoint);
 				}
 				if (!AVOWConfig.singleton.tutDisable2ndBarConnections){
 					minDist = FindClosestNode(ghostMousePos, connection0, minDist, connection1, ref closestObj, ref closestPos);			
@@ -394,7 +395,18 @@ public class AVOWUICreateTool :  AVOWUITool{
 		
 		Vector3 lighteningConductorPos = (isInside) ? insideCube.transform.position : mouseWorldPos;
 		Vector3 connection0PosUse = (isInside) ? new Vector3(insideCube.transform.position.x, connection0Pos.y, connection0Pos.z) : connection0Pos;
-		Vector3 connection1PosUse = (isInside && connection1 != null && connection1.GetComponent<AVOWComponent>() == null) ? new Vector3(insideCube.transform.position.x, connection1Pos.y, connection1Pos.z) : connection1Pos;
+		Vector3 connection1PosUse = connection1Pos;
+		
+		// Is inside a gap
+		if (isInside && connection1 != null){
+			// and that gap is between two nodes
+			if (connection1.GetComponent<AVOWComponent>() == null){
+				connection1PosUse = new Vector3(insideCube.transform.position.x, connection1Pos.y, connection1Pos.z);
+			}else{
+				connection1PosUse = (connection1WhichPoint == 0) ? connection1.GetComponent<AVOWComponent>().GetConnectionPos0() : connection1.GetComponent<AVOWComponent>().GetConnectionPos1() ;
+				
+			}
+		}
 		
 		
 		lighteningConductorPos.z = uiZPos;

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class AVOWUITool{
 	
 	protected float hysteresisFactor = 0.9f;
-	protected float maxLighteningDist = 0.2f;
+	protected float maxLighteningDist = 0.3f;
 	protected float 		uiZPos;
 	protected GameObject insideCube;
 	
@@ -54,7 +54,7 @@ public class AVOWUITool{
 	
 	
 	// The current compoent is one that we should include in our search (even if it is not strictly connected to this node)
-	protected float FindClosestComponent(Vector3 pos, GameObject nodeGO, GameObject currentSelection, float minDist, ref GameObject closestComponent, ref Vector3 closestPos){
+	protected float FindClosestComponent(Vector3 pos, GameObject nodeGO, GameObject currentSelection, float minDist, ref GameObject closestComponent, ref Vector3 closestPos, ref int whichPointRet){
 		AVOWNode node = nodeGO.GetComponent<AVOWNode>();
 		
 		// Make a copy of the list of compoents
@@ -107,6 +107,7 @@ public class AVOWUITool{
 			if (thisDist < minDist){
 				minDist = thisDist;
 				closestComponent = go;
+				whichPointRet = whichPoint;
 				if (whichPoint == 0){
 					closestPos = component.GetConnectionPos0();
 				}
@@ -163,6 +164,7 @@ public class AVOWUITool{
 			if (thisDist < minDist){
 				minDist = thisDist;
 				closestComponent = go;
+				whichPointRet = whichPoint;
 				if (whichPoint == 0){
 					closestPos = component.GetConnectionPos0();
 				}

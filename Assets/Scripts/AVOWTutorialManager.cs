@@ -26,9 +26,6 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kPressMouseSetup,
 		kPressMouseWait,
 		kPressMouseWaitTooLong,
-//		kPressMouseHoldAndMove0,
-//		kPressMouseHoldAndMove1,
-//		kPressMouseMovedFar,
 		kPressMouseToOtherConnection,
 		kPressMouseToOtherConnectionWait,
 		kPressMousePrematureRelease,
@@ -91,9 +88,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	// The "Has done" flags
 	bool hasDoneFindTheConnectionSetup0;
-//	bool hasDonePressMouseMovedFar;
 	bool hasDoneIntro1;
-//	bool hasDonePressMouseHoldAndMove0;
 	bool hasDonePressMouseToOtherConnection;
 	bool hasDoneInOutGapExplain;
 	bool hasDoneReleasedOutside;
@@ -105,8 +100,8 @@ public class AVOWTutorialManager : MonoBehaviour {
 	}
 	
 	public void StartTutorial(){
-		state = State.kIntro0;
-		//state = State.kDebugPostFirstSquare;
+		//state = State.kIntro0;
+		state = State.kDebugPostFirstSquare;
 	}
 	
 	public void StopTutorial(){
@@ -164,9 +159,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 		AVOWConfig.singleton.tutDisableComponentConstruction = true;
 		
 		hasDoneFindTheConnectionSetup0 = false;
-//		hasDonePressMouseMovedFar = false;
 		hasDoneIntro1 = false;
-//		hasDonePressMouseHoldAndMove0 = false;
 		hasDonePressMouseToOtherConnection = false;
 		hasDoneInOutGapExplain = false;
 		hasDoneReleasedOutside = false;
