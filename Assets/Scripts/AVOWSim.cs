@@ -98,6 +98,9 @@ public class AVOWSim : MonoBehaviour {
 	int[,]		permutations;
 	List<int> validPermutations = new List<int>();
 	
+	// index of the simNode which is of a node that has a battery attached.
+	int batteryNodeIndex = -1;
+	
 	
 	
 	public void Recalc(){
@@ -120,7 +123,7 @@ public class AVOWSim : MonoBehaviour {
 		CalcVoltages();
 		//DebugPrintVoltages();
 		
-		//DebugPrintGraph();
+		DebugPrintGraph();
 		LayoutHOrder();
 		
 		CalcBounds();
@@ -182,10 +185,10 @@ public class AVOWSim : MonoBehaviour {
 			AVOWNode node0 = component.node0GO.GetComponent<AVOWNode>();
 			AVOWNode node1 = component.node1GO.GetComponent<AVOWNode>();
 			if (component.GetCurrent(component.node0GO) > 0){
-				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + node0.GetID() + " to " + node1.GetID() + " resistance = " + component.GetResistance() + " current = " + component.fwCurrent);
+				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + node1.GetID() + " to " + node0.GetID() + " resistance = " + ((component.type == AVOWComponent.Type.kLoad) ? component.GetResistance().ToString () : "NULL") + " current = " + component.fwCurrent);
 			}
 			else{
-				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + node1.GetID() + " to " + node0.GetID() + " resistance = " + component.GetResistance() + " current = " + component.fwCurrent);
+				Debug.Log("Component " + component.GetID() + "/" + component.hOrder + ": from " + node1.GetID() + " to " + node0.GetID() + " resistance = " + ((component.type == AVOWComponent.Type.kLoad) ? component.GetResistance().ToString () : "NULL") + " current = " + component.fwCurrent);
 			}
 		}
 	}
@@ -608,6 +611,15 @@ public class AVOWSim : MonoBehaviour {
 			newNode.originalNode = node;
 			allSimNodes[nodeIndex] = newNode;
 			idToIndexLookup[node.id] = nodeIndex;
+			
+			
+			// Check if this node has a battery attached
+			foreach (GameObject go in node.components){
+				if (go.GetComponent<AVOWComponent>().type == AVOWComponent.Type.kVoltageSource){
+					batteryNodeIndex = nodeIndex;
+				}
+			}
+				
 			++nodeIndex;
 		}
 		
@@ -841,7 +853,7 @@ public class AVOWSim : MonoBehaviour {
 		// Traverse the graph from our first node only going to the next node when we have set its h0 - also watchout fo contradictions
 		bool error = false;
 		Queue<SimNode> nodeQueue = new Queue<SimNode>();
-		nodeQueue.Enqueue(allSimNodes[0]);
+		nodeQueue.Enqueue(allSimNodes[batteryNodeIndex]);
 		while (nodeQueue.Count > 0 && !error){
 			SimNode node = nodeQueue.Dequeue();
 			if (IsInvalidH0(node.h0)){
@@ -887,8 +899,9 @@ public class AVOWSim : MonoBehaviour {
 	bool SetupPermutation(int i){
 		ClearTestData();
 		
-		// set up an h0 value for an arbitrary node
-		allSimNodes[0].h0 = 0;
+		
+		// Set up an h0 value for a node that is connected to the battery
+		allSimNodes[batteryNodeIndex].h0 = 0;
 		
 		// Set up the ordinals
 		SetupOrdinals(i);
@@ -950,6 +963,10 @@ public class AVOWSim : MonoBehaviour {
 		float[] hOrderArrayTest = new float[permutations.GetLength (1)];
 		int bestI = -1;
 		bool hasLowest = false;
+		
+		if (allSimBlocks.Length == 4){
+			Debug.Log ("(allSimBlocks.Count == 4)");
+		}
 		
 		foreach(int i in validPermutations){
 			SetupPermutation(i);

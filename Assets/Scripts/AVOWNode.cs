@@ -60,9 +60,9 @@ public class AVOWNode : MonoBehaviour {
 
 	void Update(){
 	
-		// Not sure why this happens
+		// Not sure why this happens (I think I've fixed this so it shouldn't happen any more)
 		if (float.IsNaN(h0)){
-			Debug.Log ("Error in node h0");
+			Debug.LogError ("Error in node h0");
 			return;
 		}
 		
