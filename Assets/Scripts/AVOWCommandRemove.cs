@@ -95,16 +95,60 @@ public class AVOWCommandRemove : AVOWCommand{
 		AVOWNode outNode = component.outNodeGO.GetComponent<AVOWNode>();
 		AVOWNode inNode = component.inNodeGO.GetComponent<AVOWNode>();
 		
+		// If the nodes we are examining are on their way out, we need to consider the nodes they will eventually get attached to instead
+		bool needToCheckOutNode = true;
+		while (needToCheckOutNode){
+			int countInOut = 0;
+			AVOWNode newNode = null;
+			foreach (GameObject go in outNode.inComponents){
+				AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
+				if (!thisComponent.IsDying()){
+					countInOut++;
+				}
+				else{
+					newNode = thisComponent.outNodeGO.GetComponent<AVOWNode>();
+				}
+			}
+			if (countInOut == 0){
+				if (newNode == null) Debug.LogError ("(newNode == null) ");
+				outNode = newNode;
+			}else{
+				needToCheckOutNode = false;
+			}
+		}
+		
+		bool needToCheckInNode = true;
+		while (needToCheckInNode){
+			int countOutIn = 0;
+			AVOWNode newNode = null;
+			foreach (GameObject go in inNode.outComponents){
+				AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
+				if (!thisComponent.IsDying()){
+					countOutIn++;
+				}
+				else{
+					newNode = thisComponent.outNodeGO.GetComponent<AVOWNode>();
+				}
+			}
+			if (countOutIn == 0){
+				if (newNode == null) Debug.LogError ("(newNode == null) ");
+				inNode = newNode;
+			}else{
+				needToCheckInNode = false;
+			}
+		}
+		
+		
 		// test if there are any other components beteween these two nodes
 		int countOut = 0;
 		foreach (GameObject go in outNode.outComponents){
 			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
-			if (!thisComponent.IsDying() && thisComponent.type == AVOWComponent.Type.kLoad) countOut++;
+			if (!thisComponent.IsDying() && thisComponent.type == AVOWComponent.Type.kLoad  && removeComponentGO != go) countOut++;
 		}
 		int countIn = 0;
 		foreach (GameObject go in inNode.inComponents){
 			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
-			if (!thisComponent.IsDying() && thisComponent.type == AVOWComponent.Type.kLoad) countIn++;
+			if (!thisComponent.IsDying() && thisComponent.type == AVOWComponent.Type.kLoad  && removeComponentGO != go) countIn++;
 		}
 		int totalCount = 0;
 		foreach (GameObject go in AVOWGraph.singleton.allComponents){
@@ -112,7 +156,7 @@ public class AVOWCommandRemove : AVOWCommand{
 			if (!thisComponent.IsDying()) totalCount++;
 		}
 		// if there is more than just this node beteeen them
-		if ((countOut > 1 && countIn > 1) || totalCount == 2){
+		if ((countOut > 0 && countIn > 0) || totalCount == 2){
 			
 			return GapType.kOneOfMany;
 		}
