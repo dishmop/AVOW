@@ -72,6 +72,7 @@
      <Compile Include="Assets\Scripts\AVOWTutorialText.cs" />
      <Compile Include="Assets\Scripts\AVOWUI.cs" />
      <Compile Include="Assets\Scripts\AVOWUIButton.cs" />
+     <Compile Include="Assets\Scripts\AVOWUICounter.cs" />
      <Compile Include="Assets\Scripts\AVOWUICreateTool.cs" />
      <Compile Include="Assets\Scripts\AVOWUIDeleteTool.cs" />
      <Compile Include="Assets\Scripts\AVOWUIDisabledTool.cs" />
@@ -205,6 +206,7 @@
      <None Include="Assets\Shaders\PlasmaBalls_old.shader" />
      <None Include="Assets\Tutorial_2\1_FlatColour.shader" />
      <None Include="Assets\Shaders\AVOWCursorCubeRGB.shader" />
+     <None Include="Assets\Shaders\AVOWGreenLightening.shader" />
      <None Include="Assets\Scripts\GearProcedural\readme.txt" />
      <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasicOutline.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\DepthOfField34.shader" />

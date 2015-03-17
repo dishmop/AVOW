@@ -9,6 +9,9 @@ public class AVOWTutorialManager : MonoBehaviour {
 	public float holdDistMovedThreshold;
 	public float timeoutTime;
 	public int thresholdInOutGapCount;
+	public float largeCubeMul;
+	
+	Vector3 cubeSize;
 	
 
 	enum State{
@@ -59,6 +62,14 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kCreateButton,
 		kFreeformCreate,
 		kLastSquareCreated,
+		kSelectDestroy,
+		kDestroySquarePrelude,
+		kDestroySquare,
+		kDestroySparkActive,
+		kDestroyPressAndHold,
+		kDestroySuccessful,
+		kDestroyLostGap,
+		kDestroyLostConnection,
 		kStop
 	}
 	
@@ -110,7 +121,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	public void StartTutorial(){
 		state = State.kIntro0;
-		//state = State.kDebugPostFirstSquare;
+		state = State.kDebugPostFirstSquare;
 	}
 	
 	public void StopTutorial(){
@@ -158,10 +169,11 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	void SetupInitialTutFlags(){
 
-
+		AVOWConfig.singleton.tutDisableMouseMove = true;
 		AVOWConfig.singleton.tutDisableMouseButtton = true;
 		AVOWConfig.singleton.tutDisableConnections = true;
-		AVOWConfig.singleton.tutDisableUIButtons = true;
+		AVOWConfig.singleton.tutDisableCreateUIButton = true;
+		AVOWConfig.singleton.tutDisableDestroyUIButton = true;
 		AVOWConfig.singleton.tutDisable2ndBarConnections = true;
 		AVOWConfig.singleton.tutDisable2ndComponentConnections = true;
 		AVOWConfig.singleton.tutDisableBarConstruction = true;
@@ -179,9 +191,12 @@ public class AVOWTutorialManager : MonoBehaviour {
 	}
 	
 	void SetupExitTutFlags(){
+		AVOWConfig.singleton.tutDisableMouseMove = false;
+		
 		AVOWConfig.singleton.tutDisableMouseButtton = false;
 		AVOWConfig.singleton.tutDisableConnections = false;
-		AVOWConfig.singleton.tutDisableUIButtons = false;
+		AVOWConfig.singleton.tutDisableCreateUIButton = false;
+		AVOWConfig.singleton.tutDisableDestroyUIButton = false;
 		AVOWConfig.singleton.tutDisable2ndBarConnections = false;
 		AVOWConfig.singleton.tutDisable2ndComponentConnections = false;
 		AVOWConfig.singleton.tutDisableBarConstruction = false;
@@ -193,6 +208,10 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+	
+		if (state == State.kOff){
+			return;
+		}
 		// on entering state
 		bool onEnterState = (state != lastState);
 		lastState = state;
@@ -217,21 +236,36 @@ public class AVOWTutorialManager : MonoBehaviour {
 				AVOWConfig.singleton.tutDisableMouseButtton = false;
 				AVOWConfig.singleton.tutDisableConnections = false;
 				AVOWConfig.singleton.tutDisable2ndBarConnections = false;
-				
+				AVOWConfig.singleton.tutDisableCreateUIButton = false;
+				AVOWConfig.singleton.tutDisableMouseMove = false;
+				cubeSize = AVOWUI.singleton.GetUITool().GetCursorCube().transform.localScale;
+			
 				AVOWUI.singleton.PlaceResistor(AVOWGraph.singleton.allNodes[0], AVOWGraph.singleton.allNodes[1]);
 				state = State.kConnectonBarsSetup;
 			
 				break;
 			}
-			case State.kIntro0:{	
-				SetupInitialTutFlags();
-				AVOWTutorialText.singleton.AddPause(3);
-				state = State.kIntro1;
+			case State.kIntro0:{
+				if (onEnterState){
+					SetupInitialTutFlags();
+					AVOWTutorialText.singleton.AddPause(3);
+					AVOWTutorialText.singleton.AddText("I am cube.");
+					AVOWTutorialText.singleton.AddPause(3);
+					cubeSize = AVOWUI.singleton.GetUITool().GetCursorCube().transform.localScale;
+					AVOWUI.singleton.GetUITool().GetCursorCube().transform.localScale = cubeSize * largeCubeMul;
+					SetTextTrigger();
+				}	
+				if (onTextTrigger){
+					state = State.kIntro1;
+				}
+
 				break;
 			}
 			case State.kIntro1:{	
 				if (onEnterState){
-					AVOWTutorialText.singleton.AddText("I am cube. Move me around with your mouse.");
+					AVOWConfig.singleton.tutDisableMouseMove = false;
+
+					AVOWTutorialText.singleton.AddText("Move me around with your mouse.");
 					SetTextTrigger(hasDoneIntro1);
 				}
 				if (onTextTrigger){
@@ -306,7 +340,6 @@ public class AVOWTutorialManager : MonoBehaviour {
 			case State.kFindTheConnection2:{
 				if (onEnterState){
 					AVOWTutorialText.singleton.InterruptText("You found them both.");
-					AVOWTutorialText.singleton.AddPause(2);
 					SetTextTrigger();
 				}
 				if (onTextTrigger){
@@ -333,6 +366,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kPressMouseWait:{
 				if (onEnterState){
+					AVOWConfig.singleton.tutDisableCreateUIButton = false;
 					AVOWConfig.singleton.tutDisableMouseButtton = false;
 					SetTimerTrigger(10);
 				}
@@ -571,7 +605,6 @@ public class AVOWTutorialManager : MonoBehaviour {
 			case State.kConnectionBars2:{
 				if (onEnterState){
 					AVOWTutorialText.singleton.InterruptText("You found them both.");
-					AVOWTutorialText.singleton.AddPause(2);
 					SetTextTrigger();
 				}
 				if (onTextTrigger){
@@ -581,7 +614,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kBarsChangeShape:{
 				if (onEnterState){
-					AVOWTutorialText.singleton.AddText("The connection points have become horizontal 'connection bars'.");
+					AVOWTutorialText.singleton.AddText("The connection points have become 'connection bars'.");
 					AVOWTutorialText.singleton.AddPause(2);
 					SetTextTrigger();
 				}
@@ -624,7 +657,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kCreateSeriesSquare0:{
 				if (onEnterState){
-					AVOWTutorialText.singleton.AddText("Inside each reistance square are two green spheres. These are called Connection spheres.");
+					AVOWTutorialText.singleton.AddText("Inside each resistance square are two green 'Connection spheres'.");
 					AVOWTutorialText.singleton.AddText("As well as placing squares between two connection bars, you can also place them between a bar and a connection sphere that is attached to it.");
 					SetTextTrigger(hasDoneCreatedSeriesSquare0);
 				}
@@ -775,8 +808,8 @@ public class AVOWTutorialManager : MonoBehaviour {
 				if (onEnterState){
 					AVOWConfig.singleton.tutDisableBarConstruction = true;
 					AVOWConfig.singleton.tutDisableComponentConstruction = true;
-					AVOWTutorialText.singleton.InterruptText("Good - you made your fourth resistance square.");
-					AVOWTutorialText.singleton.InterruptText("Notice how the connection bar had to move and the other squares resized to accomodate the new square.");
+					AVOWTutorialText.singleton.InterruptText("You have made your fourth resistance square.");
+					AVOWTutorialText.singleton.AddText("Notice how the connection bar had to move and the other squares resized to accomodate it.");
 					SetTextTrigger();
 				}	
 				if (onTextTrigger){
@@ -787,7 +820,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kCreateButton:{	
 				if (onEnterState){
-					AVOWTutorialText.singleton.InterruptText("On the left of the screen is a blue square saying 'Create' - The number shows how many more squares you can create. ");
+					AVOWTutorialText.singleton.InterruptText("On the left of the screen is number showing how many more squares you can create.");
 					SetTextTrigger();
 				}	
 				if (onTextTrigger){
@@ -797,7 +830,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kFreeformCreate:{	
 				if (onEnterState){
-					AVOWTutorialText.singleton.AddText ("You can make one more square - make it anywhere you like");
+					AVOWTutorialText.singleton.AddText ("You can make one more - make it anywhere you like.");
 					AVOWConfig.singleton.tutDisableBarConstruction = false;
 					AVOWConfig.singleton.tutDisableComponentConstruction = false;
 				}	
@@ -808,11 +841,100 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}	
 			case State.kLastSquareCreated:{	
 				if (onEnterState){
-					AVOWTutorialText.singleton.InterruptText ("OK - you've run out of squares to created. ");
+				AVOWTutorialText.singleton.AddText ("OK - you've run out of squares to create.");
+					SetTextTrigger();
 				}	
+				if (onTextTrigger){
+					state = State.kSelectDestroy;
+				
+				}
 				
 				break;
-			}					
+			}		
+			case State.kSelectDestroy:{	
+				if (onEnterState){
+					AVOWConfig.singleton.tutDisableDestroyUIButton = false;
+					AVOWTutorialText.singleton.AddText ("On the left, there is a green button labelled 'Destroy'. Click this to activate the Destruction tool.");
+				}	
+				if (AVOWUI.singleton.mode == AVOWUI.ToolMode.kDelete){
+				state = State.kDestroySquare;
+				}
+				break;
+			}	
+			case State.kDestroySquare:{	
+				if (onEnterState){
+					AVOWTutorialText.singleton.AddText ("Go near the middle of a resistance square until you see the green spark.");
+				}	
+				if (AVOWUI.singleton.GetUITool().GetNumConnections() == 1){
+					state = State.kDestroySparkActive;
+				}
+				break;
+			}
+			case State.kDestroySparkActive:{	
+				if (onEnterState){
+					AVOWTutorialText.singleton.InterruptText ("Now press and hold the mouse button.");
+				}	
+				if (AVOWUI.singleton.GetUITool().IsHolding()){
+					state = State.kDestroyPressAndHold;
+				}
+				if (AVOWUI.singleton.GetUITool().GetNumConnections() == 0){
+					state = State.kDestroyLostConnection;
+				}
+				break;
+			}
+			case State.kDestroyPressAndHold:{	
+				if (onEnterState){
+					AVOWTutorialText.singleton.InterruptText ("You've started to destroy the square. Now move outside the gap that has been left and release the mouse button to complete its destruction.");
+				}
+				if (AVOWGraph.singleton.GetNumConfirmedLoads() < 5 && !AVOWUI.singleton.GetUITool().IsHolding()){
+					state = State.kDestroySuccessful;
+				}	
+				else if (!AVOWUI.singleton.GetUITool().IsHolding()){
+					state = State.kDestroyLostGap;
+				}
+				else if (AVOWUI.singleton.GetUITool().GetNumConnections() == 0){
+					state = State.kDestroyLostConnection;
+				}
+				break;
+			}
+			case State.kDestroySuccessful:{	
+				if (onEnterState){
+					AVOWTutorialText.singleton.InterruptText ("You have succesfully destroyed a resistance square.");
+					AVOWTutorialText.singleton.AddText ("f you want to make more squares, you click the blue Create button on the left or alternatvely stick with the Destruction tool.");
+					AVOWTutorialText.singleton.AddText ("Just play around with what you have learnt. When you are finished click the Main Menu button.");
+				}	
+				if (AVOWUI.singleton.GetUITool().IsHolding()){
+//					state = State.kDestroyPressAndHold;
+				}
+				break;
+			}
+			case State.kDestroyLostGap:{	
+				if (onEnterState){
+					AVOWTutorialText.singleton.InterruptText ("You let go of the mouse button whilst inside the gap - this cancels the destruction.");
+					SetTextTrigger();
+				}	
+				if (onTextTrigger){
+					state = State.kDestroySquare;
+				}
+				if (AVOWUI.singleton.GetUITool().IsHolding()){
+					state = State.kDestroyPressAndHold;
+				}
+				break;
+			}
+			case State.kDestroyLostConnection:{	
+				if (onEnterState){
+					AVOWTutorialText.singleton.InterruptText ("You've moved too far away and lost the green spark.");
+					SetTextTrigger();
+				}	
+				if (onTextTrigger){
+					state = State.kDestroySquare;
+				}
+				if (AVOWUI.singleton.GetUITool().GetNumConnections() == 1){
+					state = State.kDestroySparkActive;
+				}
+				break;
+			}
+			
 			case State.kStop:{
 				SetupExitTutFlags();
 				AVOWTutorialText.singleton.ClearText();
@@ -821,6 +943,12 @@ public class AVOWTutorialManager : MonoBehaviour {
 				break;
 			}		
 			
+		}
+		
+		float useSize = Mathf.Lerp (largeCubeMul, 1, AVOWConfig.singleton.cubeToCursor.GetValue());
+
+		if (AVOWUI.singleton.GetUITool() != null && AVOWUI.singleton.GetUITool().GetCursorCube() != null){
+			AVOWUI.singleton.GetUITool().GetCursorCube().transform.localScale = useSize * cubeSize;
 		}
 			
 	}
@@ -901,7 +1029,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	void OnGUI(){
 	
-	//	GUI.Box (new Rect(50, 50, 500, 30), "Tutorial: " + state.ToString() + " - " + AVOWGraph.singleton.GetNumConfirmedLoads().ToString());
+ 	//	GUI.Box (new Rect(50, 50, 500, 30), "Tutorial: " + state.ToString() + " - " + AVOWGraph.singleton.GetNumConfirmedLoads().ToString());
 	}
 	
 }

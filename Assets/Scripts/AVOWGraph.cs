@@ -344,6 +344,13 @@ public class AVOWGraph : MonoBehaviour {
 			}
 		}
 		
+		transform.FindChild("LighteningPoint1").gameObject.SetActive(allComponents.Count == 1);
+		transform.FindChild("LighteningPoint2").gameObject.SetActive(allComponents.Count == 1);
+		
+		float intensity = Mathf.Sin (0.9f + 0.1f * Mathf.Sin(3 * Time.time));
+		transform.FindChild("LighteningPoint1").gameObject.GetComponent<Renderer>().material.SetFloat("_Intensity", intensity);
+		transform.FindChild("LighteningPoint2").gameObject.GetComponent<Renderer>().material.SetFloat("_Intensity", intensity);
+		
 		
 	}
 	

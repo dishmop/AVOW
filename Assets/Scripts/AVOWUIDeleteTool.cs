@@ -51,10 +51,10 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		RemoveMetal(cursorCube);
 		
 		
-		lightening0GO = AVOWUI.singleton.InstantiateLightening();
+		lightening0GO = AVOWUI.singleton.InstantiateGreenLightening();
 		lightening0GO.transform.parent = AVOWUI.singleton.transform;
 		
-		lightening1GO = AVOWUI.singleton.InstantiateLightening();
+		lightening1GO = AVOWUI.singleton.InstantiateGreenLightening();
 		lightening1GO.transform.parent = AVOWUI.singleton.transform;
 		
 		uiZPos = AVOWUI.singleton.transform.position.z;
@@ -70,6 +70,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 	
 	
 	
+	
 	public override void Update () {
 		//		Debug.Log(Time.time + ": UICreateTool Update");
 		StateUpdate();
@@ -82,13 +83,27 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		return !isOutside;
 	}
 	
+	
+	public override int GetNumConnections(){
+		return (connectionGO == null) ? 0 : 1;
+	}
+	
+	
+	public override bool IsHolding(){
+		return heldConnection;
+	}
+	
 	protected override GameObject InstantiateCursorCube(){
 		return AVOWUI.singleton.InstantiateGreenCursorCube();
 	}
 	
 	void StateUpdate(){
-		// Calc the mouse posiiton on world spave
-		Vector3 mousePos = Input.mousePosition;
+	
+		// Calc the mouse posiiton on world space
+		Vector3 screenCentre = new Vector3(Screen.width * 0.75f, Screen.height * 0.5f, 0);
+		Vector3 inputScreenPos = Vector3.Lerp(screenCentre, Input.mousePosition, AVOWConfig.singleton.cubeToCursor.GetValue());
+		
+		Vector3 mousePos = inputScreenPos;
 		mousePos.z = 0;
 		mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
 		
@@ -100,7 +115,6 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		// Set the cursor cubes position
 		mouseWorldPos.z = uiZPos;
 		cursorCube.transform.position = mouseWorldPos;
-		
 		
 		
 		//	Debug.Log("Mouse world pos = " + mouseWorldPos.ToString());
@@ -165,6 +179,9 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		AVOWComponent component = go.GetComponent<AVOWComponent>();
 		return component;
 	}
+	
+	
+	
 	
 	
 	void HandleCubeInsideGap(){

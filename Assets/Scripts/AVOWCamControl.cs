@@ -31,7 +31,7 @@ public class AVOWCamControl : MonoBehaviour {
 		if (delay > 0) return;
 		
 		Camera camera = gameObject.GetComponent<Camera>();
-		float wheelVal = Input.GetAxis("Mouse ScrollWheel");
+		float wheelVal = 0;//Input.GetAxis("Mouse ScrollWheel");
 		
 		// We need to offset the camera so that the mouse pointer 
 		// remains in the same position - in which case, get its current position in world space
@@ -74,6 +74,8 @@ public class AVOWCamControl : MonoBehaviour {
 		if (!Input.GetMouseButton(0)){
 			// the -0.5f si the battery
 			Rect bounds = new Rect(AVOWSim.singleton.xMin - 0.5f, AVOWSim.singleton.yMin,Mathf.Max (AVOWObjectiveGrid.singleton.xMax, AVOWObjectives.singleton.xMax) - AVOWSim.singleton.xMin, AVOWSim.singleton.yMax - AVOWSim.singleton.yMin);
+			
+			bounds.xMax = Mathf.Max(bounds.xMax, 1);
 			
 			
 			Vector2 centre = new Vector2((bounds.xMin + bounds.xMax) * 0.5f + xOffset, (bounds.yMin + bounds.yMax) * 0.5f);

@@ -27,8 +27,10 @@ public class AVOWConfig : MonoBehaviour {
 	public float flockSpiralCoef = 0;
 	public bool flockReset = false;
 	
+	public bool tutDisableMouseMove = false;
 	public bool tutDisableConnections = false;
-	public bool tutDisableUIButtons = false;
+	public bool tutDisableCreateUIButton = false;
+	public bool tutDisableDestroyUIButton = false;
 	public bool tutDisableMouseButtton = false;
 	public bool tutDisableBarConstruction = false;
 	public bool tutDisable2ndComponentConnections = false;
@@ -37,6 +39,9 @@ public class AVOWConfig : MonoBehaviour {
 	
 	SpringValue bottomPanelUseFrac = new SpringValue(0, SpringValue.Mode.kLinear);
 	SpringValue sidePanelUseFrac = new SpringValue(0, SpringValue.Mode.kLinear);
+	
+	
+	public SpringValue cubeToCursor = new SpringValue(1, SpringValue.Mode.kLinear, 1f);
 	
 	public void DisplayBottomPanel(bool show){
 		bottomPanelUseFrac.Set (show ? bottomBarFrac :  0);
@@ -71,6 +76,13 @@ public class AVOWConfig : MonoBehaviour {
 		sidePanelUseFrac.SetSpeed (0.1f/sideBarFrac);
 	}
 	
+	public Vector3 GetViewCentre(){
+		Vector3 min = new Vector3(Screen.width * GetSidePanelFrac(), Screen.height * GetBottomPanelFrac(), 0);
+		Vector3 max = new Vector3(Screen.width, Screen.height, 0);
+		
+		return Vector3.Lerp (min, max, 0.5f);
+	}
+	
 	void Awake(){
 		if (singleton != null) Debug.LogError ("Error assigning singleton");
 		singleton = this;
@@ -84,6 +96,16 @@ public class AVOWConfig : MonoBehaviour {
 	void Update () {
 		bottomPanelUseFrac.Update ();
 		sidePanelUseFrac.Update ();
+		
+		if (tutDisableMouseMove){
+			cubeToCursor.Force (0);
+		}
+		else if (cubeToCursor.GetDesValue() == 0){
+			Cursor.lockState = CursorLockMode.Locked;
+			Cursor.lockState = CursorLockMode.Confined;
+			cubeToCursor.Set (1);
+		}
+		cubeToCursor.Update ();
 		
 	}
 }

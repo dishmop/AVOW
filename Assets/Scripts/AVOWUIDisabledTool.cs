@@ -32,14 +32,17 @@ public class AVOWUIDisabledTool :  AVOWUITool{
 	
 	
 	public override void Update () {
-		//		Debug.Log(Time.time + ": UICreateTool Update");
-		// Calc the mouse posiiton on world spave
-		Vector3 mousePos = Input.mousePosition;
+		
+		// Calc the mouse posiiton on world space
+		Vector3 screenCentre = new Vector3(Screen.width * 0.75f, Screen.height * 0.5f, 0);
+		Vector3 inputScreenPos = Vector3.Lerp(screenCentre, Input.mousePosition, AVOWConfig.singleton.cubeToCursor.GetValue());
+		
+		Vector3 mousePos = inputScreenPos;
 		mousePos.z = 0;
 		mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
+		// Set the cursor cubes position
 		mouseWorldPos.z = uiZPos;
 		cursorCube.transform.position = mouseWorldPos;
-		
 		
 	}
 	

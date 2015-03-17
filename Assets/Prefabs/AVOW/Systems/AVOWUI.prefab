@@ -46,7 +46,10 @@ MonoBehaviour:
     type: 2}
   cursorGreyCubePrefab: {fileID: 100000, guid: 8a63c5f9bfac347899c6ae49b2df7c1a, type: 2}
   lighteningPrefab: {fileID: 100000, guid: ad922b5ed1a1644d68f7428a6f6d567b, type: 2}
+  greenLighteningPrefab: {fileID: 100000, guid: 22a87bc809e934f0bbd63cbbfdc79d07,
+    type: 2}
   canCreate: 1
+  mode: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -58,4 +61,3 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 100000}
   m_IsPrefabParent: 1
-  m_IsExploded: 1

@@ -15,6 +15,7 @@ public class AVOWUI : MonoBehaviour {
 	public GameObject cursorGreenCubePrefab;
 	public GameObject cursorGreyCubePrefab;
 	public GameObject lighteningPrefab;
+	public GameObject greenLighteningPrefab;
 	
 	
 	
@@ -119,6 +120,8 @@ public class AVOWUI : MonoBehaviour {
 		
 	}
 	
+
+	
 	public void TriggerLight(){
 		cubeBrightness.Force (1);
 		cubeBrightness.Set (0);
@@ -148,6 +151,12 @@ public class AVOWUI : MonoBehaviour {
 	
 	public GameObject InstantiateLightening(){
 		GameObject obj = GameObject.Instantiate(lighteningPrefab) as GameObject;
+		obj.transform.parent = transform;
+		return obj;
+	}
+	
+	public GameObject InstantiateGreenLightening(){
+		GameObject obj = GameObject.Instantiate(greenLighteningPrefab) as GameObject;
 		obj.transform.parent = transform;
 		return obj;
 	}

@@ -37,6 +37,7 @@ public class AVOWCommandRemove : AVOWCommand{
 		removeComponentGO = componentGO;
 		cursorPos = pos;
 		gapType = DetermineType();
+		Debug.Log("Removal type = " + gapType.ToString());
 	}
 	
 	public bool IsFinished(){	

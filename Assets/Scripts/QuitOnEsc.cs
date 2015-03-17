@@ -36,6 +36,10 @@ public class QuitOnEsc : MonoBehaviour {
 			Cursor.visible = false;
 			
 		}
-	
+		
+		Cursor.lockState = CursorLockMode.Confined;
+		
+
+		
 	}
 }
