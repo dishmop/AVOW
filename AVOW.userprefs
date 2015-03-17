@@ -20,7 +20,7 @@
       <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="34" Column="24" />
       <File FileName="Assets/Scripts/AVOWTutorialManager.cs" Line="903" Column="168" />
       <File FileName="Assets/Scripts/AVOWUICounter.cs" Line="25" Column="1" />
-      <File FileName="Assets/Scripts/AVOWCommandRemove.cs" Line="124" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCommandRemove.cs" Line="123" Column="28" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

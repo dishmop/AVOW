@@ -16,7 +16,7 @@ public class AVOWConfig : MonoBehaviour {
 	public bool  modifiedNodeLengths = false;
 	public float tutorialSpeed = 1;
 	
-	public float sideBarFrac = 0.2f;
+	public float sideBarPixels = 0.2f;
 	public float bottomBarFrac = 0.2f;
 	
 	public float flockDesDistToOther = 2f;
@@ -40,6 +40,8 @@ public class AVOWConfig : MonoBehaviour {
 	SpringValue bottomPanelUseFrac = new SpringValue(0, SpringValue.Mode.kLinear);
 	SpringValue sidePanelUseFrac = new SpringValue(0, SpringValue.Mode.kLinear);
 	
+	
+	float sideBarFrac;
 	
 	public SpringValue cubeToCursor = new SpringValue(1, SpringValue.Mode.kLinear, 1f);
 	
@@ -72,6 +74,10 @@ public class AVOWConfig : MonoBehaviour {
 	
 	
 	public void Start(){
+		// Work out the sidebar fract from the pixels
+		sideBarFrac = sideBarPixels / Screen.width;
+		
+	
 		bottomPanelUseFrac.SetSpeed (0.1f/bottomBarFrac);
 		sidePanelUseFrac.SetSpeed (0.1f/sideBarFrac);
 	}

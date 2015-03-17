@@ -101,6 +101,7 @@ public class AVOWCommandRemove : AVOWCommand{
 			int countInOut = 0;
 			AVOWNode newNode = null;
 			foreach (GameObject go in outNode.inComponents){
+				if (go == null) continue;
 				AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
 				if (!thisComponent.IsDying()){
 					countInOut++;
@@ -122,6 +123,7 @@ public class AVOWCommandRemove : AVOWCommand{
 			int countOutIn = 0;
 			AVOWNode newNode = null;
 			foreach (GameObject go in inNode.outComponents){
+				if (go == null) continue;
 				AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
 				if (!thisComponent.IsDying()){
 					countOutIn++;
@@ -142,16 +144,19 @@ public class AVOWCommandRemove : AVOWCommand{
 		// test if there are any other components beteween these two nodes
 		int countOut = 0;
 		foreach (GameObject go in outNode.outComponents){
+			if (go == null) continue;
 			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
 			if (!thisComponent.IsDying() && thisComponent.type == AVOWComponent.Type.kLoad  && removeComponentGO != go) countOut++;
 		}
 		int countIn = 0;
 		foreach (GameObject go in inNode.inComponents){
+			if (go == null) continue;
 			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
 			if (!thisComponent.IsDying() && thisComponent.type == AVOWComponent.Type.kLoad  && removeComponentGO != go) countIn++;
 		}
 		int totalCount = 0;
 		foreach (GameObject go in AVOWGraph.singleton.allComponents){
+			if (go == null) continue;
 			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
 			if (!thisComponent.IsDying()) totalCount++;
 		}

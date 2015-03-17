@@ -121,7 +121,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 	public void StartTutorial(){
 		state = State.kIntro0;
-		state = State.kDebugPostFirstSquare;
+		//state = State.kDebugPostFirstSquare;
 	}
 	
 	public void StopTutorial(){
