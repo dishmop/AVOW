@@ -38,6 +38,8 @@ public class AVOWCamControl : MonoBehaviour {
 		Vector3 mousePos = Input.mousePosition;
 		mousePos.z = transform.position.z - Camera.main.transform.position.z;
 		
+		GetComponent<Camera>().rect = new Rect(AVOWConfig.singleton.GetSidePanelFrac(), AVOWConfig.singleton.GetBottomPanelFrac(), 1, 1);
+		
 		
 		if (wheelVal != 0){
 			mousePos.z = transform.position.z - Camera.main.transform.position.z;

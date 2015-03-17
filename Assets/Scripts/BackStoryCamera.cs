@@ -84,6 +84,8 @@ public class BackStoryCamera : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		UpdateMousePos();
+		GetComponent<Camera>().rect = new Rect(AVOWConfig.singleton.GetSidePanelFrac(), AVOWConfig.singleton.GetBottomPanelFrac(), 1, 1);
+		
 	
 		if (oldState != state){
 			oldState = state;

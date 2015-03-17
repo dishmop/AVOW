@@ -333,6 +333,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 			
 			case State.kStartup:{
 				SetCameraPos(state);
+				triggered = false;
 				state = State.kIntro0;
 				break;
 			}
@@ -414,7 +415,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 				break;
 			}
 			case State.kInLove0:{
-				AVOWTutorialText.singleton.AddPause(4);
+				AVOWTutorialText.singleton.AddPause(6);
 				WaitForTextToFinish(State.kInLove1);
 				break;
 			}
@@ -1632,9 +1633,9 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 		singleton = null;
 	}
 	
-//	void OnGUI(){
-//	
+	void OnGUI(){
+	
 //		GUI.Box (new Rect(50, 50, 500, 30), "BackStory: " + state.ToString());
-//	}
+	}
 	
 }

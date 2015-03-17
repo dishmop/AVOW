@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\AVOWBackStoryCutscene.cs" />
      <Compile Include="Assets\Scripts\AVOWBattery.cs" />
+     <Compile Include="Assets\Scripts\AVOWButton.cs" />
      <Compile Include="Assets\Scripts\AVOWCamControl.cs" />
      <Compile Include="Assets\Scripts\AVOWCircuitCreator.cs" />
      <Compile Include="Assets\Scripts\AVOWCommand.cs" />
@@ -65,6 +66,7 @@
      <Compile Include="Assets\Scripts\AVOWObjectiveGrid.cs" />
      <Compile Include="Assets\Scripts\AVOWObjectives.cs" />
      <Compile Include="Assets\Scripts\AVOWPusher.cs" />
+     <Compile Include="Assets\Scripts\AVOWSideBar.cs" />
      <Compile Include="Assets\Scripts\AVOWSim.cs" />
      <Compile Include="Assets\Scripts\AVOWTutorialManager.cs" />
      <Compile Include="Assets\Scripts\AVOWTutorialText.cs" />
@@ -202,6 +204,7 @@
      <None Include="Assets\Shaders\DC_Reflect-BumpSpec2.shader" />
      <None Include="Assets\Shaders\PlasmaBalls_old.shader" />
      <None Include="Assets\Tutorial_2\1_FlatColour.shader" />
+     <None Include="Assets\Shaders\AVOWCursorCubeRGB.shader" />
      <None Include="Assets\Scripts\GearProcedural\readme.txt" />
      <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasicOutline.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\DepthOfField34.shader" />

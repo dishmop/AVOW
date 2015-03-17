@@ -50,7 +50,7 @@ public class AVOWCommandRemove : AVOWCommand{
 				
 				Debug.Log ("Shriking component " + component.GetID() + " of type " + ((gapType == GapType.kOneOfMany) ? "One of many" : "Only one"));
 				
-				component.resistanceAngle.Set((gapType == GapType.kOnlyOne) ? 20 : 70);
+				component.resistanceAngle.Set((gapType == GapType.kOnlyOne) ? 35 : 55);
 				undoStep = UndoStepState.kWidenGap;
 				executeStep = ExecuteStepState.kRemoveComponent;
 				break;

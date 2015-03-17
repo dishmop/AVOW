@@ -18,8 +18,7 @@
 		        #include "UnityCG.cginc"
 		        
 		
-		        float  _Intensity;
-		        		   
+		        uniform float  _Intensity;		        		   
 
 		    
 		

@@ -123,7 +123,7 @@ public class AVOWSim : MonoBehaviour {
 		CalcVoltages();
 		//DebugPrintVoltages();
 		
-		DebugPrintGraph();
+		//DebugPrintGraph();
 		LayoutHOrder();
 		
 		CalcBounds();
@@ -964,9 +964,7 @@ public class AVOWSim : MonoBehaviour {
 		int bestI = -1;
 		bool hasLowest = false;
 		
-		if (allSimBlocks.Length == 4){
-			Debug.Log ("(allSimBlocks.Count == 4)");
-		}
+
 		
 		foreach(int i in validPermutations){
 			SetupPermutation(i);

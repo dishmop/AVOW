@@ -75,6 +75,8 @@ public class AVOWGameModes : MonoBehaviour {
 		SelectCamera(CameraChoice.kGameCam);
 		sidePanel.SetActive(true);
 		backStory.SetActive(false);
+		AVOWConfig.singleton.DisplayBottomPanel(false);
+		AVOWConfig.singleton.DisplaySidePanel(true);
 		
 		RestartFreePlayGame();
 	}
@@ -83,7 +85,8 @@ public class AVOWGameModes : MonoBehaviour {
 		
 		AVOWTutorialText.singleton.activated = true;
 		SelectCamera(CameraChoice.kGameCam);
-		sidePanel.SetActive(true);
+		AVOWConfig.singleton.DisplayBottomPanel(true);
+		AVOWConfig.singleton.DisplaySidePanel(true);
 		backStory.SetActive(false);
 		
 		AVOWTutorialManager.singleton.StartTutorial();
@@ -95,13 +98,16 @@ public class AVOWGameModes : MonoBehaviour {
 
 		
 		AVOWTutorialText.singleton.activated = true;
-		sidePanel.SetActive(false);
+		AVOWConfig.singleton.DisplayBottomPanel(true);
+		AVOWConfig.singleton.DisplaySidePanel(false);
 		SelectCamera(CameraChoice.kBackStoryCam);
 		AVOWBackStoryCutscene.singleton.StartBackStory();
 		backStory.SetActive(true);
 		
 		RestartFreePlayGame();
 	}
+	
+
 	
 	void SelectCamera(CameraChoice cam){
 		// First set them all inactive
@@ -184,7 +190,8 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWVizTotals.singleton.BuildLines();
 		AVOWBattery.singleton.ResetBattery();
 		AVOWTutorialText.singleton.activated = false;
-		
+		AVOWConfig.singleton.DisplayBottomPanel(false);
+		AVOWConfig.singleton.DisplaySidePanel(false);
 		
 		state = GameModeState.kPlayStage;
 	}
@@ -200,7 +207,8 @@ public class AVOWGameModes : MonoBehaviour {
 	public void GoToMain(){
 		AVOWBackStoryCutscene.singleton.StopBackStory();
 		AVOWTutorialManager.singleton.StopTutorial();
-		
+		AVOWConfig.singleton.DisplayBottomPanel(false);
+		AVOWConfig.singleton.DisplaySidePanel(false);
 		state = GameModeState.kMainMenu;
 	}
 	

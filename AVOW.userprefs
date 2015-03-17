@@ -1,19 +1,32 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWSim.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Shaders/AVOWCursorCubeRGB.shader">
     <Files>
-      <File FileName="Assets/Scripts/AVOWUI.cs" Line="152" Column="2" />
-      <File FileName="Assets/Scripts/AVOWNode.cs" Line="65" Column="1" />
-      <File FileName="Assets/Scripts/AVOWSim.cs" Line="951" Column="18" />
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="113" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWNode.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWTutorialManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWTutorialText.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWConfig.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWGameModes.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWObjectives.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWSideBar.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/TutorialTextPanel.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUIDeleteTool.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCommandRemove.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWBackStoryCutscene.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/BackStoryCamera.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWGreySphere.cs" Line="190" Column="1" />
+      <File FileName="Assets/Shaders/AVOWCursorCubeRGB.shader" Line="4" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/AVOW/Assets/Scripts/AVOWComponent.cs" line="121" />
       <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/AVOW/Assets/Scripts/AVOWComponent.cs" line="113" />
-      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/AVOW/Assets/Scripts/AVOWSim.cs" line="848" />
-      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/AVOW/Assets/Scripts/AVOWSim.cs" line="955" />
+      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/AVOW/Assets/Scripts/AVOWTutorialManager.cs" line="497" />
+      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/AVOW/Assets/Scripts/AVOWGreySphere.cs" line="343" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

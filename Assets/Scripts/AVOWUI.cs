@@ -16,6 +16,8 @@ public class AVOWUI : MonoBehaviour {
 	public GameObject cursorGreyCubePrefab;
 	public GameObject lighteningPrefab;
 	
+	
+	
 	public bool canCreate = true;
 	bool lastCanCreate = true;
 	
@@ -30,7 +32,7 @@ public class AVOWUI : MonoBehaviour {
 		kDelete
 	}
 	
-	ToolMode mode = ToolMode.kCreate;
+	public ToolMode mode = ToolMode.kCreate;
 			
 	AVOWUITool	uiTool;
 	

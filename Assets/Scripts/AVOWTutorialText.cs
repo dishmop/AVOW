@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Text;
 using UnityEngine.UI;
@@ -8,7 +8,6 @@ public class AVOWTutorialText : MonoBehaviour {
 	
 
 	public bool			activated = false;
-	public SpringValue	border  = new SpringValue(1, SpringValue.Mode.kLinear,0.25f);
 	public float		defaultLettersPerSecond = 5;
 	public float 		forceCompleteSpeed = 1000;
 	public GameObject 	textBox;
@@ -38,7 +37,7 @@ public class AVOWTutorialText : MonoBehaviour {
 	}
 	
 	
-	public void InturruptText(string text){
+	public void InterruptText(string text){
 		if (queuedString.Length > 5){
 			queuedString.Length = 0;
 			queuedString.Append("...\n\n");
@@ -49,7 +48,7 @@ public class AVOWTutorialText : MonoBehaviour {
 			ForceTextCompletion();
 			AddText (text);
 		}
-		Debug.Log("InturruptText: text = " + queuedString.ToString());
+		Debug.Log("InterruptText: text = " + queuedString.ToString());
 		
 		
 	}
@@ -87,6 +86,9 @@ public class AVOWTutorialText : MonoBehaviour {
 		displayedString = new StringBuilder();
 		lettersPerSecond = defaultLettersPerSecond;
 		ClearDisplayString();
+		highlightLetter = "";
+		highlightString = "";
+		PlaceTextOnScreen();
 	}
 	
 	public void ForceTextCompletion(){
@@ -105,8 +107,6 @@ public class AVOWTutorialText : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		lettersPerSecond = defaultLettersPerSecond;
-		border.Force (activated ? 0.15f : 0);
-		//ApplyBorder();
 		ClearDisplayString();
 	
 	}
@@ -128,22 +128,9 @@ public class AVOWTutorialText : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 //		Debug.Log (lettersPerSecond.ToString() + ": " + queuedString.ToString());
-		HandleBorder();
 		HandleText();
-	}
-	
-	void HandleBorder(){
-		border.Set (activated ? 0.2f : 0);
-		border.Update ();
-		ApplyBorder();
-	}
-	
-	void ApplyBorder(){
-		Rect rect = Camera.main.rect;
-		rect.yMin = border.GetValue();
-		Camera.main.rect = rect;
-		Vector2 anchorMax = new Vector2(1, border.GetValue());
-		panel.GetComponent<RectTransform>().anchorMax = anchorMax;
+		
+		
 	}
 	
 	bool HandleSpecials(){
@@ -201,6 +188,10 @@ public class AVOWTutorialText : MonoBehaviour {
 	}
 	
 	
+	void PlaceTextOnScreen(){
+		textBox.GetComponent<Text>().text = displayedString.ToString() + closingString + highlightString;
+	}
+	
 	
 	void HandleText(){
 		while (Time.time > nextletterTime){
@@ -214,7 +205,7 @@ public class AVOWTutorialText : MonoBehaviour {
 					highlightLetter = queuedString.ToString().Substring(0, 1);
 					highlightString = "<color=" + CreateColorString(highlightColor) + ">" + highlightLetter + "</color>";
 					queuedString.Remove(0,1);
-					textBox.GetComponent<Text>().text = displayedString.ToString() + closingString + highlightString;
+					PlaceTextOnScreen();
 					if (highlightLetter != " " && highlightLetter != "\n"){
 						if (!GetComponent<AudioSource>().isPlaying) GetComponent<AudioSource>().Play();
 						AVOWBackStoryCutscene.singleton.TriggerLight();
