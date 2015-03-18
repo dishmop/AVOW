@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &143652
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 479726}
+  - 114: {fileID: 11457512}
+  m_Layer: 0
+  m_Name: AVOWWoodCreator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &479726
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 143652}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+--- !u!114 &11457512
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 143652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67fed18f244bd4735bd5b28f79d219c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  woodPrefabs:
+  - {fileID: 195014, guid: 6a096e0a4f2ae43e4b70cb81003370c2, type: 2}
+  - {fileID: 197048, guid: f458a898f2e3e4118babfa2e8c742bc7, type: 2}
+  - {fileID: 104338, guid: b357048af859b4564a0c2213829e48df, type: 2}
+  - {fileID: 121906, guid: 48890e19a5b254c7d92e3c40caa4293a, type: 2}
+  - {fileID: 130522, guid: 38566f58779a641768215f91e6ae41e5, type: 2}
+  - {fileID: 157206, guid: eeac82441c51f4353b41cf3ec58abd34, type: 2}
+  - {fileID: 105636, guid: 32a30a0ef2a724755a381c612db83520, type: 2}
+  - {fileID: 126858, guid: f7ced7a4c8f674561940a834d30a60c5, type: 2}
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 143652}
+  m_IsPrefabParent: 1

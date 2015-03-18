@@ -191,7 +191,7 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWBattery.singleton.ResetBattery();
 		AVOWTutorialText.singleton.activated = false;
 		AVOWConfig.singleton.DisplayBottomPanel(false);
-		AVOWConfig.singleton.DisplaySidePanel(false);
+		AVOWConfig.singleton.DisplaySidePanel(true);
 		
 		state = GameModeState.kPlayStage;
 	}

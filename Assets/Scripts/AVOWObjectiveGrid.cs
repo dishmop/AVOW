@@ -6,6 +6,7 @@ public class AVOWObjectiveGrid : MonoBehaviour {
 	public static AVOWObjectiveGrid singleton = null;
 	
 	public GameObject drawnLingPrefab;
+	public GameObject pusher;
 	public float 	  xMax = 0;
 	
 	// For some reason testing the lines themselves doesn't work
@@ -18,6 +19,10 @@ public class AVOWObjectiveGrid : MonoBehaviour {
 	int thisWidth = 1;
 	int lastWidth = 1;
 	
+	
+	public int GetLCM(){
+		return thisLCM;
+	}
 	
 	void CalcBounds(){
 		if (AVOWConfig.singleton.ShowGraphicObjectives()){
@@ -114,19 +119,20 @@ public class AVOWObjectiveGrid : MonoBehaviour {
 	}
 	
 	void DrawGrid(int div, int length){
-		if (!AVOWConfig.singleton.ShowGraphicObjectives()) return;
-		
-		float xLen = (float)length / (float)div;
-		
-		for (int i = 0; i < div + 1; ++i){
-			DrawLine(0,  i /(float)div, xLen,  i / (float)div);
-		}
-		
-		for (int i = 0; i < length; ++i){
-			DrawLine(i /(float)div,  0, i /(float)div,  1);
-		}
-		
-		finishTime = Time.time + 0.5f;
+		AVOWWoodCreator.singleton.Construct(div, length);
+//		if (!AVOWConfig.singleton.ShowGraphicObjectives()) return;
+//		
+//		float xLen = (float)length / (float)div;
+//		
+//		for (int i = 0; i < div + 1; ++i){
+//			DrawLine(0,  i /(float)div, xLen,  i / (float)div);
+//		}
+//		
+//		for (int i = 0; i < length; ++i){
+//			DrawLine(i /(float)div,  0, i /(float)div,  1);
+//		}
+//		
+//		finishTime = Time.time + 0.5f;
 		
 		
 	}

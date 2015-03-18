@@ -60,9 +60,9 @@ public class AVOWNode : MonoBehaviour {
 
 	void Update(){
 	
-		// Not sure why this happens (I think I've fixed this so it shouldn't happen any more)
+		// Hmm this seems to happen when ghe batery runs out
 		if (float.IsNaN(h0)){
-			Debug.LogError ("Error in node h0");
+			Debug.Log ("Error in node h0");
 			return;
 		}
 		
@@ -73,7 +73,11 @@ public class AVOWNode : MonoBehaviour {
 		material.SetFloat("_Intensity", newVal);
 		
 		// Calc the prop value (use any of the components to get the gap value
-		float useLength = hWidth - 2 * components[0].GetComponent<AVOWComponent>().squareGap;
+		float useLength = 0;
+		
+		if (components.Count > 0){
+			useLength = hWidth - 2 * components[0].GetComponent<AVOWComponent>().squareGap;
+		}
 		material.SetFloat("_GapProp", useLength / hWidth);
 				
 		transform.position = new Vector3(h0 + 0.5f * hWidth, voltage, 0);

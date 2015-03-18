@@ -79,6 +79,7 @@
      <Compile Include="Assets\Scripts\AVOWUITool.cs" />
      <Compile Include="Assets\Scripts\AVOWVizObjectives.cs" />
      <Compile Include="Assets\Scripts\AVOWVizTotals.cs" />
+     <Compile Include="Assets\Scripts\AVOWWoodCreator.cs" />
      <Compile Include="Assets\Scripts\AmmeterEffect.cs" />
      <Compile Include="Assets\Scripts\AppHelper.cs" />
      <Compile Include="Assets\Scripts\AudioTimeScalar.cs" />

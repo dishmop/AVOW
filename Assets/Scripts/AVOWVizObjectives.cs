@@ -8,6 +8,7 @@ public class AVOWVizObjectives : MonoBehaviour {
 
 	public GameObject gridGOPrefab;
 	public GameObject lineGOPrefab;
+	public GameObject metalCoverPrefab;
 	public Color	  col = new Color(128, 128, 128);
 	
 	public float successDelayTime = 0;
@@ -34,7 +35,57 @@ public class AVOWVizObjectives : MonoBehaviour {
 	State state = State.kNone;
 	
 	class Box{
-		public Box(float size, float xPos, float yPos, Color col, GameObject lineGOPrefab, Transform parent){
+		public Box(float size, float xPos, float yPos, Color col, GameObject coverPrefab, Transform parent){
+			this.size = size;
+			this.xPos = new SpringValue(xPos, SpringValue.Mode.kLinear, 2);
+			this.yPos = new SpringValue(yPos, SpringValue.Mode.kLinear, 2);
+			this.col = col;
+			
+			coverGO = GameObject.Instantiate(coverPrefab) as GameObject;
+			coverGO.transform.parent = parent;
+			coverGO.transform.localScale = new Vector3(size, size, size);
+			SetupBoxes();
+		}
+		
+		public void Update(){
+			xPos.Update();
+			yPos.Update();
+			//	if (!xPos.IsAtTarget() || !yPos.IsAtTarget()) 
+			MoveBoxes();
+		}
+		
+		void SetupBoxes(){
+			float currentXPos = xPos.GetValue();
+			float currentYpos = yPos.GetValue();
+			
+			coverGO.transform.localPosition = new Vector3(xPos.GetValue(), yPos.GetValue(), coverGO.transform.parent.position.z);
+		}
+		
+		
+		void MoveBoxes(){
+			float currentXPos = xPos.GetValue();
+			float currentYpos = yPos.GetValue();
+			
+			coverGO.transform.localPosition = new Vector3(xPos.GetValue(), yPos.GetValue(), coverGO.transform.parent.position.z);
+			
+		}
+		
+		public void Destroy(){
+			GameObject.Destroy(coverGO);
+		}
+		
+		public float size;
+		
+		public GameObject coverGO;
+		
+		public SpringValue xPos;
+		public SpringValue yPos;
+		public Color col;
+	//	public float border = 0.01f;
+	};
+	
+	class BoxDrawn{
+		public BoxDrawn(float size, float xPos, float yPos, Color col, GameObject lineGOPrefab, Transform parent){
 			this.size = size;
 			this.xPos = new SpringValue(xPos, SpringValue.Mode.kLinear, 2);
 			this.yPos = new SpringValue(yPos, SpringValue.Mode.kLinear, 2);
@@ -146,7 +197,7 @@ public class AVOWVizObjectives : MonoBehaviour {
 				for (int i = 0; i < goal.Item2.Count; ++i){
 					float thisWidth = goal.Item2[i];
 					
-					boxes[i] = new Box(thisWidth, cumWidth, 0, col, lineGOPrefab, transform);
+					boxes[i] = new Box(thisWidth, cumWidth, 0, col, metalCoverPrefab, transform);
 					cumWidth += thisWidth;
 				}
 				AVOWBattery.singleton.ResetBattery();
