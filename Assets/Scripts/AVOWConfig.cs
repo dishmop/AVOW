@@ -10,9 +10,6 @@ public class AVOWConfig : MonoBehaviour {
 	public bool showObjectives = true;
 	public bool objectivesAsText = true;
 
-	public bool  noResistorLimit = false;
-	public int 	 maxNumResistors = 3;
-	public bool  useLCM = false;
 	public bool  modifiedNodeLengths = false;
 	public float tutorialSpeed = 1;
 	

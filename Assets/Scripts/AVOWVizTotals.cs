@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -43,9 +43,9 @@ public class AVOWVizTotals : MonoBehaviour {
 	
 	public void BuildLines(){
 		DestroyLines();
-		List< Eppy.Tuple<float, List<float>> > results = AVOWCircuitCreator.singleton.GetResults();
+		List< AVOWCircuitTarget > results = AVOWCircuitCreator.singleton.GetResults();
 		for (int i = 0; i < results.Count; ++i){
-			float total = results[i].Item1;
+			float total = results[i].totalCurrent;
 			
 			GameObject newLine = GameObject.Instantiate(lineGOPrefab) as GameObject;
 			newLine.transform.parent = transform;

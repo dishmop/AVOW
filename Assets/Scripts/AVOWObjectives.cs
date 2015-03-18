@@ -42,7 +42,7 @@ public class AVOWObjectives : MonoBehaviour {
 		currentObjective = 0;
 		isComplete = false;
 		yOffset.Force(0);
-		if (AVOWConfig.singleton.maxNumResistors > 0)
+		if (AVOWObjectiveManager.singleton.GetResistorLimit() > 0)
 			CreateTextBoxes();
 	
 	}
@@ -50,12 +50,12 @@ public class AVOWObjectives : MonoBehaviour {
 	bool TestForConfigChange(){
 		bool ret = false;
 		if (firstTime) ret = true;
-		if (lastUseLCM != AVOWConfig.singleton.useLCM) ret = true;
+//		if (lastUseLCM != AVOWConfig.singleton.useLCM) ret = true;
 		if (lastShowTotals != AVOWConfig.singleton.showTotals) ret = true;
 		if (lastShowIndividuals != AVOWConfig.singleton.showIndividuals) ret = true;
 		if (lastShowObjectives != AVOWConfig.singleton.showObjectives) ret = true;
 		if (lastObjectivesAsText != AVOWConfig.singleton.objectivesAsText) ret = true;
-		lastUseLCM = AVOWConfig.singleton.useLCM;
+//		lastUseLCM = AVOWConfig.singleton.useLCM;
 		lastShowTotals = AVOWConfig.singleton.showTotals;
 		lastShowIndividuals = AVOWConfig.singleton.showIndividuals;
 		lastShowObjectives = AVOWConfig.singleton.showObjectives;
@@ -67,11 +67,11 @@ public class AVOWObjectives : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (AVOWConfig.singleton.maxNumResistors == 0){
+		if (AVOWObjectiveManager.singleton.GetResistorLimit() == 0){
 			ProcessChangeToConfig();
 			return;
 		}
-		if (AVOWCircuitCreator.singleton.IsFinished()){
+		if (AVOWCircuitCreator.singleton.IsReady()){
 			if (textBoxes == null){
 				CreateTextBoxes();
 			}
@@ -97,7 +97,7 @@ public class AVOWObjectives : MonoBehaviour {
 			xMax = transform.position.x;
 		}
 		else if (AVOWConfig.singleton.showIndividuals)
-			xMax = transform.position.x + xSpacing * ( AVOWConfig.singleton.maxNumResistors);
+			xMax = transform.position.x + xSpacing * ( AVOWObjectiveManager.singleton.GetResistorLimit());
 		else if (!AVOWConfig.singleton.showIndividuals && AVOWConfig.singleton.showTotals)
 			xMax = transform.position.x + xSpacing * ( 1);
 		else 
@@ -105,28 +105,27 @@ public class AVOWObjectives : MonoBehaviour {
 	
 	}
 	
-	public Eppy.Tuple<float, List<float>> GetCurrentGoal(){
-
-		return AVOWCircuitCreator.singleton.GetResults()[currentObjective];
-	}
+	public AVOWCircuitTarget GetCurrentGoal(){
+		return AVOWCircuitCreator.singleton.GetResults()[0];
+ 	}
 	
 	public bool IsValidGoalIndex(int index){
 		return (index >= 0 && index < AVOWCircuitCreator.singleton.GetResults().Count);
 	}
 	
-	public Eppy.Tuple<float, List<float>> GetGoal(int index){
+	public AVOWCircuitTarget GetGoal(int index){
 		
 		return AVOWCircuitCreator.singleton.GetResults()[index];
 	}
 	
-	void IsAchieving(Eppy.Tuple<float, List<float>> goal, out bool total, out bool[] individual){
-		individual = new bool[goal.Item2.Count];
+	void IsAchieving(AVOWCircuitTarget goal, out bool total, out bool[] individual){
+		individual = new bool[goal.individualCurrents.Count];
 		if (AVOWGraph.singleton.HasHalfFinishedComponents()){
 			total = false;
 			return;
 		}
 		
-		total = MathUtils.FP.Feq(goal.Item1, AVOWCircuitCreator.singleton.GetLCM() * AVOWSim.singleton.xMax);
+		total = MathUtils.FP.Feq(goal.totalCurrent, AVOWCircuitCreator.singleton.GetLCM() * AVOWSim.singleton.xMax);
 		
 		List<float> currentVals = new List<float>();
 		foreach(GameObject go in AVOWGraph.singleton.allComponents){
@@ -134,8 +133,8 @@ public class AVOWObjectives : MonoBehaviour {
 			if (component.type == AVOWComponent.Type.kLoad) currentVals.Add (component.hWidth);
 		}
 		
-		for (int i = 0; i < goal.Item2.Count; ++i){
-			float target = goal.Item2[i];
+		for (int i = 0; i < goal.individualCurrents.Count; ++i){
+			float target = goal.individualCurrents[i];
 			int remIndex = -1;
 			for (int j = 0; j < currentVals.Count; ++j){
 				float testVal = AVOWCircuitCreator.singleton.GetLCM() * currentVals[j];
@@ -159,7 +158,7 @@ public class AVOWObjectives : MonoBehaviour {
 		DestroyBoxes();
 		textBoxes = new List<GameObject>[AVOWCircuitCreator.singleton.GetResults().Count];
 		
-		List<Eppy.Tuple<float, List<float>>> results = AVOWCircuitCreator.singleton.GetResults();
+		List<AVOWCircuitTarget> results = AVOWCircuitCreator.singleton.GetResults();
 		for (int i = 0; i < textBoxes.Length; ++i){
 			if (Mathf.Abs(i - currentObjective) > maxList) continue;
 			
@@ -179,15 +178,15 @@ public class AVOWObjectives : MonoBehaviour {
 			GameObject newBox = GameObject.Instantiate(textBoxPrefab, transform.position + new Vector3(0, -ySpacing * i, 0), Quaternion.identity) as GameObject;
 			
 			newBox.transform.parent = transform;
-			newBox.GetComponent<TextMesh>().text = "(" + CreateFracString(results[i].Item1) + ")";
+			newBox.GetComponent<TextMesh>().text = "(" + CreateFracString(results[i].totalCurrent) + ")";
 			newBox.GetComponent<TextMesh>().color = thisCol;
 			textBoxes[i].Add(newBox);
 						
-			for (int j = 0; j < results[i].Item2.Count; ++j){
+			for (int j = 0; j < results[i].individualCurrents.Count; ++j){
 				GameObject newBox2 = GameObject.Instantiate(textBoxPrefab, transform.position + new Vector3(xSpacing * (j + 1), -ySpacing * i, 0), Quaternion.identity) as GameObject;
 				
 				newBox2.transform.parent = transform;
-				newBox2.GetComponent<TextMesh>().text = CreateFracString(results[i].Item2[j]);
+				newBox2.GetComponent<TextMesh>().text = CreateFracString(results[i].individualCurrents[j]);
 				newBox2.GetComponent<TextMesh>().color = thisCol;
 				
 				textBoxes[i].Add(newBox2);
@@ -287,7 +286,7 @@ public class AVOWObjectives : MonoBehaviour {
 	
 
 //	
-//	string CreateText(Eppy.Tuple<float, List<float>> goal){
+//	string CreateText(AVOWCircuitTarget goal){
 //		string text = CreateFracString(goal.Item1) + ": ";
 //		for (int i = 0; i < goal.Item2.Count; ++i){
 //			text += CreateFracString(goal.Item2[i]);

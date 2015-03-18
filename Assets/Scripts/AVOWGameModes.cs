@@ -127,14 +127,9 @@ public class AVOWGameModes : MonoBehaviour {
 		}
 	}
 	void RestartTutorialGame(){
-		AVOWConfig.singleton.maxNumResistors = 5;
-		AVOWConfig.singleton.noResistorLimit = false;
 		AVOWConfig.singleton.showObjectives = false;
 		AVOWGraph.singleton.ClearCircuit();
-		AVOWCircuitCreator.singleton.Restart();
 		AVOWUI.singleton.Restart();
-		AVOWObjectives.singleton.Restart();
-		AVOWVizTotals.singleton.DestroyLines();
 		AVOWBattery.singleton.ResetBattery();
 		AVOWBattery.singleton.FreezeBattery();
 		
@@ -143,14 +138,9 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 		
 	void RestartFreePlayGame(){
-		AVOWConfig.singleton.maxNumResistors = 0;
-		AVOWConfig.singleton.noResistorLimit = true;
 		AVOWConfig.singleton.showObjectives = false;
 		AVOWGraph.singleton.ClearCircuit();
-		AVOWCircuitCreator.singleton.Restart();
 		AVOWUI.singleton.Restart();
-		AVOWObjectives.singleton.Restart();
-		AVOWVizTotals.singleton.DestroyLines();
 		AVOWBattery.singleton.ResetBattery();
 		AVOWBattery.singleton.FreezeBattery();
 
@@ -159,35 +149,30 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 
 	public void PlayEasy(){
-		AVOWConfig.singleton.maxNumResistors = 2;
+		AVOWObjectiveManager.singleton.InitialiseLevel(1);
 		RestartNormalGame();
 	}
 	
 	public void PlayMedium(){
-		AVOWConfig.singleton.maxNumResistors = 3;
+		AVOWObjectiveManager.singleton.InitialiseLevel(2);
 		RestartNormalGame();
 	}
 	
 	public void PlayHard(){
-		AVOWConfig.singleton.maxNumResistors = 4;
+		AVOWObjectiveManager.singleton.InitialiseLevel(3);
 		RestartNormalGame();
 	}
 
 	public void PlayVeryHard(){
-		AVOWConfig.singleton.maxNumResistors = 5;
+		AVOWObjectiveManager.singleton.InitialiseLevel(4);
 		RestartNormalGame();
 
 	}
 	
 	void RestartNormalGame(){
-		AVOWConfig.singleton.noResistorLimit = false;
 		AVOWConfig.singleton.showObjectives = true;
 		AVOWGraph.singleton.ClearCircuit();
-		AVOWCircuitCreator.singleton.Restart();
 		AVOWUI.singleton.Restart();
-		AVOWObjectives.singleton.Restart();
-		AVOWVizObjectives.singleton.Rebuild();
-		AVOWVizTotals.singleton.BuildLines();
 		AVOWBattery.singleton.ResetBattery();
 		AVOWTutorialText.singleton.activated = false;
 		AVOWConfig.singleton.DisplayBottomPanel(false);
@@ -209,6 +194,7 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWTutorialManager.singleton.StopTutorial();
 		AVOWConfig.singleton.DisplayBottomPanel(false);
 		AVOWConfig.singleton.DisplaySidePanel(false);
+		AVOWCircuitCreator.singleton.Deinitialise();
 		state = GameModeState.kMainMenu;
 	}
 	

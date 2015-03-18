@@ -38,8 +38,7 @@ public class AVOWButton : MonoBehaviour {
 		bool inside = IsInsideRect(transform.FindChild("SizedPanel").GetComponent<RectTransform>(), mousePos);
 		
 		
-		int numComponentsLeft = (AVOWConfig.singleton.maxNumResistors - AVOWGraph.singleton.allComponents.Count + 1);
-		if (!AVOWConfig.singleton.noResistorLimit && mode == AVOWUI.ToolMode.kCreate && numComponentsLeft <= 0){
+		if (AVOWObjectiveManager.singleton.HasResistorLimit() && mode == AVOWUI.ToolMode.kCreate && AVOWObjectiveManager.singleton.GetNumFreeResistors() <= 0){
 			state = State.kDisabled;
 			
 		}
@@ -55,10 +54,10 @@ public class AVOWButton : MonoBehaviour {
 			state = State.kNormal;
 		}
 		
-		if (state != State.kDisabled && AVOWUI.singleton.mode == mode){
+		if (state != State.kDisabled && AVOWUI.singleton.GetUIMode() == mode){
 			state = State.kSelected;
 		}
-		if (state == State.kSelected && AVOWUI.singleton.mode != mode){
+		if (state == State.kSelected && AVOWUI.singleton.GetUIMode() != mode){
 			state = State.kNormal;
 		}
 		

@@ -7,7 +7,7 @@ public class QuitOnEsc : MonoBehaviour {
 	void Start () {
 		Cursor.visible = false;
 		
-		Time.timeScale = 0.1f;
+		//Time.timeScale = 0.1f;
 	
 	}
 	

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -48,7 +48,7 @@ public class AVOWObjectiveGrid : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (AVOWCircuitCreator.singleton.IsFinished()){
+		if (AVOWCircuitCreator.singleton.IsReady()){
 			thisLCM = CalcLCM();
 			thisWidth = CalcWidth() + 1;
 			if (lastVis != AVOWConfig.singleton.ShowGraphicObjectives() || lastLCM != thisLCM || lastWidth != thisWidth){
@@ -65,10 +65,10 @@ public class AVOWObjectiveGrid : MonoBehaviour {
 	
 	int CalcLCM(){
 		if (!AVOWObjectives.singleton.IsValidGoalIndex(AVOWVizObjectives.singleton.displayedObjective)) return 1;
-		Eppy.Tuple<float, List<float>> goal = AVOWObjectives.singleton.GetGoal(AVOWVizObjectives.singleton.displayedObjective);
+		AVOWCircuitTarget goal = AVOWObjectives.singleton.GetGoal(AVOWVizObjectives.singleton.displayedObjective);
 		
-		int lcm = CalcDenominator(goal.Item1);
-		foreach (float val in goal.Item2){
+		int lcm = CalcDenominator(goal.totalCurrent);
+		foreach (float val in goal.individualCurrents){
 			lcm = MathUtils.FP.lcm(CalcDenominator(val), lcm);
 		}
 		return lcm;
@@ -76,10 +76,10 @@ public class AVOWObjectiveGrid : MonoBehaviour {
 	
 	int CalcWidth(){
 		if (!AVOWObjectives.singleton.IsValidGoalIndex(AVOWVizObjectives.singleton.displayedObjective)) return 1;
-		Eppy.Tuple<float, List<float>> goal = AVOWObjectives.singleton.GetGoal(AVOWVizObjectives.singleton.displayedObjective);
+		AVOWCircuitTarget goal = AVOWObjectives.singleton.GetGoal(AVOWVizObjectives.singleton.displayedObjective);
 		
 		int width = 0;
-		foreach (float val in goal.Item2){
+		foreach (float val in goal.individualCurrents){
 			width += CalcNumerator(val, thisLCM);
 		}
 		return width;
@@ -112,34 +112,15 @@ public class AVOWObjectiveGrid : MonoBehaviour {
 	
 	public bool IsFinished(){
 		return (finishTime < Time.time);
-//		foreach(Transform child in transform){
-//			if (!child.GetComponent<DrawnLine>().IsFinished()) return true;
-//		}
-//		return false;
+
 	}
 	
 	void DrawGrid(int div, int length){
-		AVOWWoodCreator.singleton.Construct(div, length);
-//		if (!AVOWConfig.singleton.ShowGraphicObjectives()) return;
-//		
-//		float xLen = (float)length / (float)div;
-//		
-//		for (int i = 0; i < div + 1; ++i){
-//			DrawLine(0,  i /(float)div, xLen,  i / (float)div);
-//		}
-//		
-//		for (int i = 0; i < length; ++i){
-//			DrawLine(i /(float)div,  0, i /(float)div,  1);
-//		}
-//		
-//		finishTime = Time.time + 0.5f;
+//		AVOWObjectiveManager.singleton.Construct(div, length);
+
 		
 		
 	}
 	
-	void DrawLine(float x0, float y0, float x1, float y1){
-		GameObject newLine = GameObject.Instantiate(drawnLingPrefab) as GameObject;
-		newLine.transform.parent = transform;
-		newLine.GetComponent<DrawnLine>().Draw(new Vector2(x0, y0), new Vector2(x1, y1), new Color(64/255.0f, 64/255.0f, 64/255.0f));
-	}
+
 }

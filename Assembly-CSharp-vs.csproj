@@ -51,6 +51,7 @@
      <Compile Include="Assets\Scripts\AVOWButton.cs" />
      <Compile Include="Assets\Scripts\AVOWCamControl.cs" />
      <Compile Include="Assets\Scripts\AVOWCircuitCreator.cs" />
+     <Compile Include="Assets\Scripts\AVOWCircuitTarget.cs" />
      <Compile Include="Assets\Scripts\AVOWCommand.cs" />
      <Compile Include="Assets\Scripts\AVOWCommandAddComponent.cs" />
      <Compile Include="Assets\Scripts\AVOWCommandRemove.cs" />
@@ -63,7 +64,9 @@
      <Compile Include="Assets\Scripts\AVOWGreySphere.cs" />
      <Compile Include="Assets\Scripts\AVOWGrid.cs" />
      <Compile Include="Assets\Scripts\AVOWNode.cs" />
+     <Compile Include="Assets\Scripts\AVOWObjectiveBoard.cs" />
      <Compile Include="Assets\Scripts\AVOWObjectiveGrid.cs" />
+     <Compile Include="Assets\Scripts\AVOWObjectiveManager.cs" />
      <Compile Include="Assets\Scripts\AVOWObjectives.cs" />
      <Compile Include="Assets\Scripts\AVOWPusher.cs" />
      <Compile Include="Assets\Scripts\AVOWSideBar.cs" />
@@ -79,7 +82,6 @@
      <Compile Include="Assets\Scripts\AVOWUITool.cs" />
      <Compile Include="Assets\Scripts\AVOWVizObjectives.cs" />
      <Compile Include="Assets\Scripts\AVOWVizTotals.cs" />
-     <Compile Include="Assets\Scripts\AVOWWoodCreator.cs" />
      <Compile Include="Assets\Scripts\AmmeterEffect.cs" />
      <Compile Include="Assets\Scripts\AppHelper.cs" />
      <Compile Include="Assets\Scripts\AudioTimeScalar.cs" />

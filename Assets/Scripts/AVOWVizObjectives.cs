@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -184,18 +184,18 @@ public class AVOWVizObjectives : MonoBehaviour {
 				break;
 			}
 			case State.kBuild:{
-				Eppy.Tuple<float, List<float>> goal	= AVOWObjectives.singleton.GetCurrentGoal();
+				AVOWCircuitTarget goal	= AVOWObjectives.singleton.GetCurrentGoal();
 				if (AVOWConfig.singleton.showTotals){
 					totalLine = GameObject.Instantiate(lineGOPrefab) as GameObject;
 					totalLine.transform.parent = transform;
-					totalLine.GetComponent<DrawnLine>().Draw(new Vector2(goal.Item1, 0), new Vector2(goal.Item1, 1), new Color(1, 0, 0));
+					totalLine.GetComponent<DrawnLine>().Draw(new Vector2(goal.totalCurrent, 0), new Vector2(goal.totalCurrent, 1), new Color(1, 0, 0));
 				}
 				
 			
-				boxes = new Box[goal.Item2.Count];
+				boxes = new Box[goal.individualCurrents.Count];
 				float cumWidth = 0;
-				for (int i = 0; i < goal.Item2.Count; ++i){
-					float thisWidth = goal.Item2[i];
+				for (int i = 0; i < goal.individualCurrents.Count; ++i){
+					float thisWidth = goal.individualCurrents[i];
 					
 					boxes[i] = new Box(thisWidth, cumWidth, 0, col, metalCoverPrefab, transform);
 					cumWidth += thisWidth;

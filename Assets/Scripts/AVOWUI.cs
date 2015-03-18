@@ -33,7 +33,7 @@ public class AVOWUI : MonoBehaviour {
 		kDelete
 	}
 	
-	public ToolMode mode = ToolMode.kCreate;
+	ToolMode mode = ToolMode.kCreate;
 			
 	AVOWUITool	uiTool;
 	
@@ -57,8 +57,10 @@ public class AVOWUI : MonoBehaviour {
 	
 
 	public void Restart(){
-		if (uiTool != null)
+		if (uiTool != null){
 			uiTool.OnDestroy();
+			uiTool = null;
+		}
 		graph = null;
 		Update ();
 		
@@ -80,7 +82,7 @@ public class AVOWUI : MonoBehaviour {
 		if (uiTool != null){
 			GameObject temp = uiTool.GetCursorCube();
 			if (temp == null){
-				Debug.LogError("Temo = null");
+				Debug.LogError("temp = null");
 			}
 			int numMaterials = uiTool.GetCursorCube().GetComponent<Renderer>().materials.Length;
 			uiTool.GetCursorCube().GetComponent<Renderer>().materials[numMaterials - 1].SetFloat("_Intensity", cubeBrightness.GetValue());
@@ -109,7 +111,7 @@ public class AVOWUI : MonoBehaviour {
 			}
 		
 		}
-		if (AVOWCircuitCreator.singleton.IsFinished()){
+		if (AVOWCircuitCreator.singleton.IsReady()){
 			if (graph == null){
 				Startup();
 			}

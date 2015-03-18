@@ -856,7 +856,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 					AVOWConfig.singleton.tutDisableDestroyUIButton = false;
 					AVOWTutorialText.singleton.AddText ("On the left, there is a green button labelled 'Destroy'. Click this to activate the Destruction tool.");
 				}	
-				if (AVOWUI.singleton.mode == AVOWUI.ToolMode.kDelete){
+				if (AVOWUI.singleton.GetUIMode() == AVOWUI.ToolMode.kDelete){
 				state = State.kDestroySquare;
 				}
 				break;

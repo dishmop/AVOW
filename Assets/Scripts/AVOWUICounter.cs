@@ -11,12 +11,12 @@ public class AVOWUICounter : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update (){
-		if (AVOWConfig.singleton.noResistorLimit){
+		if (!AVOWObjectiveManager.singleton.HasResistorLimit()){
 			transform.FindChild("Label").GetComponent<Text>().text = "∞";
 			
 		}
 		else{
-			int numComponentsLeft = (AVOWConfig.singleton.maxNumResistors - AVOWGraph.singleton.GetNumConfirmedLoads());
+			int numComponentsLeft = AVOWObjectiveManager.singleton.GetNumFreeResistors();
 			transform.FindChild("Label").GetComponent<Text>().text = numComponentsLeft.ToString();
 			AVOWUI.singleton.canCreate = (numComponentsLeft > 0);
 		}

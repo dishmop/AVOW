@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,21 +10,25 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	
 	public string 		filename = "LevelPerms";
 	
+	int maxNumResistors = -1;
+	
 	
 	public enum State{
+		kOff,
 		kStart,
 		kProcessing,
-		kFinished
+		kIsReady,
+		kStop,
 	}
 	
-	List< Eppy.Tuple<float, List<float>> > fracResults = new List< Eppy.Tuple<float, List<float>> > ();
-	List< Eppy.Tuple<float, List<float>> > lCMResults;
+	List< AVOWCircuitTarget > fracResults = new List< AVOWCircuitTarget > ();
+	//List< Eppy.Tuple<float, List<float>> > lCMResults;
 	
 	int currentLCM = 1;
 	int count = 0;
 	
-	State state = State.kStart;
-	IEnumerator<Eppy.Tuple<float, List<float>>> it = null;
+	State state = State.kOff;
+	IEnumerator<AVOWCircuitTarget> it = null;
 	
 	int numUsed = 0;
 	AVOWGraph graph;
@@ -36,25 +40,29 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	Stack<AVOWCommand>	commands = new Stack<AVOWCommand>();
 	
 	public int GetLCM(){
-		return AVOWConfig.singleton.useLCM ? currentLCM : 1;
+		return currentLCM;
 	}
 	
-	public bool IsFinished(){
-		return state == State.kFinished;
+	public bool IsReady(){
+		return state == State.kIsReady || state == State.kOff;
 	}
 	
 	public string CreateFilename(){
-		return filename + "_" + AVOWConfig.singleton.maxNumResistors.ToString();
+		return filename + "_" + maxNumResistors.ToString();
 	}
 	
-	public List< Eppy.Tuple<float, List<float>> > GetResults(){
-		return AVOWConfig.singleton.useLCM ? lCMResults : fracResults;
+	public List< AVOWCircuitTarget > GetResults(){
+		return fracResults;
 	
 	}
 	
-	public void Restart(){
+	public void Initialise(int maxNumResistors){
+		this.maxNumResistors = maxNumResistors;
 		state = State.kStart;
-		Update ();
+	}
+	
+	public void Deinitialise(){
+		state = State.kStop;
 	}
 	
 	
@@ -75,10 +83,10 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		
 		bw.Write (fracResults.Count);
 		for (int i = 0; i < fracResults.Count; ++i){
-			bw.Write (fracResults[i].Item1);
-			bw.Write (fracResults[i].Item2.Count);
-			for (int j = 0; j < fracResults[i].Item2.Count; ++j){
-				bw.Write (fracResults[i].Item2[j]);
+			bw.Write (fracResults[i].totalCurrent);
+			bw.Write (fracResults[i].individualCurrents.Count);
+			for (int j = 0; j < fracResults[i].individualCurrents.Count; ++j){
+				bw.Write (fracResults[i].individualCurrents[j]);
 			}
 		}
 		
@@ -88,14 +96,14 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		BinaryReader br = new BinaryReader(stream);
 		
 		int resultsCount = br.ReadInt32();
-		fracResults = new List< Eppy.Tuple<float, List<float>> > ();
+		fracResults = new List< AVOWCircuitTarget > ();
 		for (int i = 0; i < resultsCount; ++i){
 			float val = br.ReadSingle();
-			Eppy.Tuple<float, List<float>> item = new Eppy.Tuple<float, List<float>>(val, new List<float>());
+			AVOWCircuitTarget item = new AVOWCircuitTarget(val, new List<float>());
 			int listCount = br.ReadInt32();
 			for (int j = 0; j < listCount; ++j){
 				float newVal = br.ReadSingle();
-				item.Item2.Add (newVal);
+				item.individualCurrents.Add (newVal);
 			}
 			fracResults.Add (item);
 		}
@@ -149,10 +157,10 @@ public class AVOWCircuitCreator : MonoBehaviour {
 				if (LoadPerms()){
 					PrintResults();
 					PrintFracResults();
-					PostProcess();
+//					PostProcess();
 					PrintResults();
 					
-					state = State.kFinished;
+					state = State.kIsReady;
 				}
 				else{
 					it = GenerateIterate().GetEnumerator();
@@ -163,14 +171,19 @@ public class AVOWCircuitCreator : MonoBehaviour {
 			case State.kProcessing:{
 				if (it.MoveNext()){
 					fracResults.Add (it.Current);
-					}
+				}
 				else{
 					FinaliseResults();
 					PrintResults();
 					SavePerms();
-					state = State.kFinished;
+					state = State.kIsReady;
 				}
 				break;
+			}
+			case State.kStop:{
+				fracResults.Clear();
+				state = State.kOff;
+				break;	
 			}
 		}
 		
@@ -179,7 +192,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	
 	public void Generate(){
 	
-		foreach (Eppy.Tuple<float, List<float>> item in GenerateIterate()){
+		foreach (AVOWCircuitTarget item in GenerateIterate()){
 			fracResults.Add(item);
 			PrintResult(item);
 		}
@@ -191,13 +204,13 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		fracResults.Sort ((obj1, obj2) => Compare(obj1, obj2));
 		
 		// Remove duplicates
-		List<Eppy.Tuple<float, List<float>>> newList = new  List<Eppy.Tuple<float, List<float>>>();
+		List<AVOWCircuitTarget> newList = new  List<AVOWCircuitTarget>();
 		
 		// For some reason we can't test if these tuples are null
-		Eppy.Tuple<float, List<float>> lastObj = new Eppy.Tuple<float, List<float>>(-1, null);
+		AVOWCircuitTarget lastObj = new AVOWCircuitTarget(-1, null);
 
-				for (int i = 0; i < fracResults.Count; ++i){
-			Eppy.Tuple<float, List<float>> obj = fracResults[i];
+		for (int i = 0; i < fracResults.Count; ++i){
+			AVOWCircuitTarget obj = fracResults[i];
 			if (!IsSame(lastObj, obj)){
 				newList.Add (obj);
 				lastObj = obj;
@@ -220,54 +233,54 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		return denominator;
 	}
 	
-	void PostProcess(){
-		// find lowest common multiplier
-		currentLCM = CalcDenominator(fracResults[0].Item1);
-		foreach (Eppy.Tuple<float, List<float>> obj in fracResults){
-			currentLCM = MathUtils.FP.lcm(CalcDenominator(obj.Item1), currentLCM);
-			foreach (float val in obj.Item2){
-				currentLCM = MathUtils.FP.lcm(CalcDenominator(val), currentLCM);
-			}
-		}
-		Debug.Log ("Lowest Common Multiplier = " + currentLCM);
-		
-		lCMResults = new List<Eppy.Tuple<float, List<float>>>();
-		
-		// Scale the results by this so everything is an integer
-		foreach (Eppy.Tuple<float, List<float>> obj in fracResults){
-			Eppy.Tuple<float, List<float>> newItem = new Eppy.Tuple<float, List<float>>(obj.Item1 * currentLCM, new List<float>());
-			foreach (float val in obj.Item2){
-				newItem.Item2.Add(val * currentLCM);
-			}
-			lCMResults.Add (newItem);
-		}
-	}
+//	void PostProcess(){
+//		// find lowest common multiplier
+//		currentLCM = CalcDenominator(fracResults[0].Item1);
+//		foreach (AVOWCircuitTarget obj in fracResults){
+//			currentLCM = MathUtils.FP.lcm(CalcDenominator(obj.Item1), currentLCM);
+//			foreach (float val in obj.Item2){
+//				currentLCM = MathUtils.FP.lcm(CalcDenominator(val), currentLCM);
+//			}
+//		}
+//		Debug.Log ("Lowest Common Multiplier = " + currentLCM);
+//		
+//		lCMResults = new List<AVOWCircuitTarget>();
+//		
+//		// Scale the results by this so everything is an integer
+//		foreach (AVOWCircuitTarget obj in fracResults){
+//			AVOWCircuitTarget newItem = new AVOWCircuitTarget(obj.Item1 * currentLCM, new List<float>());
+//			foreach (float val in obj.Item2){
+//				newItem.Item2.Add(val * currentLCM);
+//			}
+//			lCMResults.Add (newItem);
+//		}
+//	}
 	
-	int Compare(Eppy.Tuple<float, List<float>> obj1, Eppy.Tuple<float, List<float>> obj2){
-		if (!MathUtils.FP.Feq (obj1.Item1, obj2.Item1)) return obj1.Item1.CompareTo(obj2.Item1);
+	int Compare(AVOWCircuitTarget obj1, AVOWCircuitTarget obj2){
+		if (!MathUtils.FP.Feq (obj1.totalCurrent, obj2.totalCurrent)) return obj1.totalCurrent.CompareTo(obj2.totalCurrent);
 		
-		int len = Mathf.Min (obj1.Item2.Count, obj2.Item2.Count);
+		int len = Mathf.Min (obj1.individualCurrents.Count, obj2.individualCurrents.Count);
 		for (int i = 0; i < len; ++i){
-			if (!MathUtils.FP.Feq (obj1.Item2[i], obj2.Item2[i])) return obj1.Item2[i].CompareTo(obj2.Item2[i]);
+			if (!MathUtils.FP.Feq (obj1.individualCurrents[i], obj2.individualCurrents[i])) return obj1.individualCurrents[i].CompareTo(obj2.individualCurrents[i]);
 		}
 		
-		if (obj1.Item2.Count > len) return 1;
-		if (obj2.Item2.Count > len) return -1;
+		if (obj1.individualCurrents.Count > len) return 1;
+		if (obj2.individualCurrents.Count > len) return -1;
 		
 		return 0;
 	}
 	
-	bool IsSame(Eppy.Tuple<float, List<float>> obj1, Eppy.Tuple<float, List<float>> obj2){
-		if (obj1.Item2 == null && obj2.Item2  != null) return false;
-		if (obj1.Item2  != null && obj2.Item2  == null) return false;
+	bool IsSame(AVOWCircuitTarget obj1, AVOWCircuitTarget obj2){
+		if (obj1.individualCurrents == null && obj2.individualCurrents  != null) return false;
+		if (obj1.individualCurrents  != null && obj2.individualCurrents  == null) return false;
 		
-		if (!MathUtils.FP.Feq (obj1.Item1, obj2.Item1)) return false;
+		if (!MathUtils.FP.Feq (obj1.totalCurrent, obj2.totalCurrent)) return false;
 		
-		if (obj1.Item2.Count != obj2.Item2.Count) return false;
+		if (obj1.individualCurrents.Count != obj2.individualCurrents.Count) return false;
 		
-		for (int i = 0; i < obj1.Item2.Count; ++i){
-			float val1 = obj1.Item2[i];
-			float val2 = obj2.Item2[i];
+		for (int i = 0; i < obj1.individualCurrents.Count; ++i){
+			float val1 = obj1.individualCurrents[i];
+			float val2 = obj2.individualCurrents[i];
 			if (!MathUtils.FP.Feq (val1, val2)) return false;
 		}
 		return true;
@@ -275,9 +288,9 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	
 
 	
-	public IEnumerable<Eppy.Tuple<float, List<float>>> GenerateIterate(){
+	public IEnumerable<AVOWCircuitTarget> GenerateIterate(){
 	
-		for (int i = 0; i < AVOWConfig.singleton.maxNumResistors; ++i){
+		for (int i = 0; i < maxNumResistors; ++i){
 			foreach (var x in GenerateIterate (i+1)){
 				yield return x;
 			}
@@ -287,7 +300,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	
 	
 	
-	IEnumerable<Eppy.Tuple<float, List<float>>> GenerateIterate(int numResistors){
+	IEnumerable<AVOWCircuitTarget> GenerateIterate(int numResistors){
 		MakeBasic();
 		
 		foreach (var x in EnumerateAllOptions(numResistors)){
@@ -309,9 +322,9 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		}
 	}
 	
-	void PrintResult(Eppy.Tuple<float, List<float>> result){
-		string text = result.Item1.ToString() + ": ";
-		List<float> vals = result.Item2;
+	void PrintResult(AVOWCircuitTarget result){
+		string text = result.totalCurrent.ToString() + ": ";
+		List<float> vals = result.individualCurrents;
 		for (int j = 0; j < vals.Count; ++j){
 			text += vals[j].ToString();
 			if (j != vals.Count-1){
@@ -330,9 +343,9 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		return "(" + (isNeg ? "-" : "") + integer.ToString() + " " + numerator.ToString() + "/" + denominator.ToString() + ")";
 	}
 	
-	void PrintFracResult(Eppy.Tuple<float, List<float>> result){
-		string text = CreateFracString(result.Item1) + ": ";
-		List<float> vals = result.Item2;
+	void PrintFracResult(AVOWCircuitTarget result){
+		string text = CreateFracString(result.totalCurrent) + ": ";
+		List<float> vals = result.individualCurrents;
 		for (int j = 0; j < vals.Count; ++j){
 			text += CreateFracString(vals[j]);
 			if (j != vals.Count-1){
@@ -342,21 +355,21 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		Debug.Log(text);
 	}
 	
-	IEnumerable<Eppy.Tuple<float, List<float>>> EnumerateAllOptions(int numResistors){
+	IEnumerable<AVOWCircuitTarget> EnumerateAllOptions(int numResistors){
 		int numOptions = CalcNumOptions();
 
 		// This is bodgey but need this incase we already had enoufh resistors
 		if (graph.allComponents.Count == numResistors+ 1){
 			AVOWSim.singleton.Recalc();
 			
-			Eppy.Tuple<float, List<float>> item = new Eppy.Tuple<float, List<float>>(AVOWSim.singleton.xMax, new List<float>() );
+			AVOWCircuitTarget item = new AVOWCircuitTarget(AVOWSim.singleton.xMax, new List<float>() );
 			foreach (GameObject go in graph.allComponents){
 				AVOWComponent component = go.GetComponent<AVOWComponent>();
 				if (component.type == AVOWComponent.Type.kVoltageSource) continue;
 				if (MathUtils.FP.Feq (component.hWidth, 0)) continue;
-				item.Item2.Add(component.hWidth);
+				item.individualCurrents.Add(component.hWidth);
 			}
-			item.Item2.Sort((obj1, obj2) => obj2.CompareTo(obj1));
+			item.individualCurrents.Sort((obj1, obj2) => obj2.CompareTo(obj1));
 			Debug.Log (count.ToString () + ".......Total current = " + AVOWSim.singleton.xMax);
 			count++;
 			yield return item;
@@ -367,14 +380,14 @@ public class AVOWCircuitCreator : MonoBehaviour {
 				if (graph.allComponents.Count == numResistors+ 1){
 					AVOWSim.singleton.Recalc();
 					
-					Eppy.Tuple<float, List<float>> item = new Eppy.Tuple<float, List<float>>(AVOWSim.singleton.xMax, new List<float>() );
+					AVOWCircuitTarget item = new AVOWCircuitTarget(AVOWSim.singleton.xMax, new List<float>() );
 					foreach (GameObject go in graph.allComponents){
 						AVOWComponent component = go.GetComponent<AVOWComponent>();
 						if (component.type == AVOWComponent.Type.kVoltageSource) continue;
 						if (MathUtils.FP.Feq (component.hWidth, 0, MathUtils.FP.fracEpsilon)) continue;
-						item.Item2.Add(component.hWidth);
+						item.individualCurrents.Add(component.hWidth);
 					}
-					item.Item2.Sort((obj1, obj2) => obj2.CompareTo(obj1));
+					item.individualCurrents.Sort((obj1, obj2) => obj2.CompareTo(obj1));
 					Debug.Log (count.ToString() + ".......Total current = " + AVOWSim.singleton.xMax);
 					count++;
 					if (!AVOWSim.singleton.errorInBounds){
