@@ -119,7 +119,7 @@ public class AVOWObjectives : MonoBehaviour {
 	}
 	
 	void IsAchieving(AVOWCircuitTarget goal, out bool total, out bool[] individual){
-		individual = new bool[goal.individualCurrents.Count];
+		individual = new bool[goal.componentDesc.Count];
 		if (AVOWGraph.singleton.HasHalfFinishedComponents()){
 			total = false;
 			return;
@@ -133,8 +133,8 @@ public class AVOWObjectives : MonoBehaviour {
 			if (component.type == AVOWComponent.Type.kLoad) currentVals.Add (component.hWidth);
 		}
 		
-		for (int i = 0; i < goal.individualCurrents.Count; ++i){
-			float target = goal.individualCurrents[i];
+		for (int i = 0; i < goal.componentDesc.Count; ++i){
+			float target = goal.componentDesc[i][0];
 			int remIndex = -1;
 			for (int j = 0; j < currentVals.Count; ++j){
 				float testVal = AVOWCircuitCreator.singleton.GetLCM() * currentVals[j];
@@ -182,11 +182,11 @@ public class AVOWObjectives : MonoBehaviour {
 			newBox.GetComponent<TextMesh>().color = thisCol;
 			textBoxes[i].Add(newBox);
 						
-			for (int j = 0; j < results[i].individualCurrents.Count; ++j){
+			for (int j = 0; j < results[i].componentDesc.Count; ++j){
 				GameObject newBox2 = GameObject.Instantiate(textBoxPrefab, transform.position + new Vector3(xSpacing * (j + 1), -ySpacing * i, 0), Quaternion.identity) as GameObject;
 				
 				newBox2.transform.parent = transform;
-				newBox2.GetComponent<TextMesh>().text = CreateFracString(results[i].individualCurrents[j]);
+				newBox2.GetComponent<TextMesh>().text = CreateFracString(results[i].componentDesc[j][0]);
 				newBox2.GetComponent<TextMesh>().color = thisCol;
 				
 				textBoxes[i].Add(newBox2);

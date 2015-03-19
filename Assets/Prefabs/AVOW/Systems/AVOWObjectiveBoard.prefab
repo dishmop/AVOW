@@ -48,6 +48,7 @@ MonoBehaviour:
   - {fileID: 157206, guid: eeac82441c51f4353b41cf3ec58abd34, type: 2}
   - {fileID: 105636, guid: 32a30a0ef2a724755a381c612db83520, type: 2}
   - {fileID: 126858, guid: f7ced7a4c8f674561940a834d30a60c5, type: 2}
+  coverPrefab: {fileID: 104564, guid: 95a6e1857612040b59d6e2d8fc387525, type: 2}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

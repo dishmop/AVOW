@@ -104,6 +104,15 @@ public class AVOWGraph : MonoBehaviour {
 		return allComponents.Find(item => item.GetComponent<AVOWComponent>().type == AVOWComponent.Type.kVoltageSource);
 	}
 	
+	public float GetTotalWidth(){
+		if (allComponents.Count == 0) return 0;
+		AVOWComponent component = allComponents[0].GetComponent<AVOWComponent>();
+		if (component.type != AVOWComponent.Type.kVoltageSource){
+			Debug.LogError ("GetTotalWidth - first component is not the voltage source");
+		}
+		return Mathf.Abs (component.fwCurrent);
+	}
+	
 	// Merges all connections to node0
 	public void MergeNodes(GameObject node0GO, GameObject node1GO){
 		

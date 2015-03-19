@@ -84,9 +84,11 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		bw.Write (fracResults.Count);
 		for (int i = 0; i < fracResults.Count; ++i){
 			bw.Write (fracResults[i].totalCurrent);
-			bw.Write (fracResults[i].individualCurrents.Count);
-			for (int j = 0; j < fracResults[i].individualCurrents.Count; ++j){
-				bw.Write (fracResults[i].individualCurrents[j]);
+			bw.Write (fracResults[i].componentDesc.Count);
+			for (int j = 0; j < fracResults[i].componentDesc.Count; ++j){
+				bw.Write (fracResults[i].componentDesc[j][0]);
+				bw.Write (fracResults[i].componentDesc[j][1]);
+				bw.Write (fracResults[i].componentDesc[j][2]);
 			}
 		}
 		
@@ -99,12 +101,16 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		fracResults = new List< AVOWCircuitTarget > ();
 		for (int i = 0; i < resultsCount; ++i){
 			float val = br.ReadSingle();
-			AVOWCircuitTarget item = new AVOWCircuitTarget(val, new List<float>());
+			AVOWCircuitTarget item = new AVOWCircuitTarget(val, new List<Vector3>());
 			int listCount = br.ReadInt32();
 			for (int j = 0; j < listCount; ++j){
-				float newVal = br.ReadSingle();
-				item.individualCurrents.Add (newVal);
+				Vector3 desc = new Vector3();
+				desc[0] = br.ReadSingle();
+				desc[1] = br.ReadSingle();
+				desc[2] = br.ReadSingle();
+				item.componentDesc.Add (desc);
 			}
+			item.CalcStats();
 			fracResults.Add (item);
 		}
 		
@@ -207,11 +213,11 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		List<AVOWCircuitTarget> newList = new  List<AVOWCircuitTarget>();
 		
 		// For some reason we can't test if these tuples are null
-		AVOWCircuitTarget lastObj = new AVOWCircuitTarget(-1, null);
+		AVOWCircuitTarget lastObj = null;
 
 		for (int i = 0; i < fracResults.Count; ++i){
 			AVOWCircuitTarget obj = fracResults[i];
-			if (!IsSame(lastObj, obj)){
+			if (!IsSameWidth(lastObj, obj)){
 				newList.Add (obj);
 				lastObj = obj;
 			}			
@@ -259,28 +265,29 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	int Compare(AVOWCircuitTarget obj1, AVOWCircuitTarget obj2){
 		if (!MathUtils.FP.Feq (obj1.totalCurrent, obj2.totalCurrent)) return obj1.totalCurrent.CompareTo(obj2.totalCurrent);
 		
-		int len = Mathf.Min (obj1.individualCurrents.Count, obj2.individualCurrents.Count);
+		int len = Mathf.Min (obj1.componentDesc.Count, obj2.componentDesc.Count);
 		for (int i = 0; i < len; ++i){
-			if (!MathUtils.FP.Feq (obj1.individualCurrents[i], obj2.individualCurrents[i])) return obj1.individualCurrents[i].CompareTo(obj2.individualCurrents[i]);
+			if (!MathUtils.FP.Feq (obj1.componentDesc[i][0], obj2.componentDesc[i][0])) return obj1.componentDesc[i][0].CompareTo(obj2.componentDesc[i][0]);
 		}
 		
-		if (obj1.individualCurrents.Count > len) return 1;
-		if (obj2.individualCurrents.Count > len) return -1;
+		if (obj1.componentDesc.Count > len) return 1;
+		if (obj2.componentDesc.Count > len) return -1;
 		
 		return 0;
 	}
 	
-	bool IsSame(AVOWCircuitTarget obj1, AVOWCircuitTarget obj2){
-		if (obj1.individualCurrents == null && obj2.individualCurrents  != null) return false;
-		if (obj1.individualCurrents  != null && obj2.individualCurrents  == null) return false;
+	bool IsSameWidth(AVOWCircuitTarget obj1, AVOWCircuitTarget obj2){
+		if (obj1 == null && obj2  != null) return false;
+		if (obj1 != null && obj2  == null) return false;
+		if (obj1 == null && obj2  == null) return true;
 		
 		if (!MathUtils.FP.Feq (obj1.totalCurrent, obj2.totalCurrent)) return false;
 		
-		if (obj1.individualCurrents.Count != obj2.individualCurrents.Count) return false;
+		if (obj1.componentDesc.Count != obj2.componentDesc.Count) return false;
 		
-		for (int i = 0; i < obj1.individualCurrents.Count; ++i){
-			float val1 = obj1.individualCurrents[i];
-			float val2 = obj2.individualCurrents[i];
+		for (int i = 0; i < obj1.componentDesc.Count; ++i){
+			float val1 = obj1.componentDesc[i][0];
+			float val2 = obj2.componentDesc[i][0];
 			if (!MathUtils.FP.Feq (val1, val2)) return false;
 		}
 		return true;
@@ -324,7 +331,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	
 	void PrintResult(AVOWCircuitTarget result){
 		string text = result.totalCurrent.ToString() + ": ";
-		List<float> vals = result.individualCurrents;
+		List<Vector3> vals = result.componentDesc;
 		for (int j = 0; j < vals.Count; ++j){
 			text += vals[j].ToString();
 			if (j != vals.Count-1){
@@ -345,9 +352,9 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	
 	void PrintFracResult(AVOWCircuitTarget result){
 		string text = CreateFracString(result.totalCurrent) + ": ";
-		List<float> vals = result.individualCurrents;
+		List<Vector3> vals = result.componentDesc;
 		for (int j = 0; j < vals.Count; ++j){
-			text += CreateFracString(vals[j]);
+			text += CreateFracString(vals[j][0]);
 			if (j != vals.Count-1){
 				text += ", ";
 			}
@@ -361,16 +368,8 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		// This is bodgey but need this incase we already had enoufh resistors
 		if (graph.allComponents.Count == numResistors+ 1){
 			AVOWSim.singleton.Recalc();
-			
-			AVOWCircuitTarget item = new AVOWCircuitTarget(AVOWSim.singleton.xMax, new List<float>() );
-			foreach (GameObject go in graph.allComponents){
-				AVOWComponent component = go.GetComponent<AVOWComponent>();
-				if (component.type == AVOWComponent.Type.kVoltageSource) continue;
-				if (MathUtils.FP.Feq (component.hWidth, 0)) continue;
-				item.individualCurrents.Add(component.hWidth);
-			}
-			item.individualCurrents.Sort((obj1, obj2) => obj2.CompareTo(obj1));
-			Debug.Log (count.ToString () + ".......Total current = " + AVOWSim.singleton.xMax);
+			AVOWCircuitTarget item = new AVOWCircuitTarget(graph);
+			Debug.Log (count.ToString () + ".......Total current = " + graph.GetTotalWidth());
 			count++;
 			yield return item;
 		}
@@ -380,15 +379,8 @@ public class AVOWCircuitCreator : MonoBehaviour {
 				if (graph.allComponents.Count == numResistors+ 1){
 					AVOWSim.singleton.Recalc();
 					
-					AVOWCircuitTarget item = new AVOWCircuitTarget(AVOWSim.singleton.xMax, new List<float>() );
-					foreach (GameObject go in graph.allComponents){
-						AVOWComponent component = go.GetComponent<AVOWComponent>();
-						if (component.type == AVOWComponent.Type.kVoltageSource) continue;
-						if (MathUtils.FP.Feq (component.hWidth, 0, MathUtils.FP.fracEpsilon)) continue;
-						item.individualCurrents.Add(component.hWidth);
-					}
-					item.individualCurrents.Sort((obj1, obj2) => obj2.CompareTo(obj1));
-					Debug.Log (count.ToString() + ".......Total current = " + AVOWSim.singleton.xMax);
+					AVOWCircuitTarget item = new AVOWCircuitTarget(graph);
+					Debug.Log (count.ToString () + ".......Total current = " + graph.GetTotalWidth());
 					count++;
 					if (!AVOWSim.singleton.errorInBounds){
 						yield return item;

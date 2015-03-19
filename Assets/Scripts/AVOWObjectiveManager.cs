@@ -14,13 +14,15 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	public float xMax = 2f;
 	
 	int resistorLimit = -1;
-	int currentGoalIndex = 0;
+	int currentGoalIndex;
 	
 	enum State{
 		kNone,
 		kWaitForCircuitCreator,
 		kBuildBackBoard,
 		kSwapBoards,
+		kPlay,
+		kPlaySuccess,
 	};
 	
 	State state = State.kNone;
@@ -57,8 +59,12 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		boards[0] = GameObject.Instantiate(objectiveBoardPrefab);
 		boards[1] = GameObject.Instantiate(objectiveBoardPrefab);
 		
+		
 		boards[0].transform.parent = transform;
 		boards[1].transform.parent = transform;
+		
+		boards[0].transform.localPosition = Vector3.zero;
+		boards[1].transform.localPosition = Vector3.zero;
 		SetBoardDepths();
 		
 	}
@@ -70,14 +76,14 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	
 	void SetBoardDepths(){
 		Vector3 backPos = boards[backIndex].transform.localPosition;
-		backPos.z = 0.1f;
+		backPos.z = 0.3f;
 		boards[backIndex].transform.localPosition = backPos;
 		
 		Vector3 frontPos = boards[frontIndex].transform.localPosition;
 		frontPos.z = 0f;
 		boards[frontIndex].transform.localPosition = frontPos;
 		
-	//	BOARDS ARE NOT VBISIBLE
+	//	BOARDS ARE NOT VISIBLE
 		
 		
 	}
@@ -95,16 +101,36 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			}
 			case State.kBuildBackBoard:{
 				boards[backIndex].GetComponent<AVOWObjectiveBoard>().PrepareBoard(AVOWCircuitCreator.singleton.GetResults()[currentGoalIndex]);
+//				AVOWBattery.singleton.ResetBattery();
+			
 				state = State.kSwapBoards;
 				break;
 			}
 			case State.kSwapBoards:{
 				SwapBoards();
-				state = State.kNone;
+				SetBoardDepths();
+				state = State.kPlay;
+				break;
+			}
+			case State.kPlay:{
+				if (!AVOWGraph.singleton.HasHalfFinishedComponents()){
+					AVOWCircuitTarget currentGraphAsTarget = new AVOWCircuitTarget(AVOWGraph.singleton);
+					if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatch(currentGraphAsTarget)){
+						boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToTarget(currentGraphAsTarget);
+						state = State.kPlaySuccess;
+					}
+			    }
+				break;
+			}
+			case State.kPlaySuccess:{
+				if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().IsReady()){
+					currentGoalIndex++;
+					state = State.kBuildBackBoard;
+				}
 				break;
 			}
 		}
-	
+		
 	}
 	
 	void Awake(){

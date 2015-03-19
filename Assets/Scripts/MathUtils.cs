@@ -107,6 +107,60 @@ namespace MathUtils
 		{
 			return (a / gcf(a, b)) * b;
 		}
+		
+		public static int kMaxPermValue = 9999;
+
+		
+		public static int[,] GeneratePermutations(int numItems){
+			if (numItems >= kMaxPermValue){
+				Debug.LogError ("Request for permutations is over maximum");
+				return null;
+			}
+			if (cachedPermutations[numItems] == null){
+				int numPerms = (int)MathUtils.Int.Factorial(numItems);
+				
+				int[,] permutations = new int[numPerms, numItems];
+				int[] sequence = new int[numItems];
+				// Fill sequence
+				for (int i = 0; i < numItems; ++i){
+					sequence[i] = i;
+				}
+				// Generate the permutations
+				int outputIndex = 0;
+				HeapsPermutations(numItems, sequence, ref permutations, ref outputIndex);
+				cachedPermutations[numItems]  = permutations;
+			}
+			return cachedPermutations[numItems] ;
+		}
+		
+		static int[][,] cachedPermutations = new int[kMaxPermValue][,];
+		
+		static void HeapsPermutations(int n, int[] sequencePass, ref int[,] outputArr, ref int outputIndex){
+			int[] sequence = new int[sequencePass.Length];
+			sequencePass.CopyTo(sequence, 0);
+			//		int[] sequence = sequencePass;
+			
+			
+			// If n==1 Copy to the output array and increment outputIndex
+			if (n ==0){
+				for (int i = 0; i < sequence.Length; ++i){
+					outputArr[outputIndex, i] = sequence[i];
+				}
+				++outputIndex;
+			}
+			else{
+				for (int i = 0; i < n; ++i){
+					HeapsPermutations(n - 1, sequence, ref outputArr, ref outputIndex);
+					// if i is even
+					int j = ((i % 2) == 0) ? 0 : i;
+					// Swap i an j
+					int temp = sequence[n-1];
+					sequence[n-1] = sequence[j];
+					sequence[j] = temp;
+				}
+			}
+		}
+		
 	}	
 	
 	#endregion

@@ -10,7 +10,7 @@ labels:
 - architecture
 - parquet
 - floor
-timeCreated: 1426677999
+timeCreated: 1426710654
 licenseType: Free
 SubstanceImporter:
   serializedVersion: 5
@@ -379,7 +379,7 @@ SubstanceImporter:
       textureWidth: 1024
       textureHeight: 1024
       textureFormat: 0
-      loadingBehavior: 1
+      loadingBehavior: 4
   deletedPrototypes: []
   userData: 
   assetBundleName: 

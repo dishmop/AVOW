@@ -10,7 +10,7 @@ public class AVOWObjectiveGrid : MonoBehaviour {
 	public float 	  xMax = 0;
 	
 	// For some reason testing the lines themselves doesn't work
-	float				finishTime;
+//	float				finishTime;
 	
 
 	int thisLCM = 1;
@@ -68,8 +68,8 @@ public class AVOWObjectiveGrid : MonoBehaviour {
 		AVOWCircuitTarget goal = AVOWObjectives.singleton.GetGoal(AVOWVizObjectives.singleton.displayedObjective);
 		
 		int lcm = CalcDenominator(goal.totalCurrent);
-		foreach (float val in goal.individualCurrents){
-			lcm = MathUtils.FP.lcm(CalcDenominator(val), lcm);
+		foreach (Vector3 val in goal.componentDesc){
+			lcm = MathUtils.FP.lcm(CalcDenominator(val[0]), lcm);
 		}
 		return lcm;
 	}
@@ -79,8 +79,8 @@ public class AVOWObjectiveGrid : MonoBehaviour {
 		AVOWCircuitTarget goal = AVOWObjectives.singleton.GetGoal(AVOWVizObjectives.singleton.displayedObjective);
 		
 		int width = 0;
-		foreach (float val in goal.individualCurrents){
-			width += CalcNumerator(val, thisLCM);
+		foreach (Vector3 val in goal.componentDesc){
+			width += CalcNumerator(val[0], thisLCM);
 		}
 		return width;
 	}
@@ -111,7 +111,8 @@ public class AVOWObjectiveGrid : MonoBehaviour {
 	}
 	
 	public bool IsFinished(){
-		return (finishTime < Time.time);
+		return false;
+//		return (finishTime < Time.time);
 
 	}
 	

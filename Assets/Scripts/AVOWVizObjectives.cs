@@ -55,16 +55,16 @@ public class AVOWVizObjectives : MonoBehaviour {
 		}
 		
 		void SetupBoxes(){
-			float currentXPos = xPos.GetValue();
-			float currentYpos = yPos.GetValue();
+//			float currentXPos = xPos.GetValue();
+//			float currentYpos = yPos.GetValue();
 			
 			coverGO.transform.localPosition = new Vector3(xPos.GetValue(), yPos.GetValue(), coverGO.transform.parent.position.z);
 		}
 		
 		
 		void MoveBoxes(){
-			float currentXPos = xPos.GetValue();
-			float currentYpos = yPos.GetValue();
+//			float currentXPos = xPos.GetValue();
+//			float currentYpos = yPos.GetValue();
 			
 			coverGO.transform.localPosition = new Vector3(xPos.GetValue(), yPos.GetValue(), coverGO.transform.parent.position.z);
 			
@@ -192,10 +192,10 @@ public class AVOWVizObjectives : MonoBehaviour {
 				}
 				
 			
-				boxes = new Box[goal.individualCurrents.Count];
+				boxes = new Box[goal.componentDesc.Count];
 				float cumWidth = 0;
-				for (int i = 0; i < goal.individualCurrents.Count; ++i){
-					float thisWidth = goal.individualCurrents[i];
+				for (int i = 0; i < goal.componentDesc.Count; ++i){
+					float thisWidth = goal.componentDesc[i][0];
 					
 					boxes[i] = new Box(thisWidth, cumWidth, 0, col, metalCoverPrefab, transform);
 					cumWidth += thisWidth;

@@ -37,7 +37,8 @@ public class AVOWCommandRemove : AVOWCommand{
 		removeComponentGO = componentGO;
 		cursorPos = pos;
 		gapType = DetermineType();
-		Debug.Log("Removal type = " + gapType.ToString());
+	//	Debug.Log("Removal type = " + gapType.ToString());
+		Debug.Log("Removal type = " + (gapType == GapType.kOneOfMany ? "Thinny" : "Fatty"));
 	}
 	
 	public bool IsFinished(){	
@@ -96,8 +97,23 @@ public class AVOWCommandRemove : AVOWCommand{
 		AVOWNode inNode = component.inNodeGO.GetComponent<AVOWNode>();
 		
 		// If the nodes we are examining are on their way out, we need to consider the nodes they will eventually get attached to instead
+		int countOut = 0;
+		int countIn = 0;
+		
 		bool needToCheckOutNode = true;
 		while (needToCheckOutNode){
+			// test if there are any other components beteween these two nodes
+			foreach (GameObject go in outNode.outComponents){
+				if (go == null) continue;
+				AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
+				if (!thisComponent.IsDying() && thisComponent.type == AVOWComponent.Type.kLoad  && removeComponentGO != go) countOut++;
+			}
+			foreach (GameObject go in inNode.inComponents){
+				if (go == null) continue;
+				AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
+				if (!thisComponent.IsDying() && thisComponent.type == AVOWComponent.Type.kLoad  && removeComponentGO != go) countIn++;
+			}
+			
 			int countInOut = 0;
 			AVOWNode newNode = null;
 			foreach (GameObject go in outNode.inComponents){
@@ -141,19 +157,9 @@ public class AVOWCommandRemove : AVOWCommand{
 		}
 		
 		
-		// test if there are any other components beteween these two nodes
-		int countOut = 0;
-		foreach (GameObject go in outNode.outComponents){
-			if (go == null) continue;
-			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
-			if (!thisComponent.IsDying() && thisComponent.type == AVOWComponent.Type.kLoad  && removeComponentGO != go) countOut++;
-		}
-		int countIn = 0;
-		foreach (GameObject go in inNode.inComponents){
-			if (go == null) continue;
-			AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
-			if (!thisComponent.IsDying() && thisComponent.type == AVOWComponent.Type.kLoad  && removeComponentGO != go) countIn++;
-		}
+
+
+
 		int totalCount = 0;
 		foreach (GameObject go in AVOWGraph.singleton.allComponents){
 			if (go == null) continue;
