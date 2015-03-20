@@ -6,17 +6,20 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	public static AVOWObjectiveManager singleton = null;
 	public GameObject objectiveBoardPrefab;
 	public float boardSpeed;
+	public float unstackWaitDuration = 0.5f;
+	
 	
 	// Front and back boards
 	GameObject[] boards = new GameObject[2];
 	int frontIndex = 0;
 	int backIndex = 1;
 	
-	enum LayoutMode {
-		kRow,
-		kStack
-	};
-	LayoutMode layoutMode = LayoutMode.kRow;
+	float unstackWaitTime;
+	int numBoardsToUnstack;
+	bool hasMovedToRow;
+	
+
+	AVOWObjectiveBoard.LayoutMode layoutMode = AVOWObjectiveBoard.LayoutMode.kRow;
 	
 	
 	float backBoardDepth = 0.5f;
@@ -58,24 +61,26 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	}
 	
 	public void InitialiseLevel(int level){
+		numBoardsToUnstack = 0;
 		switch (level){
 			case 1:{
-				layoutMode = LayoutMode.kStack;
+				layoutMode = AVOWObjectiveBoard.LayoutMode.kStack;
 				resistorLimit = 3;
 				break;
 			}
 			case 2:{
-				layoutMode = LayoutMode.kStack;
+				layoutMode = AVOWObjectiveBoard.LayoutMode.kStack;
 				resistorLimit = 4;
 				break;
 			}
 			case 3:{
-				layoutMode = LayoutMode.kRow;
+				layoutMode = AVOWObjectiveBoard.LayoutMode.kRow;
+				numBoardsToUnstack = 4;
 				resistorLimit = 4;
 				break;
 			}
 			case 4:{
-				layoutMode = LayoutMode.kRow;
+				layoutMode = AVOWObjectiveBoard.LayoutMode.kRow;
 				resistorLimit = 5;
 				break;
 			}
@@ -157,7 +162,15 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				break;
 			}
 			case State.kBuildBackBoard:{
-				boards[backIndex].GetComponent<AVOWObjectiveBoard>().PrepareBoard(AVOWCircuitCreator.singleton.GetResults()[currentGoalIndex], layoutMode == LayoutMode.kStack);
+				AVOWObjectiveBoard board = boards[backIndex].GetComponent<AVOWObjectiveBoard>();
+				AVOWCircuitTarget target = AVOWCircuitCreator.singleton.GetResults()[currentGoalIndex];
+				if (numBoardsToUnstack > 0){
+					board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kStack);
+					hasMovedToRow = false;
+				}
+				else{
+					board.PrepareBoard(target, layoutMode);
+				}
 				boards[backIndex].transform.localPosition = Vector3.zero;
 				ForceBoardDepths();
 			//				AVOWBattery.singleton.ResetBattery();
@@ -184,11 +197,16 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				boards[backIndex].transform.position = pos;
 				
 				if (UpdateBoardDepths()){
+					unstackWaitTime = Time.time + unstackWaitDuration;
 					state = State.kPlay;
 				}
 				break;
 			}
 			case State.kPlay:{
+				if (numBoardsToUnstack > 0 && Time.time > unstackWaitTime && !hasMovedToRow){
+					boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToRow();
+					hasMovedToRow = true;
+				}
 				if (!AVOWGraph.singleton.HasHalfFinishedComponents()){
 					AVOWCircuitTarget currentGraphAsTarget = new AVOWCircuitTarget(AVOWGraph.singleton);
 					if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatch(currentGraphAsTarget)){
@@ -201,6 +219,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			case State.kGoalComplete0:{
 				if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().IsReady()){
 					boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToComplete();
+					numBoardsToUnstack--;
 					state = State.kGoalComplete1;
 				}
 				break;
@@ -221,7 +240,8 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				Vector3 pos = boards[frontIndex].transform.position;
 				pos.y -= boardSpeed * Time.deltaTime;
 				boards[frontIndex].transform.position = pos;
-				
+				AVOWGameModes.singleton.PreStageComplete();
+			
 			
 				if (pos.y < -1){
 					AVOWGameModes.singleton.SetStageComplete();

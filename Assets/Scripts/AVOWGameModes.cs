@@ -82,7 +82,6 @@ public class AVOWGameModes : MonoBehaviour {
 				}
 				pusher.GetComponent<AVOWPusher>().disableMovement = true;
 				AVOWCamControl.singleton.disableMovement = true;
-				greenBackground.GetComponent<AVOWGreenBackground>().MakeBig();
 				if (AVOWGraph.singleton.allComponents.Count == 1){
 					state = GameModeState.kStageComplete1;
 				}
@@ -188,7 +187,6 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWBattery.singleton.ResetBattery();
 		AVOWBattery.singleton.FreezeBattery();
 
-
 		state = GameModeState.kPlayStage;
 	}
 
@@ -221,6 +219,11 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	public void SetStageComplete(){
 		state = GameModeState.kStageComplete0;
+	}
+	
+	// This is a bit bodgey
+	public void PreStageComplete(){
+		greenBackground.GetComponent<AVOWGreenBackground>().MakeBig();
 	}
 	
 	public void GoToMain(){

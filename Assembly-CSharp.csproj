@@ -46,7 +46,6 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\AVOWMenuButton.cs" />
      <Compile Include="Assets\Scripts\AVOWBackStoryCutscene.cs" />
      <Compile Include="Assets\Scripts\AVOWBattery.cs" />
      <Compile Include="Assets\Scripts\AVOWButton.cs" />
@@ -64,6 +63,7 @@
      <Compile Include="Assets\Scripts\AVOWGreenBackground.cs" />
      <Compile Include="Assets\Scripts\AVOWGreySphere.cs" />
      <Compile Include="Assets\Scripts\AVOWGrid.cs" />
+     <Compile Include="Assets\Scripts\AVOWMenuButton.cs" />
      <Compile Include="Assets\Scripts\AVOWNode.cs" />
      <Compile Include="Assets\Scripts\AVOWObjectiveBoard.cs" />
      <Compile Include="Assets\Scripts\AVOWObjectiveGrid.cs" />

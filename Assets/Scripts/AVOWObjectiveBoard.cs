@@ -12,9 +12,18 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	public float coverMoveSpeed;
 	public float completeWaitDuration;
 	
+	public enum LayoutMode {
+		kRow,
+		kStack,
+	};	
+	
 	float maxShade = 0.675f;
 	AVOWCircuitTarget currentTarget;
 	AVOWCircuitTarget displayTarget;
+	
+	
+	bool	horizontalFirst;
+	
 	
 	float completeWaitTime;
 	
@@ -43,33 +52,41 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		displayTarget = CreateRowTarget (displayTarget);
 		RecreateDisplayMapping();
 		state = State.kMovingToTarget;
+		horizontalFirst = true;
 	}
 	
 	public void MoveToTarget(AVOWCircuitTarget target){
 		displayTarget = target;
 		RecreateDisplayMapping();
 		state = State.kMovingToTarget;
+		horizontalFirst = false;
 	}
 	
 	public void MoveToOriginalTarget(){
 		displayTarget = currentTarget;
 		RecreateDisplayMapping();
 		state = State.kMovingToTarget;
+		horizontalFirst = false;
 	}
 	
 	public void MoveToComplete(){
 		state = State.kMovingToComplete;
 	}
 	
-	public void PrepareBoard(AVOWCircuitTarget target, bool stack){
+	public void PrepareBoard(AVOWCircuitTarget target, LayoutMode layoutMode){
 		currentTarget = target;
 		ConstructGrid(currentTarget);
-		if (stack){
-			CreateCovers(currentTarget);
+		switch (layoutMode){
+			case LayoutMode.kRow:{
+				CreateCovers(CreateRowTarget(currentTarget));
+			break;
+			}
+			case LayoutMode.kStack:{
+				CreateCovers(currentTarget);
+				break;
+			}
 		}
-		else{
-			CreateCovers(CreateRowTarget(currentTarget));
-		}
+
 	}
 	
 	public float GetWidth(){
@@ -299,7 +316,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			//totalCost += (coverPosY - descPosY) * (coverPosY - descPosY) + (coverPosX - descPosX) * (coverPosX - descPosX);
 			float thisCost = Mathf.Abs(coverPosY - descPosY)  + Mathf.Abs (coverPosX - descPosX);
 			// We add a bit to try and get things further to the rigth to tend to be hiegher up (all other things being equal). 
-			float addCost = Mathf.Abs(coverPosX - descPosY);
+			float addCost = (horizontalFirst) ? Mathf.Abs(coverPosY - descPosX) : Mathf.Abs(coverPosX - descPosY);
 			totalCost += thisCost * thisCost + addCost;
 		}
 		return totalCost;
@@ -344,10 +361,54 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		}
 	}
 	
+	bool UpdateMoveToTargetHorzontal(){
+		float deltaDist = coverMoveSpeed * Time.deltaTime;
+		
+		bool finished = true;
+		for (int i = 0; i < displayTarget.componentDesc.Count; ++i){
+			float coverPosX = currentCovers[displayToCoversMapping[i]].transform.localPosition.x;
+			float coverPosY = currentCovers[displayToCoversMapping[i]].transform.localPosition.y;
+			float coverPosZ = currentCovers[displayToCoversMapping[i]].transform.localPosition.z;
+			
+			float descPosX = displayTarget.componentDesc[i][1];
+			
+			if (!MathUtils.FP.Feq (coverPosX, descPosX)){
+				if (coverPosX < descPosX){
+					coverPosX += Mathf.Min (deltaDist, descPosX - coverPosX);
+				}
+				else{
+					coverPosX -= Mathf.Min (deltaDist, coverPosX - descPosX);
+				}
+				finished = false;
+			}
+			currentCovers[displayToCoversMapping[i]].transform.localPosition = new Vector3(coverPosX, coverPosY, coverPosZ);
+		}		
+		
+		
+		return finished;
+	}
 	
 	bool UpdateMoveToTarget(){
+		if (horizontalFirst){
+			bool finished = UpdateMoveToTargetHorzontal();
+			if (finished){
+				finished =  UpdateMoveToTargetVertical();
+			}
+			return finished;
+		}
+		else{
+			bool finished = UpdateMoveToTargetVertical();
+			if (finished){
+				finished =  UpdateMoveToTargetHorzontal();
+			}
+			return finished;
+		}
+	}
+	
+	
+	bool UpdateMoveToTargetVertical(){
 		float deltaDist = coverMoveSpeed * Time.deltaTime;
-		bool yFinished = true;
+		bool finished = true;
 		
 		for (int i = 0; i < displayTarget.componentDesc.Count; ++i){
 			float coverPosX = currentCovers[displayToCoversMapping[i]].transform.localPosition.x;
@@ -363,35 +424,14 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 				else{
 					coverPosY -= Mathf.Min (deltaDist, coverPosY - descPosY);
 				}
-				yFinished = false;
+				finished = false;
 				
 			}
 			currentCovers[displayToCoversMapping[i]].transform.localPosition = new Vector3(coverPosX, coverPosY, coverPosZ);
 		}
-		if (!yFinished) return false;
-		
-		bool xFinished = true;
-		for (int i = 0; i < displayTarget.componentDesc.Count; ++i){
-			float coverPosX = currentCovers[displayToCoversMapping[i]].transform.localPosition.x;
-			float coverPosY = currentCovers[displayToCoversMapping[i]].transform.localPosition.y;
-			float coverPosZ = currentCovers[displayToCoversMapping[i]].transform.localPosition.z;
-			
-			float descPosX = displayTarget.componentDesc[i][1];
-			
-			if (!MathUtils.FP.Feq (coverPosX, descPosX)){
-				if (coverPosX < descPosX){
-					coverPosX += Mathf.Min (deltaDist, descPosX - coverPosX);
-				}
-				else{
-					coverPosX -= Mathf.Min (deltaDist, coverPosX - descPosX);
-				}
-				xFinished = false;
-			}
-			currentCovers[displayToCoversMapping[i]].transform.localPosition = new Vector3(coverPosX, coverPosY, coverPosZ);
-		}		
+		return finished;
 		
 
-		return xFinished && yFinished;
 	}
 
 	bool UpdateMoveToComplete(){
