@@ -24,6 +24,13 @@ public class AVOWGameModes : MonoBehaviour {
 	public GameObject greenBackground;
 	public GameObject scenery;
 	public GameObject pusher;
+	
+	int currentLevel = -1;
+	
+	const int kBackStoryIndex = -2;
+	const int kTutorialIndex = -1;
+	const int kFreePlayIndex = 0;
+	// then level 1, 2.... etc.
 
 	enum CameraChoice{
 		kNone,
@@ -36,7 +43,14 @@ public class AVOWGameModes : MonoBehaviour {
 		SelectCamera(CameraChoice.kGameCam);
 		tutorialText.SetActive(true);
 
+	}
 	
+	public int GetNumMainMenuButtons(){
+		return 7;
+	}
+	
+	public int GetMinMainMenuButton(){
+		return -2;
 	}
 	
 	// Use this for initialization
@@ -124,7 +138,7 @@ public class AVOWGameModes : MonoBehaviour {
 		RestartFreePlayGame();
 	}
 	
-	public void PlayTutorial1(){
+	public void PlayTutorial(){
 		
 		AVOWTutorialText.singleton.activated = true;
 		SelectCamera(CameraChoice.kGameCam);
@@ -193,8 +207,33 @@ public class AVOWGameModes : MonoBehaviour {
 
 	
 	public void StartLevel(int levelNum){
-		AVOWObjectiveManager.singleton.InitialiseLevel(levelNum);
-		RestartNormalGame();
+		currentLevel = levelNum;
+		if (currentLevel > 0){
+			AVOWObjectiveManager.singleton.InitialiseLevel(levelNum);
+			RestartNormalGame();
+		}
+		else{
+			switch (currentLevel){
+				case kBackStoryIndex:{
+					PlayBackStory();
+					break;
+				}
+				case kTutorialIndex:{
+					PlayTutorial();
+					break;
+				}
+				case kFreePlayIndex:{
+					PlayFree();
+					break;
+				}
+			}
+		}
+		
+	}
+	
+	public void StartNextLevel(){
+		currentLevel++;
+		StartLevel (currentLevel);
 		
 	}
 	
@@ -238,5 +277,24 @@ public class AVOWGameModes : MonoBehaviour {
 	public void GoToMainFromComplete(){
 		PlayFree();
 		state = GameModeState.kMainMenu;
+	}
+	
+	public string GetLevelName(int index){
+		if (index > 0){
+			return "Level " + index.ToString();
+		}
+		switch (index){
+			case kFreePlayIndex:{
+				return "Free play";
+			}
+			case kBackStoryIndex:{
+				return "Back story";
+			}
+			case kTutorialIndex:{
+				return "Tutorial";
+			}
+		}
+		return "Unkown level";
+	
 	}
 }
