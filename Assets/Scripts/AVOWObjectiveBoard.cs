@@ -7,6 +7,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	public GameObject[] woodPrefabs;
 	public GameObject[] coverPrefabs;
 	public GameObject shadedPrefab;
+	public int totalNumPanels = 50;
 	
 	public float coverMoveSpeed;
 	public float completeWaitDuration;
@@ -60,11 +61,15 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		state = State.kMovingToComplete;
 	}
 	
-	public void PrepareBoard(AVOWCircuitTarget target){
+	public void PrepareBoard(AVOWCircuitTarget target, bool stack){
 		currentTarget = target;
 		ConstructGrid(currentTarget);
-		CreateCovers(CreateRowTarget(currentTarget));
-		//CreateCovers(currentTarget);
+		if (stack){
+			CreateCovers(currentTarget);
+		}
+		else{
+			CreateCovers(CreateRowTarget(currentTarget));
+		}
 	}
 	
 	public float GetWidth(){
@@ -89,7 +94,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			}
 			GameObject.Destroy(shadedSquare);
 		}
-		int numPanels = 1 + width / division;
+		int numPanels = totalNumPanels;
 		currentWood = new GameObject[numPanels];
 		for (int i = 0; i < numPanels; ++i){
 			currentWood[i] = GameObject.Instantiate(woodPrefabs[division-1]);
@@ -161,6 +166,26 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		
 		}
 		return newTarget;
+		
+	}
+	
+	public void DestroyBoard(){
+		if (currentCovers != null){
+			foreach (GameObject go in currentCovers){
+				GameObject.Destroy (go);
+			}
+			currentCovers= null;
+		}
+		
+		if (currentWood != null){
+			foreach (GameObject go in currentWood){
+				GameObject.Destroy(go);
+			}
+			GameObject.Destroy(shadedSquare);
+			currentWood = null;
+			shadedSquare = null;
+			shadeVal = null;
+		}
 		
 	}
 	

@@ -12,6 +12,12 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	int frontIndex = 0;
 	int backIndex = 1;
 	
+	enum LayoutMode {
+		kRow,
+		kStack
+	};
+	LayoutMode layoutMode = LayoutMode.kRow;
+	
 	
 	float backBoardDepth = 0.5f;
 	float frontBoardDepth = 0;
@@ -31,6 +37,8 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		kPlay,
 		kGoalComplete0,
 		kGoalComplete1,
+		kLevelComplete0,
+		kLevelComplete1,
 	};
 	
 	State state = State.kNone;
@@ -50,7 +58,29 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	}
 	
 	public void InitialiseLevel(int level){
-		resistorLimit = level + 1;
+		switch (level){
+			case 1:{
+				layoutMode = LayoutMode.kStack;
+				resistorLimit = 3;
+				break;
+			}
+			case 2:{
+				layoutMode = LayoutMode.kStack;
+				resistorLimit = 4;
+				break;
+			}
+			case 3:{
+				layoutMode = LayoutMode.kRow;
+				resistorLimit = 4;
+				break;
+			}
+			case 4:{
+				layoutMode = LayoutMode.kRow;
+				resistorLimit = 5;
+				break;
+			}
+		}
+		
 		AVOWCircuitCreator.singleton.Initialise(resistorLimit);
 		state = State.kWaitForCircuitCreator;
 		currentGoalIndex = 0;
@@ -81,6 +111,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		
 		boards[0].transform.localPosition = Vector3.zero;
 		boards[1].transform.localPosition = Vector3.zero;
+		
 		ForceBoardDepths();
 		
 	}
@@ -126,7 +157,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				break;
 			}
 			case State.kBuildBackBoard:{
-				boards[backIndex].GetComponent<AVOWObjectiveBoard>().PrepareBoard(AVOWCircuitCreator.singleton.GetResults()[currentGoalIndex]);
+				boards[backIndex].GetComponent<AVOWObjectiveBoard>().PrepareBoard(AVOWCircuitCreator.singleton.GetResults()[currentGoalIndex], layoutMode == LayoutMode.kStack);
 				boards[backIndex].transform.localPosition = Vector3.zero;
 				ForceBoardDepths();
 			//				AVOWBattery.singleton.ResetBattery();
@@ -177,9 +208,32 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			case State.kGoalComplete1:{
 				if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().IsReady()){
 					currentGoalIndex++;
-					state = State.kBuildBackBoard;
+					if (currentGoalIndex < AVOWCircuitCreator.singleton.GetResults().Count){
+						state = State.kBuildBackBoard;
+					}
+					else{
+						state = State.kLevelComplete0;
+					}
 				}
 				break;
+			}
+			case State.kLevelComplete0:{
+				Vector3 pos = boards[frontIndex].transform.position;
+				pos.y -= boardSpeed * Time.deltaTime;
+				boards[frontIndex].transform.position = pos;
+				
+			
+				if (pos.y < -1){
+					AVOWGameModes.singleton.SetStageComplete();
+					boards[0].GetComponent<AVOWObjectiveBoard>().DestroyBoard();
+					boards[1].GetComponent<AVOWObjectiveBoard>().DestroyBoard();
+					state = State.kLevelComplete1;
+				}
+				break;		
+			}
+			case State.kLevelComplete1:{
+				
+				break;		
 			}
 		}
 		

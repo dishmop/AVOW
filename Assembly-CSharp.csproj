@@ -46,6 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\AVOWMenuButton.cs" />
      <Compile Include="Assets\Scripts\AVOWBackStoryCutscene.cs" />
      <Compile Include="Assets\Scripts\AVOWBattery.cs" />
      <Compile Include="Assets\Scripts\AVOWButton.cs" />
@@ -69,6 +70,7 @@
      <Compile Include="Assets\Scripts\AVOWObjectiveManager.cs" />
      <Compile Include="Assets\Scripts\AVOWObjectives.cs" />
      <Compile Include="Assets\Scripts\AVOWPusher.cs" />
+     <Compile Include="Assets\Scripts\AVOWSceneConstructor.cs" />
      <Compile Include="Assets\Scripts\AVOWSideBar.cs" />
      <Compile Include="Assets\Scripts\AVOWSim.cs" />
      <Compile Include="Assets\Scripts\AVOWTutorialManager.cs" />

@@ -13,6 +13,7 @@ public class AVOWCamControl : MonoBehaviour {
 	public float xFOV		= 1.7f;
 	public float yFOV		= 1.7f;
 	public float xOffset 	= 0;
+	public bool disableMovement = false;
 	Vector3					prevMousePos = new Vector3();
 	
 	
@@ -29,6 +30,8 @@ public class AVOWCamControl : MonoBehaviour {
 	void Update () {
 		delay--;
 		if (delay > 0) return;
+		
+		if (disableMovement) return;
 		
 		Camera camera = gameObject.GetComponent<Camera>();
 		float wheelVal = 0;//Input.GetAxis("Mouse ScrollWheel");

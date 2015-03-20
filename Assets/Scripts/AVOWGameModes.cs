@@ -8,7 +8,8 @@ public class AVOWGameModes : MonoBehaviour {
 		kStartup,
 		kMainMenu,
 		kPlayStage,
-		kStageComplete,
+		kStageComplete0,
+		kStageComplete1,
 		kGameOver
 
 	}
@@ -20,8 +21,10 @@ public class AVOWGameModes : MonoBehaviour {
 	public GameObject sidePanel;
 	public GameObject backStory;
 	public GameObject tutorialText;
-	
-	
+	public GameObject greenBackground;
+	public GameObject scenery;
+	public GameObject pusher;
+
 	enum CameraChoice{
 		kNone,
 		kGameCam,
@@ -64,9 +67,50 @@ public class AVOWGameModes : MonoBehaviour {
 		}
 		
 		mainMenuPanel.SetActive(state == GameModeState.kMainMenu);
-		dlgPanel.SetActive(state == GameModeState.kStageComplete || state == GameModeState.kGameOver);
-		dlgPanel.transform.FindChild("StageCompleteDlg").gameObject.SetActive(state == GameModeState.kStageComplete);
+		dlgPanel.SetActive(state == GameModeState.kGameOver);
+		//dlgPanel.transform.FindChild("StageCompleteDlg").gameObject.SetActive(state == GameModeState.kStageComplete);
 		dlgPanel.transform.FindChild("GameOverDlg").gameObject.SetActive(state == GameModeState.kGameOver);
+		
+		switch (state){
+			case GameModeState.kStageComplete0:{
+				// Get rid of all our resistance squares
+				foreach (GameObject go in AVOWGraph.singleton.allComponents){
+					AVOWComponent component = go.GetComponent<AVOWComponent>();
+					if (component.type == AVOWComponent.Type.kLoad){
+						component.Kill (89);
+					}
+				}
+				pusher.GetComponent<AVOWPusher>().disableMovement = true;
+				AVOWCamControl.singleton.disableMovement = true;
+				greenBackground.GetComponent<AVOWGreenBackground>().MakeBig();
+				if (AVOWGraph.singleton.allComponents.Count == 1){
+					state = GameModeState.kStageComplete1;
+				}
+				AVOWConfig.singleton.tutDisableConnections = true;
+				break;	
+			}
+			case GameModeState.kStageComplete1:{
+				// Get rid of all our resistance squares
+				float scaleVal = scenery.transform.localScale.x;
+				scenery.transform.localScale = new Vector3(scaleVal * 1.02f, scaleVal * 1.02f, 1);
+				break;	
+			}
+			case GameModeState.kMainMenu:{
+				AVOWUI.singleton.enableToolUpdate = false;
+				AVOWConfig.singleton.tutDisableConnections = false;
+				break;	
+			}
+			default:{
+				AVOWUI.singleton.enableToolUpdate = true;
+				greenBackground.GetComponent<AVOWGreenBackground>().MakeSmall();
+				pusher.GetComponent<AVOWPusher>().disableMovement = false;
+				AVOWCamControl.singleton.disableMovement = false;
+				scenery.transform.localScale = new Vector3(1, 1, 1);
+				break;
+			}
+		}
+
+
 	}
 	
 	public void PlayFree(){
@@ -148,25 +192,12 @@ public class AVOWGameModes : MonoBehaviour {
 		state = GameModeState.kPlayStage;
 	}
 
-	public void PlayEasy(){
-		AVOWObjectiveManager.singleton.InitialiseLevel(1);
-		RestartNormalGame();
-	}
-	
-	public void PlayMedium(){
-		AVOWObjectiveManager.singleton.InitialiseLevel(2);
-		RestartNormalGame();
-	}
-	
-	public void PlayHard(){
-		AVOWObjectiveManager.singleton.InitialiseLevel(3);
-		RestartNormalGame();
-	}
 
-	public void PlayVeryHard(){
-		AVOWObjectiveManager.singleton.InitialiseLevel(4);
+	
+	public void StartLevel(int levelNum){
+		AVOWObjectiveManager.singleton.InitialiseLevel(levelNum);
 		RestartNormalGame();
-
+		
 	}
 	
 	void RestartNormalGame(){
@@ -189,7 +220,7 @@ public class AVOWGameModes : MonoBehaviour {
 	}	
 	
 	public void SetStageComplete(){
-		state = GameModeState.kStageComplete;
+		state = GameModeState.kStageComplete0;
 	}
 	
 	public void GoToMain(){

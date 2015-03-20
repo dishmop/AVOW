@@ -17,6 +17,7 @@ public class AVOWUI : MonoBehaviour {
 	public GameObject lighteningPrefab;
 	public GameObject greenLighteningPrefab;
 	
+	public  bool enableToolUpdate = true;
 	
 	
 	public bool canCreate = true;
@@ -115,7 +116,7 @@ public class AVOWUI : MonoBehaviour {
 			if (graph == null){
 				Startup();
 			}
-			if (AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kPlayStage) uiTool.Update();
+			if (enableToolUpdate) uiTool.Update();
 		}
 
 		

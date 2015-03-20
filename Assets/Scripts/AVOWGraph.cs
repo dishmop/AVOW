@@ -9,7 +9,8 @@ public class AVOWGraph : MonoBehaviour {
 	// the nodes in the graph are simply numbered
 	
 	public GameObject NodePrefab;
-
+	public GameObject lighteningPoints;
+	
 	
 	public int maxNodeId = -1;
 	
@@ -18,6 +19,7 @@ public class AVOWGraph : MonoBehaviour {
 	
 	public List<GameObject> allNodes = new List<GameObject>();
 	public List<GameObject> allComponents = new List<GameObject>();
+	
 	
 	
 
@@ -353,12 +355,12 @@ public class AVOWGraph : MonoBehaviour {
 			}
 		}
 		
-		transform.FindChild("LighteningPoint1").gameObject.SetActive(allComponents.Count == 1);
-		transform.FindChild("LighteningPoint2").gameObject.SetActive(allComponents.Count == 1);
+		lighteningPoints.transform.FindChild("LighteningPoint1").gameObject.SetActive(allComponents.Count == 1);
+		lighteningPoints.transform.FindChild("LighteningPoint2").gameObject.SetActive(allComponents.Count == 1);
 		
 		float intensity = Mathf.Sin (0.9f + 0.1f * Mathf.Sin(3 * Time.time));
-		transform.FindChild("LighteningPoint1").gameObject.GetComponent<Renderer>().material.SetFloat("_Intensity", intensity);
-		transform.FindChild("LighteningPoint2").gameObject.GetComponent<Renderer>().material.SetFloat("_Intensity", intensity);
+		lighteningPoints.transform.FindChild("LighteningPoint1").gameObject.GetComponent<Renderer>().material.SetFloat("_Intensity", intensity);
+		lighteningPoints.transform.FindChild("LighteningPoint2").gameObject.GetComponent<Renderer>().material.SetFloat("_Intensity", intensity);
 		
 		
 	}

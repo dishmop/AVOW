@@ -1,16 +1,16 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &100000
+--- !u!1 &133044
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 400000}
-  - 114: {fileID: 11400000}
-  - 114: {fileID: 11400002}
-  - 82: {fileID: 8200000}
+  - 4: {fileID: 479792}
+  - 114: {fileID: 11459462}
+  - 114: {fileID: 11424656}
+  - 82: {fileID: 8219808}
   m_Layer: 0
   m_Name: GameModes
   m_TagString: Untagged
@@ -18,26 +18,27 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &400000
+--- !u!4 &479792
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
+  m_GameObject: {fileID: 133044}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 595.349976, y: 233, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
---- !u!82 &8200000
+--- !u!82 &8219808
 AudioSource:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
+  m_GameObject: {fileID: 133044}
   m_Enabled: 1
-  serializedVersion: 3
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: bb858f21c67194f17a56c390c3e2472d, type: 3}
   m_PlayOnAwake: 0
   m_Volume: .100000001
@@ -72,7 +73,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -88,12 +89,43 @@ AudioSource:
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
---- !u!114 &11400000
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+--- !u!114 &11424656
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
+  m_GameObject: {fileID: 133044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5c1aea24b6034b1784808248829fd75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  greySphere: {fileID: 100000, guid: ba21d24887660484488ad55ce57ff931, type: 2}
+  backStory: {fileID: 0}
+  babyCubePrefab: {fileID: 100002, guid: 6254920d69e964c9083e8c0512222c11, type: 2}
+  babyCubePrefabMid: {fileID: 100002, guid: 801374bb62bdf4ed9ac81cb0c89c9e34, type: 2}
+  babyCubePrefabAfter: {fileID: 100002, guid: 599bb7c98a8ad477b80cebce294d49fd, type: 2}
+  danceFollow3Dist: 40
+  prisonSphere1: {fileID: 0}
+  state: 4
+  steerSphereRadius: 15
+  steerSphereCentre: {x: 0, y: 0, z: 210}
+--- !u!114 &11459462
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 133044}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3102848a53ead4a7d8fc706588583fdf, type: 3}
@@ -106,26 +138,10 @@ MonoBehaviour:
   dlgPanel: {fileID: 0}
   sidePanel: {fileID: 0}
   backStory: {fileID: 0}
---- !u!114 &11400002
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ded62a3017994cc28a9cf91729a50f2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  greySphere: {fileID: 100000, guid: ba21d24887660484488ad55ce57ff931, type: 2}
-  backStory: {fileID: 0}
-  babyCubePrefab: {fileID: 100002, guid: 6254920d69e964c9083e8c0512222c11, type: 2}
-  danceFollow3Dist: 50
-  prisonSphere1: {fileID: 0}
-  cursorCubePrefab: {fileID: 100000, guid: 88c1abdfbc47544a981d1aaa7566a21f, type: 2}
-  state: 3
-  steerSphereRadius: 15
-  steerSphereCentre: {x: 0, y: 0, z: 210}
+  tutorialText: {fileID: 0}
+  greenBackground: {fileID: 0}
+  scenery: {fileID: 0}
+  pusher: {fileID: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -135,6 +151,5 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 100000}
+  m_RootGameObject: {fileID: 133044}
   m_IsPrefabParent: 1
-  m_IsExploded: 1

@@ -26,7 +26,7 @@ public class QuitOnEsc : MonoBehaviour {
 		Vector3 mousePos = Input.mousePosition;
 		if (mousePos.x < Screen.width * AVOWConfig.singleton.GetSidePanelFrac() || 
 			AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kMainMenu || 
-			AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kStageComplete ||
+		//	AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kStageComplete ||
 		    AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kGameOver ){
 			Cursor.visible = true;
 			

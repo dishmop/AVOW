@@ -3,6 +3,8 @@ using System.Collections;
 
 public class AVOWPusher : MonoBehaviour {
 
+	public bool disableMovement = false;
+
 	// Use this for initialization
 	void Start () {
 	
@@ -10,7 +12,7 @@ public class AVOWPusher : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		transform.position = new Vector3(AVOWSim.singleton.xMax, 0 ,0f);
+		if (!disableMovement) transform.position = new Vector3(AVOWSim.singleton.xMax, 0 ,0f);
 		//transform.localScale = new Vector3(AVOWSim.singleton.xMax, AVOWSim.singleton.yMax,1);
 		
 	}
