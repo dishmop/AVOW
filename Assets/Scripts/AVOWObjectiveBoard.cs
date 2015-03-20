@@ -5,11 +5,19 @@ using System.Collections.Generic;
 public class AVOWObjectiveBoard : MonoBehaviour {
 
 	public GameObject[] woodPrefabs;
-	public GameObject coverPrefab;
-	public float coverModeSpeed = 1f;
+	public GameObject[] coverPrefabs;
+	public GameObject shadedPrefab;
 	
+	public float coverMoveSpeed;
+	public float completeWaitDuration;
+	
+	float maxShade = 0.675f;
 	AVOWCircuitTarget currentTarget;
 	AVOWCircuitTarget displayTarget;
+	
+	float completeWaitTime;
+	
+	float gridWidth = 0;
 	
 	// The nth cover maps to which index of the display
 //	int[]	coversToDisplayMapping;
@@ -18,11 +26,15 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	
 	GameObject[] currentWood;
 	GameObject[] currentCovers;
+	GameObject shadedSquare;
+	SpringValue shadeVal;
 	
 	enum State{
 		kReady,
 		kMovingToTarget,
-		kMovingToComplete
+		kMovingToComplete,
+		kWaitingCompleted,
+		kDroppingOff,
 	};
 	State state = State.kReady;
 	
@@ -55,6 +67,10 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		//CreateCovers(currentTarget);
 	}
 	
+	public float GetWidth(){
+		return gridWidth;
+	}
+	
 	
 	public bool IsReady(){
 		return state == State.kReady;
@@ -62,12 +78,16 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	
 	public void ConstructGrid(AVOWCircuitTarget target){
 		int division = target.lcm;
-		int width = target.totalCurrentInLCMs;
+		int width = target.widthInLCMs;
+		
+		gridWidth = (float)width / (float)division;
+	
 		
 		if (currentWood != null){
 			foreach (GameObject go in currentWood){
 				GameObject.Destroy(go);
 			}
+			GameObject.Destroy(shadedSquare);
 		}
 		int numPanels = 1 + width / division;
 		currentWood = new GameObject[numPanels];
@@ -76,6 +96,32 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			currentWood[i].transform.parent = transform;
 			currentWood[i].transform.localPosition = new Vector3(i+1, 0, 0.2f);
 		}
+		
+		shadedSquare = GameObject.Instantiate(shadedPrefab);
+		shadedSquare.transform.parent = transform;
+		shadedSquare.transform.localPosition = new Vector3(0, 0, -0.1f);
+		shadedSquare.transform.localScale = new Vector3(numPanels, 1, 1);
+		shadeVal = new SpringValue(maxShade);
+		UpdateShadedSquare();
+	}
+	
+	void UpdateShadedSquare(){
+		if (shadeVal  == null) return;
+		shadeVal.Update ();
+		
+		if (shadeVal.IsAtTarget() && MathUtils.FP.Feq (shadeVal.GetValue(), 0)){
+			shadedSquare.SetActive(false);
+		}
+		else{
+			shadedSquare.SetActive(true);
+			shadedSquare.GetComponent<Renderer>().material.SetColor("_Color", new Color (0, 0, 0, shadeVal.GetValue()));
+		}
+	
+	}
+	
+	public void BrightenBoard(float duration){
+		shadeVal.Set (0);
+		shadeVal.SetSpeed(maxShade/duration);
 	}
 	
 
@@ -130,10 +176,11 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		for (int i = 0; i < target.componentDesc.Count; ++i){
 			float thisWidth = target.componentDesc[i][0];
 			
-			currentCovers[i] = GameObject.Instantiate(coverPrefab);
+			int sizePrefab = Mathf.RoundToInt(1f/thisWidth) - 1;
+			currentCovers[i] = GameObject.Instantiate(coverPrefabs[sizePrefab]);
 			currentCovers[i].transform.parent = transform;
 			currentCovers[i].transform.localScale = new Vector3(thisWidth, thisWidth, thisWidth);
-			currentCovers[i].transform.localPosition = new Vector3(target.componentDesc[i][1], target.componentDesc[i][2], -0.01f * i);
+			currentCovers[i].transform.localPosition = new Vector3(target.componentDesc[i][1], target.componentDesc[i][2], -0.01f * (i + 1));
 			
 			cumWidth += thisWidth;
 		}
@@ -148,8 +195,21 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			if (!MathUtils.FP.Feq(testTarget.componentDesc[i][0], currentTarget.componentDesc[i][0])) return false;
 		}
 		return true;
-		
-		
+	}
+	
+	public bool TestPositionMatch(AVOWCircuitTarget testTarget){		
+		for (int i = 0; i < displayTarget.componentDesc.Count; ++i){
+			
+			if (!MathUtils.FP.Feq (currentCovers[displayToCoversMapping[i]].transform.localPosition.x, displayTarget.componentDesc[i][1])){
+				return false;
+				
+			}
+			if (!MathUtils.FP.Feq (currentCovers[displayToCoversMapping[i]].transform.localPosition.y, displayTarget.componentDesc[i][2])){
+				return false;
+				
+			}
+		}
+		return true;
 	}
 	
 	int[] CreateIdentityMapping(int length){
@@ -213,7 +273,9 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			
 			//totalCost += (coverPosY - descPosY) * (coverPosY - descPosY) + (coverPosX - descPosX) * (coverPosX - descPosX);
 			float thisCost = Mathf.Abs(coverPosY - descPosY)  + Mathf.Abs (coverPosX - descPosX);
-			totalCost += thisCost * thisCost;
+			// We add a bit to try and get things further to the rigth to tend to be hiegher up (all other things being equal). 
+			float addCost = Mathf.Abs(coverPosX - descPosY);
+			totalCost += thisCost * thisCost + addCost;
 		}
 		return totalCost;
 	}
@@ -226,24 +288,40 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+		UpdateShadedSquare();
+		
 		switch (state){
 			case State.kMovingToTarget:{
 				if (UpdateMoveToTarget ()) state = State.kReady;
 				break;
 			}
 			case State.kMovingToComplete:{
-				if (UpdateMoveToComplete ()) state = State.kReady;
+				if (UpdateMoveToComplete ()){
+					completeWaitTime = Time.time + completeWaitDuration;
+				state = State.kWaitingCompleted;
+				}
+				break;
+			}
+			case State.kWaitingCompleted:{
+				if (Time.time > completeWaitTime){
+					state = State.kDroppingOff;
+				}
+			    
+				break;
+			}
+			case State.kDroppingOff:{
+				if (DroppingOff()) state = State.kReady;
 				break;
 			}
 			
-
+			
+			
 		}
 	}
 	
 	
 	bool UpdateMoveToTarget(){
-		float deltaDist = coverModeSpeed * Time.deltaTime;
+		float deltaDist = coverMoveSpeed * Time.deltaTime;
 		bool yFinished = true;
 		
 		for (int i = 0; i < displayTarget.componentDesc.Count; ++i){
@@ -251,7 +329,6 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			float coverPosY = currentCovers[displayToCoversMapping[i]].transform.localPosition.y;
 			float coverPosZ = currentCovers[displayToCoversMapping[i]].transform.localPosition.z;
 			
-			float descPosX = displayTarget.componentDesc[i][1];
 			float descPosY = displayTarget.componentDesc[i][2];
 			
 			if (!MathUtils.FP.Feq (coverPosY, descPosY)){
@@ -275,7 +352,6 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			float coverPosZ = currentCovers[displayToCoversMapping[i]].transform.localPosition.z;
 			
 			float descPosX = displayTarget.componentDesc[i][1];
-			float descPosY = displayTarget.componentDesc[i][2];
 			
 			if (!MathUtils.FP.Feq (coverPosX, descPosX)){
 				if (coverPosX < descPosX){
@@ -294,7 +370,31 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 
 	bool UpdateMoveToComplete(){
-		return true;
+		float deltaDist = coverMoveSpeed * Time.deltaTime;
+		
+		float maxDistToMove = currentCovers[displayToCoversMapping[0]].transform.localPosition.x - (displayTarget.componentDesc[0][1]- displayTarget.totalCurrent);
+		
+		if (MathUtils.FP.Feq(maxDistToMove, 0)){
+			return true;
+		}
+		
+		for (int i = 0; i < currentCovers.Length; ++i){
+			Vector3 pos = currentCovers[i].transform.localPosition;
+			pos.x -= Mathf.Min (deltaDist, maxDistToMove);
+			currentCovers[i].transform.localPosition = pos;
+			
+		}	
+		return false;
+	}
+	
+	bool DroppingOff(){
+		float deltaDist = coverMoveSpeed * Time.deltaTime;
+		float minHeight = 1;
+		foreach (GameObject go in currentCovers){
+			go.transform.localPosition -= new Vector3(0, deltaDist, 0);
+			minHeight = Mathf.Min (minHeight, go.transform.localPosition.y);
+		}	
+		return (minHeight < -1);
 	}
 	
 }

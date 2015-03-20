@@ -44,6 +44,7 @@ void surf (Input IN, inout SurfaceOutput o) {
 	
 	o.Gloss = tex.a;
 	o.Specular = _Shininess;
+		
 	
 	fixed3 tempNormal = UnpackNormal(tex2D(_BumpMap, IN.uv_BumpMap));
 	

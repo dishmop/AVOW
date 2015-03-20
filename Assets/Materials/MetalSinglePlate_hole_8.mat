@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: MetalSinglePlate
-  m_Shader: {fileID: 23, guid: 0000000000000000f000000000000000, type: 0}
+  m_Name: MetalSinglePlate_hole_8
+  m_Shader: {fileID: 4800000, guid: 745b7e9957e8c47d4bb6df0ab99fb664, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
   m_CustomRenderQueue: -1
@@ -18,14 +18,14 @@ Material:
         first:
           name: _MainTex
         second:
-          m_Texture: {fileID: 2800000, guid: b3087f1142728434089e98d0d08e24ab, type: 3}
+          m_Texture: {fileID: 2800000, guid: 01e4b643ab2384b9ea9d7ccc494f1658, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
           name: _BumpMap
         second:
-          m_Texture: {fileID: 2800000, guid: cea30ba24c1c24aa5aed2aa12171d60a, type: 3}
+          m_Texture: {fileID: 2800000, guid: 176177f5a2007410085b11d4a9d5c3ed, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
@@ -40,6 +40,14 @@ Material:
         first:
           name: _Shininess
         second: .191872939
+      data:
+        first:
+          name: _NormalRotationCos
+        second: 1
+      data:
+        first:
+          name: _NormalRotationSin
+        second: 0
     m_Colors:
       data:
         first:

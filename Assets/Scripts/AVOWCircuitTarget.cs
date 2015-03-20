@@ -15,7 +15,7 @@ public class AVOWCircuitTarget{
 
 	
 	public int lcm;
-	public int totalCurrentInLCMs;
+	public int widthInLCMs;
 	
 
 	// copy constructor
@@ -28,7 +28,7 @@ public class AVOWCircuitTarget{
 			componentDesc.Add (val3);
 		}
 		lcm = other.lcm;
-		totalCurrentInLCMs = other.totalCurrentInLCMs;
+		widthInLCMs = other.widthInLCMs;
 		
 	}
 	
@@ -72,7 +72,7 @@ public class AVOWCircuitTarget{
 			width += val;
 			lcm = MathUtils.FP.lcm(denominator, lcm);
 		}
-		totalCurrentInLCMs = Mathf.RoundToInt(width * lcm);
+		widthInLCMs = Mathf.RoundToInt(width * lcm);
 	}
 	
 	

@@ -48,7 +48,18 @@ MonoBehaviour:
   - {fileID: 157206, guid: eeac82441c51f4353b41cf3ec58abd34, type: 2}
   - {fileID: 105636, guid: 32a30a0ef2a724755a381c612db83520, type: 2}
   - {fileID: 126858, guid: f7ced7a4c8f674561940a834d30a60c5, type: 2}
-  coverPrefab: {fileID: 104564, guid: 95a6e1857612040b59d6e2d8fc387525, type: 2}
+  coverPrefabs:
+  - {fileID: 180322, guid: 0f38a4dc8bb1643789e069644996bc27, type: 2}
+  - {fileID: 116626, guid: 5e96d5d67378d45a788c0cb38d1a6241, type: 2}
+  - {fileID: 106136, guid: b9efcd3834b694ad2b27a69ce4497ada, type: 2}
+  - {fileID: 122228, guid: 69a1c866c87a74faf9abbb64c4dcba92, type: 2}
+  - {fileID: 104066, guid: c8e1cbc34d2d042d79c7d117f454dd7e, type: 2}
+  - {fileID: 194954, guid: 34eb6d76f67f34393a6cb3734cca633f, type: 2}
+  - {fileID: 134162, guid: 1ab61f326a51a4d6d8cd89af1b3e59b0, type: 2}
+  - {fileID: 134162, guid: 1ab61f326a51a4d6d8cd89af1b3e59b0, type: 2}
+  shadedPrefab: {fileID: 182376, guid: d2ce0c8d57bed482d8cfef96bb814719, type: 2}
+  coverMoveSpeed: 2
+  completeWaitDuration: .5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

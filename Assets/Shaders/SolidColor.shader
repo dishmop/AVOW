@@ -4,7 +4,7 @@
             _Color ("Color", Color) = (1,1,1,1)
         }
         SubShader {
-        	ZTest Always
+        //	ZTest Always
 			Blend SrcAlpha OneMinusSrcAlpha
 			Tags {"Queue"="Transparent"}
 			
