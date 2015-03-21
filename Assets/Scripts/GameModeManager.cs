@@ -397,6 +397,8 @@ public class GameModeManager : MonoBehaviour {
 		lastGameMode = gameMode;	
 	}
 	
+	
+	
 	public void SetUIState(int state){
 		gameMode = (GameMode)state;
 	}

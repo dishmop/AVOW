@@ -135,6 +135,8 @@ MonoBehaviour:
   stage: 0
   level: 0
   mainMenuPanel: {fileID: 0}
+  levelCompleteDlg: {fileID: 0}
+  whitePanel: {fileID: 0}
   dlgPanel: {fileID: 0}
   sidePanel: {fileID: 0}
   backStory: {fileID: 0}

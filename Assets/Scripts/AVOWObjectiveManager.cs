@@ -65,21 +65,26 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		switch (level){
 			case 1:{
 				layoutMode = AVOWObjectiveBoard.LayoutMode.kStack;
-				resistorLimit = 3;
+				resistorLimit = 2;
 				break;
 			}
 			case 2:{
 				layoutMode = AVOWObjectiveBoard.LayoutMode.kStack;
-				resistorLimit = 4;
+				resistorLimit = 3;
 				break;
 			}
 			case 3:{
+				layoutMode = AVOWObjectiveBoard.LayoutMode.kStack;
+				resistorLimit = 4;
+				break;
+			}
+			case 4:{
 				layoutMode = AVOWObjectiveBoard.LayoutMode.kRow;
 				numBoardsToUnstack = 4;
 				resistorLimit = 4;
 				break;
 			}
-			case 4:{
+			case 5:{
 				layoutMode = AVOWObjectiveBoard.LayoutMode.kRow;
 				resistorLimit = 5;
 				break;

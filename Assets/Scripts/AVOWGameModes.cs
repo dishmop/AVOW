@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class AVOWGameModes : MonoBehaviour {
 	public static AVOWGameModes singleton = null;
@@ -10,6 +11,9 @@ public class AVOWGameModes : MonoBehaviour {
 		kPlayStage,
 		kStageComplete0,
 		kStageComplete1,
+		kStageComplete2,
+		kStageComplete3,
+		kStageComplete4,
 		kGameOver
 
 	}
@@ -17,6 +21,8 @@ public class AVOWGameModes : MonoBehaviour {
 	public int stage = 0;
 	public int level = 0;
 	public GameObject mainMenuPanel;
+	public GameObject levelCompleteDlg;
+	public GameObject whitePanel;
 	public GameObject dlgPanel;
 	public GameObject sidePanel;
 	public GameObject backStory;
@@ -46,7 +52,7 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 	
 	public int GetNumMainMenuButtons(){
-		return 7;
+		return 8;
 	}
 	
 	public int GetMinMainMenuButton(){
@@ -80,12 +86,25 @@ public class AVOWGameModes : MonoBehaviour {
 			}
 		}
 		
+		dlgPanel.SetActive(state == GameModeState.kGameOver || state == GameModeState.kStageComplete3);
 		mainMenuPanel.SetActive(state == GameModeState.kMainMenu);
-		dlgPanel.SetActive(state == GameModeState.kGameOver);
+		levelCompleteDlg.SetActive (state == GameModeState.kStageComplete3 || state == GameModeState.kStageComplete4);
 		//dlgPanel.transform.FindChild("StageCompleteDlg").gameObject.SetActive(state == GameModeState.kStageComplete);
 		dlgPanel.transform.FindChild("GameOverDlg").gameObject.SetActive(state == GameModeState.kGameOver);
 		
 		switch (state){
+			case GameModeState.kMainMenu:{
+//				AVOWUI.singleton.enableToolUpdate = false;
+//				AVOWConfig.singleton.tutDisableConnections = false;
+				whitePanel.SetActive(false);
+				break;
+			
+			}
+			case GameModeState.kPlayStage:{
+				whitePanel.SetActive(false);
+				break;
+				
+			}
 			case GameModeState.kStageComplete0:{
 				// Get rid of all our resistance squares
 				foreach (GameObject go in AVOWGraph.singleton.allComponents){
@@ -94,6 +113,10 @@ public class AVOWGameModes : MonoBehaviour {
 						component.Kill (89);
 					}
 				}
+				
+				AVOWConfig.singleton.DisplaySidePanel(false);
+			
+				
 				pusher.GetComponent<AVOWPusher>().disableMovement = true;
 				AVOWCamControl.singleton.disableMovement = true;
 				if (AVOWGraph.singleton.allComponents.Count == 1){
@@ -106,11 +129,39 @@ public class AVOWGameModes : MonoBehaviour {
 				// Get rid of all our resistance squares
 				float scaleVal = scenery.transform.localScale.x;
 				scenery.transform.localScale = new Vector3(scaleVal * 1.02f, scaleVal * 1.02f, 1);
+				if (scaleVal > 2f){
+					state = GameModeState.kStageComplete2;
+					whitePanel.SetActive(true);
+					whitePanel.GetComponent<Image>().color = new Color(1, 1, 1, 0);
+				}
 				break;	
 			}
-			case GameModeState.kMainMenu:{
-				AVOWUI.singleton.enableToolUpdate = false;
-				AVOWConfig.singleton.tutDisableConnections = false;
+			case GameModeState.kStageComplete2:{
+				float scaleVal = scenery.transform.localScale.x;
+				scenery.transform.localScale = new Vector3(scaleVal * 1.02f, scaleVal * 1.02f, 1);
+				Color col = whitePanel.GetComponent<Image>().color;
+				col.a += 0.01f;
+				whitePanel.GetComponent<Image>().color = col;
+				levelCompleteDlg.transform.FindChild("LevelComplete").GetComponent<Text>().text = "Congratulations!/n" + GetLevelName(currentLevel) + " complete";
+				levelCompleteDlg.transform.FindChild("Continue").GetComponent<Text>().text = "Continue to " + GetLevelName(currentLevel + 1);
+				levelCompleteDlg.transform.FindChild("Continue").GetComponent<AVOWMenuButton>().levelNum = currentLevel + 1;
+				if (col.a >= 1){
+					state = GameModeState.kStageComplete3;
+				}
+				
+				//levelCompleteDlg.
+				break;	
+			}
+			case GameModeState.kStageComplete3:{
+				Color col = whitePanel.GetComponent<Image>().color;
+				col.a -= 0.01f;
+				whitePanel.GetComponent<Image>().color = col;
+				if (col.a <= 0){
+					state = GameModeState.kStageComplete4;
+				}
+				break;	
+			}
+			case GameModeState.kStageComplete4:{
 				break;	
 			}
 			default:{
@@ -183,6 +234,20 @@ public class AVOWGameModes : MonoBehaviour {
 		 	}
 		}
 	}
+	
+	// THe level complete routine rather messes up the scenery - this puts it all back
+	void ResetScenery(){
+		scenery.transform.localScale = new Vector3(1, 1, 1);	
+		whitePanel.SetActive(false);
+		levelCompleteDlg.SetActive(false);
+		pusher.GetComponent<AVOWPusher>().disableMovement = false;
+		AVOWCamControl.singleton.disableMovement = false;
+		AVOWConfig.singleton.tutDisableConnections = false;
+		
+		
+		
+	}
+	
 	void RestartTutorialGame(){
 		AVOWConfig.singleton.showObjectives = false;
 		AVOWGraph.singleton.ClearCircuit();
@@ -207,6 +272,7 @@ public class AVOWGameModes : MonoBehaviour {
 
 	
 	public void StartLevel(int levelNum){
+		ResetScenery();
 		currentLevel = levelNum;
 		if (currentLevel > 0){
 			AVOWObjectiveManager.singleton.InitialiseLevel(levelNum);
@@ -228,6 +294,7 @@ public class AVOWGameModes : MonoBehaviour {
 				}
 			}
 		}
+		
 		
 	}
 	

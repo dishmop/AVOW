@@ -30,7 +30,10 @@ public class AVOWCamControl : MonoBehaviour {
 	void Update () {
 		delay--;
 		if (delay > 0) return;
-		
+
+		// Even if movement disabled - we still can change the viewport size		
+		GetComponent<Camera>().rect = new Rect(AVOWConfig.singleton.GetSidePanelFrac(), AVOWConfig.singleton.GetBottomPanelFrac(), 1, 1);
+
 		if (disableMovement) return;
 		
 		Camera camera = gameObject.GetComponent<Camera>();
@@ -41,7 +44,6 @@ public class AVOWCamControl : MonoBehaviour {
 		Vector3 mousePos = Input.mousePosition;
 		mousePos.z = transform.position.z - Camera.main.transform.position.z;
 		
-		GetComponent<Camera>().rect = new Rect(AVOWConfig.singleton.GetSidePanelFrac(), AVOWConfig.singleton.GetBottomPanelFrac(), 1, 1);
 		
 		
 		if (wheelVal != 0){
