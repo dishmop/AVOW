@@ -7,7 +7,7 @@ public class AVOWComponent : MonoBehaviour {
 	// Intrinsic data
 	public GameObject node0GO;
 	public GameObject node1GO;
-	public SpringValue resistanceAngle = new SpringValue(45);
+	public SpringValue resistanceAngle = new SpringValue(45, SpringValue.Mode.kLinear, 40);
 	public float connectorProp = 0.1f;
 	public float squareGap = 0.02f;
 	public float lighteningSize = 0.5f;
@@ -405,15 +405,21 @@ public class AVOWComponent : MonoBehaviour {
 			transform.FindChild("Lightening0").gameObject.SetActive(isInteractive && enableLightening0);
 			transform.FindChild("Lightening1").gameObject.SetActive(isInteractive && enableLightening1);
 			transform.FindChild("Lightening2").gameObject.SetActive(isInteractive);
+			
+			transform.FindChild("ConnectionSphere0").gameObject.SetActive(isInteractive);
+			transform.FindChild("ConnectionSphere1").gameObject.SetActive(false);
+			
 		}
 		else{
 			transform.FindChild("Lightening0").gameObject.SetActive(isInteractive && enableLightening0);
 			transform.FindChild("Lightening1").gameObject.SetActive(isInteractive && enableLightening1);
 			transform.FindChild("Lightening2").gameObject.SetActive(false);
+			
+			transform.FindChild("ConnectionSphere0").gameObject.SetActive(isInteractive);
+			transform.FindChild("ConnectionSphere1").gameObject.SetActive(isInteractive);
+			
 		}
 
-		transform.FindChild("ConnectionSphere0").gameObject.SetActive(isInteractive);
-		transform.FindChild("ConnectionSphere1").gameObject.SetActive(isInteractive);
 		
 		Vector3 newNode0Pos = node0GO.transform.position;
 		Vector3 newNode1Pos = node1GO.transform.position;

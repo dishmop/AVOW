@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class AVOWUITool{
 	
-	protected float hysteresisFactor = 0.9f;
+	protected float hysteresisFactor = 0.85f;
 	protected float maxLighteningDist = 0.3f;
 	protected float 		uiZPos;
 	protected GameObject insideCube;

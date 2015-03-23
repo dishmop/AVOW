@@ -8,6 +8,7 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 	public GameObject prefab;
 	GameObject newNodeGO;
 	GameObject newComponentGO;
+	bool isSplittingAtCell;
 	
 	enum UndoStepState{
 		kRemoveComponent,
@@ -25,10 +26,11 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 	
 	public static int debugCount = 0;
 	
-	public AVOWCommandSplitAddComponent(GameObject splitNodeGO, GameObject component, GameObject prefabToUse){
+	public AVOWCommandSplitAddComponent(GameObject splitNodeGO, GameObject component, GameObject prefabToUse, bool isSplittingCell){
 		nodeGO = splitNodeGO;
 		movedComponent = component;
 		prefab = prefabToUse;
+		isSplittingAtCell = isSplittingCell;
 
 //		Debug.Log (debugCount + " Construct: AVOWCommandSplitAddComponent: splitNodeGO = " + splitNodeGO.GetComponent<AVOWNode>().GetID() + ", component = " + component.GetComponent<AVOWComponent>().GetID());
 
@@ -51,7 +53,7 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 
 				AVOWComponent newComponent = newComponentGO.GetComponent<AVOWComponent>();
 				newComponent.resistanceAngle.Force(0);
-				newComponent.resistanceAngle.Set(10);
+				newComponent.resistanceAngle.Set(isSplittingAtCell ? 8 : 25);
 				newComponent.isInteractive = false;
 				
 				AVOWGraph.singleton.PlaceComponent(newComponentGO, newNodeGO, nodeGO);

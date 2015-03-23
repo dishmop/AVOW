@@ -517,7 +517,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 			int index = i - totalNodeNode;
 			AVOWNode node = graph.allNodes[splitNodeCache[index].Item1].GetComponent<AVOWNode>();
 			Debug.Log ("index = " + index);
-			command = new AVOWCommandSplitAddComponent(graph.allNodes[splitNodeCache[index].Item1], node.components[splitNodeCache[index].Item2], AVOWUI.singleton.resistorPrefab);
+			command = new AVOWCommandSplitAddComponent(graph.allNodes[splitNodeCache[index].Item1], node.components[splitNodeCache[index].Item2], AVOWUI.singleton.resistorPrefab, false);
 		
 		}
 		commands.Push(command);

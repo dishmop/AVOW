@@ -36,7 +36,7 @@ public class AVOWCommandAddComponent : AVOWCommand{
 				AVOWComponent newComponent = newComponentGO.GetComponent<AVOWComponent>();
 			
 				newComponent.resistanceAngle.Force(89);
-				newComponent.resistanceAngle.Set(80);
+				newComponent.resistanceAngle.Set(70);
 				newComponent.isInteractive = false;
 			
 				AVOWGraph.singleton.PlaceComponent(newComponentGO, node0GO, node1GO);

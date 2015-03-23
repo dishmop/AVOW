@@ -656,8 +656,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kCreateSeriesSquare0:{
 				if (onEnterState){
-					AVOWTutorialText.singleton.AddText("Inside each resistance square are two green 'Connection spheres'.");
-					AVOWTutorialText.singleton.AddText("As well as placing squares between two connection bars, you can also place them between a bar and a connection sphere that is attached to it.");
+					AVOWTutorialText.singleton.AddText("As well as placing squares between two connection bars, you can also place them between a bar and a resistance square that is attached to it.");
 					SetTextTrigger(hasDoneCreatedSeriesSquare0);
 				}
 				if (onTextTrigger){
@@ -668,8 +667,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kCreateSeriesSquare1:{
 				if (onEnterState){
-					AVOWTutorialText.singleton.AddText("Go near a connection bar, press and hold the mouse button - notice that some of the connection spheres remain lit while the others go black.");
-					AVOWTutorialText.singleton.AddText("Place the loose spark over a lit connection sphere.");
+					AVOWTutorialText.singleton.AddText("Go near a connection bar, press and hold the mouse button - then connect the loose spark to a green sphere in the centre of a connected square. ");
 					AVOWConfig.singleton.tutDisable2ndComponentConnections = false;
 					AVOWConfig.singleton.tutDisableComponentConstruction = false;
 					SetTextTrigger(hasDoneCreatedSeriesSquare1);

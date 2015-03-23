@@ -837,7 +837,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   node0GO: {fileID: 0}
   node1GO: {fileID: 0}
-  connectorProp: .200000003
+  connectorProp: .5
   squareGap: .00999999978
   lighteningSize: .5
   isInteractive: 1

@@ -204,7 +204,7 @@ public class AVOWGameModes : MonoBehaviour {
 		backStory.SetActive(false);
 		AVOWConfig.singleton.DisplayBottomPanel(false);
 		AVOWConfig.singleton.DisplaySidePanel(true);
-		AVOWObjectiveManager.singleton.InitialiseLimitsOnly(-1);
+		AVOWObjectiveManager.singleton.InitialiseLimitsOnly(7);
 		
 		RestartFreePlayGame();
 	}
