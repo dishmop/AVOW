@@ -15,6 +15,7 @@ public class AVOWConfig : MonoBehaviour {
 	
 	public float sideBarPixels = 0.2f;
 	public float bottomBarFrac = 0.2f;
+	public float buttonFlashRate = 1f;
 	
 	public float flockDesDistToOther = 2f;
 	public float flockDesSpeed = 1f;
@@ -83,7 +84,7 @@ public class AVOWConfig : MonoBehaviour {
 		Vector3 min = new Vector3(Screen.width * GetSidePanelFrac(), Screen.height * GetBottomPanelFrac(), 0);
 		Vector3 max = new Vector3(Screen.width, Screen.height, 0);
 		
-		return Vector3.Lerp (min, max, 0.5f);
+		return new Vector3(Mathf.Lerp (min.x, max.x, 0.55f), Mathf.Lerp (min.y, max.y, 0.5f), Mathf.Lerp (min.z, max.z, 0.5f));
 	}
 	
 	void Awake(){

@@ -23,13 +23,17 @@ public class AVOWGameModes : MonoBehaviour {
 	public GameObject mainMenuPanel;
 	public GameObject levelCompleteDlg;
 	public GameObject whitePanel;
-	public GameObject dlgPanel;
+	public GameObject levelStartMsg;
 	public GameObject sidePanel;
 	public GameObject backStory;
 	public GameObject tutorialText;
 	public GameObject greenBackground;
 	public GameObject scenery;
 	public GameObject pusher;
+	
+	public float levelStartMsgDuration;
+	public float levelStartFadeInDuration;
+	public float levelStartFadeOutDuration;
 	
 	int currentLevel = -1;
 	
@@ -43,6 +47,8 @@ public class AVOWGameModes : MonoBehaviour {
 		kGameCam,
 		kBackStoryCam,
 	}
+	
+	float levelStartMsgTime = -100f;
 
 	// Use this for initialization
 	void Start () {
@@ -86,11 +92,13 @@ public class AVOWGameModes : MonoBehaviour {
 			}
 		}
 		
-		dlgPanel.SetActive(state == GameModeState.kGameOver || state == GameModeState.kStageComplete3);
+		//dlgPanel.SetActive(state == GameModeState.kGameOver || state == GameModeState.kStageComplete3);
 		mainMenuPanel.SetActive(state == GameModeState.kMainMenu);
 		levelCompleteDlg.SetActive (state == GameModeState.kStageComplete3 || state == GameModeState.kStageComplete4);
 		//dlgPanel.transform.FindChild("StageCompleteDlg").gameObject.SetActive(state == GameModeState.kStageComplete);
-		dlgPanel.transform.FindChild("GameOverDlg").gameObject.SetActive(state == GameModeState.kGameOver);
+		//dlgPanel.transform.FindChild("GameOverDlg").gameObject.SetActive(state == GameModeState.kGameOver);
+		
+		HandleLevelStartMsg();
 		
 		switch (state){
 			case GameModeState.kMainMenu:{
@@ -142,7 +150,7 @@ public class AVOWGameModes : MonoBehaviour {
 				Color col = whitePanel.GetComponent<Image>().color;
 				col.a += 0.01f;
 				whitePanel.GetComponent<Image>().color = col;
-				levelCompleteDlg.transform.FindChild("LevelComplete").GetComponent<Text>().text = "Congratulations!/n" + GetLevelName(currentLevel) + " complete";
+				levelCompleteDlg.transform.FindChild("LevelComplete").GetComponent<Text>().text = "Congratulations!\n" + GetLevelName(currentLevel) + " complete";
 				levelCompleteDlg.transform.FindChild("Continue").GetComponent<Text>().text = "Continue to " + GetLevelName(currentLevel + 1);
 				levelCompleteDlg.transform.FindChild("Continue").GetComponent<AVOWMenuButton>().levelNum = currentLevel + 1;
 				if (col.a >= 1){
@@ -177,6 +185,17 @@ public class AVOWGameModes : MonoBehaviour {
 
 	}
 	
+	public void TriggerLevelStartMessage(){
+		levelStartMsgTime = Time.time;
+		levelStartMsg.transform.FindChild ("LevelTitle").GetComponent<Text>().text = GetLevelName(currentLevel);
+	
+	}
+	
+	public void ClearLevelStartMessage(){
+		levelStartMsgTime = -100f;
+	}
+	
+	
 	public void PlayFree(){
 
 		AVOWTutorialText.singleton.activated = false;
@@ -185,6 +204,7 @@ public class AVOWGameModes : MonoBehaviour {
 		backStory.SetActive(false);
 		AVOWConfig.singleton.DisplayBottomPanel(false);
 		AVOWConfig.singleton.DisplaySidePanel(true);
+		AVOWObjectiveManager.singleton.InitialiseLimitsOnly(-1);
 		
 		RestartFreePlayGame();
 	}
@@ -196,6 +216,7 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWConfig.singleton.DisplayBottomPanel(true);
 		AVOWConfig.singleton.DisplaySidePanel(true);
 		backStory.SetActive(false);
+		AVOWObjectiveManager.singleton.InitialiseLimitsOnly(5);
 		
 		AVOWTutorialManager.singleton.StartTutorial();
 		
@@ -235,6 +256,7 @@ public class AVOWGameModes : MonoBehaviour {
 		}
 	}
 	
+	
 	// THe level complete routine rather messes up the scenery - this puts it all back
 	void ResetScenery(){
 		scenery.transform.localScale = new Vector3(1, 1, 1);	
@@ -254,6 +276,7 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWUI.singleton.Restart();
 		AVOWBattery.singleton.ResetBattery();
 		AVOWBattery.singleton.FreezeBattery();
+		AVOWObjectiveManager.singleton.InitialiseBlankBoard();
 		
 		
 		state = GameModeState.kPlayStage;
@@ -265,7 +288,8 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWUI.singleton.Restart();
 		AVOWBattery.singleton.ResetBattery();
 		AVOWBattery.singleton.FreezeBattery();
-
+		AVOWObjectiveManager.singleton.InitialiseBlankBoard();
+		
 		state = GameModeState.kPlayStage;
 	}
 
@@ -304,6 +328,34 @@ public class AVOWGameModes : MonoBehaviour {
 		
 	}
 	
+	void HandleLevelStartMsg(){
+		if (Time.time > levelStartMsgTime + levelStartMsgDuration || Time.time < levelStartMsgTime){
+			levelStartMsg.SetActive(false);
+		}
+		else{
+			levelStartMsg.SetActive(true);
+			// work out the alpha value of the text
+			float alpha = 1;
+			// If fade in
+			if (Time.time < levelStartMsgTime + levelStartFadeInDuration){
+				alpha = (Time.time - levelStartMsgTime) / levelStartFadeInDuration;
+			}
+			// If fade out
+			else if (Time.time > levelStartMsgTime + levelStartMsgDuration - levelStartFadeOutDuration){
+				alpha = (levelStartMsgTime + levelStartMsgDuration - Time.time) / levelStartFadeOutDuration;
+			}
+			// Set the title color
+			Color titleCol = levelStartMsg.transform.FindChild ("LevelTitle").GetComponent<Text>().color;
+			titleCol.a = alpha;
+			levelStartMsg.transform.FindChild ("LevelTitle").GetComponent<Text>().color = titleCol;
+
+			// Set the message color			
+			Color msgCol = levelStartMsg.transform.FindChild ("Message").GetComponent<Text>().color;
+			msgCol.a = alpha;
+			levelStartMsg.transform.FindChild ("Message").GetComponent<Text>().color = msgCol;
+		}
+	}
+	
 	void RestartNormalGame(){
 		AVOWConfig.singleton.showObjectives = true;
 		AVOWGraph.singleton.ClearCircuit();
@@ -338,13 +390,15 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWConfig.singleton.DisplayBottomPanel(false);
 		AVOWConfig.singleton.DisplaySidePanel(false);
 		AVOWCircuitCreator.singleton.Deinitialise();
+		AVOWObjectiveManager.singleton.StopObjectives();
+		ClearLevelStartMessage();
 		state = GameModeState.kMainMenu;
 	}
 	
-	public void GoToMainFromComplete(){
-		PlayFree();
-		state = GameModeState.kMainMenu;
-	}
+//	public void GoToMainFromComplete(){
+//		PlayFree();
+//		state = GameModeState.kMainMenu;
+//	}
 	
 	public string GetLevelName(int index){
 		if (index > 0){

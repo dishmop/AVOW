@@ -40,6 +40,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   woodPrefabs:
+  - {fileID: 195014, guid: 678d52bfa9c514e1ab2146635edc41f1, type: 2}
   - {fileID: 195014, guid: 6a096e0a4f2ae43e4b70cb81003370c2, type: 2}
   - {fileID: 197048, guid: f458a898f2e3e4118babfa2e8c742bc7, type: 2}
   - {fileID: 104338, guid: b357048af859b4564a0c2213829e48df, type: 2}
@@ -58,6 +59,7 @@ MonoBehaviour:
   - {fileID: 134162, guid: 1ab61f326a51a4d6d8cd89af1b3e59b0, type: 2}
   - {fileID: 134162, guid: 1ab61f326a51a4d6d8cd89af1b3e59b0, type: 2}
   shadedPrefab: {fileID: 182376, guid: d2ce0c8d57bed482d8cfef96bb814719, type: 2}
+  totalNumPanels: 50
   coverMoveSpeed: 2
   completeWaitDuration: .5
 --- !u!1001 &100100000

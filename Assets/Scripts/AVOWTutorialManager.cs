@@ -433,7 +433,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			case State.kPressMouseToOtherConnection:{	
 				if (onEnterState){
 					AVOWTutorialText.singleton.InterruptText("There is another spark coming from me which is not attached to anything. This is called the loose spark.");
-					AVOWTutorialText.singleton.AddTextNoLine("Try to connect the loose spark to the other connection point");
+					AVOWTutorialText.singleton.AddText("Try to connect the loose spark to the other connection point");
 					SetTextTrigger(hasDonePressMouseToOtherConnection);
 				}	
 				if (onTextTrigger){
@@ -449,7 +449,6 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kPressMouseToOtherConnectionWait:{
 				if (onEnterState){
-					AVOWTutorialText.singleton.AddText(" that's hidden in the wall.");
 					AVOWConfig.singleton.tutDisable2ndBarConnections = false;
 				}
 				if (AVOWUI.singleton.GetUITool().GetNumConnections() == 2){
@@ -900,8 +899,8 @@ public class AVOWTutorialManager : MonoBehaviour {
 			case State.kDestroySuccessful:{	
 				if (onEnterState){
 					AVOWTutorialText.singleton.InterruptText ("You have succesfully destroyed a resistance square.");
-					AVOWTutorialText.singleton.AddText ("f you want to make more squares, you click the blue Create button on the left or alternatvely stick with the Destruction tool.");
-					AVOWTutorialText.singleton.AddText ("Just play around with what you have learnt. When you are finished click the Main Menu button.");
+					AVOWTutorialText.singleton.AddText ("If you want to make more squares, click the blue Create button on the left or alternatvely stick with the Destruction tool.");
+					AVOWTutorialText.singleton.AddText ("Just play around with what you have learnt. When you are finished click the Main Menu button. You can always play around more be selecting the Free Play option from the main menu.");
 				}	
 				if (AVOWUI.singleton.GetUITool().IsHolding()){
 //					state = State.kDestroyPressAndHold;

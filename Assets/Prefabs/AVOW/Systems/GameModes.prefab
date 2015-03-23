@@ -115,6 +115,7 @@ MonoBehaviour:
   babyCubePrefab: {fileID: 100002, guid: 6254920d69e964c9083e8c0512222c11, type: 2}
   babyCubePrefabMid: {fileID: 100002, guid: 801374bb62bdf4ed9ac81cb0c89c9e34, type: 2}
   babyCubePrefabAfter: {fileID: 100002, guid: 599bb7c98a8ad477b80cebce294d49fd, type: 2}
+  backStoryQuit: {fileID: 0}
   danceFollow3Dist: 40
   prisonSphere1: {fileID: 0}
   state: 4
@@ -137,13 +138,16 @@ MonoBehaviour:
   mainMenuPanel: {fileID: 0}
   levelCompleteDlg: {fileID: 0}
   whitePanel: {fileID: 0}
-  dlgPanel: {fileID: 0}
+  levelStartMsg: {fileID: 0}
   sidePanel: {fileID: 0}
   backStory: {fileID: 0}
   tutorialText: {fileID: 0}
   greenBackground: {fileID: 0}
   scenery: {fileID: 0}
   pusher: {fileID: 0}
+  levelStartMsgDuration: 5
+  levelStartFadeInDuration: 1
+  levelStartFadeOutDuration: 2
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

@@ -51,6 +51,7 @@
      <Compile Include="Assets\Scripts\AVOWButton.cs" />
      <Compile Include="Assets\Scripts\AVOWCamControl.cs" />
      <Compile Include="Assets\Scripts\AVOWCircuitCreator.cs" />
+     <Compile Include="Assets\Scripts\AVOWCircuitSubsetter.cs" />
      <Compile Include="Assets\Scripts\AVOWCircuitTarget.cs" />
      <Compile Include="Assets\Scripts\AVOWCommand.cs" />
      <Compile Include="Assets\Scripts\AVOWCommandAddComponent.cs" />
@@ -58,6 +59,7 @@
      <Compile Include="Assets\Scripts\AVOWCommandSplitAddComponent.cs" />
      <Compile Include="Assets\Scripts\AVOWComponent.cs" />
      <Compile Include="Assets\Scripts\AVOWConfig.cs" />
+     <Compile Include="Assets\Scripts\AVOWFlashingButton.cs" />
      <Compile Include="Assets\Scripts\AVOWGameModes.cs" />
      <Compile Include="Assets\Scripts\AVOWGraph.cs" />
      <Compile Include="Assets\Scripts\AVOWGreenBackground.cs" />
@@ -163,6 +165,7 @@
      <Compile Include="Assets\Scripts\alglib\src\solvers.cs" />
      <Compile Include="Assets\Scripts\alglib\src\specialfunctions.cs" />
      <Compile Include="Assets\Scripts\alglib\src\statistics.cs" />
+     <Compile Include="Assets\TextScaler.cs" />
      <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />
      <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />

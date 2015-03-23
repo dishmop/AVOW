@@ -98,6 +98,39 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		return state == State.kReady;
 	}
 	
+	public void ConstructBlankBoard(){
+		if (currentWood != null){
+			foreach (GameObject go in currentWood){
+				GameObject.Destroy(go);
+			}
+			GameObject.Destroy(shadedSquare);
+		}
+		int numPanels = totalNumPanels;
+		currentWood = new GameObject[numPanels];
+		for (int i = 0; i < numPanels; ++i){
+			currentWood[i] = GameObject.Instantiate(woodPrefabs[0]);
+			currentWood[i].transform.parent = transform;
+			currentWood[i].transform.localPosition = new Vector3(i+1, 0, 0.2f);
+		}
+		shadedSquare = GameObject.Instantiate(shadedPrefab);
+		shadedSquare.transform.parent = transform;
+		shadedSquare.transform.localPosition = new Vector3(0, 0, -0.1f);
+		shadedSquare.transform.localScale = new Vector3(numPanels, 1, 1);
+		shadeVal = new SpringValue(0);
+		UpdateShadedSquare();
+		
+		
+		// Remove any covers that already exist
+		if (currentCovers != null){
+			foreach (GameObject go in currentCovers){
+				GameObject.Destroy (go);
+			}
+			currentCovers = null;
+		}
+		
+		transform.localPosition = Vector3.zero;
+	}
+	
 	public void ConstructGrid(AVOWCircuitTarget target){
 		int division = target.lcm;
 		int width = target.widthInLCMs;
@@ -114,7 +147,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		int numPanels = totalNumPanels;
 		currentWood = new GameObject[numPanels];
 		for (int i = 0; i < numPanels; ++i){
-			currentWood[i] = GameObject.Instantiate(woodPrefabs[division-1]);
+			currentWood[i] = GameObject.Instantiate(woodPrefabs[division]);
 			currentWood[i].transform.parent = transform;
 			currentWood[i].transform.localPosition = new Vector3(i+1, 0, 0.2f);
 		}

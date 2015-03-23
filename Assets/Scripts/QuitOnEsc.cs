@@ -2,6 +2,9 @@ using UnityEngine;
 using System.Collections;
 
 public class QuitOnEsc : MonoBehaviour {
+	public float mouseMoveCursorTimeout = 5;
+	float mouseMoveTime;
+	
 
 	// Use this for initialization
 	void Start () {
@@ -13,6 +16,12 @@ public class QuitOnEsc : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		// if the back story is on, then do a timed cursor
+		Vector2 mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+		if (!MathUtils.FP.Feq (mouseDelta.magnitude, 0, 0.01f)){
+			mouseMoveTime = Time.time;
+		}
+		
 		// Test for exit
 		if (Input.GetKeyDown (KeyCode.Escape)) {
 			if (GameModeManager.singleton != null){
@@ -34,7 +43,14 @@ public class QuitOnEsc : MonoBehaviour {
 		}
 		else
 		{
-			Cursor.visible = false;
+			if ( AVOWBackStoryCutscene.singleton.state != AVOWBackStoryCutscene.State.kOff){
+		//		Cursor.visible = (Time.time < mouseMoveTime + mouseMoveCursorTimeout);
+				
+			}
+			else{
+				//otherwise we are probably just playing the game, so want to use the gane cursor
+				Cursor.visible = false;
+			}
 			
 		}
 		

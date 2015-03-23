@@ -14,6 +14,8 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	public GameObject babyCubePrefab;
 	public GameObject babyCubePrefabMid;
 	public GameObject babyCubePrefabAfter;
+	public GameObject backStoryQuit;
+	
 	
 	public float danceFollow3Dist = 10;
 	
@@ -296,6 +298,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		backStoryQuit.SetActive(state != State.kOff);
 		if (steeringState == SteeringState.kAvoidCentre){
 			SteerSpheresAwayFromCentre();
 		}
@@ -651,7 +654,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 				BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView = Mathf.Min (BackStoryCamera.singleton.GetComponent<Camera>().fieldOfView + zoomSpeed, 45);
 				if ((babyCube.transform.position - BackStoryCamera.singleton.transform.position).magnitude > danceFollow3Dist * 0.8){
 					state = State.kEnvy3a;
-					AVOWTutorialText.singleton.AddTextNoLine("The spheres that made me were cast out, ");
+					AVOWTutorialText.singleton.AddText("The spheres that made me were cast out.");
 					envy2Time = Time.fixedTime + 7f;
 				
 				}

@@ -117,7 +117,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 		// Calc the mouse posiiton on world space
 		Vector3 screenCentre = AVOWConfig.singleton.GetViewCentre();
 		Vector3 inputScreenPos = Vector3.Lerp(screenCentre, Input.mousePosition, AVOWConfig.singleton.cubeToCursor.GetValue());
-		
+		if (AVOWConfig.singleton.tutDisableMouseMove) cursorCube.transform.rotation = Quaternion.identity;
 		Vector3 mousePos = inputScreenPos;
 		mousePos.z = 0;
 		mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);

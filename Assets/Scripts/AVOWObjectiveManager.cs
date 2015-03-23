@@ -7,6 +7,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	public GameObject objectiveBoardPrefab;
 	public float boardSpeed;
 	public float unstackWaitDuration = 0.5f;
+	public float levelStartPauseDuration;
 	
 	
 	// Front and back boards
@@ -14,7 +15,8 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	int frontIndex = 0;
 	int backIndex = 1;
 	
-	float unstackWaitTime;
+	float waitTime;
+	
 	int numBoardsToUnstack;
 	bool hasMovedToRow;
 	
@@ -29,10 +31,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	int resistorLimit = -1;
 	int currentGoalIndex;
 	
-	bool isFirstBoard;
 	
 	enum State{
 		kNone,
+		kPauseOnLevelStart,
 		kWaitForCircuitCreator,
 		kBuildBackBoard,
 		kSwapBoards0,
@@ -59,6 +61,11 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		
 		return transform.position.x +  Mathf.Max (1, boards[frontIndex].GetComponent<AVOWObjectiveBoard>().GetWidth());
 	}
+	
+	public void InitialiseLimitsOnly(int limit){
+		resistorLimit = limit;
+	}
+		
 	
 	public void InitialiseLevel(int level){
 		numBoardsToUnstack = 0;
@@ -90,12 +97,25 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				break;
 			}
 		}
-		
+		InitialiseBlankBoard();
 		AVOWCircuitCreator.singleton.Initialise(resistorLimit);
-		state = State.kWaitForCircuitCreator;
-		currentGoalIndex = 0;
-		isFirstBoard = true;
+		state = State.kPauseOnLevelStart;
+		waitTime = Time.time + levelStartPauseDuration;
+		AVOWGameModes.singleton.TriggerLevelStartMessage();
 	}
+	
+	public void InitialiseBlankBoard(){
+		currentGoalIndex = 0;
+		boards[frontIndex].GetComponent<AVOWObjectiveBoard>().ConstructBlankBoard();
+		boards[backIndex].GetComponent<AVOWObjectiveBoard>().ConstructBlankBoard();
+	}
+	
+	// Call to stop the game
+	public void StopObjectives(){
+		state = State.kNone;
+		InitialiseBlankBoard();
+	}
+	
 
 	public void DeinitialiseLevel(){
 		AVOWCircuitCreator.singleton.Deinitialise();
@@ -160,6 +180,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	void Update () {
 	
 		switch (state){
+			case State.kPauseOnLevelStart:{
+				if (Time.time > waitTime) state = State.kWaitForCircuitCreator;
+				break;
+			}
 			case State.kWaitForCircuitCreator:{
 				if (AVOWCircuitCreator.singleton.IsReady()){
 					state = State.kBuildBackBoard;
@@ -167,6 +191,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				break;
 			}
 			case State.kBuildBackBoard:{
+				// Chedk that we have a valud currentGoal
+				if (currentGoalIndex < 0 || currentGoalIndex >= AVOWCircuitCreator.singleton.GetResults().Count){
+					Debug.LogError ("currentGoalIndex = " + currentGoalIndex + " when trying to build a board");
+				}
 				AVOWObjectiveBoard board = boards[backIndex].GetComponent<AVOWObjectiveBoard>();
 				AVOWCircuitTarget target = AVOWCircuitCreator.singleton.GetResults()[currentGoalIndex];
 				if (numBoardsToUnstack > 0){
@@ -188,11 +216,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				pos.y -= boardSpeed * Time.deltaTime;
 				boards[frontIndex].transform.position = pos;
 				
-				if (pos.y < -1 || isFirstBoard){
+				if (pos.y < -1){
 					SwapBoards();
 					boards[frontIndex].GetComponent<AVOWObjectiveBoard>().BrightenBoard(0.5f);
 					state = State.kSwapBoards1;
-					isFirstBoard = false;
 				}
 				break;
 			}
@@ -202,13 +229,13 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				boards[backIndex].transform.position = pos;
 				
 				if (UpdateBoardDepths()){
-					unstackWaitTime = Time.time + unstackWaitDuration;
+					waitTime = Time.time + unstackWaitDuration;
 					state = State.kPlay;
 				}
 				break;
 			}
 			case State.kPlay:{
-				if (numBoardsToUnstack > 0 && Time.time > unstackWaitTime && !hasMovedToRow){
+				if (numBoardsToUnstack > 0 && Time.time > waitTime && !hasMovedToRow){
 					boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToRow();
 					hasMovedToRow = true;
 				}

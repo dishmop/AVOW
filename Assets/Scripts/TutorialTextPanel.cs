@@ -13,10 +13,6 @@ public class TutorialTextPanel : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		GetComponent<RectTransform>().anchorMax = new Vector2(1, AVOWConfig.singleton.GetBottomPanelFrac());
-		float panelHeght = GetComponent<RectTransform>().anchorMax.y * Screen.height;
-		
-		transform.FindChild ("Image").FindChild ("Text").GetComponent<Text>().fontSize = (int)panelHeght / 10;
-		
 	
 	}
 }
