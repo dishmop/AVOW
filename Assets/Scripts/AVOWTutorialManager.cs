@@ -898,7 +898,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 				if (onEnterState){
 					AVOWTutorialText.singleton.InterruptText ("You have succesfully destroyed a resistance square.");
 					AVOWTutorialText.singleton.AddText ("If you want to make more squares, click the blue Create button on the left or alternatvely stick with the Destruction tool.");
-					AVOWTutorialText.singleton.AddText ("Just play around with what you have learnt. When you are finished click the Main Menu button. You can always play around more be selecting the Free Play option from the main menu.");
+					AVOWTutorialText.singleton.AddText ("Just play around with what you have learnt. When you are finished click the Main Menu button. You can always play around more by selecting the Free Play option from the main menu.");
 				}	
 				if (AVOWUI.singleton.GetUITool().IsHolding()){
 //					state = State.kDestroyPressAndHold;

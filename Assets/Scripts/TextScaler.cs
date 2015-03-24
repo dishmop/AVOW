@@ -11,8 +11,6 @@ public class TextScaler : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		
-		
 	}
 	
 	// Update is called once per frame
@@ -20,6 +18,7 @@ public class TextScaler : MonoBehaviour {
 		float screenHeight = sizeGO.GetComponent<RectTransform>().rect.height;
 		
 		transform.GetComponent<Text>().fontSize = (int)(screenHeight / ((float)numLinesToFit * tuneVal));
+	
 		
 		
 	}

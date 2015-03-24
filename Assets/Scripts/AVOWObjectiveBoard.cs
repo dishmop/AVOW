@@ -267,14 +267,14 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		displayToCoversMapping = CreateIdentityMapping(target.componentDesc.Count);
 	}
 	
-	public bool TestWidthsMatch(AVOWCircuitTarget testTarget){
-		if (testTarget.componentDesc.Count != currentTarget.componentDesc.Count) return false;
-		
-		for (int i = 0; i < testTarget.componentDesc.Count; ++i){
-			if (!MathUtils.FP.Feq(testTarget.componentDesc[i][0], currentTarget.componentDesc[i][0])) return false;
-		}
-		return true;
-	}
+//	public bool TestWidthsMatch(AVOWCircuitTarget testTarget){
+//		if (testTarget.componentDesc.Count != currentTarget.componentDesc.Count) return false;
+//		
+//		for (int i = 0; i < testTarget.componentDesc.Count; ++i){
+//			if (!MathUtils.FP.Feq(testTarget.componentDesc[i][0], currentTarget.componentDesc[i][0])) return false;
+//		}
+//		return true;
+//	}
 	
 	public bool TestWidthsMatchWithGaps(AVOWCircuitTarget testTarget){
 		// make a list of the goals we are trying to reach so we can cross them off as we go

@@ -32,7 +32,7 @@ public class AVOWTutorialText : MonoBehaviour {
 	const string		kTriggerKey = "TRIGGER";
 	
 	public void AddText(string text){
-		queuedString.Append(text + "\n\n");
+		queuedString.Append(text + "\n");
 		
 	}
 	
@@ -40,9 +40,9 @@ public class AVOWTutorialText : MonoBehaviour {
 	public void InterruptText(string text){
 		if (queuedString.Length > 5){
 			queuedString.Length = 0;
-			queuedString.Append("...\n\n");
+			queuedString.Append("...\n");
 			ForceTextCompletion();
-			queuedString.Append(text + "\n\n");
+			queuedString.Append(text + "\n");
 		}
 		else{
 			ForceTextCompletion();
@@ -108,6 +108,7 @@ public class AVOWTutorialText : MonoBehaviour {
 	void Start () {
 		lettersPerSecond = defaultLettersPerSecond;
 		ClearDisplayString();
+		textBox.GetComponent<Text>().lineSpacing = 1.5f;
 	
 	}
 	
