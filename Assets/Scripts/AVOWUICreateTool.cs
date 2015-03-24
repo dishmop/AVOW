@@ -124,6 +124,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 		
 		// Get the mouse buttons
 		bool  buttonPressed = (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButtonDown(0));
+		bool  buttonIsDown =   (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButton(0));
 		bool  buttonReleased = (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButtonUp(0));
 		//		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
 		
@@ -158,7 +159,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 			
 			
 			
-			if (buttonPressed && connection0 != null){
+			if (buttonIsDown && connection0 != null){
 				heldConnection = true;
 			}
 		}
@@ -424,7 +425,8 @@ public class AVOWUICreateTool :  AVOWUITool{
 			// and that gap is between two nodes
 			if (connection1.GetComponent<AVOWComponent>() == null){
 				connection1PosUse = new Vector3(insideCube.transform.position.x, connection1Pos.y, connection1Pos.z);
-			}else{
+			}
+			else{
 				connection1PosUse = (connection1WhichPoint == 0) ? connection1.GetComponent<AVOWComponent>().GetConnectionPos0() : connection1.GetComponent<AVOWComponent>().GetConnectionPos1() ;
 				
 			}
@@ -595,7 +597,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 		if (heldGapCommand == null && connection1 != null){
 			heldGapConnection1 = connection1;
 			if (connection1.GetComponent<AVOWComponent>()){
-				heldGapCommand = new AVOWCommandSplitAddComponent(connection0, connection1, AVOWUI.singleton.resistorPrefab, connection1.GetComponent<AVOWComponent>().type == AVOWComponent.Type.kVoltageSource);
+				heldGapCommand = new AVOWCommandSplitAddComponent(connection0, connection1, AVOWUI.singleton.resistorPrefab, connection1.GetComponent<AVOWComponent>().type == AVOWComponent.Type.kVoltageSource && (connection0.GetComponent<AVOWNode>().inComponents.Count + connection0.GetComponent<AVOWNode>().outComponents.Count) > 2);
 				Debug.Log("new AVOWCommandSplitAddComponent " + Time.time);
 			}
 			else{

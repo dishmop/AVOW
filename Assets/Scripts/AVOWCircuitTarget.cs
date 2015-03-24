@@ -112,8 +112,17 @@ public class AVOWCircuitTarget{
 	}
 	
 	
+	int CompareValsForSorting(Vector3 val1, Vector3 val2){
+		if (!MathUtils.FP.Feq (val1[0], val2[0])) return val2[0].CompareTo(val1[0]);
+		if (!MathUtils.FP.Feq (val1[2], val2[2])) return val1[2].CompareTo(val2[2]);
+		return val1[1].CompareTo(val2[1]);
+		
+	}
+	
+	
 	public void CalcStats(){
-		componentDesc.Sort((obj1, obj2) => obj2[0].CompareTo(obj1[0]));
+		componentDesc.Sort((obj1, obj2) => CompareValsForSorting(obj1, obj2));
+		
 		
 		int denominator;
 		int vulgarNumerator;

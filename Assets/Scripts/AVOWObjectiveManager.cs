@@ -98,11 +98,13 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			}
 			case 6:{
 				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
+				numBoardsToUnstack = 3;
 				resistorLimit = 3;
 				break;
 			}
 			case 7:{
 				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
+				numBoardsToUnstack = 3;
 				resistorLimit = 4;
 				break;
 			}
@@ -221,13 +223,24 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				else{
 					target = AVOWCircuitSubsetter.singleton.GetResults()[currentGoalIndex];
 				}
-				if (numBoardsToUnstack > 0){
-					board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kStack);
-					hasMovedToRow = false;
+				if (layoutMode == AVOWObjectiveBoard.LayoutMode.kRow){
+				    if (numBoardsToUnstack > 0){
+						board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kStack);
+						hasMovedToRow = false;
+					}
+					else{
+						board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kRow);
+					}
 				}
-				else{
-					board.PrepareBoard(target, layoutMode);
-				}
+				if (layoutMode == AVOWObjectiveBoard.LayoutMode.kGappedRow){
+					if (numBoardsToUnstack > 0){
+						board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kRow);
+						hasMovedToRow = false;
+					}
+					else{
+						board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kGappedRow);
+					}
+				}				
 				boards[backIndex].transform.localPosition = Vector3.zero;
 				ForceBoardDepths();
 			//				AVOWBattery.singleton.ResetBattery();
@@ -260,7 +273,12 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			}
 			case State.kPlay:{
 				if (numBoardsToUnstack > 0 && Time.time > waitTime && !hasMovedToRow){
-					boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToRow();
+					if (layoutMode == AVOWObjectiveBoard.LayoutMode.kRow){
+						boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToRow();
+					}
+					else{
+						boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToGappedRow();
+					}
 					hasMovedToRow = true;
 				}
 				if (!AVOWGraph.singleton.HasHalfFinishedComponents()){
@@ -273,8 +291,8 @@ public class AVOWObjectiveManager : MonoBehaviour {
 					}
 					else{
 						if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatchWithGaps(currentGraphAsTarget)){
-//							boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToTarget(currentGraphAsTarget);
-							state = State.kGoalComplete1;
+							boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToTarget(currentGraphAsTarget);
+							state = State.kGoalComplete0;
 						}
 					}
 			    }

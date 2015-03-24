@@ -50,14 +50,25 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	State state = State.kReady;
 	
 	public void MoveToRow(){
-		displayTarget = CreateRowTarget (displayTarget);
+		displayTarget = CreateRowTarget (displayTarget, false);
 		RecreateDisplayMapping();
 		state = State.kMovingToTarget;
 		horizontalFirst = true;
 	}
 	
+	
+	
+	public void MoveToGappedRow(){
+		displayTarget = CreateRowTarget (currentTarget, false);
+		ReorderCoversToMatch(displayTarget);
+		RecreateDisplayMapping();
+		state = State.kMovingToTarget;
+		horizontalFirst = true;
+	}
+	
+	
 	public void MoveToTarget(AVOWCircuitTarget target){
-		displayTarget = target;
+		displayTarget = ConstructCompatibleDisplayTarget(target);
 		RecreateDisplayMapping();
 		state = State.kMovingToTarget;
 		horizontalFirst = false;
@@ -79,11 +90,11 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		ConstructGrid(currentTarget);
 		switch (layoutMode){
 			case LayoutMode.kRow:{
-				CreateCovers(CreateRowTarget(currentTarget));
+				CreateCovers(CreateRowTarget(currentTarget, true));
 				break;
 			}
 			case LayoutMode.kGappedRow:{
-				CreateCovers(CreateRowTarget(currentTarget));
+				CreateCovers(CreateRowTarget(currentTarget, false));
 				break;
 			}
 			case LayoutMode.kStack:{
@@ -134,6 +145,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		}
 		
 		transform.localPosition = Vector3.zero;
+		state = State.kReady;
 	}
 	
 	public void ConstructGrid(AVOWCircuitTarget target){
@@ -163,6 +175,54 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		shadedSquare.transform.localScale = new Vector3(numPanels, 1, 1);
 		shadeVal = new SpringValue(maxShade);
 		UpdateShadedSquare();
+	}
+	
+	// This constructs a target which we can display given that our goal is "target" - our covers may not currently
+	// Match these sizes, though should at least be a subset of it
+	AVOWCircuitTarget ConstructCompatibleDisplayTarget(AVOWCircuitTarget target){
+		// Lets assume that the current display target does match the covers and try and make something which matches the current display target
+		// This target has things in all the right places
+		
+		// Go through each of the components in target and match them with ones in display - if we can't match one, then remove it
+		AVOWCircuitTarget newTarget = new AVOWCircuitTarget(target);
+		List<Vector3> currentDisplayList = new List<Vector3>();
+		foreach(Vector3 vals in displayTarget.componentDesc){
+			currentDisplayList.Add (vals);	
+		}
+		
+		for (int i = 0; i < newTarget.componentDesc.Count; ){
+			float targetVal = newTarget.componentDesc[i][0];
+			
+			int removalIndex = -1;
+			for (int j = 0; j < currentDisplayList.Count; ++j){
+				if (MathUtils.FP.Feq(currentDisplayList[j][0], targetVal)){
+					removalIndex = j;
+					break;
+				}
+			}
+			// If we couldn't find our target box in the set of displayed components - then remove it from the target
+			// And no need to increment i
+			if (removalIndex == -1){
+				newTarget.HideComponent(i);
+			}
+			// Otherwise, we did find it - so should remove it from the display list to show it has already been accounted for
+			else{
+				currentDisplayList.RemoveAt(removalIndex);
+				++i;
+			}
+		}
+		
+		// We should have at least accounted for everything in the display list
+		if (currentDisplayList.Count != 0){
+			Debug.LogError ("currentDisplayList.Count != 0");
+		}
+		// Also we should have the same set of targets in the newTarget as we had in the old one
+		if (!newTarget.Equals (displayTarget)){
+			Debug.LogError ("(!newTarget.Equals (displayTarget)");
+		}
+		return newTarget;
+
+		
 	}
 	
 	void UpdateShadedSquare(){
@@ -206,9 +266,10 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 //		}
 //	}
 //	
-	public AVOWCircuitTarget CreateRowTarget(AVOWCircuitTarget target){
+	public AVOWCircuitTarget CreateRowTarget(AVOWCircuitTarget target, bool showHidden){
 		// Make a deep copy
 		AVOWCircuitTarget newTarget = new AVOWCircuitTarget(target);
+		if (showHidden) newTarget.UnhideAllComponents();
 		
 		// The compoentDescs should already be sorted in biggest to smallest order
 		float cumWidth = 0;
@@ -323,6 +384,39 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		return mapping;
 	}
 	
+	// This Target might just contain a subset of the blocks, say, N of them - we reorder our 
+	// covers so that the sizes of the first N match those in target
+	void ReorderCoversToMatch(AVOWCircuitTarget target){
+		GameObject[] newCovers = new GameObject[currentCovers.Length];
+		
+		int coversIndex = 0;
+		for (int i = 0; i < target.componentDesc.Count; ++i){	
+			float targetSize = target.componentDesc[i][0];
+			int removalIndex = -1;
+			for (int j = 0; j < currentCovers.Length; ++j){
+				float coverSize = currentCovers[j].transform.localScale.x;
+				if (MathUtils.FP.Feq (coverSize, targetSize)){
+					newCovers[coversIndex++] = currentCovers[j];
+					removalIndex = j;
+					break;
+				}
+			}
+			if (removalIndex == -1){
+				Debug.LogError (" (removalIndex != -1)");
+			}
+			// Remvoe it (a bit hacky)
+			List<GameObject> foos = new List<GameObject>(currentCovers);
+			foos.RemoveAt(removalIndex);
+			currentCovers = foos.ToArray();
+		}
+		
+		// Now add in the remaining covers (so we are still keeping track of them all)
+		foreach (GameObject cover in currentCovers){
+			newCovers[coversIndex++] = cover;
+		} 
+		currentCovers = newCovers;
+		
+	}
 	
 	void RecreateDisplayMapping(){
 		int startIndex = 0;
@@ -449,18 +543,64 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		return finished;
 	}
 	
+	bool UpdateRemoveHidden(){
+	
+		if (currentCovers.Length == displayTarget.componentDesc.Count) return true;
+		
+		float deltaDist = coverMoveSpeed * Time.deltaTime;
+		
+		
+		// Get a list of all the covers which are not accounted for in the displayToCovers mapping
+		bool[] coversRemove = new bool[currentCovers.Length];
+		for (int i = 0; i < coversRemove.Length; ++i){
+			coversRemove[i] = true;
+		}
+		for (int i = 0; i < displayTarget.componentDesc.Count; ++i){
+			coversRemove[displayToCoversMapping[i]] = false;
+		}
+		float maxHeight = -100f;
+		for (int i = 0; i < currentCovers.Length; ++i){
+			if (coversRemove[i]){
+				currentCovers[i].transform.localPosition -= new Vector3(0, deltaDist, 0);
+				maxHeight = Mathf.Max(maxHeight, currentCovers[i].transform.localPosition.y);
+				
+			}
+		}
+		
+		return ( maxHeight < -2);
+		
+		
+	}
+	
 	bool UpdateMoveToTarget(){
+
 		if (horizontalFirst){
-			bool finished = UpdateMoveToTargetHorzontal();
+			bool finished = UpdateRemoveHidden();
+			if (finished){
+				finished = UpdateMoveToTargetHorzontal();
+			}
 			if (finished){
 				finished =  UpdateMoveToTargetVertical();
+			}
+			if (finished){
+				if (currentCovers.Length != displayTarget.componentDesc.Count){
+					CreateCovers(displayTarget);
+				}
 			}
 			return finished;
 		}
 		else{
-			bool finished = UpdateMoveToTargetVertical();
+			bool finished = UpdateRemoveHidden();
+			if (finished){
+				finished = UpdateMoveToTargetVertical();
+			}
 			if (finished){
 				finished =  UpdateMoveToTargetHorzontal();
+			}
+			if (finished){
+				if (currentCovers.Length != displayTarget.componentDesc.Count){
+					CreateCovers(displayTarget);
+				}
 			}
 			return finished;
 		}
@@ -517,6 +657,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		float deltaDist = coverMoveSpeed * Time.deltaTime;
 		float minHeight = 1;
 		foreach (GameObject go in currentCovers){
+			if (go == null) continue;
 			go.transform.localPosition -= new Vector3(0, deltaDist, 0);
 			minHeight = Mathf.Min (minHeight, go.transform.localPosition.y);
 		}	

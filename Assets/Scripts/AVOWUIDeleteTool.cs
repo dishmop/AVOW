@@ -109,6 +109,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		
 		// Get the mouse buttons
 		bool  buttonPressed = (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButtonDown(0));
+		bool  buttonIsDown =   (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButton(0));
 		bool  buttonReleased = (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButtonUp(0));
 		//		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
 		
@@ -128,7 +129,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 			connectionGO = closestObj;
 			connectionPos = closestPos;
 			
-			if (buttonPressed && connectionGO != null){
+			if (buttonIsDown && connectionGO != null){
 				heldConnection = true;
 			}
 		}
