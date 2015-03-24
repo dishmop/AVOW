@@ -58,7 +58,7 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 	
 	public int GetNumMainMenuButtons(){
-		return 8;
+		return 11;
 	}
 	
 	public int GetMinMainMenuButton(){
@@ -300,6 +300,7 @@ public class AVOWGameModes : MonoBehaviour {
 		currentLevel = levelNum;
 		if (currentLevel > 0){
 			AVOWObjectiveManager.singleton.InitialiseLevel(levelNum);
+			SelectCamera(CameraChoice.kGameCam);
 			RestartNormalGame();
 		}
 		else{

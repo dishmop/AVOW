@@ -15,6 +15,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	public enum LayoutMode {
 		kRow,
 		kStack,
+		kGappedRow,
 	};	
 	
 	float maxShade = 0.675f;
@@ -79,7 +80,11 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		switch (layoutMode){
 			case LayoutMode.kRow:{
 				CreateCovers(CreateRowTarget(currentTarget));
-			break;
+				break;
+			}
+			case LayoutMode.kGappedRow:{
+				CreateCovers(CreateRowTarget(currentTarget));
+				break;
 			}
 			case LayoutMode.kStack:{
 				CreateCovers(currentTarget);
@@ -263,7 +268,6 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public bool TestWidthsMatch(AVOWCircuitTarget testTarget){
-		// Exclude the battery in the count
 		if (testTarget.componentDesc.Count != currentTarget.componentDesc.Count) return false;
 		
 		for (int i = 0; i < testTarget.componentDesc.Count; ++i){
@@ -272,20 +276,44 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		return true;
 	}
 	
-	public bool TestPositionMatch(AVOWCircuitTarget testTarget){		
-		for (int i = 0; i < displayTarget.componentDesc.Count; ++i){
-			
-			if (!MathUtils.FP.Feq (currentCovers[displayToCoversMapping[i]].transform.localPosition.x, displayTarget.componentDesc[i][1])){
-				return false;
-				
+	public bool TestWidthsMatchWithGaps(AVOWCircuitTarget testTarget){
+		// make a list of the goals we are trying to reach so we can cross them off as we go
+		List<Vector3> goalList = new List<Vector3>();
+		foreach (Vector3 vals in currentTarget.componentDesc){
+			goalList.Add(vals);
+		}
+		
+		foreach (Vector3 vals in testTarget.componentDesc){	
+			// See if we have it in our goal list
+			int removalIndex = -1;
+			for (int i = 0; i < goalList.Count; ++i){
+				if (MathUtils.FP.Feq (goalList[i][0], vals[0])){
+					removalIndex = i;
+					break;
+				}
 			}
-			if (!MathUtils.FP.Feq (currentCovers[displayToCoversMapping[i]].transform.localPosition.y, displayTarget.componentDesc[i][2])){
-				return false;
-				
+			if (removalIndex != -1){
+				goalList.RemoveAt(removalIndex);
 			}
 		}
-		return true;
+		
+		return goalList.Count == 0;
 	}
+	
+//	public bool TestPositionMatch(AVOWCircuitTarget testTarget){		
+//		for (int i = 0; i < displayTarget.componentDesc.Count; ++i){
+//			
+//			if (!MathUtils.FP.Feq (currentCovers[displayToCoversMapping[i]].transform.localPosition.x, displayTarget.componentDesc[i][1])){
+//				return false;
+//				
+//			}
+//			if (!MathUtils.FP.Feq (currentCovers[displayToCoversMapping[i]].transform.localPosition.y, displayTarget.componentDesc[i][2])){
+//				return false;
+//				
+//			}
+//		}
+//		return true;
+//	}
 	
 	int[] CreateIdentityMapping(int length){
 		int[] mapping = new int[length];

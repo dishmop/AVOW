@@ -44,7 +44,7 @@ public class QuitOnEsc : MonoBehaviour {
 		else
 		{
 			if ( AVOWBackStoryCutscene.singleton.state != AVOWBackStoryCutscene.State.kOff){
-		//		Cursor.visible = (Time.time < mouseMoveTime + mouseMoveCursorTimeout);
+				Cursor.visible = (Time.time < mouseMoveTime + mouseMoveCursorTimeout);
 				
 			}
 			else{

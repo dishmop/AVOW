@@ -143,6 +143,7 @@
      <Compile Include="Assets\Scripts\Telemetry.cs" />
      <Compile Include="Assets\Scripts\TelemtryListener.cs" />
      <Compile Include="Assets\Scripts\TestFig8.cs" />
+     <Compile Include="Assets\Scripts\TextScaler.cs" />
      <Compile Include="Assets\Scripts\TrailTest.cs" />
      <Compile Include="Assets\Scripts\TrailTest_2.cs" />
      <Compile Include="Assets\Scripts\Tuple.cs" />
@@ -165,7 +166,6 @@
      <Compile Include="Assets\Scripts\alglib\src\solvers.cs" />
      <Compile Include="Assets\Scripts\alglib\src\specialfunctions.cs" />
      <Compile Include="Assets\Scripts\alglib\src\statistics.cs" />
-     <Compile Include="Assets\TextScaler.cs" />
      <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />
      <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />

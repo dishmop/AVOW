@@ -96,9 +96,30 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				resistorLimit = 5;
 				break;
 			}
+			case 6:{
+				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
+				resistorLimit = 3;
+				break;
+			}
+			case 7:{
+				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
+				resistorLimit = 4;
+				break;
+			}
+			case 8:{
+				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
+				resistorLimit = 5;
+				break;
+			}
 		}
 		InitialiseBlankBoard();
-		AVOWCircuitCreator.singleton.Initialise(resistorLimit);
+		if (layoutMode !=  AVOWObjectiveBoard.LayoutMode.kGappedRow){
+			AVOWCircuitCreator.singleton.Initialise(resistorLimit);
+		}
+		else{
+			AVOWCircuitSubsetter.singleton.Initialise(resistorLimit);
+		}
+		
 		state = State.kPauseOnLevelStart;
 		waitTime = Time.time + levelStartPauseDuration;
 		AVOWGameModes.singleton.TriggerLevelStartMessage();
@@ -191,12 +212,15 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				break;
 			}
 			case State.kBuildBackBoard:{
-				// Chedk that we have a valud currentGoal
-				if (currentGoalIndex < 0 || currentGoalIndex >= AVOWCircuitCreator.singleton.GetResults().Count){
-					Debug.LogError ("currentGoalIndex = " + currentGoalIndex + " when trying to build a board");
-				}
+
 				AVOWObjectiveBoard board = boards[backIndex].GetComponent<AVOWObjectiveBoard>();
-				AVOWCircuitTarget target = AVOWCircuitCreator.singleton.GetResults()[currentGoalIndex];
+				AVOWCircuitTarget target =null;
+				if (layoutMode != AVOWObjectiveBoard.LayoutMode.kGappedRow){
+					target = AVOWCircuitCreator.singleton.GetResults()[currentGoalIndex];
+				}
+				else{
+					target = AVOWCircuitSubsetter.singleton.GetResults()[currentGoalIndex];
+				}
 				if (numBoardsToUnstack > 0){
 					board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kStack);
 					hasMovedToRow = false;
@@ -241,9 +265,17 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				}
 				if (!AVOWGraph.singleton.HasHalfFinishedComponents()){
 					AVOWCircuitTarget currentGraphAsTarget = new AVOWCircuitTarget(AVOWGraph.singleton);
-					if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatch(currentGraphAsTarget)){
-						boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToTarget(currentGraphAsTarget);
-						state = State.kGoalComplete0;
+					if (layoutMode != AVOWObjectiveBoard.LayoutMode.kGappedRow){
+						if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatch(currentGraphAsTarget)){
+							boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToTarget(currentGraphAsTarget);
+							state = State.kGoalComplete0;
+						}
+					}
+					else{
+						if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatchWithGaps(currentGraphAsTarget)){
+//							boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToTarget(currentGraphAsTarget);
+							state = State.kGoalComplete1;
+						}
 					}
 			    }
 				break;
@@ -259,7 +291,8 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			case State.kGoalComplete1:{
 				if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().IsReady()){
 					currentGoalIndex++;
-					if (currentGoalIndex < AVOWCircuitCreator.singleton.GetResults().Count){
+					int maxGoalNum = (layoutMode == AVOWObjectiveBoard.LayoutMode.kGappedRow) ? AVOWCircuitSubsetter.singleton.GetResults().Count : AVOWCircuitCreator.singleton.GetResults().Count;
+					if (currentGoalIndex < maxGoalNum){
 						state = State.kBuildBackBoard;
 					}
 					else{

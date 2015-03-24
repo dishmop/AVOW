@@ -139,6 +139,7 @@ public class AVOWCommandRemove : AVOWCommand{
 			int countOutIn = 0;
 			AVOWNode newNode = null;
 			foreach (GameObject go in inNode.outComponents){
+				// Hmm this seems to cause a problem where when it gets hit we are stuck in an infinite loop - not sure how it happens though
 				if (go == null) continue;
 				AVOWComponent thisComponent = go.GetComponent<AVOWComponent>();
 				if (!thisComponent.IsDying()){
