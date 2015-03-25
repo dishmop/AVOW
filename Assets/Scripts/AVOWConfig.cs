@@ -16,6 +16,7 @@ public class AVOWConfig : MonoBehaviour {
 	public float sideBarPixels = 0.2f;
 	public float bottomBarFrac = 0.2f;
 	public float buttonFlashRate = 1f;
+	public bool levelExcludeEdit = false;
 	
 	public float flockDesDistToOther = 2f;
 	public float flockDesSpeed = 1f;

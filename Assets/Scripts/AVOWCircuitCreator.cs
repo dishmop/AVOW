@@ -113,8 +113,6 @@ public class AVOWCircuitCreator : MonoBehaviour {
 			item.CalcStats();
 			fracResults.Add (item);
 		}
-		
-		
 	}
 	
 	

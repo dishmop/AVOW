@@ -121,6 +121,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			}
 			GameObject.Destroy(shadedSquare);
 		}
+		gridWidth = 1;
 		int numPanels = totalNumPanels;
 		currentWood = new GameObject[numPanels];
 		for (int i = 0; i < numPanels; ++i){

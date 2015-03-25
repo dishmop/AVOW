@@ -95,6 +95,9 @@ public class AVOWGameModes : MonoBehaviour {
 		//dlgPanel.SetActive(state == GameModeState.kGameOver || state == GameModeState.kStageComplete3);
 		mainMenuPanel.SetActive(state == GameModeState.kMainMenu);
 		levelCompleteDlg.SetActive (state == GameModeState.kStageComplete3 || state == GameModeState.kStageComplete4);
+		
+		sidePanel.transform.FindChild("ExcludeToggle").gameObject.SetActive(AVOWConfig.singleton.levelExcludeEdit);
+		sidePanel.transform.FindChild("ExcludeToggle").GetComponent<Text>().text = AVOWObjectiveManager.singleton.IsCurrentGoalExcluded() ? "Include Goal" : "Exclude Goal";
 		//dlgPanel.transform.FindChild("StageCompleteDlg").gameObject.SetActive(state == GameModeState.kStageComplete);
 		//dlgPanel.transform.FindChild("GameOverDlg").gameObject.SetActive(state == GameModeState.kGameOver);
 		
@@ -105,6 +108,7 @@ public class AVOWGameModes : MonoBehaviour {
 //				AVOWUI.singleton.enableToolUpdate = false;
 //				AVOWConfig.singleton.tutDisableConnections = false;
 				whitePanel.SetActive(false);
+				//AVOWCamControl.singleton.disableMovement = false;
 				break;
 			
 			}
@@ -300,6 +304,8 @@ public class AVOWGameModes : MonoBehaviour {
 		currentLevel = levelNum;
 		if (currentLevel > 0){
 			AVOWObjectiveManager.singleton.InitialiseLevel(levelNum);
+			AVOWGameModes.singleton.TriggerLevelStartMessage();
+			
 			SelectCamera(CameraChoice.kGameCam);
 			RestartNormalGame();
 		}
@@ -383,6 +389,10 @@ public class AVOWGameModes : MonoBehaviour {
 	// This is a bit bodgey
 	public void PreStageComplete(){
 		greenBackground.GetComponent<AVOWGreenBackground>().MakeBig();
+	}
+	
+	public void ToggleExcludeCurrentGoal(){
+		AVOWObjectiveManager.singleton.ToggleExcludeCurrentGoal();
 	}
 	
 	public void GoToMain(){

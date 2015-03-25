@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class AVOWObjectiveManager : MonoBehaviour {
 
@@ -8,6 +11,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	public float boardSpeed;
 	public float unstackWaitDuration = 0.5f;
 	public float levelStartPauseDuration;
+	
+	
+	public string filename = "ExcludedGoals";
+	bool[][]	excludedGoals;
 	
 	
 	// Front and back boards
@@ -29,8 +36,8 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	float boardDepthSpeed = 1f;
 	
 	int resistorLimit = -1;
-	int currentGoalIndex;
-	
+	int currentGoalIndex = -1;
+	int currentLevel = -1;
 	
 	enum State{
 		kNone,
@@ -66,8 +73,24 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		resistorLimit = limit;
 	}
 		
+
+	// Levels start at level1 and go up to this number not inclusive
+	public int GetMaxLevelNum(){
+		return AVOWGameModes.singleton.GetNumMainMenuButtons() + AVOWGameModes.singleton.GetMinMainMenuButton();
+	}
+	
+	public bool IsCurrentGoalExcluded(){
+		if (currentLevel < 0 || currentGoalIndex < 0 || currentGoalIndex >= GetGoalTargets().Count) return false;
+		return excludedGoals[currentLevel][currentGoalIndex];
+	}
+	
+	public void ToggleExcludeCurrentGoal(){
+		excludedGoals[currentLevel][currentGoalIndex] = !excludedGoals[currentLevel][currentGoalIndex];
+		SaveExcludedLevels();
+	}
 	
 	public void InitialiseLevel(int level){
+		currentLevel = level;
 		numBoardsToUnstack = 0;
 		switch (level){
 			case 1:{
@@ -114,6 +137,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				break;
 			}
 		}
+		
 		InitialiseBlankBoard();
 		if (layoutMode !=  AVOWObjectiveBoard.LayoutMode.kGappedRow){
 			AVOWCircuitCreator.singleton.Initialise(resistorLimit);
@@ -124,11 +148,11 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		
 		state = State.kPauseOnLevelStart;
 		waitTime = Time.time + levelStartPauseDuration;
-		AVOWGameModes.singleton.TriggerLevelStartMessage();
+		
+
 	}
 	
 	public void InitialiseBlankBoard(){
-		currentGoalIndex = 0;
 		boards[frontIndex].GetComponent<AVOWObjectiveBoard>().ConstructBlankBoard();
 		boards[backIndex].GetComponent<AVOWObjectiveBoard>().ConstructBlankBoard();
 	}
@@ -144,6 +168,8 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		AVOWCircuitCreator.singleton.Deinitialise();
 		resistorLimit = -1;
 		state = State.kNone;
+		currentGoalIndex = -1;
+		currentLevel = -1;
 	}
 	
 	public bool HasResistorLimit(){
@@ -165,9 +191,102 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		boards[0].transform.localPosition = Vector3.zero;
 		boards[1].transform.localPosition = Vector3.zero;
 		
+		ConstructExcludedGoals();
+		LoadExcludedGoals();
+		
 		ForceBoardDepths();
 		
 	}
+	
+	// We saving using the standard file system
+	string BuildFullPath(){
+		return Application.dataPath + "/Resources/RuntimeData/" + filename + ".bytes";
+		
+	}
+	
+	
+	// We load using the resources
+	string BuildResourcePath(){
+		return "RuntimeData/" + filename;
+	}
+	
+	
+	public void SerializeExcludedGoals(Stream stream){
+		
+		BinaryWriter bw = new BinaryWriter(stream);
+		
+		bw.Write (excludedGoals.Length);
+		for (int i = 0; i < excludedGoals.Length; ++i){
+			int numGoals = excludedGoals[i] == null ? 0 : excludedGoals[i].Length;
+			bw.Write (numGoals);
+			for (int j = 0; j < numGoals; ++j){
+				bw.Write (excludedGoals[i][j]);
+			}
+		}
+		
+	}
+	
+	public void DeserializeExcludedGoals(Stream stream){
+		BinaryReader br = new BinaryReader(stream);
+		
+		int numLevels = br.ReadInt32();
+		for (int i = 0; i < numLevels; ++i){
+			int numGoals =  br.ReadInt32();
+			
+			for (int j = 0; j < numGoals; ++j){
+				bool exlude = br.ReadBoolean();
+				if (i < excludedGoals.Length && j < excludedGoals[i].Length){
+					excludedGoals[i][j] = exlude;
+				}
+			}
+		}
+	}
+	
+	void ConstructExcludedGoals(){
+		
+		excludedGoals = new bool[GetMaxLevelNum()][]; 
+		
+		// Create arrys of the correct suze
+		for (int i = 1; i < GetMaxLevelNum(); ++i){
+			InitialiseLevel(i);
+			while (!AVOWCircuitCreator.singleton.IsReady()){
+				AVOWCircuitCreator.singleton.Update ();
+			}
+			excludedGoals[i] = new bool[GetGoalTargets().Count];
+		}
+		DeinitialiseLevel();
+	}
+
+
+	
+	public bool LoadExcludedGoals(){
+		
+		TextAsset asset = Resources.Load(BuildResourcePath ()) as TextAsset;
+		if (asset != null){
+			Debug.Log ("Loading Excluded goals asset");
+			Stream s = new MemoryStream(asset.bytes);
+			DeserializeExcludedGoals(s);
+			Resources.UnloadAsset(asset);
+			return true;
+		}	
+		return false;			
+	}
+	
+	// Does the actual serialising
+	public void SaveExcludedLevels(){
+		#if UNITY_EDITOR		
+		FileStream file = File.Create(BuildFullPath());
+		
+		SerializeExcludedGoals(file);
+		
+		
+		file.Close();
+		
+		// Ensure the assets are all realoaded and the cache cleared.
+		UnityEditor.AssetDatabase.Refresh();
+		#endif
+		
+	}	
 	
 	void SwapBoards(){
 		frontIndex = 1 - frontIndex;
@@ -198,13 +317,25 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		return MathUtils.FP.Feq (frontPos.z - frontBoardDepth, 0);
 	}
 	
+	List<AVOWCircuitTarget> GetGoalTargets(){
+		if (layoutMode != AVOWObjectiveBoard.LayoutMode.kGappedRow){
+			return AVOWCircuitCreator.singleton.GetResults();
+		}
+		else{
+			return AVOWCircuitSubsetter.singleton.GetResults();
+		}
+	}
+	
 	
 	// Update is called once per frame
 	void Update () {
 	
 		switch (state){
 			case State.kPauseOnLevelStart:{
-				if (Time.time > waitTime) state = State.kWaitForCircuitCreator;
+				if (Time.time > waitTime){
+					currentGoalIndex = FindNextValidGoal(-1);
+					state = State.kWaitForCircuitCreator;
+				}
 				break;
 			}
 			case State.kWaitForCircuitCreator:{
@@ -216,13 +347,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			case State.kBuildBackBoard:{
 
 				AVOWObjectiveBoard board = boards[backIndex].GetComponent<AVOWObjectiveBoard>();
-				AVOWCircuitTarget target =null;
-				if (layoutMode != AVOWObjectiveBoard.LayoutMode.kGappedRow){
-					target = AVOWCircuitCreator.singleton.GetResults()[currentGoalIndex];
-				}
-				else{
-					target = AVOWCircuitSubsetter.singleton.GetResults()[currentGoalIndex];
-				}
+				AVOWCircuitTarget target = GetGoalTargets()[currentGoalIndex];
 				if (layoutMode == AVOWObjectiveBoard.LayoutMode.kStack){
 					board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kStack);
 				}
@@ -311,9 +436,9 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			}
 			case State.kGoalComplete1:{
 				if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().IsReady()){
-					currentGoalIndex++;
-					int maxGoalNum = (layoutMode == AVOWObjectiveBoard.LayoutMode.kGappedRow) ? AVOWCircuitSubsetter.singleton.GetResults().Count : AVOWCircuitCreator.singleton.GetResults().Count;
-					if (currentGoalIndex < maxGoalNum){
+					currentGoalIndex = FindNextValidGoal(currentGoalIndex);
+
+					if (currentGoalIndex < GetGoalTargets().Count){
 						state = State.kBuildBackBoard;
 					}
 					else{
@@ -343,6 +468,13 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			}
 		}
 		
+	}
+	
+	int FindNextValidGoal(int currentIndex){
+		do{
+			currentIndex++;
+		} while (currentIndex < GetGoalTargets().Count && excludedGoals[currentLevel][currentIndex] && !AVOWConfig.singleton.levelExcludeEdit);
+		return currentIndex;
 	}
 	
 	void Awake(){

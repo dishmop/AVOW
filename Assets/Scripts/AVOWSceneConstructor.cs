@@ -9,8 +9,8 @@ public class AVOWSceneConstructor : MonoBehaviour {
 	public GameObject blackStripPrefab;
 
 	
-	public int wallWidth = 100;
-	public int wallHeight = 100;
+	public int wallWidth;
+	public int wallHeight;
 	
 
 	
