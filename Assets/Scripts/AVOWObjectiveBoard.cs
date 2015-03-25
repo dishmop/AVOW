@@ -12,6 +12,8 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	public float coverMoveSpeed;
 	public float completeWaitDuration;
 	
+	public bool renderBackwards;
+	
 	public enum LayoutMode {
 		kRow,
 		kStack,
@@ -127,12 +129,13 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		for (int i = 0; i < numPanels; ++i){
 			currentWood[i] = GameObject.Instantiate(woodPrefabs[0]);
 			currentWood[i].transform.parent = transform;
-			currentWood[i].transform.localPosition = new Vector3(i+1, 0, 0.2f);
+			float xPos = renderBackwards ? 0-i  : i+1;
+			currentWood[i].transform.localPosition = new Vector3(xPos, 0, 0.2f);
 		}
 		shadedSquare = GameObject.Instantiate(shadedPrefab);
 		shadedSquare.transform.parent = transform;
 		shadedSquare.transform.localPosition = new Vector3(0, 0, -0.1f);
-		shadedSquare.transform.localScale = new Vector3(numPanels, 1, 1);
+		shadedSquare.transform.localScale = new Vector3(renderBackwards ? -numPanels : numPanels, 1, 1);
 		shadeVal = new SpringValue(0);
 		UpdateShadedSquare();
 		
@@ -167,13 +170,15 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		for (int i = 0; i < numPanels; ++i){
 			currentWood[i] = GameObject.Instantiate(woodPrefabs[division]);
 			currentWood[i].transform.parent = transform;
-			currentWood[i].transform.localPosition = new Vector3(i+1, 0, 0.2f);
+			float xPos = renderBackwards ? 0-i  : i+1;
+			currentWood[i].transform.localPosition = new Vector3(xPos, 0, 0.2f);
+			
 		}
 		
 		shadedSquare = GameObject.Instantiate(shadedPrefab);
 		shadedSquare.transform.parent = transform;
 		shadedSquare.transform.localPosition = new Vector3(0, 0, -0.1f);
-		shadedSquare.transform.localScale = new Vector3(numPanels, 1, 1);
+		shadedSquare.transform.localScale = new Vector3(renderBackwards ? -numPanels : numPanels, 1, 1);
 		shadeVal = new SpringValue(maxShade);
 		UpdateShadedSquare();
 	}
@@ -282,6 +287,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			newTarget.componentDesc[i] = newDesc;
 		
 		}
+		newTarget.totalCurrent = -1;
 		return newTarget;
 		
 	}
@@ -306,6 +312,25 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		
 	}
 	
+	Vector3 GamePosToTransformPos(Vector3 pos, float sizeOfSquare, float totalCurrent){
+		if(totalCurrent >= 0){
+			return renderBackwards ? new Vector3(-totalCurrent + pos.x, pos.y, pos.z) : pos;
+	  }
+	  else{
+			return renderBackwards ? new Vector3( - sizeOfSquare - pos.x, pos.y, pos.z) : pos;
+		}
+	}
+	
+
+	Vector3 TransformPosToGamePos(Vector3 pos, float sizeOfSquare, float totalCurrent){
+		if(totalCurrent >= 0){
+			return renderBackwards ? new Vector3(pos.x + totalCurrent, pos.y, pos.z) : pos;
+		}
+		else{
+			return renderBackwards ? new Vector3( - sizeOfSquare - pos.x, pos.y, pos.z) : pos;
+		}
+	}
+	
 	public void CreateCovers(AVOWCircuitTarget target){
 		displayTarget = target;
 		if (currentCovers != null){
@@ -322,7 +347,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			currentCovers[i] = GameObject.Instantiate(coverPrefabs[sizePrefab]);
 			currentCovers[i].transform.parent = transform;
 			currentCovers[i].transform.localScale = new Vector3(thisWidth, thisWidth, thisWidth);
-			currentCovers[i].transform.localPosition = new Vector3(target.componentDesc[i][1], target.componentDesc[i][2], -0.01f * (i + 1));
+			currentCovers[i].transform.localPosition = GamePosToTransformPos(new Vector3(target.componentDesc[i][1], target.componentDesc[i][2], -0.01f * (i + 1)), thisWidth, target.totalCurrent);
 			
 			cumWidth += thisWidth;
 		}
@@ -463,8 +488,10 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	float CalcCost(AVOWCircuitTarget target, int[] testTargetToCoverMapping){
 		float totalCost = 0;
 		for (int i = 0; i < target.componentDesc.Count; ++i){
-			float coverPosX = currentCovers[testTargetToCoverMapping[i]].transform.localPosition.x;
-			float coverPosY = currentCovers[testTargetToCoverMapping[i]].transform.localPosition.y;
+			float squareSize = currentCovers[testTargetToCoverMapping[i]].transform.localScale.x;
+			Vector3 localCoverPos = TransformPosToGamePos(currentCovers[testTargetToCoverMapping[i]].transform.localPosition, squareSize, target.totalCurrent);
+			float coverPosX = localCoverPos.x;
+			float coverPosY = localCoverPos.y;
 			
 			float descPosX = target.componentDesc[i][1];
 			float descPosY = target.componentDesc[i][2];
@@ -522,9 +549,11 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		
 		bool finished = true;
 		for (int i = 0; i < displayTarget.componentDesc.Count; ++i){
-			float coverPosX = currentCovers[displayToCoversMapping[i]].transform.localPosition.x;
-			float coverPosY = currentCovers[displayToCoversMapping[i]].transform.localPosition.y;
-			float coverPosZ = currentCovers[displayToCoversMapping[i]].transform.localPosition.z;
+			float squareSize = currentCovers[displayToCoversMapping[i]].transform.localScale.x;
+			Vector3 localPos = TransformPosToGamePos( currentCovers[displayToCoversMapping[i]].transform.localPosition,  squareSize, displayTarget.totalCurrent);
+			float coverPosX = localPos.x;
+			float coverPosY = localPos.y;
+			float coverPosZ = localPos.z;
 			
 			float descPosX = displayTarget.componentDesc[i][1];
 			
@@ -537,7 +566,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 				}
 				finished = false;
 			}
-			currentCovers[displayToCoversMapping[i]].transform.localPosition = new Vector3(coverPosX, coverPosY, coverPosZ);
+			currentCovers[displayToCoversMapping[i]].transform.localPosition = GamePosToTransformPos(new Vector3(coverPosX, coverPosY, coverPosZ), squareSize, displayTarget.totalCurrent);
 		}		
 		
 		
@@ -613,9 +642,12 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		bool finished = true;
 		
 		for (int i = 0; i < displayTarget.componentDesc.Count; ++i){
-			float coverPosX = currentCovers[displayToCoversMapping[i]].transform.localPosition.x;
-			float coverPosY = currentCovers[displayToCoversMapping[i]].transform.localPosition.y;
-			float coverPosZ = currentCovers[displayToCoversMapping[i]].transform.localPosition.z;
+			float squareSize = currentCovers[displayToCoversMapping[i]].transform.localScale.x;
+			Vector3 localPos = TransformPosToGamePos( currentCovers[displayToCoversMapping[i]].transform.localPosition,  squareSize, displayTarget.totalCurrent);
+			
+			float coverPosX = localPos.x;
+			float coverPosY = localPos.y;
+			float coverPosZ = localPos.z;
 			
 			float descPosY = displayTarget.componentDesc[i][2];
 			
@@ -629,7 +661,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 				finished = false;
 				
 			}
-			currentCovers[displayToCoversMapping[i]].transform.localPosition = new Vector3(coverPosX, coverPosY, coverPosZ);
+			currentCovers[displayToCoversMapping[i]].transform.localPosition = GamePosToTransformPos(new Vector3(coverPosX, coverPosY, coverPosZ), squareSize, displayTarget.totalCurrent);
 		}
 		return finished;
 		
@@ -639,16 +671,23 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	bool UpdateMoveToComplete(){
 		float deltaDist = coverMoveSpeed * Time.deltaTime;
 		
-		float maxDistToMove = currentCovers[displayToCoversMapping[0]].transform.localPosition.x - (displayTarget.componentDesc[0][1]- displayTarget.totalCurrent);
+		//Vector3 coverPos = TransformPosToGamePos (currentCovers[displayToCoversMapping[0]].transform.localPosition, currentCovers[displayToCoversMapping[0]].transform.localScale.x, displayTarget.totalCurrent);
+		Vector3 coverPos = currentCovers[displayToCoversMapping[0]].transform.localPosition;
+		float maxDistToMove = renderBackwards ?  Mathf.Abs (coverPos.x - (displayTarget.componentDesc[0][1]) + transform.position.x) :  Mathf.Abs (coverPos.x - (displayTarget.componentDesc[0][1]- displayTarget.totalCurrent));
 		
 		if (MathUtils.FP.Feq(maxDistToMove, 0)){
 			return true;
 		}
 		
 		for (int i = 0; i < currentCovers.Length; ++i){
-			Vector3 pos = currentCovers[i].transform.localPosition;
-			pos.x -= Mathf.Min (deltaDist, maxDistToMove);
-			currentCovers[i].transform.localPosition = pos;
+			Vector3 pos = TransformPosToGamePos (currentCovers[i].transform.localPosition, currentCovers[i].transform.localScale.x, displayTarget.totalCurrent);
+			if (renderBackwards){
+				pos.x += Mathf.Min (deltaDist, maxDistToMove);
+			}
+			else{
+				pos.x -= Mathf.Min (deltaDist, maxDistToMove);
+			}
+			currentCovers[i].transform.localPosition = GamePosToTransformPos(pos, currentCovers[i].transform.localScale.x, displayTarget.totalCurrent);
 			
 		}	
 		return false;

@@ -50,7 +50,7 @@ SubShader {
 
 			o.pos =	mul(UNITY_MATRIX_MVP, v.vertex);
 			
-			//o.uv = v.texcoord;
+			o.uv = v.texcoord;
 		    float4 worldPos = mul ((float4x4)_Object2World, v.vertex );
 		    o.uv = worldPos;// / _TextureScale;  //setting and scaling UVs 		
 		    

@@ -25,7 +25,7 @@ public class AVOWSceneConstructor : MonoBehaviour {
 				int xPos = (x - halfWidth);
 				int yPos = (y - halfheight);
 				
-				if (xPos < 0 || yPos != 0){
+				if (yPos != 0){
 					GameObject newWall = GameObject.Instantiate(wallPrefab);
 					newWall.transform.parent = transform;
 					newWall.transform.localPosition = new Vector3((float)xPos, (float)yPos, wallPrefab.transform.position.z);

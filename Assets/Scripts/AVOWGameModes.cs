@@ -20,6 +20,7 @@ public class AVOWGameModes : MonoBehaviour {
 	public GameModeState state = GameModeState.kMainMenu;
 	public int stage = 0;
 	public int level = 0;
+	public GameObject screenSpaceUI;
 	public GameObject mainMenuPanel;
 	public GameObject levelCompleteDlg;
 	public GameObject whitePanel;
@@ -68,8 +69,12 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	// Use this for initialization
 	void Awake () {
+	
 		if (singleton != null) Debug.LogError ("Error assigning singleton");
 		singleton = this;
+		
+		screenSpaceUI.SetActive(true);
+		
 		
 	}
 	
@@ -114,6 +119,7 @@ public class AVOWGameModes : MonoBehaviour {
 			
 			}
 			case GameModeState.kPlayStage:{
+				
 				whitePanel.SetActive(false);
 				break;
 				
@@ -270,6 +276,7 @@ public class AVOWGameModes : MonoBehaviour {
 		pusher.GetComponent<AVOWPusher>().disableMovement = false;
 		AVOWCamControl.singleton.disableMovement = false;
 		AVOWConfig.singleton.tutDisableConnections = false;
+		greenBackground.GetComponent<AVOWGreenBackground>().MakeSmall();
 		
 		
 		
@@ -302,6 +309,7 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	public void StartLevel(int levelNum){
 		ResetScenery();
+		
 		currentLevel = levelNum;
 		if (currentLevel > 0){
 			AVOWObjectiveManager.singleton.InitialiseLevel(levelNum);

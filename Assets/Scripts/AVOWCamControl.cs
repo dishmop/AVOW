@@ -78,10 +78,11 @@ public class AVOWCamControl : MonoBehaviour {
 		float prop = 0.1f;
 		if (!Input.GetMouseButton(0)){
 			// the -0.5f si the battery
-			float gameBoardXMax = AVOWObjectiveManager.singleton.GetMaxX();
-			Rect bounds = new Rect(AVOWSim.singleton.xMin - 0.5f, AVOWSim.singleton.yMin, gameBoardXMax - (AVOWSim.singleton.xMin - 0.5f), AVOWSim.singleton.yMax - AVOWSim.singleton.yMin);
+			float gameBoardXMin = AVOWObjectiveManager.singleton.GetMinX();
+			float simMax = Mathf.Max (1, AVOWSim.singleton.xMax);
+			Rect bounds = new Rect(gameBoardXMin, AVOWSim.singleton.yMin, simMax  - gameBoardXMin , AVOWSim.singleton.yMax - AVOWSim.singleton.yMin);
 			
-			bounds.xMax = Mathf.Max(bounds.xMax, 1);
+		//	bounds.xMax = Mathf.Max(bounds.xMax, 1);
 			
 			
 			Vector2 centre = new Vector2((bounds.xMin + bounds.xMax) * 0.5f + xOffset, (bounds.yMin + bounds.yMax) * 0.5f);

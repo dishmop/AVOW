@@ -1,16 +1,22 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWObjectiveManager.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Shaders/noise-simplex_v03.shader">
     <Files>
-      <File FileName="Assets/Scripts/AVOWObjectiveManager.cs" Line="67" Column="1" />
+      <File FileName="Assets/Scripts/AVOWObjectiveManager.cs" Line="69" Column="32" />
       <File FileName="Assets/Scripts/AVOWCircuitCreator.cs" Line="76" Column="2" />
-      <File FileName="Assets/Scripts/AVOWGameModes.cs" Line="103" Column="3" />
+      <File FileName="Assets/Scripts/AVOWGameModes.cs" Line="279" Column="67" />
       <File FileName="Assets/Scripts/AVOWConfig.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWUICreateTool.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWUIDeleteTool.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWSceneConstructor.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="16" Column="29" />
-      <File FileName="Assets/Scripts/AVOWObjectiveBoard.cs" Line="124" Column="16" />
+      <File FileName="Assets/Scripts/AVOWSceneConstructor.cs" Line="28" Column="9" />
+      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="75" Column="27" />
+      <File FileName="Assets/Scripts/AVOWObjectiveBoard.cs" Line="676" Column="130" />
+      <File FileName="Assets/Scripts/AVOWSideBar.cs" Line="19" Column="119" />
+      <File FileName="Assets/Scripts/AVOWBattery.cs" Line="43" Column="1" />
+      <File FileName="Assets/Scripts/AVOWSim.cs" Line="33" Column="27" />
+      <File FileName="Assets/Scripts/AVOWGreenBackground.cs" Line="11" Column="20" />
+      <File FileName="Assets/Shaders/DC_Reflect-Glass.shader" Line="51" Column="39" />
+      <File FileName="Assets/Shaders/noise-simplex_v03.shader" Line="22" Column="24" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

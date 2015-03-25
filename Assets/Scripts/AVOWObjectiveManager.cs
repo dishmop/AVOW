@@ -62,11 +62,11 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	}
 	
 	
-	public float GetMaxX(){
+	public float GetMinX(){
 	
-		if (boards[frontIndex] == null) return transform.position.x + 1f;
+		if (boards[frontIndex] == null) return transform.position.x;
 		
-		return transform.position.x +  Mathf.Max (1, boards[frontIndex].GetComponent<AVOWObjectiveBoard>().GetWidth());
+		return transform.position.x -  Mathf.Max (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().GetWidth());
 	}
 	
 	public void InitialiseLimitsOnly(int limit){

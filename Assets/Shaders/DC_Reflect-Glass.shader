@@ -48,7 +48,7 @@ Shader "Custom/DC_Reflect-Glass" {
          
             // Diffuse texture
             half4 c = tex2D (_MainTex, IN.uv_MainTex);
-            o.Albedo = c.rgb;
+            o.Albedo = float4(0.0, 0.2,0.3, 0);//c.rgb;
              
             // How transparent is the surface?
             o.Alpha = _Colour.a * c.a;

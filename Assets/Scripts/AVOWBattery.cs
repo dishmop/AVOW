@@ -35,9 +35,11 @@ public class AVOWBattery : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 		if (AVOWGraph.singleton.allComponents.Count > 0){
+			lightening1.GetComponent<Lightening>().startPoint = transform.FindChild("Sphere1").position;
 			lightening1.GetComponent<Lightening>().endPoint = AVOWGraph.singleton.allComponents[0].transform.FindChild ("ConnectionSphere1").position;
 			lightening1.GetComponent<Lightening>().size = AVOWGraph.singleton.allComponents[0].GetComponent<AVOWComponent>().hWidth * lighteningSize;
 			lightening1.GetComponent<Lightening>().ConstructMesh();
+			lightening2.GetComponent<Lightening>().startPoint = transform.FindChild("Sphere2").position;
 			lightening2.GetComponent<Lightening>().endPoint = AVOWGraph.singleton.allComponents[0].transform.FindChild ("ConnectionSphere0").position;
 			lightening2.GetComponent<Lightening>().size = AVOWGraph.singleton.allComponents[0].GetComponent<AVOWComponent>().hWidth * lighteningSize;
 			lightening2.GetComponent<Lightening>().ConstructMesh();
