@@ -52,6 +52,7 @@ public class AVOWGameModes : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		backStory.SetActive(true);
 		SelectCamera(CameraChoice.kGameCam);
 		tutorialText.SetActive(true);
 
