@@ -4,7 +4,9 @@ using System.Collections;
 public class AVOWSceneConstructor : MonoBehaviour {
 
 	public GameObject wallPrefab;
+	public GameObject notchedStripPrefabUpperStart;
 	public GameObject notchedStripPrefabUpper;
+	public GameObject notchedStripPrefabLowerStart;
 	public GameObject notchedStripPrefabLower;
 	public GameObject blackStripPrefab;
 
@@ -36,7 +38,7 @@ public class AVOWSceneConstructor : MonoBehaviour {
 		// Find the stub for the upper strip prefabs
 		Transform upperStripStub = transform.FindChild("NotchedStripStubUpper");
 		for (int x = 0; x < halfWidth; ++x){
-			GameObject newStripUnit = GameObject.Instantiate(notchedStripPrefabUpper);
+			GameObject newStripUnit = GameObject.Instantiate( (x == 0) ? notchedStripPrefabUpperStart : notchedStripPrefabUpper);
 			newStripUnit.transform.parent = upperStripStub.transform;
 			newStripUnit.transform.localPosition = new Vector3((float)x, 0, notchedStripPrefabUpper.transform.position.z);
 		}
@@ -44,7 +46,7 @@ public class AVOWSceneConstructor : MonoBehaviour {
 		// Find the stub for the lower strip prefabs
 		Transform lowerStripStub = transform.FindChild("NotchedStripStubLower");
 		for (int x = 0; x < halfWidth; ++x){
-			GameObject newStripUnit = GameObject.Instantiate(notchedStripPrefabLower);
+			GameObject newStripUnit = GameObject.Instantiate( (x == 0) ? notchedStripPrefabLowerStart : notchedStripPrefabLower);
 			newStripUnit.transform.parent = lowerStripStub.transform;
 			newStripUnit.transform.localPosition = new Vector3((float)x, 0, notchedStripPrefabLower.transform.position.z);
 		}	
