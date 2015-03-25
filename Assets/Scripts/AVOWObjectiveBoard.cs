@@ -89,17 +89,19 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	
 	public void PrepareBoard(AVOWCircuitTarget target, LayoutMode layoutMode){
 		currentTarget = target;
-		ConstructGrid(currentTarget);
 		switch (layoutMode){
 			case LayoutMode.kRow:{
+			ConstructGrid(CreateRowTarget(currentTarget, true));
 				CreateCovers(CreateRowTarget(currentTarget, true));
 				break;
 			}
 			case LayoutMode.kGappedRow:{
+				ConstructGrid(CreateRowTarget(currentTarget, false));
 				CreateCovers(CreateRowTarget(currentTarget, false));
 				break;
 			}
 			case LayoutMode.kStack:{
+				ConstructGrid(currentTarget);
 				CreateCovers(currentTarget);
 				break;
 			}
@@ -108,7 +110,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public float GetWidth(){
-		return gridWidth;
+		return Mathf.Max (1, gridWidth);
 	}
 	
 	
@@ -156,8 +158,13 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		int division = target.lcm;
 		int width = target.widthInLCMs;
 		
-		gridWidth = (float)width / (float)division;
-	
+		if (target.totalCurrent < 0){
+			gridWidth = (float)width / (float)division;
+		}
+		else{
+			gridWidth = target.totalCurrent;
+		}
+		
 		
 		if (currentWood != null){
 			foreach (GameObject go in currentWood){
