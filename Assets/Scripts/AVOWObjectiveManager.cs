@@ -223,6 +223,9 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				else{
 					target = AVOWCircuitSubsetter.singleton.GetResults()[currentGoalIndex];
 				}
+				if (layoutMode == AVOWObjectiveBoard.LayoutMode.kStack){
+					board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kStack);
+				}
 				if (layoutMode == AVOWObjectiveBoard.LayoutMode.kRow){
 				    if (numBoardsToUnstack > 0){
 						board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kStack);
@@ -284,7 +287,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				if (!AVOWGraph.singleton.HasHalfFinishedComponents()){
 					AVOWCircuitTarget currentGraphAsTarget = new AVOWCircuitTarget(AVOWGraph.singleton);
 					if (layoutMode != AVOWObjectiveBoard.LayoutMode.kGappedRow){
-						if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatchWithGaps(currentGraphAsTarget)){
+					if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatchWithGaps(currentGraphAsTarget)){
 							boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToTarget(currentGraphAsTarget);
 							state = State.kGoalComplete0;
 						}

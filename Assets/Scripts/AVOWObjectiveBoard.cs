@@ -327,7 +327,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		}
 		displayToCoversMapping = CreateIdentityMapping(target.componentDesc.Count);
 	}
-	
+//	
 //	public bool TestWidthsMatch(AVOWCircuitTarget testTarget){
 //		if (testTarget.componentDesc.Count != currentTarget.componentDesc.Count) return false;
 //		
