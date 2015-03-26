@@ -126,7 +126,6 @@ public class AVOWUICreateTool :  AVOWUITool{
 		Vector3 mousePos = inputScreenPos;
 		mousePos.z = 0;
 		mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
-
 		
 
 		// Set the cursor cubes position

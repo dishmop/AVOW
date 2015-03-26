@@ -54,7 +54,7 @@ public class AVOWGameModes : MonoBehaviour {
 
 	// Use this for initialization
 	public void Initialise () {
-		backStory.SetActive(true);
+		backStory.SetActive(false);
 		SelectCamera(CameraChoice.kGameCam);
 		tutorialText.SetActive(true);
 
@@ -109,7 +109,7 @@ public class AVOWGameModes : MonoBehaviour {
 		}
 		else{
 			levelCompleteDlg.SetActive (false);
-			levelCompleteDlg.SetActive (false);
+			gameCompleteDlg.SetActive (false);
 		}
 		sidePanel.transform.FindChild("ExcludeToggle").gameObject.SetActive(AVOWConfig.singleton.levelExcludeEdit);
 		sidePanel.transform.FindChild("ExcludeToggle").GetComponent<Text>().text = AVOWObjectiveManager.singleton.IsCurrentGoalExcluded() ? "Include Goal" : "Exclude Goal";
@@ -123,7 +123,6 @@ public class AVOWGameModes : MonoBehaviour {
 			
 		}
 		case GameModeState.kPlayStage:{
-			
 			whitePanel.SetActive(false);
 			break;
 			
@@ -415,12 +414,15 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 	
 	public void GoToMain(){
+		backStory.SetActive(false);
+		
 		AVOWBackStoryCutscene.singleton.StopBackStory();
 		AVOWTutorialManager.singleton.StopTutorial();
 		AVOWConfig.singleton.DisplayBottomPanel(false);
 		AVOWConfig.singleton.DisplaySidePanel(false);
 		AVOWCircuitCreator.singleton.Deinitialise();
 		AVOWObjectiveManager.singleton.StopObjectives();
+		SelectCamera(CameraChoice.kGameCam);
 		ClearLevelStartMessage();
 		state = GameModeState.kMainMenu;
 	}

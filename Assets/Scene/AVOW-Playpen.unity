@@ -2033,6 +2033,10 @@ Prefab:
       propertyPath: screenSpaceUI
       value: 
       objectReference: {fileID: 776105478}
+    - target: {fileID: 11459462, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
+      propertyPath: gameCompleteDlg
+      value: 
+      objectReference: {fileID: 725760409}
     m_RemovedComponents:
     - {fileID: 11424656, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: c1264dd9d156a4a159e03b56f33f6b37, type: 2}
@@ -4511,7 +4515,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1226278290
 Transform:
   m_ObjectHideFlags: 0
