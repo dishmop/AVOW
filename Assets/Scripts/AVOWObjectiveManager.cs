@@ -16,6 +16,8 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	public string filename = "ExcludedGoals";
 	bool[][]	excludedGoals;
 	
+	bool firstUpdate = true;
+	
 	
 	// Front and back boards
 	GameObject[] boards = new GameObject[2];
@@ -191,8 +193,6 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		boards[0].transform.localPosition = Vector3.zero;
 		boards[1].transform.localPosition = Vector3.zero;
 		
-		ConstructExcludedGoals();
-		LoadExcludedGoals();
 		
 		ForceBoardDepths();
 		
@@ -329,6 +329,12 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		
+		if (firstUpdate){
+			ConstructExcludedGoals();
+			LoadExcludedGoals();
+			firstUpdate  = false;
+		}
 	
 		switch (state){
 			case State.kPauseOnLevelStart:{

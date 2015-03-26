@@ -46,6 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\AVOWUpdateManager.cs" />
      <Compile Include="Assets\Scripts\AVOWBackStoryCutscene.cs" />
      <Compile Include="Assets\Scripts\AVOWBattery.cs" />
      <Compile Include="Assets\Scripts\AVOWButton.cs" />

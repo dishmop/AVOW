@@ -1,6 +1,9 @@
 Base path: /Applications/Unity/Unity.app/Contents
-Pipe name: \\.\pipe\UnityShaderCompiler-64bit-4-749641728
+Pipe name: \\.\pipe\UnityShaderCompiler-64bit-4-758292480
 Cmd: getPlatforms
-End of pipe
-
-Quitting shader compiler process
+Cmd: compileSnippet
+  api=0 type=0 insize=8643 outsize=3975 kw=DIRECTIONAL LIGHTMAP_OFF DIRLIGHTMAP_OFF DYNAMICLIGHTMAP_OFF VERTEXLIGHT_ON ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=5144 outsize=1919 kw=SPOT ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=5144 outsize=6 kw=SPOT ok=1

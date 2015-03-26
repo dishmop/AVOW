@@ -1,6 +1,7 @@
 Base path: /Applications/Unity/Unity.app/Contents
-Pipe name: \\.\pipe\UnityShaderCompiler-64bit-3-750440448
+Pipe name: \\.\pipe\UnityShaderCompiler-64bit-3-759091200
 Cmd: getPlatforms
-End of pipe
-
-Quitting shader compiler process
+Cmd: compileSnippet
+  api=0 type=0 insize=5144 outsize=1863 kw=POINT_COOKIE ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=5144 outsize=6 kw=POINT_COOKIE ok=1
