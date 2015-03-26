@@ -23,6 +23,7 @@ public class AVOWGameModes : MonoBehaviour {
 	public GameObject screenSpaceUI;
 	public GameObject mainMenuPanel;
 	public GameObject levelCompleteDlg;
+	public GameObject gameCompleteDlg;
 	public GameObject whitePanel;
 	public GameObject levelStartMsg;
 	public GameObject sidePanel;
@@ -52,7 +53,7 @@ public class AVOWGameModes : MonoBehaviour {
 	float levelStartMsgTime = -100f;
 
 	// Use this for initialization
-	void Start () {
+	public void Initialise () {
 		backStory.SetActive(true);
 		SelectCamera(CameraChoice.kGameCam);
 		tutorialText.SetActive(true);
@@ -84,9 +85,7 @@ public class AVOWGameModes : MonoBehaviour {
 		singleton = null;
 	}	
 	
-	// Update is called once per frame
-	void Update () {
-	
+	public void GameUpdate(){
 		if (AVOWBattery.singleton.IsDepleated()){
 			AVOWBattery.singleton.FreezeBattery();
 			state = GameModeState.kGameOver;
@@ -100,50 +99,75 @@ public class AVOWGameModes : MonoBehaviour {
 		
 		//dlgPanel.SetActive(state == GameModeState.kGameOver || state == GameModeState.kStageComplete3);
 		mainMenuPanel.SetActive(state == GameModeState.kMainMenu);
-		levelCompleteDlg.SetActive (state == GameModeState.kStageComplete3 || state == GameModeState.kStageComplete4);
-		
+		if (state == GameModeState.kStageComplete3 || state == GameModeState.kStageComplete4){
+			if (AVOWObjectiveManager.singleton.IsOnLastLevel()){
+				gameCompleteDlg.SetActive (true);
+			}
+			else{
+				levelCompleteDlg.SetActive (true);
+			}
+		}
+		else{
+			levelCompleteDlg.SetActive (false);
+			levelCompleteDlg.SetActive (false);
+		}
 		sidePanel.transform.FindChild("ExcludeToggle").gameObject.SetActive(AVOWConfig.singleton.levelExcludeEdit);
 		sidePanel.transform.FindChild("ExcludeToggle").GetComponent<Text>().text = AVOWObjectiveManager.singleton.IsCurrentGoalExcluded() ? "Include Goal" : "Exclude Goal";
-		//dlgPanel.transform.FindChild("StageCompleteDlg").gameObject.SetActive(state == GameModeState.kStageComplete);
-		//dlgPanel.transform.FindChild("GameOverDlg").gameObject.SetActive(state == GameModeState.kGameOver);
 		
+
+		
+		switch (state){
+		case GameModeState.kMainMenu:{
+			whitePanel.SetActive(false);
+			break;
+			
+		}
+		case GameModeState.kPlayStage:{
+			
+			whitePanel.SetActive(false);
+			break;
+			
+		}
+		case GameModeState.kStageComplete0:{
+			// Get rid of all our resistance squares
+			foreach (GameObject go in AVOWGraph.singleton.allComponents){
+				AVOWComponent component = go.GetComponent<AVOWComponent>();
+				if (component.type == AVOWComponent.Type.kLoad){
+					component.Kill (89);
+				}
+			}
+			
+			AVOWConfig.singleton.DisplaySidePanel(false);
+			
+			
+			pusher.GetComponent<AVOWPusher>().disableMovement = true;
+			AVOWCamControl.singleton.disableMovement = true;
+			if (AVOWGraph.singleton.allComponents.Count == 1){
+				state = GameModeState.kStageComplete1;
+			}
+			AVOWConfig.singleton.tutDisableConnections = true;
+			break;	
+		}
+		case GameModeState.kStageComplete4:{
+			break;	
+		}
+		default:{
+//			AVOWUI.singleton.enableToolUpdate = true;
+//			greenBackground.GetComponent<AVOWGreenBackground>().MakeSmall();
+//			pusher.GetComponent<AVOWPusher>().disableMovement = false;
+//			AVOWCamControl.singleton.disableMovement = false;
+//			scenery.transform.localScale = new Vector3(1, 1, 1);
+			break;
+			}
+		}
+	}
+	
+	// Update is called once per frame
+	public void RenderUpdate () {
+	
 		HandleLevelStartMsg();
 		
 		switch (state){
-			case GameModeState.kMainMenu:{
-//				AVOWUI.singleton.enableToolUpdate = false;
-//				AVOWConfig.singleton.tutDisableConnections = false;
-				whitePanel.SetActive(false);
-				//AVOWCamControl.singleton.disableMovement = false;
-				break;
-			
-			}
-			case GameModeState.kPlayStage:{
-				
-				whitePanel.SetActive(false);
-				break;
-				
-			}
-			case GameModeState.kStageComplete0:{
-				// Get rid of all our resistance squares
-				foreach (GameObject go in AVOWGraph.singleton.allComponents){
-					AVOWComponent component = go.GetComponent<AVOWComponent>();
-					if (component.type == AVOWComponent.Type.kLoad){
-						component.Kill (89);
-					}
-				}
-				
-				AVOWConfig.singleton.DisplaySidePanel(false);
-			
-				
-				pusher.GetComponent<AVOWPusher>().disableMovement = true;
-				AVOWCamControl.singleton.disableMovement = true;
-				if (AVOWGraph.singleton.allComponents.Count == 1){
-					state = GameModeState.kStageComplete1;
-				}
-				AVOWConfig.singleton.tutDisableConnections = true;
-				break;	
-			}
 			case GameModeState.kStageComplete1:{
 				// Get rid of all our resistance squares
 				float scaleVal = scenery.transform.localScale.x;
@@ -180,18 +204,9 @@ public class AVOWGameModes : MonoBehaviour {
 				}
 				break;	
 			}
-			case GameModeState.kStageComplete4:{
-				break;	
-			}
-			default:{
-				AVOWUI.singleton.enableToolUpdate = true;
-				greenBackground.GetComponent<AVOWGreenBackground>().MakeSmall();
-				pusher.GetComponent<AVOWPusher>().disableMovement = false;
-				AVOWCamControl.singleton.disableMovement = false;
-				scenery.transform.localScale = new Vector3(1, 1, 1);
-				break;
-			}
 		}
+	
+
 
 
 	}
@@ -208,7 +223,6 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	
 	public void PlayFree(){
-
 		AVOWTutorialText.singleton.activated = false;
 		SelectCamera(CameraChoice.kGameCam);
 		sidePanel.SetActive(true);
@@ -221,22 +235,18 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 	
 	public void PlayTutorial(){
-		
 		AVOWTutorialText.singleton.activated = true;
 		SelectCamera(CameraChoice.kGameCam);
 		AVOWConfig.singleton.DisplayBottomPanel(true);
 		AVOWConfig.singleton.DisplaySidePanel(true);
 		backStory.SetActive(false);
 		AVOWObjectiveManager.singleton.InitialiseLimitsOnly(5);
-		
 		AVOWTutorialManager.singleton.StartTutorial();
 		
 		RestartTutorialGame();
 	}
 	
 	public void PlayBackStory(){
-
-		
 		AVOWTutorialText.singleton.activated = true;
 		AVOWConfig.singleton.DisplayBottomPanel(true);
 		AVOWConfig.singleton.DisplaySidePanel(false);

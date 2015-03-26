@@ -139,7 +139,10 @@ public class AVOWSim : MonoBehaviour {
 		singleton = null;
 	}
 	
-	public void FixedUpdate(){
+	public void Initialise(){
+	}
+	
+	public void GameUpdate(){
 //		Debug.Log("Sim Update");
 		
 		RecordMousePos();

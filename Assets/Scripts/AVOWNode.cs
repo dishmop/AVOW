@@ -49,7 +49,7 @@ public class AVOWNode : MonoBehaviour {
 		hasBeenLayedOut = true;
 		
 		// A bit naughty, but the only way we can get all the things in the right place
-		Update ();
+		RenderUpdate ();
 	}
 		
 	
@@ -57,8 +57,12 @@ public class AVOWNode : MonoBehaviour {
 	public void SetSelected(bool enable){
 		isSelected = enable;
 	}
+	
+	public void GameUpdate (){
+		
+	}
 
-	void Update(){
+	public void RenderUpdate(){
 	
 		// Hmm this seems to happen when ghe batery runs out
 		if (float.IsNaN(h0)){
@@ -85,12 +89,12 @@ public class AVOWNode : MonoBehaviour {
 		transform.gameObject.SetActive(isInteractive);	
 		
 		// Modify the scale and position so we don't extend outside of the connections we have
-		if (AVOWConfig.singleton.modifiedNodeLengths) ApplyMOdifiedLength();
+		if (AVOWConfig.singleton.modifiedNodeLengths) ApplyModifiedLength();
 
 	
 	}
 	
-	void ApplyMOdifiedLength(){
+	void ApplyModifiedLength(){
 		// examine list of all conneciton points along this node
 		float minPos = h0 + hWidth;
 		float maxPos = h0;

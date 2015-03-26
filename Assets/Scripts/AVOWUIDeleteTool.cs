@@ -43,7 +43,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 	}
 	
 	
-	public override void Start(){
+	public override void Startup(){
 		cursorCube = InstantiateCursorCube();
 		cursorCube.transform.parent = AVOWUI.singleton.transform;
 		
@@ -53,11 +53,17 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		
 		lightening0GO = AVOWUI.singleton.InstantiateGreenLightening();
 		lightening0GO.transform.parent = AVOWUI.singleton.transform;
+		lightening0GO.SetActive(false);
 		
 		lightening1GO = AVOWUI.singleton.InstantiateGreenLightening();
 		lightening1GO.transform.parent = AVOWUI.singleton.transform;
+		lightening1GO.SetActive(false);
 		
 		uiZPos = AVOWUI.singleton.transform.position.z;
+		ResetButtonFlags();
+		
+		RenderUpdate();
+			
 		
 	}
 	
@@ -69,13 +75,33 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 	}
 	
 	
+	public override void RenderUpdate () {
+		
+		// Calc the mouse posiiton on world space
+		Vector3 screenCentre = new Vector3(Screen.width * 0.75f, Screen.height * 0.5f, 0);
+		Vector3 inputScreenPos = Vector3.Lerp(screenCentre, Input.mousePosition, AVOWConfig.singleton.cubeToCursor.GetValue());
+		
+		Vector3 mousePos = inputScreenPos;
+		mousePos.z = 0;
+		mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
+		
+		// Get the mouse buttons
+		HandleMouseButtonInput();
+		
+		
+		// Set the cursor cubes position
+		mouseWorldPos.z = uiZPos;
+		cursorCube.transform.position = mouseWorldPos;
+		
+		VizUpdate();
+	}
+		
 	
-	
-	public override void Update () {
+	public override void FixedUpdate () {
 		//		Debug.Log(Time.time + ": UICreateTool Update");
 		StateUpdate();
 		CommandsUpdate();
-		VizUpdate();
+		ResetButtonFlags();
 		
 	}
 	
@@ -98,26 +124,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 	}
 	
 	void StateUpdate(){
-	
-		// Calc the mouse posiiton on world space
-		Vector3 screenCentre = new Vector3(Screen.width * 0.75f, Screen.height * 0.5f, 0);
-		Vector3 inputScreenPos = Vector3.Lerp(screenCentre, Input.mousePosition, AVOWConfig.singleton.cubeToCursor.GetValue());
-		
-		Vector3 mousePos = inputScreenPos;
-		mousePos.z = 0;
-		mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
-		
-		// Get the mouse buttons
-//		bool  buttonPressed = (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButtonDown(0));
-		bool  buttonIsDown =   (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButton(0));
-		bool  buttonReleased = (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButtonUp(0));
-		//		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
-		
-		// Set the cursor cubes position
-		mouseWorldPos.z = uiZPos;
-		cursorCube.transform.position = mouseWorldPos;
-		
-		
+
 		//	Debug.Log("Mouse world pos = " + mouseWorldPos.ToString());
 		
 		
@@ -129,7 +136,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 			connectionGO = closestObj;
 			connectionPos = closestPos;
 			
-			if (buttonIsDown && connectionGO != null){
+			if (IsButtonDown() && connectionGO != null){
 				heldConnection = true;
 			}
 		}
@@ -141,7 +148,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 			// If not inside the held gap, find the next closest thing - favouring whatever we have connected already
 			if (isOutside){
 				
-				if (buttonReleased){
+				if (IsButtonReleased()){
 					heldConnection = false;
 					heldGapCommand.ExecuteStep();
 					AVOWUI.singleton.commands.Push(heldGapCommand);
@@ -151,14 +158,14 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 				}
 			}
 			else{
-				if (buttonReleased){
+				if (IsButtonReleased()){
 					heldConnection = false;
 					insideState = InsideGapState.kOnCancel;
 					
 				}
 			}
 			
-			
+
 		}
 		
 		// If we have a gap which we are holding open, check if our mous is inside the gap
@@ -168,7 +175,6 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 			isOutside = !component.IsPointInsideGap(mouseWorldPos);
 		}
 		
-		if (heldConnection || insideState == InsideGapState.kOnCancel || insideState == InsideGapState.kOnRemove) HandleCubeInsideGap();
 	}
 	
 	AVOWComponent GetHeldCommandComponent(){
@@ -315,6 +321,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 	
 	
 	void VizUpdate(){
+		if (heldConnection || insideState == InsideGapState.kOnCancel || insideState == InsideGapState.kOnRemove) HandleCubeInsideGap();
 		
 		Vector3 lighteningConductorPos = mouseWorldPos;//(isInside) ? insideCube.transform.position : mouseWorldPos;
 		AVOWGraph.singleton.EnableAllLightening();
@@ -406,7 +413,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 			
 			// Ned to force the sim to do an update (this would be better if all this logic was in a fixed update and it 
 			// was more tightly controlled
-			AVOWSim.singleton.FixedUpdate();
+			AVOWSim.singleton.GameUpdate();
 		}
 		
 	}

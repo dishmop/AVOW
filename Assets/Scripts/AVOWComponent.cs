@@ -101,11 +101,10 @@ public class AVOWComponent : MonoBehaviour {
 	}
 	
 	void Start(){
-		if (type == Type.kLoad){
-		//	transform.FindChild("Resistance").gameObject.renderer.materials[0].color =  new Color(Random.Range(0f, 1f), Random.Range(0f, 1f),Random.Range(0f, 1f));
-			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = "";
-		}
+
 		lighteningZDepth = transform.position.z - 0.01f;
+		transform.FindChild("Lightening0").gameObject.SetActive(false);
+		transform.FindChild("Lightening1").gameObject.SetActive(false);
 	}
 	
 	public float GetResistance(){
@@ -338,17 +337,19 @@ public class AVOWComponent : MonoBehaviour {
 	public void HasBeenLayedOut(){
 		hasBeenLayedOut = true;
 		// A bit naughty, but the only way we can get all the things in the right place
-		Update ();
+		RenderUpdate ();
 		
+	}
+	
+	public void GameUpdate (){
+		CheckForKillResistance();
 	}
 	
 
 	// Update is called once per frame
-	void Update () {
+	public void RenderUpdate () {
 	
 		resistanceAngle.Update();
-		CheckForKillResistance();
-		
 		
 		// NOt sure why this should eveqr happen but...
 		if (float.IsNaN(h0)){
@@ -427,20 +428,6 @@ public class AVOWComponent : MonoBehaviour {
 		// Debug text
 		//transform.FindChild("Resistance").FindChild ("AVOWTextBox").gameObject.SetActive(false);
 		//transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = GetID() + " - " + hOrder.ToString();
-		if (!AVOWGraph.singleton.HasHalfFinishedComponents()){
-			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().text = CreateFracString(hWidth * AVOWCircuitCreator.singleton.GetLCM());
-			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().color = new Color(0, 1, 0);
-		}
-		else{
-			transform.FindChild("Resistance").FindChild ("AVOWTextBox").GetComponent<TextMesh>().color = new Color(0.75f, 0.125f, 0f);
-			
-		}
-		
-		// If we are not displaying individual currents then remove the display
-		if (type == Type.kLoad){
-			transform.FindChild("Resistance").FindChild ("AVOWTextBox").gameObject.SetActive(AVOWConfig.singleton.showIndividuals);
-			transform.FindChild("Resistance").FindChild ("Display").gameObject.SetActive(AVOWConfig.singleton.showIndividuals);
-		}
 		
 		
 		
@@ -506,7 +493,7 @@ public class AVOWComponent : MonoBehaviour {
 		int integer;
 		bool isNeg;
 		//val *= AVOWCircuitCreator.singleton.currentLCM;
-		MathUtils.FP.CalcFraction(val, out integer, out numerator, out denominator, out isNeg);
+			MathUtils.FP.CalcFraction(val, out integer, out numerator, out denominator, out isNeg);
 		return (integer * denominator + numerator).ToString() + (MathUtils.FP.Feq (denominator, 1) ? "" : "/" + denominator.ToString() );
 	}
 	

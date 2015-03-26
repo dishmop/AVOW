@@ -10,6 +10,10 @@ public class AVOWUITool{
 	protected GameObject insideCube;
 	
 	
+	bool isMouseDown;
+	bool isMouseReleased;
+	
+	
 	public virtual GameObject GetCursorCube(){
 		return null;
 	}
@@ -47,8 +51,33 @@ public class AVOWUITool{
 		}
 	}
 	
-	public virtual void Start(){}
-	public virtual void Update(){}
+	// Call from fixed update to determine if the mouse button is down (or has been down since the last frame
+	protected bool IsButtonDown(){
+		return isMouseDown;
+	}
+	
+	// Call from fixed update to determine if the mouse button has been released since last frame
+	protected bool IsButtonReleased(){
+		return isMouseReleased;
+	}
+	
+	// Call this at the end of the fixed update function to ensure correct behaviour
+	protected void ResetButtonFlags(){
+		isMouseDown = false;
+		isMouseReleased = false;
+	}
+	
+	// Call from the render update
+	protected void HandleMouseButtonInput(){
+		/// Logic is a latch which ust be reset 
+		isMouseDown =   isMouseDown || (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButton(0));
+		isMouseReleased = isMouseReleased || (!AVOWConfig.singleton.tutDisableMouseButtton && !Input.GetMouseButton(0));
+	}
+	
+	
+	public virtual void Startup(){}
+	public virtual void RenderUpdate(){}
+	public virtual void FixedUpdate(){}
 	public virtual void OnDestroy(){}
 	
 	

@@ -181,8 +181,13 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	public int GetNumFreeResistors(){
 		return (GetResistorLimit() - AVOWGraph.singleton.GetNumConfirmedLoads());
 	}
-		// Use this for initialization
-	void Start () {
+	
+	public bool IsOnLastLevel(){
+		return currentLevel == GetMaxLevelNum() - 1;
+	}
+	
+	// Use this for initialization
+	public void Initialise () {
 		boards[0] = GameObject.Instantiate(objectiveBoardPrefab);
 		boards[1] = GameObject.Instantiate(objectiveBoardPrefab);
 		
@@ -250,7 +255,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		for (int i = 1; i < GetMaxLevelNum(); ++i){
 			InitialiseLevel(i);
 			while (!AVOWCircuitCreator.singleton.IsReady()){
-				AVOWCircuitCreator.singleton.Update ();
+				AVOWCircuitCreator.singleton.GameUpdate ();
 			}
 			excludedGoals[i] = new bool[GetGoalTargets().Count];
 		}
@@ -328,7 +333,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	
 	
 	// Update is called once per frame
-	void Update () {
+	public void RenderUpdate () {
 		
 		if (firstUpdate){
 			ConstructExcludedGoals();
@@ -472,6 +477,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				
 				break;		
 			}
+		}
+		
+		for (int i = 0; i < 2; ++i){
+			boards[i].GetComponent<AVOWObjectiveBoard>().RenderUpdate();
 		}
 		
 	}

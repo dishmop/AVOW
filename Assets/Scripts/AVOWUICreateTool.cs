@@ -47,26 +47,33 @@ public class AVOWUICreateTool :  AVOWUITool{
 	float					confirmedConnectionHeight;
 	
 	
-	public override void Start(){
+	public override void Startup(){
 		cursorCube = InstantiateCursorCube();
 		cursorCube.transform.parent = AVOWUI.singleton.transform;
 		lightening0GO = AVOWUI.singleton.InstantiateLightening();
 		lightening0GO.transform.parent = AVOWUI.singleton.transform;
+		lightening0GO.SetActive(false);
+		
+		
 		lightening1GO = AVOWUI.singleton.InstantiateLightening();
 		lightening1GO.transform.parent = AVOWUI.singleton.transform;
+		lightening1GO.SetActive(false);
+
 		
 		uiZPos = AVOWUI.singleton.transform.position.z;
+		
+		RenderUpdate();
 		
 		insideLerpSpeed = minLerpSpeed;
 	}
 	
 	
-	public override void Update () {
+	public override void FixedUpdate () {
 		//		Debug.Log(Time.time + ": UICreateTool Update");
 		StateUpdate();
 		CalcNewHOrder();
 		CommandsUpdate();
-		VizUpdate();
+		ResetButtonFlags();
 		
 	}
 	
@@ -110,10 +117,8 @@ public class AVOWUICreateTool :  AVOWUITool{
 		return isInside;
 	}
 	
-
-	
-	void StateUpdate(){
-	
+	public override void RenderUpdate(){
+		
 		// Calc the mouse posiiton on world space
 		Vector3 screenCentre = AVOWConfig.singleton.GetViewCentre();
 		Vector3 inputScreenPos = Vector3.Lerp(screenCentre, Input.mousePosition, AVOWConfig.singleton.cubeToCursor.GetValue());
@@ -121,17 +126,24 @@ public class AVOWUICreateTool :  AVOWUITool{
 		Vector3 mousePos = inputScreenPos;
 		mousePos.z = 0;
 		mouseWorldPos = Camera.main.ScreenToWorldPoint( mousePos);
+
 		
-		// Get the mouse buttons
-//		bool  buttonPressed = (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButtonDown(0));
-		bool  buttonIsDown =   (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButton(0));
-		bool  buttonReleased = (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButtonUp(0));
-		//		bool  buttonDown = (Input.GetMouseButton(0) && !Input.GetKey (KeyCode.LeftControl));
-		
+
 		// Set the cursor cubes position
 		mouseWorldPos.z = uiZPos;
 		cursorCube.transform.position = mouseWorldPos;
 		
+		HandleMouseButtonInput();
+		VizUpdate();
+		
+		
+	}
+	
+
+	
+	void StateUpdate(){
+	
+
 		if (AVOWConfig.singleton.tutDisableConnections) 
 		{
 			connection0 = null;
@@ -159,7 +171,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 			
 			
 			
-			if (buttonIsDown && connection0 != null){
+			if (IsButtonDown() && connection0 != null){
 				heldConnection = true;
 			}
 		}
@@ -192,13 +204,13 @@ public class AVOWUICreateTool :  AVOWUITool{
 				}
 				connection1 = closestObj;
 				connection1Pos = closestPos;	
-				if (buttonReleased){
+				if (IsButtonReleased()){
 					heldConnection = false;
 					connection1 = null;
 				}
 			}
 			else{
-				if (buttonReleased){
+				if (IsButtonReleased()){
 					// do logic to see if the thing should be creared
 					// If a node to node connection
 					bool okToCreate = true;
@@ -226,7 +238,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 					}
 				}
 			}
-
+			
 			
 			
 		}
@@ -247,7 +259,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 			isInside = component.IsPointInsideGap(mouseWorldPos);
 		}
 		
-		HandleCubeInsideGap();
+
 		
 	}
 	
@@ -345,6 +357,8 @@ public class AVOWUICreateTool :  AVOWUITool{
 	
 	
 	void HandleVizConnectors(){
+
+		
 		if (connection0 == null || !heldConnection){
 			foreach(GameObject go in AVOWGraph.singleton.allComponents){
 				go.transform.FindChild("ConnectionSphere0").GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
@@ -402,7 +416,9 @@ public class AVOWUICreateTool :  AVOWUITool{
 	
 	
 	void VizUpdate(){
-	
+		HandleCubeInsideGap();
+		
+		
 		// if we are holding a node then select that node
 		AVOWGraph.singleton.UnselectAllNodes();
 		if (heldConnection){
@@ -610,7 +626,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 			
 			// Ned to force the sim to do an update (this would be better if all this logic was in a fixed update and it 
 			// was more tightly controlled
-			AVOWSim.singleton.FixedUpdate();
+			AVOWSim.singleton.GameUpdate();
 		}
 		
 	}

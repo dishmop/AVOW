@@ -10,7 +10,7 @@ public class AVOWUIDisabledTool :  AVOWUITool{
 	Vector3 				mouseWorldPos;
 	GameObject 				cursorCube;
 	
-	public override void Start(){
+	public override void Startup(){
 		cursorCube = InstantiateCursorCube();
 		cursorCube.transform.parent = AVOWUI.singleton.transform;
 		
@@ -31,7 +31,7 @@ public class AVOWUIDisabledTool :  AVOWUITool{
 	
 	
 	
-	public override void Update () {
+	public override void RenderUpdate () {
 		
 		// Calc the mouse posiiton on world space
 		Vector3 screenCentre = new Vector3(Screen.width * 0.75f, Screen.height * 0.5f, 0);

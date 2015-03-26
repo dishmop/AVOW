@@ -63,7 +63,7 @@ public class AVOWUI : MonoBehaviour {
 			uiTool = null;
 		}
 		graph = null;
-		Update ();
+		FixedUpdate ();
 		
 	}
 	
@@ -72,8 +72,7 @@ public class AVOWUI : MonoBehaviour {
 		return uiTool;
 	}
 	
-	
-	void Update(){
+	public void RenderUpdate(){
 		if (Time.fixedTime > lastFlashTime + 0.5f){
 			cubeBrightness.Set (1);
 			cubeBrightness.SetSpeed(2);
@@ -87,7 +86,11 @@ public class AVOWUI : MonoBehaviour {
 			}
 			int numMaterials = uiTool.GetCursorCube().GetComponent<Renderer>().materials.Length;
 			uiTool.GetCursorCube().GetComponent<Renderer>().materials[numMaterials - 1].SetFloat("_Intensity", cubeBrightness.GetValue());
+			uiTool.RenderUpdate();
 		}
+	}
+	
+	public void FixedUpdate(){
 		
 		if (AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kGameOver){
 			if (uiTool != null){		
@@ -116,11 +119,9 @@ public class AVOWUI : MonoBehaviour {
 			if (graph == null){
 				Startup();
 			}
-			if (enableToolUpdate) uiTool.Update();
+			if (enableToolUpdate) uiTool.FixedUpdate();
 		}
 
-		
-		
 	}
 	
 
@@ -205,7 +206,7 @@ public class AVOWUI : MonoBehaviour {
 		
 		mode = ToolMode.kCreate;
 		
-		uiTool.Start();
+		uiTool.Startup();
 
 		
 	}
@@ -219,21 +220,21 @@ public class AVOWUI : MonoBehaviour {
 	public void SetCreateTool(){
 		uiTool.OnDestroy();
 		uiTool = new AVOWUICreateTool();
-		uiTool.Start();
+		uiTool.Startup();
 		mode = ToolMode.kCreate;
 	}
 	
 	public void SetDeleteTool(){
 		uiTool.OnDestroy();
 		uiTool = new AVOWUIDeleteTool();
-		uiTool.Start();
+		uiTool.Startup();
 		mode = ToolMode.kDelete;
 	}
 	
 	public void SetDisableTool(){
 		uiTool.OnDestroy();
 		uiTool = new AVOWUIDisabledTool();
-		uiTool.Start();
+		uiTool.Startup();
 	}
 	
 }

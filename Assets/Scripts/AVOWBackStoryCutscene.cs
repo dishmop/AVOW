@@ -243,7 +243,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	}
 
 	// Use this for initialization
-	void Start () {
+	public void Initialise () {
 //		string name = backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[0].name;
 		reflectionColor = backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[0].GetColor ("_ReflectColor");
 		rustColor = backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[1].GetColor ("_TintColor");
@@ -297,7 +297,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	public void RenderUpdate () {
 		backStoryQuit.SetActive(state != State.kOff);
 		if (steeringState == SteeringState.kAvoidCentre){
 			SteerSpheresAwayFromCentre();

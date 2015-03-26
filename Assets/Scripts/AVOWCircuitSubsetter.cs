@@ -20,7 +20,7 @@ public class AVOWCircuitSubsetter : MonoBehaviour {
 	FileStream	fileStream = null;
 
 	// Use this for initialization
-	void Start () {
+	public void Startup () {
 		organisedTargets = new List<AVOWCircuitTarget>[6];
 		for (int i = 0; i < organisedTargets.Length; ++i){
 			organisedTargets[i] = new List<AVOWCircuitTarget>();
@@ -33,11 +33,7 @@ public class AVOWCircuitSubsetter : MonoBehaviour {
 	
 	}
 	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-	
+
 	// Just to give it same interface as the circuit creator
 	public void Initialise(int numResistors){
 		this.numResistors = numResistors;
@@ -320,7 +316,7 @@ public class AVOWCircuitSubsetter : MonoBehaviour {
 			AVOWCircuitCreator.singleton.Initialise(i);
 			bool isReady = false;
 			while (!isReady){
-				AVOWCircuitCreator.singleton.Update();
+				AVOWCircuitCreator.singleton.GameUpdate();
 				isReady = AVOWCircuitCreator.singleton.IsReady();
 			}
 			foreach (AVOWCircuitTarget target in AVOWCircuitCreator.singleton.GetResults()){

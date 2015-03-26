@@ -46,7 +46,6 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\AVOWUpdateManager.cs" />
      <Compile Include="Assets\Scripts\AVOWBackStoryCutscene.cs" />
      <Compile Include="Assets\Scripts\AVOWBattery.cs" />
      <Compile Include="Assets\Scripts\AVOWButton.cs" />
@@ -86,6 +85,7 @@
      <Compile Include="Assets\Scripts\AVOWUIDeleteTool.cs" />
      <Compile Include="Assets\Scripts\AVOWUIDisabledTool.cs" />
      <Compile Include="Assets\Scripts\AVOWUITool.cs" />
+     <Compile Include="Assets\Scripts\AVOWUpdateManager.cs" />
      <Compile Include="Assets\Scripts\AVOWVizObjectives.cs" />
      <Compile Include="Assets\Scripts\AVOWVizTotals.cs" />
      <Compile Include="Assets\Scripts\AmmeterEffect.cs" />
@@ -119,6 +119,7 @@
      <Compile Include="Assets\Scripts\GearProcedural\Gear.cs" />
      <Compile Include="Assets\Scripts\Grid.cs" />
      <Compile Include="Assets\Scripts\GridPoint.cs" />
+     <Compile Include="Assets\Scripts\Interpolator.cs" />
      <Compile Include="Assets\Scripts\LeccyUIButton.cs" />
      <Compile Include="Assets\Scripts\LevelManager.cs" />
      <Compile Include="Assets\Scripts\LevelStartMessage.cs" />

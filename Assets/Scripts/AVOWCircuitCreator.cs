@@ -155,7 +155,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	public void Update () {
+	public void GameUpdate () {
 		switch (state){
 			case State.kStart:{
 				if (LoadPerms()){

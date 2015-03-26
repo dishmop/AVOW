@@ -21,6 +21,9 @@ public class AVOWGraph : MonoBehaviour {
 	public List<GameObject> allComponents = new List<GameObject>();
 	
 	
+	List<GameObject> componentsToRemove = new List<GameObject>();
+	
+	
 	
 
 	// Place an new component between two existing nodes
@@ -56,15 +59,24 @@ public class AVOWGraph : MonoBehaviour {
 	
 	
 	public void RemoveComponent(GameObject obj){
-		AVOWComponent component = obj.GetComponent<AVOWComponent>();
-		GameObject node0 = component.node0GO;
-		GameObject node1 = component.node1GO;
-
-		// Remove the component
-		allComponents.Remove(obj);
-		node0.GetComponent<AVOWNode>().components.Remove (obj);
-		node1.GetComponent<AVOWNode>().components.Remove (obj);
-		GameObject.Destroy(obj);
+		componentsToRemove.Add (obj);
+	}
+	
+	// Really remove it
+	void PrivateRemoveQueuedComponent(){
+		foreach (GameObject obj in componentsToRemove){
+			AVOWComponent component = obj.GetComponent<AVOWComponent>();
+			GameObject node0 = component.node0GO;
+			GameObject node1 = component.node1GO;
+			
+			// Remove the component
+			allComponents.Remove(obj);
+			node0.GetComponent<AVOWNode>().components.Remove (obj);
+			node1.GetComponent<AVOWNode>().components.Remove (obj);
+			GameObject.Destroy(obj);
+		}
+		
+		componentsToRemove.Clear();
 		
 	}
 	
@@ -344,7 +356,16 @@ public class AVOWGraph : MonoBehaviour {
 	
 	}
 	
-	void FixedUpdate(){
+	public void RenderUpdate(){
+		foreach (GameObject go in allNodes){
+			go.GetComponent<AVOWNode>().RenderUpdate();
+		}
+		foreach (GameObject go in allComponents){
+			go.GetComponent<AVOWComponent>().RenderUpdate();
+		}
+	}
+	
+	public void GameUpdate(){
 	
 		// If all our components are "confirmed" then we get each component to save the positions of their
 		// connectoin points - as these will be used by the UI when attaching to avoid oscillations
@@ -362,7 +383,13 @@ public class AVOWGraph : MonoBehaviour {
 		lighteningPoints.transform.FindChild("LighteningPoint1").gameObject.GetComponent<Renderer>().material.SetFloat("_Intensity", intensity);
 		lighteningPoints.transform.FindChild("LighteningPoint2").gameObject.GetComponent<Renderer>().material.SetFloat("_Intensity", intensity);
 		
-		
+		foreach (GameObject go in allNodes){
+			go.GetComponent<AVOWNode>().GameUpdate();
+		}
+		foreach (GameObject go in allComponents){
+			go.GetComponent<AVOWComponent>().GameUpdate();
+		}
+		PrivateRemoveQueuedComponent();
 	}
 	
 	

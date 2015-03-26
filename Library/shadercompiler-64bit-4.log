@@ -7,3 +7,6 @@ Cmd: compileSnippet
   api=0 type=0 insize=5144 outsize=1919 kw=SPOT ok=1
 Cmd: compileSnippet
   api=0 type=1 insize=5144 outsize=6 kw=SPOT ok=1
+End of pipe
+
+Quitting shader compiler process

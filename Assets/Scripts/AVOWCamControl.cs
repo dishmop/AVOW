@@ -27,7 +27,7 @@ public class AVOWCamControl : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	public void RenderUpdate () {
 		delay--;
 		if (delay > 0) return;
 

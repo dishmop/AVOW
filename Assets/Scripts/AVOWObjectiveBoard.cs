@@ -519,7 +519,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	public void RenderUpdate () {
 		UpdateShadedSquare();
 		
 		switch (state){
@@ -530,7 +530,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			case State.kMovingToComplete:{
 				if (UpdateMoveToComplete ()){
 					completeWaitTime = Time.time + completeWaitDuration;
-				state = State.kWaitingCompleted;
+					state = State.kWaitingCompleted;
 				}
 				break;
 			}

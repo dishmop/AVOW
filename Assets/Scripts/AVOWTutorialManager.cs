@@ -207,7 +207,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 
 	
 	// Update is called once per frame
-	void FixedUpdate () {
+	public void GameUpdate () {
 	
 		if (state == State.kOff){
 			return;

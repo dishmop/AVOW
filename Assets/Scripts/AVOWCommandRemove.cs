@@ -127,7 +127,7 @@ public class AVOWCommandRemove : AVOWCommand{
 				}
 			}
 			if (countInOut == 0){
-				if (newNode == null) Debug.LogError ("(newNode == null) ");
+				if (newNode == null) Debug.Log ("Error(newNode == null) ");
 				outNode = newNode;
 			}else{
 				needToCheckOutNode = false;

@@ -72,7 +72,7 @@ public class AVOWConfig : MonoBehaviour {
 	}
 	
 	
-	public void Start(){
+	public void Initialise(){
 		// Work out the sidebar fract from the pixels
 		sideBarFrac = sideBarPixels / Screen.width;
 		
@@ -98,7 +98,7 @@ public class AVOWConfig : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	public void RenderUpdate () {
 		bottomPanelUseFrac.Update ();
 		sidePanelUseFrac.Update ();
 		
