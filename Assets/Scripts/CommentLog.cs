@@ -67,7 +67,8 @@ public class CommentLog : MonoBehaviour, TelemetryListener {
 		if (!showUserComments && Telemetry.singleton.GetEventType(e) == Telemetry.EventType.kUserComments){
 			return;
 		}	
-		string newString = PlaybackTime.FormatTime(GameModeManager.singleton.GetGameTime()) + ": " + e.ToString().Substring (1, e.ToString().Length-1)  + ": " + text;
+		//string newString = PlaybackTime.FormatTime(GameModeManager.singleton.GetGameTime()) + ": " + e.ToString().Substring (1, e.ToString().Length-1)  + ": " + text;
+		string newString = "DUMMY";
 		displayStrings.Add(newString);
 		UpdateText();
 	}
@@ -94,8 +95,8 @@ public class CommentLog : MonoBehaviour, TelemetryListener {
 			return;
 		}
 		
-		string newString  = PlaybackTime.FormatTime(GameModeManager.singleton.GetGameTime()) + ": " + e.ToString().Substring (1, e.ToString().Length-1);
-		
+		//string newString  = PlaybackTime.FormatTime(GameModeManager.singleton.GetGameTime()) + ": " + e.ToString().Substring (1, e.ToString().Length-1);
+		string newString = "DUMMY";
 		displayStrings.Add(newString);
 		UpdateText();
 	}

@@ -59,30 +59,10 @@ public class Telemetry : MonoBehaviour {
 	// Flags about what has happened in this frame. try not to delete these as they may be needed to 
 	// parse older files (event enums are stored as strings)
 	public enum Event{
-		kCircuitChanged,
 		kNewGameStarted,
 		kGameFinished,
-		kLevelStarted,
-		kLevelCompleteWait,
-		kLevelComplete,
-		kGameComplete,
-		kApplicationQuit,
-		kFrameInc,
-		kMouseMove,
-		kGhostChange,
-		kUserComment,
-		kUIStateNone,
-		kUIStateSplash,
-		kUIStateStart,
-		kUIStateStartEditor,
-		kUIStateTitleScreen,
-		kUIStatePlayLevelInit,
-		kUIStatePlayLevel,
-		kUIStateLevelCompleteWait,
-		kUIStateLevelComplete,
-		kUIStateGameComplete,
-		kUIStateQuitGame,
-		kUIStateReallyQuitGame,	
+		kGameUpdate,
+		kRenderUpdate,
 		kNumEvents
 		
 	};
@@ -313,9 +293,9 @@ public class Telemetry : MonoBehaviour {
 		
 		BinaryWriter bw = new BinaryWriter(useStream);
 		// Always write the time of the event (from game start time).
-		float gameTime = GameModeManager.singleton.GetGameTime();
-		
-		// In the file, we record the position of the last event - since this is where
+		//float gameTime = GameModeManager.singleton.GetGameTime();
+		float gameTime = 0;
+			// In the file, we record the position of the last event - since this is where
 		// we want to jump back to when we say step backwards
 		lastStreamPos = streamPos;
 		streamPos = gZipOutStream.writeCount;
@@ -343,58 +323,58 @@ public class Telemetry : MonoBehaviour {
 	}
 	
 	void WriteTelemetryEvent(BinaryWriter bw, Event e){
-		bw.Write (e.ToString());
-		
-		if (IsTextEvent(e)){
-			bw.Write (frameStrings[0]);
-			foreach (TelemetryListener listener in listeners){
-				listener.OnEvent(e, frameStrings[0]);
-			}
-			frameStrings.RemoveAt(0);
-		}
-		else{
-			foreach (TelemetryListener listener in listeners){
-				listener.OnEvent(e);
-			}
-		}
-//		Debug.Log ("Write event = " + e.ToString());
-		
-		
-		switch(e){
-			case Event.kCircuitChanged:{
-				LevelManager.singleton.SerializeLevel(useStream);
-				break;
-			}
-			case Event.kNewGameStarted:{
-				WriteHeader (bw);
-				foreach(TelemetryListener listener in listeners){
-					listener.OnNewGame();
-				}
-			
-				
-				break;
-			}
-			case Event.kGameFinished:{
-				FinaliseRecording();
-				break;
-			}
-			case Event.kLevelStarted:{
-				bw.Write (LevelManager.singleton.currentLevelIndex);
-				bw.Write (LevelManager.singleton.GetCurrentLevelName());
-				
-				// Serialise out the level too (as it includes the all-important circuit GUID)
-				LevelManager.singleton.SerializeLevel(useStream);
-				
-				
-				break;
-			}
-			
-			case Event.kGhostChange:{
-				UI.singleton.SerializeGhostElement(useStream);
-				break;
-			}
-
-		}
+//		bw.Write (e.ToString());
+//		
+//		if (IsTextEvent(e)){
+//			bw.Write (frameStrings[0]);
+//			foreach (TelemetryListener listener in listeners){
+//				listener.OnEvent(e, frameStrings[0]);
+//			}
+//			frameStrings.RemoveAt(0);
+//		}
+//		else{
+//			foreach (TelemetryListener listener in listeners){
+//				listener.OnEvent(e);
+//			}
+//		}
+////		Debug.Log ("Write event = " + e.ToString());
+//		
+//		
+//		switch(e){
+//			case Event.kCircuitChanged:{
+//				LevelManager.singleton.SerializeLevel(useStream);
+//				break;
+//			}
+//			case Event.kNewGameStarted:{
+//				WriteHeader (bw);
+//				foreach(TelemetryListener listener in listeners){
+//					listener.OnNewGame();
+//				}
+//			
+//				
+//				break;
+//			}
+//			case Event.kGameFinished:{
+//				FinaliseRecording();
+//				break;
+//			}
+//			case Event.kLevelStarted:{
+//				bw.Write (LevelManager.singleton.currentLevelIndex);
+//				bw.Write (LevelManager.singleton.GetCurrentLevelName());
+//				
+//				// Serialise out the level too (as it includes the all-important circuit GUID)
+//				LevelManager.singleton.SerializeLevel(useStream);
+//				
+//				
+//				break;
+//			}
+//			
+//			case Event.kGhostChange:{
+//				UI.singleton.SerializeGhostElement(useStream);
+//				break;
+//			}
+//
+//		}
 		// We do this in case the player quits the application in an unexpeted way.
 		if (useStream != null)
 			useStream.Flush();
@@ -546,7 +526,7 @@ public class Telemetry : MonoBehaviour {
 			OpenFileForReading();
 			finalStreamPos = -3;
 			
-			GameModeManager.singleton.ResetGameTime();
+//			GameModeManager.singleton.ResetGameTime();
 			playbackState = PlaybackState.kStepForward;
 		}
 		// Is telemetr is disabled - then do nothing		
@@ -568,13 +548,13 @@ public class Telemetry : MonoBehaviour {
 				break;
 			}
 			case PlaybackState.kPlaying:{
-				ReadAndProcessTelemetryEvent();			
+//				ReadAndProcessTelemetryEvent();			
 				break;
 			}			
 
 			case PlaybackState.kStepForward:{
-				GameModeManager.singleton.ForceSetGameTime(playbackTime);
-				ReadAndProcessTelemetryEvent();		
+//				GameModeManager.singleton.ForceSetGameTime(playbackTime);
+//				ReadAndProcessTelemetryEvent();		
 				
 				bool exists = lastEventsRead.Exists(e => ShouldProcessStepEvent(GetEventType(e)));
 				
@@ -593,7 +573,7 @@ public class Telemetry : MonoBehaviour {
 				ReadSeek(lastStreamPos);
 			    // Note that this is ok to do as it will set the read state to ensure that data is read next
 				ReadEventTime(true);
-				ReadAndProcessTelemetryEvent();	
+//				ReadAndProcessTelemetryEvent();	
 
 				bool exists = lastEventsRead.Exists(e => ShouldProcessStepEvent(GetEventType(e)));
 				
@@ -612,7 +592,7 @@ public class Telemetry : MonoBehaviour {
 				ReadSeek(0);
 				// Note that this is ok to do as it will set the read state to ensure that data is read next
 				ReadEventTime(true);
-				ReadAndProcessTelemetryEvent();	
+//				ReadAndProcessTelemetryEvent();	
 				playbackState = PlaybackState.kPaused;
 				break;
 			}
@@ -624,7 +604,7 @@ public class Telemetry : MonoBehaviour {
 				// And then stop forward one to get us to the end
 				ReadSeek(finalLastStreamPos);
 				ReadEventTime(true);
-				ReadAndProcessTelemetryEvent();	
+//				ReadAndProcessTelemetryEvent();	
 				playbackState = PlaybackState.kStepForward;
 				break;
 			}
@@ -648,44 +628,44 @@ public class Telemetry : MonoBehaviour {
 		readState = ReadState.kReadData;
 		
 		
-		if (forceGameToMatch)
-			GameModeManager.singleton.ForceSetGameTime(playbackTime);
+	//	if (forceGameToMatch)
+	//		GameModeManager.singleton.ForceSetGameTime(playbackTime);
 	}
 	
 	bool ShouldProcessStepEvent(EventType type){
 		return stepProcessEvent[(int)type];
 	}
 	
-	void ReadAndProcessTelemetryEvent(){
-		bool finish = false;
-		while (!finish && MathUtils.FP.Fleq (playbackTime, GameModeManager.singleton.GetGameTime())){
-			switch (readState){
-				case ReadState.kReadTime:{
-					ReadEventTime(false);
-					break;
-				}
-				case ReadState.kReadData:{
-					BinaryReader br = new BinaryReader(useStream);
-					// Read the position of the event before this one (so we can jump back to it if necessary
-					lastStreamPos = br.ReadInt64();
-//					Debug.Log("Read lastSteamPos = " + lastStreamPos);
-					streamPos = br.ReadInt64();
-//					Debug.Log("Read streamPos = " + streamPos);
-					
-					int numEvents = br.ReadInt32 ();
-					lastEventsRead.Clear();
-					for (int i = 0; i < numEvents; ++i){
-						// Hopefully any "finishing" events should be the last event that frame!
-						finish = ReadData();
-					}
-					readState = ReadState.kReadTime;
-					break;
-				}
-
-			}
-		}
-	}
-	
+//	void ReadAndProcessTelemetryEvent(){
+//		bool finish = false;
+//		while (!finish && MathUtils.FP.Fleq (playbackTime, GameModeManager.singleton.GetGameTime())){
+//			switch (readState){
+//				case ReadState.kReadTime:{
+//					ReadEventTime(false);
+//					break;
+//				}
+//				case ReadState.kReadData:{
+//					BinaryReader br = new BinaryReader(useStream);
+//					// Read the position of the event before this one (so we can jump back to it if necessary
+//					lastStreamPos = br.ReadInt64();
+////					Debug.Log("Read lastSteamPos = " + lastStreamPos);
+//					streamPos = br.ReadInt64();
+////					Debug.Log("Read streamPos = " + streamPos);
+//					
+//					int numEvents = br.ReadInt32 ();
+//					lastEventsRead.Clear();
+//					for (int i = 0; i < numEvents; ++i){
+//						// Hopefully any "finishing" events should be the last event that frame!
+//						finish = ReadData();
+//					}
+//					readState = ReadState.kReadTime;
+//					break;
+//				}
+//
+//			}
+//		}
+//	}
+//	
 	bool ReadData(){
 		BinaryReader br = new BinaryReader(useStream);
 		
@@ -714,50 +694,50 @@ public class Telemetry : MonoBehaviour {
 
 		
 		
-		switch(e){
-			case Event.kCircuitChanged:{
-				LevelManager.singleton.DeserializeLevel(useStream);
-				break;
-			}
-			case Event.kGameFinished:{
-				playbackState = PlaybackState.kPaused;
-				// Record the last posiiton in the file
-				finalStreamPos = streamPos;
-				finalLastStreamPos = lastStreamPos;
-				return true;
-			}
-			case Event.kNewGameStarted:{
-				GameModeManager.singleton.StartGame();
-				Circuit.singleton.CreateBlankCircuit();
-				foreach(TelemetryListener listener in listeners){
-					listener.OnNewGame();
-				}
-				ReadHeader();
-				break;
-			}
-			case Event.kLevelStarted:{
-				LevelManager.singleton.currentLevelIndex = br.ReadInt32 ();
-				string levelName = br.ReadString();
-				if (levelName != LevelManager.singleton.GetCurrentLevelName()){
-					Debug.LogError ("Level name does not match the name in the level manager");
-				}
-				
-				// Serialise out the level too (as it includes the all-important circuit GUID)
-				LevelManager.singleton.DeserializeLevel(useStream);
-				break;
-			}
-
-			case Event.kGhostChange:{
-				UI.singleton.DeserializeGhostElement(useStream);
-				break;
-			}
-		}
-		if (e > Event.kUIStateNone){
-			// don't do this if it is a quit game message
-			if (e != Event.kUIStateQuitGame || e != Event.kUIStateReallyQuitGame ){
-				GameModeManager.singleton.SetUIState((int)e - (int)Event.kUIStateNone);
-			}
-		}
+//		switch(e){
+//			case Event.kCircuitChanged:{
+//				LevelManager.singleton.DeserializeLevel(useStream);
+//				break;
+//			}
+//			case Event.kGameFinished:{
+//				playbackState = PlaybackState.kPaused;
+//				// Record the last posiiton in the file
+//				finalStreamPos = streamPos;
+//				finalLastStreamPos = lastStreamPos;
+//				return true;
+//			}
+//			case Event.kNewGameStarted:{
+//				GameModeManager.singleton.StartGame();
+//				Circuit.singleton.CreateBlankCircuit();
+//				foreach(TelemetryListener listener in listeners){
+//					listener.OnNewGame();
+//				}
+//				ReadHeader();
+//				break;
+//			}
+//			case Event.kLevelStarted:{
+//				LevelManager.singleton.currentLevelIndex = br.ReadInt32 ();
+//				string levelName = br.ReadString();
+//				if (levelName != LevelManager.singleton.GetCurrentLevelName()){
+//					Debug.LogError ("Level name does not match the name in the level manager");
+//				}
+//				
+//				// Serialise out the level too (as it includes the all-important circuit GUID)
+//				LevelManager.singleton.DeserializeLevel(useStream);
+//				break;
+//			}
+//
+//			case Event.kGhostChange:{
+//				UI.singleton.DeserializeGhostElement(useStream);
+//				break;
+//			}
+//		}
+//		if (e > Event.kUIStateNone){
+//			// don't do this if it is a quit game message
+//			if (e != Event.kUIStateQuitGame || e != Event.kUIStateReallyQuitGame ){
+//				GameModeManager.singleton.SetUIState((int)e - (int)Event.kUIStateNone);
+//			}
+//		}
 			
 		return false;
 			
@@ -788,7 +768,7 @@ public class Telemetry : MonoBehaviour {
 		hhmmss = dt.Hour.ToString("00.##") + dt.Minute.ToString("00.##") + dt.Second.ToString("00.##");
 		machineGUID = GetMachineGUID();
 		fileGuid = Guid.NewGuid().ToString();
-		playerName = PlayerPrefs.GetString(GameModeManager.playerNameKey);
+//		playerName = PlayerPrefs.GetString(GameModeManager.playerNameKey);
 		if (playerName == "") playerName = "NONE-GIVEN";
 		writeFilename =  gameName + "_" + gameVersion + "_" + playerName + "_" + yyyymmdd + "_" + hhmmss + "_" + machineGUID + "_" + fileGuid + BuildExtension();
 		writeFilenameFinal =  gameName + "_" + gameVersion + "_" + playerName + "_" + yyyymmdd + "_" + hhmmss + "_" + machineGUID + "_" + fileGuid + BuildFinalExtension();
@@ -882,29 +862,29 @@ public class Telemetry : MonoBehaviour {
 	
 	void SetupEventTypeMatrix(){
 	
-		eventTypes[(int)Event.kCircuitChanged] = EventType.kCircuitChange;
-		eventTypes[(int)Event.kNewGameStarted] = EventType.kGameState;
-		eventTypes[(int)Event.kLevelStarted] = EventType.kGameState;
-		eventTypes[(int)Event.kLevelCompleteWait] = EventType.kGameState;
-		eventTypes[(int)Event.kLevelComplete] = EventType.kGameState;
-		eventTypes[(int)Event.kGameComplete] = EventType.kGameState;
-		eventTypes[(int)Event.kApplicationQuit] = EventType.kGameState;
-		eventTypes[(int)Event.kFrameInc] = EventType.kUnknown;
-		eventTypes[(int)Event.kMouseMove] = EventType.kCursor;
-		eventTypes[(int)Event.kGhostChange] = EventType.kCursor;
-		eventTypes[(int)Event.kUserComment] = EventType.kUserComments;
-		eventTypes[(int)Event.kUIStateNone] = EventType.kUIState;
-		eventTypes[(int)Event.kUIStateStart] = EventType.kUIState;
-		eventTypes[(int)Event.kUIStateSplash] = EventType.kUIState;
-		eventTypes[(int)Event.kUIStateStartEditor] = EventType.kUIState;
-		eventTypes[(int)Event.kUIStateTitleScreen] = EventType.kUIState;
-		eventTypes[(int)Event.kUIStatePlayLevelInit] = EventType.kUIState;
-		eventTypes[(int)Event.kUIStatePlayLevel] = EventType.kUIState;
-		eventTypes[(int)Event.kUIStateLevelCompleteWait] = EventType.kUIState;
-		eventTypes[(int)Event.kUIStateLevelComplete] = EventType.kUIState;
-		eventTypes[(int)Event.kUIStateGameComplete] = EventType.kUIState;
-		eventTypes[(int)Event.kUIStateQuitGame] = EventType.kUIState;
-		eventTypes[(int)Event.kUIStateReallyQuitGame] = EventType.kUIState;
+//		eventTypes[(int)Event.kCircuitChanged] = EventType.kCircuitChange;
+//		eventTypes[(int)Event.kNewGameStarted] = EventType.kGameState;
+//		eventTypes[(int)Event.kLevelStarted] = EventType.kGameState;
+//		eventTypes[(int)Event.kLevelCompleteWait] = EventType.kGameState;
+//		eventTypes[(int)Event.kLevelComplete] = EventType.kGameState;
+//		eventTypes[(int)Event.kGameComplete] = EventType.kGameState;
+//		eventTypes[(int)Event.kApplicationQuit] = EventType.kGameState;
+//		eventTypes[(int)Event.kFrameInc] = EventType.kUnknown;
+//		eventTypes[(int)Event.kMouseMove] = EventType.kCursor;
+//		eventTypes[(int)Event.kGhostChange] = EventType.kCursor;
+//		eventTypes[(int)Event.kUserComment] = EventType.kUserComments;
+//		eventTypes[(int)Event.kUIStateNone] = EventType.kUIState;
+//		eventTypes[(int)Event.kUIStateStart] = EventType.kUIState;
+//		eventTypes[(int)Event.kUIStateSplash] = EventType.kUIState;
+//		eventTypes[(int)Event.kUIStateStartEditor] = EventType.kUIState;
+//		eventTypes[(int)Event.kUIStateTitleScreen] = EventType.kUIState;
+//		eventTypes[(int)Event.kUIStatePlayLevelInit] = EventType.kUIState;
+//		eventTypes[(int)Event.kUIStatePlayLevel] = EventType.kUIState;
+//		eventTypes[(int)Event.kUIStateLevelCompleteWait] = EventType.kUIState;
+//		eventTypes[(int)Event.kUIStateLevelComplete] = EventType.kUIState;
+//		eventTypes[(int)Event.kUIStateGameComplete] = EventType.kUIState;
+//		eventTypes[(int)Event.kUIStateQuitGame] = EventType.kUIState;
+//		eventTypes[(int)Event.kUIStateReallyQuitGame] = EventType.kUIState;
 	}
 	
 	

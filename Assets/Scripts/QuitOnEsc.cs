@@ -24,12 +24,7 @@ public class QuitOnEsc : MonoBehaviour {
 		
 		// Test for exit
 		if (Input.GetKeyDown (KeyCode.Escape)) {
-			if (GameModeManager.singleton != null){
-				GameModeManager.singleton.ReallyQuitGame();
-			}
-			else{
-				AppHelper.Quit();
-			}
+			AppHelper.Quit();
 		}
 		
 		Vector3 mousePos = Input.mousePosition;

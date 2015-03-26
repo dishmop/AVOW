@@ -59,7 +59,6 @@
      <Compile Include="Assets\Editor\ImageEffects\SunShaftsEditor.cs" />
      <Compile Include="Assets\Editor\ImageEffects\TonemappingEditor.cs" />
      <Compile Include="Assets\Editor\ImageEffects\VignetteAndChromaticAberrationEditor.cs" />
-     <Compile Include="Assets\Scripts\GearProcedural\Editor\GearInspector.cs" />
      <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />
      <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />
@@ -110,7 +109,6 @@
      <None Include="Assets\Tutorial_2\1_FlatColour.shader" />
      <None Include="Assets\Shaders\AVOWCursorCubeRGB.shader" />
      <None Include="Assets\Shaders\AVOWGreenLightening.shader" />
-     <None Include="Assets\Scripts\GearProcedural\readme.txt" />
      <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasicOutline.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\DepthOfField34.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\MobileBlur.shader" />

@@ -17,7 +17,7 @@ public class SendButtonScript : MonoBehaviour {
 	}
 	
 	public void OnClick(){
-		Telemetry.singleton.RegisterEvent(Telemetry.Event.kUserComment, textHolderObj.GetComponent<Text>().text);
+		//Telemetry.singleton.RegisterEvent(Telemetry.Event.kUserComment, textHolderObj.GetComponent<Text>().text);
 	
 	}
 }

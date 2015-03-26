@@ -15,8 +15,8 @@ public class PlaybackTime : MonoBehaviour {
 	void Update () {
 	
 		//float gameTime = Telemetry.singleton.GetPlaybackTime();
-		float gameTime = GameModeManager.singleton.GetGameTime();
-
+	//	float gameTime = GameModeManager.singleton.GetGameTime();
+		float gameTime  = 0;
 		GetComponent<Text>().text = FormatTime(gameTime);
 		
 	}
