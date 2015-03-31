@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class AVOWGameModes : MonoBehaviour {
 	public static AVOWGameModes singleton = null;
@@ -50,6 +52,8 @@ public class AVOWGameModes : MonoBehaviour {
 		kBackStoryCam,
 	}
 	
+
+	
 	float levelStartMsgTime = -100f;
 
 	// Use this for initialization
@@ -57,11 +61,13 @@ public class AVOWGameModes : MonoBehaviour {
 		backStory.SetActive(false);
 		SelectCamera(CameraChoice.kGameCam);
 		tutorialText.SetActive(true);
-
+		
+		
+		
 	}
 	
 	public int GetNumMainMenuButtons(){
-		return 11;
+		return 12;
 	}
 	
 	public int GetMinMainMenuButton(){
@@ -316,10 +322,34 @@ public class AVOWGameModes : MonoBehaviour {
 
 
 	
+	public bool IsTelemPlaybackLevel(int index){
+		return (index == GetNumMainMenuButtons() + GetMinMainMenuButton() - 1);
+	}
+	
+
+
+	
 	public void StartLevel(int levelNum){
 		ResetScenery();
+		AVOWUpdateManager.singleton.ResetGameTime();
+		
+		if (IsTelemPlaybackLevel(levelNum)){
+			RestartNormalGame();
+			Telemetry.singleton.StartPlayback();
+			return;
+		}
+		
 		
 		currentLevel = levelNum;
+		
+		/// Sert up recoring
+		if (true){
+			if (!Telemetry.singleton.isRecording){
+				Telemetry.singleton.StartRecording();
+			}
+			AVOWTelemetry.singleton.WriteStartLevelEvent(currentLevel);
+		}
+		
 		if (currentLevel > 0){
 			AVOWObjectiveManager.singleton.InitialiseLevel(levelNum);
 			AVOWGameModes.singleton.TriggerLevelStartMessage();
@@ -424,6 +454,12 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWObjectiveManager.singleton.StopObjectives();
 		SelectCamera(CameraChoice.kGameCam);
 		ClearLevelStartMessage();
+		if (Telemetry.singleton.mode == Telemetry.Mode.kRecord && Telemetry.singleton.isRecording){
+			Telemetry.singleton.StopRecording(AVOWUpdateManager.singleton.GetGameTime());
+		}
+		if (Telemetry.singleton.mode == Telemetry.Mode.kPlayback && Telemetry.singleton.isPlaying){
+			Telemetry.singleton.StopPlayback();
+		}
 		state = GameModeState.kMainMenu;
 	}
 	
@@ -433,9 +469,14 @@ public class AVOWGameModes : MonoBehaviour {
 //	}
 	
 	public string GetLevelName(int index){
+		// Check if it is the last one
+		if (IsTelemPlaybackLevel(index)){
+			return "Playback telemetry";
+		}
 		if (index > 0){
 			return "Level " + index.ToString();
 		}
+
 		switch (index){
 			case kFreePlayIndex:{
 				return "Free play";

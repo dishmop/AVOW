@@ -2,6 +2,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class AVOWUI : MonoBehaviour {
 	public static AVOWUI singleton = null;
@@ -17,8 +19,6 @@ public class AVOWUI : MonoBehaviour {
 	public GameObject lighteningPrefab;
 	public GameObject greenLighteningPrefab;
 	
-	public  bool enableToolUpdate = true;
-	
 	
 	public bool canCreate = true;
 	bool lastCanCreate = true;
@@ -28,7 +28,9 @@ public class AVOWUI : MonoBehaviour {
 	SpringValue cubeBrightness = new SpringValue(0, SpringValue.Mode.kAsymptotic);
 	float lastFlashTime = 0;
 	
-	
+	const int		kLoadSaveVersion = 1;		
+
+		
 	public enum ToolMode{
 		kCreate,
 		kDelete
@@ -58,13 +60,27 @@ public class AVOWUI : MonoBehaviour {
 	
 
 	public void Restart(){
+		graph = null;
+		RemakeUITool();
+		
+	}
+	
+	void RemakeUITool(){
 		if (uiTool != null){
 			uiTool.OnDestroy();
 			uiTool = null;
 		}
-		graph = null;
-		FixedUpdate ();
-		
+		if (canCreate == false){
+			SetDisableTool();
+		}
+		else{
+			if (mode == ToolMode.kCreate){
+				SetCreateTool();
+			}
+			else{
+				SetDeleteTool();	
+			}
+		}
 	}
 	
 	
@@ -90,36 +106,30 @@ public class AVOWUI : MonoBehaviour {
 		}
 	}
 	
-	public void FixedUpdate(){
+
+
+	
+	public void GameUpdate(){
 		
-		if (AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kGameOver){
-			if (uiTool != null){		
-				uiTool.OnDestroy();
-				uiTool = null;
-			}
-			return;
-			
-		}
-		if (mode == ToolMode.kCreate && lastCanCreate != canCreate && uiTool != null && !uiTool.IsHolding()){
-			lastCanCreate = canCreate;
-			if (canCreate == false){
-				SetDisableTool();
-			}
-			else{
-				if (mode == ToolMode.kCreate){
-					SetCreateTool();
-				}
-				else{
-					SetDeleteTool();	
-				}
-			}
-		
-		}
 		if (AVOWCircuitCreator.singleton.IsReady()){
 			if (graph == null){
 				Startup();
 			}
-			if (enableToolUpdate) uiTool.FixedUpdate();
+			
+			if (AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kGameOver){
+				if (uiTool != null){		
+					uiTool.OnDestroy();
+					uiTool = null;
+				}
+				return;
+			
+			}
+			if (mode == ToolMode.kCreate && lastCanCreate != canCreate && uiTool != null && !uiTool.IsHolding()){
+				lastCanCreate = canCreate;
+				RemakeUITool();
+			
+			}
+			uiTool.FixedUpdate();
 		}
 
 	}
@@ -202,13 +212,97 @@ public class AVOWUI : MonoBehaviour {
 		*/
 		
 		AVOWSim.singleton.Recalc();
-		uiTool = new AVOWUICreateTool();
-		
 		mode = ToolMode.kCreate;
-		
-		uiTool.Startup();
+		RemakeUITool();
+
+
 
 		
+	}
+	
+	int DetermineToolCode(){
+		int code = -1;
+		if (uiTool is AVOWUICreateTool){
+			code = 1;
+		}
+		else if (uiTool is AVOWUIDeleteTool){
+			code = 2;
+		}
+		else if (uiTool is AVOWUIDisabledTool){
+			code = 3;
+		}
+		else{
+			code = 0;
+		}
+		
+		return code;
+	}
+	
+	void ModifyToolSelection(int newCode){
+		int currentCode = DetermineToolCode();
+		if (newCode != currentCode){
+			switch(newCode){
+				case 0:{
+					uiTool.OnDestroy();
+					uiTool = null;
+					break;
+				}
+				case 1:{
+					SetCreateTool();
+					break;
+				}
+				case 2:{
+					SetDeleteTool();
+					break;
+				}
+				case 3:{
+					SetDisableTool();
+					break;
+				}
+			}
+		}
+
+
+	}
+	
+	public void Serialise(BinaryWriter bw){
+		int code = DetermineToolCode();
+
+		bw.Write (kLoadSaveVersion);
+		bw.Write ((int)mode);
+		bw.Write (canCreate);
+		bw.Write (lastCanCreate);
+		bw.Write (code);
+		if (uiTool != null){
+			uiTool.Serialise(bw);
+		}
+		bw.Write (graph != null);
+		
+	}
+	
+	public void Deserialise(BinaryReader br){
+		int version = br.ReadInt32();
+		switch (version){
+			case kLoadSaveVersion:{
+				mode = (ToolMode) br.ReadInt32();
+				canCreate = br.ReadBoolean();
+				lastCanCreate = br.ReadBoolean();
+				
+				int code = br.ReadInt32();
+				ModifyToolSelection(code);
+				if (uiTool != null){
+					uiTool.Deserialise(br);
+				}
+				break;
+			}
+		}
+		bool hasGraph = br.ReadBoolean();
+		if (hasGraph){
+			graph = AVOWGraph.singleton;
+		}
+		else{
+			graph = null;
+		}
 	}
 	
 	public GameObject PlaceResistor(GameObject node0GO, GameObject node1GO){
@@ -218,21 +312,21 @@ public class AVOWUI : MonoBehaviour {
 	}
 	
 	public void SetCreateTool(){
-		uiTool.OnDestroy();
+		if (uiTool != null) uiTool.OnDestroy();
 		uiTool = new AVOWUICreateTool();
 		uiTool.Startup();
 		mode = ToolMode.kCreate;
 	}
 	
 	public void SetDeleteTool(){
-		uiTool.OnDestroy();
+		if (uiTool != null) uiTool.OnDestroy();
 		uiTool = new AVOWUIDeleteTool();
 		uiTool.Startup();
 		mode = ToolMode.kDelete;
 	}
 	
 	public void SetDisableTool(){
-		uiTool.OnDestroy();
+		if (uiTool != null) uiTool.OnDestroy();
 		uiTool = new AVOWUIDisabledTool();
 		uiTool.Startup();
 	}

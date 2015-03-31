@@ -598,8 +598,8 @@ public class AVOWSim : MonoBehaviour {
 			component.SetupInOutNodes();
 		}
 		
-	
-		int[] idToIndexLookup = new int[graph.maxNodeId + 1];
+		Dictionary<int, int> idToIndexLookup = new Dictionary<int, int>();
+		
 	
 		// Make a copy of the nodes in the tree
 		allSimNodes = new SimNode[graph.allNodes.Count];
@@ -612,7 +612,7 @@ public class AVOWSim : MonoBehaviour {
 			newNode.blockList[kOut] = new List<SimBlock>();
 			newNode.originalNode = node;
 			allSimNodes[nodeIndex] = newNode;
-			idToIndexLookup[node.id] = nodeIndex;
+			idToIndexLookup.Add (node.id, nodeIndex);
 			
 			
 			// Check if this node has a battery attached

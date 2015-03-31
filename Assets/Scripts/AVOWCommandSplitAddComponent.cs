@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class AVOWCommandSplitAddComponent : AVOWCommand{
 
@@ -9,6 +11,8 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 	GameObject newNodeGO;
 	GameObject newComponentGO;
 	bool isSplittingAtCell;
+	
+	const int		kLoadSaveVersion = 1;	
 	
 	enum UndoStepState{
 		kRemoveComponent,
@@ -24,7 +28,8 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 	UndoStepState undoStep = UndoStepState.kRemoveComponent;
 	ExecuteStepState executeStep = ExecuteStepState.kMakeGap;
 	
-	public static int debugCount = 0;
+	public AVOWCommandSplitAddComponent(){
+	}
 	
 	public AVOWCommandSplitAddComponent(GameObject splitNodeGO, GameObject component, GameObject prefabToUse, bool isSplittingCell){
 		nodeGO = splitNodeGO;
@@ -32,10 +37,36 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 		prefab = prefabToUse;
 		isSplittingAtCell = isSplittingCell;
 
-//		Debug.Log (debugCount + " Construct: AVOWCommandSplitAddComponent: splitNodeGO = " + splitNodeGO.GetComponent<AVOWNode>().GetID() + ", component = " + component.GetComponent<AVOWComponent>().GetID());
-
-		debugCount++;
 		
+	}
+	
+	
+	public void Serialise(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		AVOWGraph.singleton.SerialiseRef(bw, nodeGO);
+		AVOWGraph.singleton.SerialiseRef(bw, movedComponent);
+		AVOWGraph.singleton.SerialiseRef(bw, newNodeGO);
+		AVOWGraph.singleton.SerialiseRef(bw, newComponentGO);
+		bw.Write (isSplittingAtCell);
+		bw.Write ((int)undoStep);
+		bw.Write ((int)executeStep);
+		
+	}
+	
+	public void Deserialise(BinaryReader br){
+		int version = br.ReadInt32();
+		switch (version){
+			case kLoadSaveVersion:{
+				nodeGO = AVOWGraph.singleton.DeseraliseRef(br);
+				movedComponent = AVOWGraph.singleton.DeseraliseRef(br);
+				newNodeGO = AVOWGraph.singleton.DeseraliseRef(br);
+				newComponentGO = AVOWGraph.singleton.DeseraliseRef(br);
+				isSplittingAtCell = br.ReadBoolean();
+				undoStep = (UndoStepState)br.ReadInt32 ();
+				executeStep = (ExecuteStepState)br.ReadInt32 ();
+				break;
+			}
+		}
 	}
 	
 	public bool IsFinished(){	

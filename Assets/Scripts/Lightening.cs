@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class Lightening : MonoBehaviour {
 
@@ -12,6 +14,8 @@ public class Lightening : MonoBehaviour {
 	public int			numStages;
 	public float		probOfChange;
 	
+	
+	const int		kLoadSaveVersion = 1;	
 
 //	public float avFeedbackZ;
 
@@ -47,6 +51,40 @@ public class Lightening : MonoBehaviour {
 //		Quaternion quat = Quaternion.LookRotation(endPoint - startPoint, Camera.main.transform.position - transform.position);
 //		transform.rotation = new Quaternion(quat
 		
+	}
+	
+	public void Serialise(BinaryWriter bw){
+	
+		bw.Write (kLoadSaveVersion);
+		bw.Write (gameObject.activeSelf);
+		bw.Write (startPoint);
+		bw.Write (endPoint);
+		bw.Write (endSD);
+		bw.Write (startSD);
+		bw.Write (midSD);
+		bw.Write (size);
+		bw.Write (numStages);
+		bw.Write (probOfChange);	
+	}
+	
+	public void Deserialise(BinaryReader br){
+		int version = br.ReadInt32();
+		switch (version){
+			case kLoadSaveVersion:{
+				bool isActive = br.ReadBoolean();
+				startPoint =  br.ReadVector3();
+				endPoint = br.ReadVector3();
+				endSD = br.ReadVector3();
+				startSD =  br.ReadVector3();
+				midSD = br.ReadVector3();
+				size =  br.ReadSingle();
+				numStages = br.ReadInt32();
+				probOfChange = br.ReadSingle();
+				ConstructMesh();
+				gameObject.SetActive(isActive);
+				break;
+			}
+		}
 	}
 	
 	

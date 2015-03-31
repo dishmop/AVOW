@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class AVOWCircuitTarget{
+
 
 	public float totalCurrent;
 	
@@ -16,6 +19,63 @@ public class AVOWCircuitTarget{
 	public int widthInLCMs;
 	public long orderingValue;
 	
+	
+	const int		kLoadSaveVersion = 1;
+	
+	
+	
+	public void Serialise(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		bw.Write (totalCurrent);
+		
+		bw.Write (componentDesc.Count);
+		for (int i= 0; i < componentDesc.Count; ++i){
+			bw.Write (componentDesc[i]);
+		
+		}
+		
+		bw.Write (hiddenComponents.Count);
+		for (int i= 0; i < hiddenComponents.Count; ++i){
+			bw.Write (hiddenComponents[i]);
+			
+		}
+		
+		bw.Write (lcm);
+		bw.Write (widthInLCMs);
+		bw.Write (orderingValue);
+	}
+	
+	
+	public void Deserialise(BinaryReader br){
+		
+		int version = br.ReadInt32();
+		switch (version){
+			case kLoadSaveVersion:{
+				totalCurrent = br.ReadSingle();
+				
+				int numDesc = br.ReadInt32 ();
+				componentDesc = new List<Vector3>();
+			for (int i= 0; i < numDesc; ++i){
+					componentDesc.Add (br.ReadVector3 ());
+				}
+				
+				int numHidden = br.ReadInt32 ();
+				hiddenComponents = new List<Vector3>();
+				for (int i= 0; i < numHidden; ++i){
+					hiddenComponents.Add (br.ReadVector3 ());
+				}
+				
+				lcm = br.ReadInt32 ();
+				widthInLCMs =  br.ReadInt32 ();
+				orderingValue = br.ReadInt64 ();
+				break;
+			}
+		}
+	}
+	
+	
+	public AVOWCircuitTarget (){
+	}
 
 	// copy constructor
 	public AVOWCircuitTarget (AVOWCircuitTarget other){

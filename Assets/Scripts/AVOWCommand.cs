@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public interface AVOWCommand{
 
@@ -14,5 +16,8 @@ public interface AVOWCommand{
 	GameObject GetNewComponent();
 	
 	GameObject GetNewNode();
+	
+	void Serialise(BinaryWriter bw);
+	void Deserialise(BinaryReader br);
 	
 }

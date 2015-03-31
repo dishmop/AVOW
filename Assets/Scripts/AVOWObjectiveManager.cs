@@ -12,6 +12,8 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	public float unstackWaitDuration = 0.5f;
 	public float levelStartPauseDuration;
 	
+	const int		kLoadSaveVersion = 1;	
+	
 	
 	public string filename = "ExcludedGoals";
 	bool[][]	excludedGoals;
@@ -56,6 +58,73 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	};
 	
 	State state = State.kNone;
+	
+	
+	public void Serialise(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		bw.Write (firstUpdate);
+		
+		bw.Write (boards[0] != null);
+		if (boards[0] != null){
+			boards[0].GetComponent<AVOWObjectiveBoard>().Serialise(bw);
+			boards[1].GetComponent<AVOWObjectiveBoard>().Serialise(bw);
+		}
+		
+		bw.Write (frontIndex);
+		bw.Write (backIndex);
+		bw.Write (waitTime);
+		bw.Write (numBoardsToUnstack);
+		bw.Write (hasMovedToRow);
+		bw.Write ((int)layoutMode);
+		bw.Write (backBoardDepth);
+		bw.Write (frontBoardDepth);
+		
+		bw.Write (resistorLimit);
+		bw.Write (currentGoalIndex);
+	   	bw.Write (currentLevel);
+		
+		bw.Write ((int)state);
+	}
+	
+	public void Deserialise(BinaryReader br){
+		
+		int version = br.ReadInt32();
+		switch (version){
+			case kLoadSaveVersion:{
+				firstUpdate = br.ReadBoolean();
+				bool hasBoards = br.ReadBoolean();
+				if (hasBoards && boards[0] == null){
+					ConstructBoards();
+				}
+				else if (!hasBoards && boards[0] != null){
+					GameObject.Destroy (boards[0]);
+					GameObject.Destroy (boards[1]);
+					boards[0] = null;
+					boards[1] = null;
+				}
+				
+				if (boards[0] != null){
+					boards[0].GetComponent<AVOWObjectiveBoard>().Deserialise(br);
+					boards[1].GetComponent<AVOWObjectiveBoard>().Deserialise(br);
+				}
+				
+				frontIndex = 			br.ReadInt32();
+				backIndex = 			br.ReadInt32();
+				waitTime = 				br.ReadSingle();
+				numBoardsToUnstack = 	br.ReadInt32();
+				hasMovedToRow = 		br.ReadBoolean();
+				layoutMode = 			(AVOWObjectiveBoard.LayoutMode)br.ReadInt32();
+				backBoardDepth = 		br.ReadSingle();
+				frontBoardDepth = 		br.ReadSingle();		
+				resistorLimit = 		br.ReadInt32();
+				currentGoalIndex = 		br.ReadInt32();
+				currentLevel = 			br.ReadInt32();
+				state = 				(State)br.ReadInt32 ();
+
+				break;
+			}
+		}
+	}
 	
 	
 	// reutrn -1 if no limit
@@ -186,8 +255,8 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		return currentLevel == GetMaxLevelNum() - 1;
 	}
 	
-	// Use this for initialization
-	public void Initialise () {
+	void ConstructBoards(){
+		
 		boards[0] = GameObject.Instantiate(objectiveBoardPrefab);
 		boards[1] = GameObject.Instantiate(objectiveBoardPrefab);
 		
@@ -196,8 +265,12 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		boards[1].transform.parent = transform;
 		
 		boards[0].transform.localPosition = Vector3.zero;
-		boards[1].transform.localPosition = Vector3.zero;
-		
+		boards[1].transform.localPosition = Vector3.zero;	
+	}
+	
+	// Use this for initialization
+	public void Initialise () {
+		ConstructBoards();
 		
 		ForceBoardDepths();
 		
@@ -332,15 +405,14 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	}
 	
 	
-	// Update is called once per frame
-	public void RenderUpdate () {
+	public void GameUpdate(){
 		
 		if (firstUpdate){
 			ConstructExcludedGoals();
 			LoadExcludedGoals();
 			firstUpdate  = false;
 		}
-	
+		
 		switch (state){
 			case State.kPauseOnLevelStart:{
 				if (Time.time > waitTime){
@@ -356,14 +428,14 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				break;
 			}
 			case State.kBuildBackBoard:{
-
+				
 				AVOWObjectiveBoard board = boards[backIndex].GetComponent<AVOWObjectiveBoard>();
 				AVOWCircuitTarget target = GetGoalTargets()[currentGoalIndex];
 				if (layoutMode == AVOWObjectiveBoard.LayoutMode.kStack){
 					board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kStack);
 				}
 				if (layoutMode == AVOWObjectiveBoard.LayoutMode.kRow){
-				    if (numBoardsToUnstack > 0){
+					if (numBoardsToUnstack > 0){
 						board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kStack);
 						hasMovedToRow = false;
 					}
@@ -382,8 +454,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				}				
 				boards[backIndex].transform.localPosition = Vector3.zero;
 				ForceBoardDepths();
-			//				AVOWBattery.singleton.ResetBattery();
-			
+				//				AVOWBattery.singleton.ResetBattery();
+				
+				AVOWTelemetry.singleton.WriteStartGoalEvent(currentGoalIndex);
+				
 				state = State.kSwapBoards0;
 				break;
 			}
@@ -423,7 +497,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				if (!AVOWGraph.singleton.HasHalfFinishedComponents()){
 					AVOWCircuitTarget currentGraphAsTarget = new AVOWCircuitTarget(AVOWGraph.singleton);
 					if (layoutMode != AVOWObjectiveBoard.LayoutMode.kGappedRow){
-					if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatchWithGaps(currentGraphAsTarget)){
+						if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatchWithGaps(currentGraphAsTarget)){
 							boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToTarget(currentGraphAsTarget);
 							state = State.kGoalComplete0;
 						}
@@ -434,7 +508,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 							state = State.kGoalComplete0;
 						}
 					}
-			    }
+				}
 				break;
 			}
 			case State.kGoalComplete0:{
@@ -448,7 +522,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			case State.kGoalComplete1:{
 				if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().IsReady()){
 					currentGoalIndex = FindNextValidGoal(currentGoalIndex);
-
+					
 					if (currentGoalIndex < GetGoalTargets().Count){
 						state = State.kBuildBackBoard;
 					}
@@ -463,8 +537,8 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				pos.y -= boardSpeed * Time.deltaTime;
 				boards[frontIndex].transform.position = pos;
 				AVOWGameModes.singleton.PreStageComplete();
-			
-			
+				
+				
 				if (pos.y < -1){
 					AVOWGameModes.singleton.SetStageComplete();
 					boards[0].GetComponent<AVOWObjectiveBoard>().DestroyBoard();
@@ -479,6 +553,17 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			}
 		}
 		
+		for (int i = 0; i < 2; ++i){
+			boards[i].GetComponent<AVOWObjectiveBoard>().GameUpdate();
+		}
+		
+	}
+
+	
+	
+	// Update is called once per frame
+	public void RenderUpdate () {
+	
 		for (int i = 0; i < 2; ++i){
 			boards[i].GetComponent<AVOWObjectiveBoard>().RenderUpdate();
 		}

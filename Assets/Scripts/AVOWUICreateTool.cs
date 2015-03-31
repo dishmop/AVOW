@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class AVOWUICreateTool :  AVOWUITool{
 	
@@ -16,6 +17,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 	public AVOWCommand 	heldGapCommand;
 	public GameObject 	heldGapConnection1;
 	
+	const int		kLoadSaveVersion = 1;	
 	
 	float		newHOrder;
 	
@@ -85,7 +87,138 @@ public class AVOWUICreateTool :  AVOWUITool{
 	protected override GameObject InstantiateCursorCube(){
 		return AVOWUI.singleton.InstantiateBlueCursorCube();		
 	}
+	
+
+	
+	void ModifyGapCommand(int code){
+		int currentCode = SerialisationFactory.GetCommandCode (heldGapCommand);
+		if (code != currentCode){
+			heldGapCommand = SerialisationFactory.ConstructCommandFromCode(code);
+		}
+	}
 		
+	public override void Serialise(BinaryWriter bw){
+		base.Serialise(bw);
+		bw.Write (kLoadSaveVersion);
+		AVOWGraph.singleton.SerialiseRef(bw, connection0);
+		AVOWGraph.singleton.SerialiseRef(bw, connection1);
+		bw.Write(connection0Pos);
+		bw.Write(connection1Pos);
+		bw.Write (heldConnection);
+		
+		int commandCode = SerialisationFactory.GetCommandCode(heldGapCommand);
+		bw.Write (commandCode);
+		if (heldGapCommand != null){
+			heldGapCommand.Serialise(bw);
+		}
+		
+		AVOWGraph.singleton.SerialiseRef(bw, heldGapConnection1);
+		
+		bw.Write (newHOrder);
+		bw.Write (isInside);
+		bw.Write ((int)insideState);
+		bw.Write (maxLerpSpeed);
+		bw.Write (minLerpSpeed);
+		bw.Write (insideLerpSpeed);
+		bw.Write (mouseWorldPos);
+		bw.Write (ghostMousePos);
+		bw.Write (cursorCube != null);
+		if (cursorCube != null){
+			bw.Write (cursorCube.transform.localPosition);
+			bw.Write (cursorCube.transform.localRotation);
+			bw.Write (cursorCube.transform.localScale);
+		}
+		
+		bw.Write (lightening0GO != null);
+		if (lightening0GO != null){
+			lightening0GO.GetComponent<Lightening>().Serialise(bw);
+		}
+		
+		bw.Write (lightening1GO != null);
+		if (lightening1GO != null){
+			lightening1GO.GetComponent<Lightening>().Serialise(bw);
+		}
+
+		bw.Write (confirmedConnectionHeight);
+		
+		
+	}
+	
+	public override void Deserialise(BinaryReader br){
+		base.Deserialise(br);
+		
+		int version = br.ReadInt32();
+		switch (version){
+			case kLoadSaveVersion:{
+				connection0 = AVOWGraph.singleton.DeseraliseRef(br);
+				connection1 = AVOWGraph.singleton.DeseraliseRef(br);
+				connection0Pos = br.ReadVector3();
+				connection1Pos = br.ReadVector3();
+				heldConnection = br.ReadBoolean();
+				
+				int commandCode = br.ReadInt32 ();
+				ModifyGapCommand(commandCode);
+				if (heldGapCommand != null)
+					heldGapCommand.Deserialise(br);
+				
+				heldGapConnection1 = AVOWGraph.singleton.DeseraliseRef(br);
+				newHOrder = br.ReadSingle();
+				isInside = br.ReadBoolean();
+				insideState = (InsideGapState)br.ReadInt32 ();
+				maxLerpSpeed = br.ReadSingle();
+				minLerpSpeed = br.ReadSingle();
+				insideLerpSpeed = br.ReadSingle();
+				mouseWorldPos = br.ReadVector3 ();
+				ghostMousePos = br.ReadVector3 ();
+				bool hasCursorCube = br.ReadBoolean();
+				if (hasCursorCube && cursorCube == null){
+					cursorCube = InstantiateCursorCube();
+				}
+				else if (!hasCursorCube && cursorCube != null){
+					GameObject.Destroy(cursorCube);
+					cursorCube = null;
+				}
+
+				if (cursorCube != null){
+					cursorCube.transform.localPosition = br.ReadVector3 ();
+					cursorCube.transform.localRotation = br.ReadQuaternion ();
+					cursorCube.transform.localScale = br.ReadVector3 ();
+				}
+				
+				bool hasLightening0 = br.ReadBoolean();
+				if (hasLightening0 && lightening0GO == null){
+					lightening0GO = AVOWUI.singleton.InstantiateLightening();
+					lightening0GO.transform.parent = AVOWUI.singleton.transform;
+				}
+				else if (!hasLightening0 && lightening0GO != null){
+					GameObject.Destroy ( lightening0GO);
+					lightening0GO = null;
+				}
+				if (lightening0GO){
+					lightening0GO.GetComponent<Lightening>().Deserialise(br);
+				}
+				
+				bool hasLightening1 = br.ReadBoolean();
+				if (hasLightening1 && lightening1GO == null){
+					lightening1GO = AVOWUI.singleton.InstantiateLightening();
+					lightening1GO.transform.parent = AVOWUI.singleton.transform;
+				}
+				else if (!hasLightening1 && lightening1GO != null){
+					GameObject.Destroy ( lightening1GO);
+					lightening1GO = null;
+				}
+				if (lightening1GO){
+					lightening1GO.GetComponent<Lightening>().Deserialise(br);
+				}
+			
+				
+				confirmedConnectionHeight = br.ReadSingle();
+				
+				break;
+			}
+		}
+	}
+	
 	
 	public override void OnDestroy(){
 		GameObject.Destroy(cursorCube);
@@ -153,7 +286,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 		
 		//	Debug.Log("Mouse world pos = " + mouseWorldPos.ToString());
 		
-		ghostMousePos = Vector3.zero;
+		ghostMousePos = mouseWorldPos;
 		// If we don't have a held connection, then we find the closest node and that's all
 		if (!heldConnection){
 			GameObject closestObj = null;

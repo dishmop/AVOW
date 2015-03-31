@@ -14,7 +14,7 @@ public class AVOWBattery : MonoBehaviour {
 	GameObject lightening2;
 
 	// Use this for initialization
-	void Start () {
+	public void Initialise () {
 		lightening1 = GameObject.Instantiate(lighteningPrefab) as GameObject;
 		lightening1.transform.parent = transform;
 		lightening1.GetComponent<Lightening>().startPoint = transform.FindChild("Sphere1").position;
@@ -33,7 +33,7 @@ public class AVOWBattery : MonoBehaviour {
 	
 	
 	// Update is called once per frame
-	void FixedUpdate () {
+	public void RenderUpdate () {
 		if (AVOWGraph.singleton.allComponents.Count > 0){
 			lightening1.GetComponent<Lightening>().startPoint = transform.FindChild("Sphere1").position;
 			lightening1.GetComponent<Lightening>().endPoint = AVOWGraph.singleton.allComponents[0].transform.FindChild ("ConnectionSphere1").position;

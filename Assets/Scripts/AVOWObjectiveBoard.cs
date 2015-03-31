@@ -1,9 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+using System;
+
 
 public class AVOWObjectiveBoard : MonoBehaviour {
 
+	// When instantiasting this we give them a name which is the index of the prefab - so we can save it out easily
 	public GameObject[] woodPrefabs;
 	public GameObject[] coverPrefabs;
 	public GameObject shadedPrefab;
@@ -19,6 +24,8 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		kStack,
 		kGappedRow,
 	};	
+	
+	const int		kLoadSaveVersion = 1;
 	
 	float maxShade = 0.675f;
 	AVOWCircuitTarget currentTarget;
@@ -50,6 +57,194 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		kDroppingOff,
 	};
 	State state = State.kReady;
+	
+	
+	
+	public void Serialise(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		
+		bw.Write (transform.localPosition);
+		bw.Write (transform.localRotation);
+		bw.Write (transform.localScale);
+		
+		bw.Write (renderBackwards);
+		bw.Write (currentTarget != null);
+		if (currentTarget != null){
+			currentTarget.Serialise(bw);
+		}
+		bw.Write (displayTarget != null);
+		if (displayTarget != null){
+			displayTarget.Serialise(bw);
+		}
+
+		bw.Write (horizontalFirst);
+		bw.Write (completeWaitTime);
+		bw.Write (gridWidth);
+		
+		bw.Write (displayToCoversMapping != null);
+		if (displayToCoversMapping != null){
+			bw.Write (displayToCoversMapping.Length);
+			for (int i = 0; i < displayToCoversMapping.Length; ++i){
+				bw.Write (displayToCoversMapping[i]);
+			}
+		}
+		
+		bw.Write (currentWood != null);
+		if (currentWood != null){
+			bw.Write (currentWood.Length);
+			for (int i = 0; i < currentWood.Length; ++i){
+				bw.Write (currentWood[i].name);
+				bw.Write (currentWood[i].transform.localPosition);
+				bw.Write (currentWood[i].transform.localRotation);
+				bw.Write (currentWood[i].transform.localScale);
+			}
+		}
+		
+		bw.Write (currentCovers != null);
+		if (currentCovers != null){
+			bw.Write (currentCovers.Length);
+			for (int i = 0; i < currentCovers.Length; ++i){
+				bw.Write (currentCovers[i].name);
+				bw.Write (currentCovers[i].transform.localPosition);
+				bw.Write (currentCovers[i].transform.localRotation);
+				bw.Write (currentCovers[i].transform.localScale);
+			}
+		}
+		
+		bw.Write (shadedSquare != null);
+		if (shadedSquare != null){
+			bw.Write (shadedSquare.transform.localPosition);
+			bw.Write (shadedSquare.transform.localRotation);
+			bw.Write (shadedSquare.transform.localScale);
+		}
+		bw.Write (shadeVal != null);
+		if (shadeVal != null){
+			shadeVal.Serialise(bw);
+		}
+		
+		bw.Write ((int)state);
+		
+	}
+	
+	
+	public void Deserialise(BinaryReader br){
+		
+		int version = br.ReadInt32();
+		switch (version){
+			case kLoadSaveVersion:{
+				transform.localPosition = br.ReadVector3 ();
+				transform.localRotation = br.ReadQuaternion ();
+				transform.localScale = br.ReadVector3 ();
+				
+			
+				renderBackwards = br.ReadBoolean();
+				bool hasCurrentTarget = br.ReadBoolean();
+				if (hasCurrentTarget){
+					currentTarget = new AVOWCircuitTarget();
+					currentTarget.Deserialise(br);
+				}
+				else{
+					currentTarget = null;
+				}
+				
+				bool hasDisplayTarget = br.ReadBoolean();
+				if (hasDisplayTarget){
+					displayTarget = new AVOWCircuitTarget();
+					displayTarget.Deserialise(br);
+				}
+				else{
+					displayTarget = null;
+				}
+					
+				horizontalFirst = br.ReadBoolean ();
+				completeWaitTime = br.ReadSingle();
+				gridWidth = br.ReadSingle();
+			
+				bool hasMapping = br.ReadBoolean();
+				if (hasMapping){
+					int size = br.ReadInt32 ();
+					displayToCoversMapping = new int[size];
+					for (int i = 0; i < size; ++i){
+						displayToCoversMapping[i] = br.ReadInt32();
+					}
+				}
+				else{
+					displayToCoversMapping = null;
+				}
+				
+				
+				if (currentWood != null){
+					foreach (GameObject go in currentWood){
+						GameObject.Destroy(go);
+					}
+					currentWood = null;
+				}		
+						
+				bool hasWood = br.ReadBoolean ();
+				if (hasWood){
+
+					int size = br.ReadInt32 ();
+					currentWood = new GameObject[size];
+					for (int i = 0; i < size; ++i){
+						string name = br.ReadString();
+						currentWood[i] = GameObject.Instantiate(woodPrefabs[Convert.ToInt32(name)]);
+						currentWood[i].transform.parent = transform;
+						currentWood[i].transform.localPosition = br.ReadVector3();
+						currentWood[i].transform.localRotation = br.ReadQuaternion();
+						currentWood[i].transform.localScale = br.ReadVector3();
+					}
+				}
+
+				
+					
+				if (currentCovers != null){
+					foreach (GameObject go in currentCovers){
+						GameObject.Destroy(go);
+					}
+					currentCovers = null;
+				}			
+					
+				bool hasCovers = br.ReadBoolean ();
+				if (hasCovers){
+					int size = br.ReadInt32 ();
+					currentCovers = new GameObject[size];
+					for (int i = 0; i < size; ++i){
+						string name = br.ReadString();
+						currentCovers[i] = GameObject.Instantiate(coverPrefabs[Convert.ToInt32(name)]);
+						currentCovers[i].transform.parent = transform;
+						currentCovers[i].transform.localPosition = br.ReadVector3();
+						currentCovers[i].transform.localRotation = br.ReadQuaternion();
+						currentCovers[i].transform.localScale = br.ReadVector3();
+					}
+				}
+				
+				
+				if (shadedSquare != null){
+					GameObject.Destroy(shadedSquare);
+				}
+				bool hasShadedSquare = br.ReadBoolean();
+				if (hasShadedSquare){
+					shadedSquare = GameObject.Instantiate(shadedPrefab);
+					shadedSquare.transform.parent = transform;
+					shadedSquare.transform.localPosition = br.ReadVector3();
+					shadedSquare.transform.localRotation = br.ReadQuaternion();
+					shadedSquare.transform.localScale = br.ReadVector3();
+				}
+				bool hasShadeVale = br.ReadBoolean();
+				if (hasShadeVale){
+					shadeVal = new SpringValue(0);
+					shadeVal.Deserialise(br);
+				}
+				else{
+					shadeVal = null;
+				}
+				
+
+				state = (State)br.ReadInt32 ();;
+				break;
+			}
+		}
+	}
 	
 	public void MoveToRow(){
 		displayTarget = CreateRowTarget (displayTarget, false);
@@ -133,6 +328,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			currentWood[i].transform.parent = transform;
 			float xPos = renderBackwards ? 0-i  : i+1;
 			currentWood[i].transform.localPosition = new Vector3(xPos, 0, 0.2f);
+			currentWood[i].name = "0";
 		}
 		shadedSquare = GameObject.Instantiate(shadedPrefab);
 		shadedSquare.transform.parent = transform;
@@ -179,6 +375,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			currentWood[i].transform.parent = transform;
 			float xPos = renderBackwards ? 0-i  : i+1;
 			currentWood[i].transform.localPosition = new Vector3(xPos, 0, 0.2f);
+			currentWood[i].name = division.ToString();
 			
 		}
 		
@@ -355,7 +552,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			currentCovers[i].transform.parent = transform;
 			currentCovers[i].transform.localScale = new Vector3(thisWidth, thisWidth, thisWidth);
 			currentCovers[i].transform.localPosition = GamePosToTransformPos(new Vector3(target.componentDesc[i][1], target.componentDesc[i][2], -0.01f * (i + 1)), thisWidth, target.totalCurrent);
-			
+			currentCovers[i].name = sizePrefab.ToString();
 			cumWidth += thisWidth;
 		}
 		displayToCoversMapping = CreateIdentityMapping(target.componentDesc.Count);
@@ -518,9 +715,13 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	
 	}
 	
-	// Update is called once per frame
-	public void RenderUpdate () {
+	public void RenderUpdate(){
 		UpdateShadedSquare();
+	}
+	
+	// Update is called once per frame
+	public void GameUpdate () {
+
 		
 		switch (state){
 			case State.kMovingToTarget:{

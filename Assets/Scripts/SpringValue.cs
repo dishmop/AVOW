@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class SpringValue{
 
@@ -7,6 +9,9 @@ public class SpringValue{
 		kAsymptotic,
 		kLinear
 	};
+	
+	const int		kLoadSaveVersion = 1;	
+	
 	
 	float desValue = 0f;
 	float currentValue = 0f;
@@ -17,6 +22,23 @@ public class SpringValue{
 	
 	Mode mode =  Mode.kLinear;
 	
+	
+	public void Serialise(BinaryWriter bw){
+		bw.Write (desValue);
+		bw.Write (currentValue);
+		bw.Write (linSpeed);
+		bw.Write (asSpeed);
+		bw.Write ((int)mode);
+		
+	}
+	
+	public void Deserialise(BinaryReader br){
+		desValue = br.ReadSingle();
+		currentValue = br.ReadSingle();
+		linSpeed = br.ReadSingle();
+		asSpeed = br.ReadSingle();
+		mode = (Mode)br.ReadInt32();
+	}
 	
 	public SpringValue(float val){
 		desValue = val;

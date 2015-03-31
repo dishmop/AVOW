@@ -1,13 +1,15 @@
 ﻿using UnityEngine;
 using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class AVOWCommandRemove : AVOWCommand{
 
 	public GameObject 	inNodeGO;
 	public GameObject 	outNodeGO;
 	public GameObject 	removeComponentGO;
-	public Vector3		cursorPos;
 	
+	const int		kLoadSaveVersion = 1;	
 	
 	enum GapType{
 		kUndetermined,
@@ -32,14 +34,46 @@ public class AVOWCommandRemove : AVOWCommand{
 	UndoStepState undoStep = UndoStepState.kFinished;
 	ExecuteStepState executeStep = ExecuteStepState.kMakeGap;
 	
+
+	public AVOWCommandRemove(){
+
+
+	}
 	
 	public AVOWCommandRemove(GameObject componentGO, Vector3 pos){
 		removeComponentGO = componentGO;
-		cursorPos = pos;
 		gapType = DetermineType();
 	//	Debug.Log("Removal type = " + gapType.ToString());
 		Debug.Log("Removal type = " + (gapType == GapType.kOneOfMany ? "Thinny" : "Fatty"));
 	}
+	
+	
+	
+	public void Serialise(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		AVOWGraph.singleton.SerialiseRef(bw, inNodeGO);
+		AVOWGraph.singleton.SerialiseRef(bw, outNodeGO);
+		AVOWGraph.singleton.SerialiseRef(bw, removeComponentGO);
+		bw.Write ((int)undoStep);
+		bw.Write ((int)executeStep);
+		
+	}
+	
+	public void Deserialise(BinaryReader br){
+		int version = br.ReadInt32();
+		switch (version){
+		case kLoadSaveVersion:{
+			inNodeGO = AVOWGraph.singleton.DeseraliseRef(br);
+			outNodeGO = AVOWGraph.singleton.DeseraliseRef(br);
+			removeComponentGO = AVOWGraph.singleton.DeseraliseRef(br);
+			undoStep = (UndoStepState)br.ReadInt32 ();
+			executeStep = (ExecuteStepState)br.ReadInt32 ();
+			break;
+		}
+		}
+	}
+	
+	
 	
 	public bool IsFinished(){	
 		return executeStep == ExecuteStepState.kFinished;

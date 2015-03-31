@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class AVOWComponent : MonoBehaviour {
 
@@ -13,6 +15,11 @@ public class AVOWComponent : MonoBehaviour {
 	public float lighteningSize = 0.5f;
 	public bool isInteractive = true;	
 	public bool showResistance = true;
+	
+	
+	
+	const int		kLoadSaveVersion = 1;	
+	
 	// top bottom, left right 
 	float useH0;
 	float useH1;
@@ -53,6 +60,7 @@ public class AVOWComponent : MonoBehaviour {
 		// True if this loops traverses from node0 to node1
 		public bool isForward;
 	}
+	
 	public List<LoopRecord> loopRecords;
 	public bool visited;
 	public int uiVisitedIndex;	// used by the UI to traverse
@@ -78,10 +86,10 @@ public class AVOWComponent : MonoBehaviour {
 	public GameObject inNodeGO;		// references to node0 and node1. Current flows in to this node from the componet
 	public GameObject outNodeGO;	// references to node0 and node1. Current flows out of this node into the compoent
 	public bool hasBeenLayedOut;	// false at first and then true after we have been layed out at least once. 
+	public int id;
 	
 	// Debug data
 	static int staticCount = 0;
-	int id;
 	
 	// Killing
 	bool removeOnTarget = false;
@@ -128,10 +136,170 @@ public class AVOWComponent : MonoBehaviour {
 		
 	}
 	
+	
+	public void SerialiseData(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		resistanceAngle.Serialise(bw);
+		
+		bw.Write (isInteractive);
+		bw.Write(showResistance);
+		// top bottom, left right 
+		bw.Write(useH0);
+		bw.Write(useH1);
+		bw.Write(useV0);
+		bw.Write(useV1);
+		
+		bw.Write(enableLightening0);
+		bw.Write(enableLightening1);
+		bw.Write(enableLightening2);
+		
+		bw.Write(lighteningZDepth);
+		
+		// Used to keep a track of where our last stable (confirmed) connecton positions were
+		bw.Write(confirmedPos0);
+		bw.Write(confirmedPos1);
+		
+		// For cells
+		bw.Write(voltage);
+		bw.Write ((int)type);
+		
+		bw.Write (loopRecords.Count);
+		for (int i = 0; i < loopRecords.Count; ++i){
+			bw.Write (loopRecords[i].loopId);
+			bw.Write (loopRecords[i].isForward);
+		}
+		bw.Write (visited);
+		bw.Write (uiVisitedIndex);	// used by the UI to traverse
+		bw.Write (disable);
+		bw.Write (fwCurrent);
+		
+		// Visulation data
+		bw.Write (col0);
+		bw.Write (col1);
+		bw.Write (border);
+		
+		// Layout
+		bw.Write (hOrder);
+		bw.Write (hWidth);			// Always known by the time we get to layout
+		bw.Write (h0);				// Set to -1 if unknown
+		bw.Write (h0LowerBound);		// Set to -1 if unknown
+		bw.Write (h0UpperBound);		// Set to -1 if unknown
+		bw.Write (inNodeOrdinal);		// the nth component on node0 flowing in this direction (=kOrdinaUnordered if unknown)
+		bw.Write (outNodeOrdinal);		// the nth component on node1 flowing in this direction (=kOrdinaUnordered if unknown)
+		bw.Write (inLocalH0);			// The starting position measured from the inNodes h0 (which we may not know)
+		bw.Write (outLocalH0);		// The starting position measured from the outNodes h0 (which we may not know)
+		bw.Write (hasBeenLayedOut);
+		bw.Write (id);
+		
+		// Killing
+		bw.Write (removeOnTarget);
+		bw.Write (SerialisationFactory.GetCommandCode(onDeadCommand));
+		if (onDeadCommand != null){
+			onDeadCommand.Serialise(bw);
+		}
+		bw.Write (onDeadCommandDoExecutate);
+		
+		
+	}
+	
+	public void DeserialiseData(BinaryReader br){
+		int version = br.ReadInt32 ();
+		switch (version){
+			case (kLoadSaveVersion):{
+				resistanceAngle.Deserialise(br);
+				isInteractive = br.ReadBoolean();
+				showResistance = br.ReadBoolean();
+				
+				useH0 = br.ReadSingle();
+				useH1 = br.ReadSingle();
+				useV0 = br.ReadSingle();
+				useV1 = br.ReadSingle();
+				
+				
+				enableLightening0 = br.ReadBoolean();
+				enableLightening1 = br.ReadBoolean();
+				enableLightening2 = br.ReadBoolean();
+				
+				lighteningZDepth = br.ReadSingle();
+				
+				confirmedPos0 = br.ReadVector3();
+				confirmedPos1 = br.ReadVector3();
+				
+				voltage = br.ReadSingle();
+				
+				type = (Type)br.ReadInt32 ();
+				int numLoops = br.ReadInt32 ();
+				loopRecords = new List<LoopRecord>();
+				for (int i = 0 ; i < numLoops; ++i){
+					loopRecords.Add (new LoopRecord());
+					loopRecords[i].loopId = br.ReadInt32();
+					loopRecords[i].isForward = br.ReadBoolean();
+				}
+				visited = br.ReadBoolean();
+				uiVisitedIndex = br.ReadInt32 ();
+				disable = br.ReadBoolean();
+				fwCurrent = br.ReadSingle();
+				
+				col0 = br.ReadColor();
+				col1 = br.ReadColor();
+				border = br.ReadSingle();
+				
+				hOrder = br.ReadSingle();
+				hWidth = br.ReadSingle();
+				h0 = br.ReadSingle();
+				h0LowerBound = br.ReadSingle();
+				h0UpperBound = br.ReadSingle();
+				
+				inNodeOrdinal = br.ReadInt32 ();
+				outNodeOrdinal = br.ReadInt32 ();
+				
+				inLocalH0 = br.ReadSingle();
+				outLocalH0 = br.ReadSingle();
+				hasBeenLayedOut = br.ReadBoolean();
+				id = br.ReadInt32 ();
+				
+				removeOnTarget = br.ReadBoolean();
+				int commandCode = br.ReadInt32 ();
+				onDeadCommand = SerialisationFactory.ConstructCommandFromCode(commandCode);
+				if (onDeadCommand != null){
+					onDeadCommand.Deserialise(br);
+				}
+				onDeadCommandDoExecutate = br.ReadBoolean();
+				break;
+			}
+		}
+
+		}
+	
+	
+	public void SerialiseConnections(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		AVOWGraph.singleton.SerialiseRef(bw, node0GO);
+		AVOWGraph.singleton.SerialiseRef(bw, node1GO);
+		AVOWGraph.singleton.SerialiseRef(bw, inNodeGO);
+		AVOWGraph.singleton.SerialiseRef(bw, outNodeGO);
+		
+	}
+	
+	public void DeserialiseConnections(BinaryReader br){
+		int version = br.ReadInt32 ();
+		switch (version){
+			case (kLoadSaveVersion):{
+				node0GO = AVOWGraph.singleton.DeseraliseRef(br);
+				node1GO = AVOWGraph.singleton.DeseraliseRef(br);
+				inNodeGO = AVOWGraph.singleton.DeseraliseRef(br);
+				outNodeGO = AVOWGraph.singleton.DeseraliseRef(br);
+				break;
+			}
+		}
+	}
+	
+	
 	public void Kill(float targetRes){
 		resistanceAngle.Set (targetRes);
 		removeOnTarget = true;
 	}
+	
 	
 	public void CheckForKillResistance(){
 		if (!removeOnTarget) return;

@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class AVOWCommandAddComponent : AVOWCommand{
 
@@ -7,6 +9,8 @@ public class AVOWCommandAddComponent : AVOWCommand{
 	public GameObject node1GO;
 	public GameObject prefab;
 	GameObject newComponentGO;
+	
+	const int		kLoadSaveVersion = 1;		
 	
 	
 	enum ExecuteStepState{
@@ -18,11 +22,38 @@ public class AVOWCommandAddComponent : AVOWCommand{
 	ExecuteStepState executeStep = ExecuteStepState.kMakeGap;
 	
 	
+	public AVOWCommandAddComponent(){
+		
+	}
+	
+	
 	public AVOWCommandAddComponent(GameObject fromNodeGO, GameObject toNodeGO, GameObject prefabToUse){
 		node0GO = fromNodeGO;
 		node1GO = toNodeGO;
 		prefab = prefabToUse;
 		
+	}
+	
+	public void Serialise(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		AVOWGraph.singleton.SerialiseRef(bw, node0GO);
+		AVOWGraph.singleton.SerialiseRef(bw, node1GO);
+		AVOWGraph.singleton.SerialiseRef(bw, newComponentGO);
+		bw.Write ((int)executeStep);
+		
+	}
+	
+	public void Deserialise(BinaryReader br){
+		int version = br.ReadInt32();
+		switch (version){
+		case kLoadSaveVersion:{
+			node0GO = AVOWGraph.singleton.DeseraliseRef(br);
+			node1GO = AVOWGraph.singleton.DeseraliseRef(br);
+			newComponentGO = AVOWGraph.singleton.DeseraliseRef(br);
+			executeStep = (ExecuteStepState)br.ReadInt32 ();
+			break;
+		}
+		}
 	}
 	
 	public bool IsFinished(){	

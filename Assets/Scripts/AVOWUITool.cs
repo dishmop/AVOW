@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+
 
 public class AVOWUITool{
 	
@@ -9,6 +12,7 @@ public class AVOWUITool{
 	protected float 		uiZPos;
 	protected GameObject insideCube;
 	
+	const int		kLoadSaveVersion = 1;	
 	
 	bool isMouseDown;
 	bool isMouseReleased;
@@ -80,6 +84,46 @@ public class AVOWUITool{
 	public virtual void FixedUpdate(){}
 	public virtual void OnDestroy(){}
 	
+	public virtual void Serialise(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		bw.Write (insideCube != null);	
+		if (insideCube != null) {
+			bw.Write (insideCube.transform.localPosition);
+			bw.Write (insideCube.transform.localRotation);
+			bw.Write (insideCube.transform.localScale);
+		}
+		bw.Write (isMouseDown);
+		bw.Write (isMouseReleased);
+	
+	
+	}
+	
+	public virtual void Deserialise(BinaryReader br){
+		int version = br.ReadInt32();
+		switch (version){
+		 	case kLoadSaveVersion:{
+		 		bool hasInsideCube = br.ReadBoolean();
+		 		if (hasInsideCube && insideCube == null){
+		 			insideCube = InstantiateCursorCube();
+		 		}
+				else if (!hasInsideCube && insideCube != null){
+					GameObject.Destroy(insideCube);
+					insideCube = null;
+					
+				}
+				if (insideCube != null){
+					insideCube.transform.localPosition = br.ReadVector3();
+					insideCube.transform.localRotation = br.ReadQuaternion();
+					insideCube.transform.localScale = br.ReadVector3();
+				}
+				isMouseDown = br.ReadBoolean();
+				isMouseReleased = br.ReadBoolean();
+		 		break;
+		 	}
+		}
+	}
+	
+
 	
 	
 	// The current compoent is one that we should include in our search (even if it is not strictly connected to this node)

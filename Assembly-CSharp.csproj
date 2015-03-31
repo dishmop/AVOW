@@ -59,6 +59,7 @@
      <Compile Include="Assets\Scripts\AVOWCommandSplitAddComponent.cs" />
      <Compile Include="Assets\Scripts\AVOWComponent.cs" />
      <Compile Include="Assets\Scripts\AVOWConfig.cs" />
+     <Compile Include="Assets\Scripts\AVOWEventType.cs" />
      <Compile Include="Assets\Scripts\AVOWFlashingButton.cs" />
      <Compile Include="Assets\Scripts\AVOWGameModes.cs" />
      <Compile Include="Assets\Scripts\AVOWGraph.cs" />
@@ -75,6 +76,7 @@
      <Compile Include="Assets\Scripts\AVOWSceneConstructor.cs" />
      <Compile Include="Assets\Scripts\AVOWSideBar.cs" />
      <Compile Include="Assets\Scripts\AVOWSim.cs" />
+     <Compile Include="Assets\Scripts\AVOWTelemetry.cs" />
      <Compile Include="Assets\Scripts\AVOWTutorialManager.cs" />
      <Compile Include="Assets\Scripts\AVOWTutorialText.cs" />
      <Compile Include="Assets\Scripts\AVOWUI.cs" />
@@ -109,6 +111,7 @@
      <Compile Include="Assets\Scripts\ProjectorScript.cs" />
      <Compile Include="Assets\Scripts\QuitOnEsc.cs" />
      <Compile Include="Assets\Scripts\SendButtonScript.cs" />
+     <Compile Include="Assets\Scripts\SerialisationFactory.cs" />
      <Compile Include="Assets\Scripts\SerializationID.cs" />
      <Compile Include="Assets\Scripts\SerializationUtils.cs" />
      <Compile Include="Assets\Scripts\ServerUpload.cs" />

@@ -2,10 +2,9 @@
 
 public interface TelemetryListener {
 
-
-	void OnEvent(Telemetry.Event e);
-	void OnEvent(Telemetry.Event e, string text);
+	int RangeIdMin();
+	int RangeIdMax();
 	
-	void OnNewGame();
+	void OnEvent(TelemEvent e);
 }
  

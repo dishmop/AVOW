@@ -4,7 +4,7 @@ using System.Collections;
 
 public class EventFilterButton : MonoBehaviour {
 
-	public Telemetry.EventType eventType;
+//	public Telemetry.EventType eventType;
 	public bool enableState;
 	public Color enableColor;
 	public Color disableColor;
@@ -13,13 +13,13 @@ public class EventFilterButton : MonoBehaviour {
 	public void OnClick(){
 		enableState = !enableState;
 		SetupColor();
-		SetupOtherObjects();
+//		SetupOtherObjects();
 	}
 
 	// Use this for initialization
 	void Start () {
 		SetupColor();
-		SetupOtherObjects();
+//		SetupOtherObjects();
 	
 	}
 	
@@ -32,9 +32,9 @@ public class EventFilterButton : MonoBehaviour {
 		GetComponent<Text>().color = enableState ? enableColor : disableColor;
 	}
 	
-	void SetupOtherObjects(){
-		eventLog.GetComponent<CommentLog>().ShowType(eventType, enableState);
-		Telemetry.singleton.EnableStepType(eventType, enableState);
-		
-	}
+//	void SetupOtherObjects(){
+//		eventLog.GetComponent<CommentLog>().ShowType(eventType, enableState);
+//		Telemetry.singleton.EnableStepType(eventType, enableState);
+//		
+//	}
 }

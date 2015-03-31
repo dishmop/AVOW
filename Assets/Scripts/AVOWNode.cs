@@ -1,8 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+
 
 public class AVOWNode : MonoBehaviour {
+
+	const int		kLoadSaveVersion = 1;	
+	
 	// This list may not be needed anymore
 	public List<GameObject> components = new List<GameObject>();
 	
@@ -56,6 +62,106 @@ public class AVOWNode : MonoBehaviour {
 	
 	public void SetSelected(bool enable){
 		isSelected = enable;
+	}
+	
+	public void SerialiseData(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		bw.Write (visited);
+		bw.Write (id);
+		
+		// simulation data
+		bw.Write (voltage);
+		
+		// Visualisation data
+		bw.Write ( h0);	// =-1 if not known yet	
+		bw.Write (h0LowerBound);
+		bw.Write (h0UpperBound);
+		bw.Write (inOrdinalledWidth);
+		bw.Write (outOrdinalledWidth);
+		bw.Write (hasBeenLayedOut);	
+		bw.Write (addConnPos);
+		
+		bw.Write (hWidth);
+		bw.Write (isInteractive);
+		bw.Write (isSelected);
+	}
+	
+	public void DeserialiseData(BinaryReader br){
+		int version = br.ReadInt32 ();
+		switch (version){
+			case (kLoadSaveVersion):{
+				visited = br.ReadBoolean();	
+				id = br.ReadInt32 ();	
+				
+				voltage = br.ReadSingle();
+				h0 = br.ReadSingle();
+				h0LowerBound = br.ReadSingle();
+				h0UpperBound = br.ReadSingle();
+				inOrdinalledWidth = br.ReadSingle();
+				outOrdinalledWidth = br.ReadSingle();
+				hasBeenLayedOut = br.ReadBoolean();
+				addConnPos = br.ReadSingle();
+				hWidth = br.ReadSingle();
+				isInteractive = br.ReadBoolean();
+				isSelected =  br.ReadBoolean();
+				break;
+			}
+		}
+	}
+	
+	
+	public void SerialiseConnections(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		
+		bw.Write (components.Count);
+		for (int i = 0; i < components.Count; ++i){
+			AVOWGraph.singleton.SerialiseRef(bw, components[i]);
+		}
+		
+		bw.Write (inComponents.Count);
+		for (int i = 0; i < inComponents.Count; ++i){
+			AVOWGraph.singleton.SerialiseRef(bw, inComponents[i]);
+		}
+		
+		bw.Write (outComponents.Count);
+		for (int i = 0; i < outComponents.Count; ++i){
+			AVOWGraph.singleton.SerialiseRef(bw, outComponents[i]);
+		}
+		
+		AVOWGraph.singleton.SerialiseRef(bw, splitFromNode);
+			
+		
+	}
+	
+	public void DeserialiseConnections(BinaryReader br){
+		int version = br.ReadInt32 ();
+		switch (version){
+			case (kLoadSaveVersion):{
+			
+				
+				int numComponents = br.ReadInt32 ();
+				components = new List<GameObject>();
+				for (int i = 0; i < numComponents; ++i){
+					components.Add(AVOWGraph.singleton.DeseraliseRef(br));
+				}
+				
+				int numInComponents = br.ReadInt32 ();
+				inComponents = new  List<GameObject>();
+				for (int i = 0; i < numInComponents; ++i){
+					inComponents.Add(AVOWGraph.singleton.DeseraliseRef(br));
+				}
+	
+				int numOutComponents = br.ReadInt32 ();
+				outComponents = new List<GameObject>();
+				for (int i = 0; i < numOutComponents; ++i){
+					outComponents.Add(AVOWGraph.singleton.DeseraliseRef(br));
+				}
+				
+				splitFromNode = AVOWGraph.singleton.DeseraliseRef(br);
+				
+				break;
+			}
+		}
 	}
 	
 	public void GameUpdate (){

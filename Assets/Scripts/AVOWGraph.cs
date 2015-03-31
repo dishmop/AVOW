@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class AVOWGraph : MonoBehaviour {
 
@@ -8,24 +10,167 @@ public class AVOWGraph : MonoBehaviour {
 
 	// the nodes in the graph are simply numbered
 	
-	public GameObject NodePrefab;
+	public GameObject nodePrefab;
 	public GameObject lighteningPoints;
 	
-	
-	public int maxNodeId = -1;
-	
+		
 	public static int kMinLowerBound = 0;
 	public static int kMaxUpperBound = 9999;
 	
 	public List<GameObject> allNodes = new List<GameObject>();
 	public List<GameObject> allComponents = new List<GameObject>();
 	
+	public float xMin;
+	public float xMax;
+	public float yMin;
+	public float yMax;
+	
+	const int		kLoadSaveVersion = 1;	
+	
 	
 	List<GameObject> componentsToRemove = new List<GameObject>();
 	
 	
 	
+	int GetTypeCode(GameObject go){
+		if (go.GetComponent<AVOWNode>()) return 1;
+		else if (go.GetComponent<AVOWComponent>()) return 2;
+		else return -1;
+	}
+	
+	// Serialise a pointer to either a component or a node
+	public void SerialiseRef(BinaryWriter bw, GameObject go){
+		bw.Write (go != null);
+		if (go != null){
+			if (go.GetComponent<AVOWNode>() != null){
+				bw.Write ((int)1);
+				bw.Write (go.GetComponent<AVOWNode>().id);
+			}
+			else if (go.GetComponent<AVOWComponent>() != null){
+				bw.Write ((int)2);
+				bw.Write (go.GetComponent<AVOWComponent>().id);
+			}
+			else{
+				bw.Write ((int)-1);
+				bw.Write ((int)-1);
+			}
+		}
+	}
+	
+	// Deserialise into to return a pointer to a node or component in the graph
+	public GameObject DeseraliseRef(BinaryReader br){
+		bool isObj = br.ReadBoolean();
+		GameObject retObj = null;
+		if (isObj){
+			int code = br.ReadInt32 ();
+			int id = br.ReadInt32 ();
+			switch (code){
+				case 1:{
+					retObj = allNodes.Find (obj => obj.GetComponent<AVOWNode>().id == id);
+					break;
+				}
+				case 2:{
+					retObj = allComponents.Find (obj => obj.GetComponent<AVOWComponent>().id == id);
+					break;
+				}
+				default:{
+					Debug.LogError ("Error serialising reference");
+					break;
+				}
+			}
+		}
+		return retObj;
+	}
+	
+	
+	public void Serialise(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		bw.Write (allComponents.Count);
+		for (int i = 0; i < allComponents.Count; ++i){
+			bw.Write ((int)allComponents[i].GetComponent<AVOWComponent>().type);
+			allComponents[i].GetComponent<AVOWComponent>().SerialiseData(bw);
+		}
+		bw.Write (allNodes.Count);
+		for (int i = 0; i < allNodes.Count; ++i){
+			allNodes[i].GetComponent<AVOWNode>().SerialiseData(bw);
+		}
+		
+		for (int i = 0; i < allComponents.Count; ++i){
+			allComponents[i].GetComponent<AVOWComponent>().SerialiseConnections(bw);
+		}
+		for (int i = 0; i < allNodes.Count; ++i){
+			allNodes[i].GetComponent<AVOWNode>().SerialiseConnections(bw);
+		}
+	
+		bw.Write (xMin);
+		bw.Write (xMax);
+		bw.Write (yMin);
+		bw.Write (yMax);
+		
+	}
+	
+	
+	public void Deserialise(BinaryReader br){
+	
+		int version = br.ReadInt32();
+		switch (version){
+			case kLoadSaveVersion:{
+				foreach (GameObject go in allComponents){
+					GameObject.Destroy (go);
+				}
+				allComponents = new List<GameObject>();
+			
+				int numComponents = br.ReadInt32 ();
+				for (int i = 0; i < numComponents; ++i){
+					GameObject newComponenent = null;
+					AVOWComponent.Type thisType = (AVOWComponent.Type)br.ReadInt32 ();
+					switch (thisType){
+						case AVOWComponent.Type.kLoad:{
+							newComponenent = GameObject.Instantiate(AVOWUI.singleton.resistorPrefab);
+							break;
+						}
+						case AVOWComponent.Type.kVoltageSource:{
+							newComponenent = GameObject.Instantiate(AVOWUI.singleton.cellPrefab);
+							break;
+						}
+					}
+					newComponenent.transform.parent = transform;
+					newComponenent.GetComponent<AVOWComponent>().DeserialiseData(br);
+					allComponents.Add (newComponenent);
+					
+				}
+				break;
+			}
+			
+		}
+		
+		foreach (GameObject go in allNodes){
+			GameObject.Destroy (go);
+		}
+		allNodes = new List<GameObject>();
+		
+		int numNodes = br.ReadInt32 ();
+		for (int i = 0; i < numNodes; ++i){
+			GameObject newNode = GameObject.Instantiate(nodePrefab);
+			newNode.GetComponent<AVOWNode>().DeserialiseData(br);
+			allNodes.Add (newNode);
+		}
+		
+		for (int i = 0; i < allComponents.Count; ++i){
+			allComponents[i].GetComponent<AVOWComponent>().DeserialiseConnections(br);
+		}
+		for (int i = 0; i < allNodes.Count; ++i){
+			allNodes[i].GetComponent<AVOWNode>().DeserialiseConnections(br);
+		}
+		
+		xMin = br.ReadSingle();
+		xMax = br.ReadSingle();
+		yMin = br.ReadSingle();
+		yMax = br.ReadSingle();
 
+				
+		
+	}
 	// Place an new component between two existing nodes
 	public void PlaceComponent(GameObject newGO, GameObject node0, GameObject node1){
 
@@ -177,10 +322,9 @@ public class AVOWGraph : MonoBehaviour {
 	
 	
 	public GameObject AddNode(){
-		GameObject newNodeGO = Instantiate(NodePrefab) as GameObject;
+		GameObject newNodeGO = Instantiate(nodePrefab) as GameObject;
 		newNodeGO.transform.parent = transform;
 		
-		maxNodeId = Mathf.Max (maxNodeId, newNodeGO.GetComponent<AVOWNode>().id);
 		allNodes.Add (newNodeGO);
 		return newNodeGO;
 	}
@@ -390,6 +534,18 @@ public class AVOWGraph : MonoBehaviour {
 			go.GetComponent<AVOWComponent>().GameUpdate();
 		}
 		PrivateRemoveQueuedComponent();
+		
+		// Record the width of the graph (which is always the same as the current running through the cell
+		yMin = 0;
+		yMax = 1;
+		if (allComponents.Count == 0){
+			xMin = 0;
+			xMax = 0;
+		}
+		else{
+			xMin = 0;
+			xMax = Mathf.Abs (allComponents[0].GetComponent<AVOWComponent>().fwCurrent);
+		}
 	}
 	
 	
