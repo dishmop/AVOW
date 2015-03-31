@@ -7,6 +7,6 @@ public class AVOWMenuButton : MonoBehaviour {
 
 	// Use this for initialization
 	public void OnClick(){
-		AVOWGameModes.singleton.StartLevel(levelNum);
+		AVOWGameModes.singleton.TriggerStartLevel(levelNum);
 	}
 }

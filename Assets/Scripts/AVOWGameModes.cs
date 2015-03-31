@@ -19,9 +19,7 @@ public class AVOWGameModes : MonoBehaviour {
 		kGameOver
 
 	}
-	public GameModeState state = GameModeState.kMainMenu;
-	public int stage = 0;
-	public int level = 0;
+
 	public GameObject screenSpaceUI;
 	public GameObject mainMenuPanel;
 	public GameObject levelCompleteDlg;
@@ -39,6 +37,10 @@ public class AVOWGameModes : MonoBehaviour {
 	public float levelStartFadeInDuration;
 	public float levelStartFadeOutDuration;
 	
+	public GameModeState state = GameModeState.kMainMenu;
+	
+	const int		kLoadSaveVersion = 1;	
+	
 	int currentLevel = -1;
 	
 	const int kBackStoryIndex = -2;
@@ -52,9 +54,51 @@ public class AVOWGameModes : MonoBehaviour {
 		kBackStoryCam,
 	}
 	
-
+	CameraChoice currentCamSelect = CameraChoice.kNone;
 	
 	float levelStartMsgTime = -100f;
+	
+	
+	// Set by buttons - and the level only ACTUALLY started from the gameupdate
+	int triggerStartLevel = kBackStoryIndex - 1;
+	
+	public void TriggerStartLevel(int levelNum){
+		triggerStartLevel = levelNum;
+	}
+	
+	
+	
+	
+	
+	
+	public void Serialise(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		bw.Write ((int)state);
+		bw.Write (currentLevel);
+		bw.Write ((int)currentCamSelect);
+		bw.Write (levelStartMsgTime);
+		bw.Write (triggerStartLevel);
+		
+	}
+	
+	
+	public void Deserialise(BinaryReader br){
+		
+		int version = br.ReadInt32();
+		switch (version){
+			case kLoadSaveVersion:{
+				state = (GameModeState)br.ReadInt32 ();
+				currentLevel = br.ReadInt32 ();
+				currentCamSelect = (CameraChoice)br.ReadInt32();
+				levelStartMsgTime = br.ReadSingle();
+				triggerStartLevel = br.ReadInt32 ();
+			
+				SelectCamera(currentCamSelect);
+				
+				break;
+			}
+		}
+	}
 
 	// Use this for initialization
 	public void Initialise () {
@@ -92,6 +136,11 @@ public class AVOWGameModes : MonoBehaviour {
 	}	
 	
 	public void GameUpdate(){
+		if (triggerStartLevel >= kBackStoryIndex){
+			StartLevel(triggerStartLevel);
+			triggerStartLevel = kBackStoryIndex-1;
+		
+		}
 		if (AVOWBattery.singleton.IsDepleated()){
 			AVOWBattery.singleton.FreezeBattery();
 			state = GameModeState.kGameOver;
@@ -103,37 +152,18 @@ public class AVOWGameModes : MonoBehaviour {
 			}
 		}
 		
-		//dlgPanel.SetActive(state == GameModeState.kGameOver || state == GameModeState.kStageComplete3);
-		mainMenuPanel.SetActive(state == GameModeState.kMainMenu);
-		if (state == GameModeState.kStageComplete3 || state == GameModeState.kStageComplete4){
-			if (AVOWObjectiveManager.singleton.IsOnLastLevel()){
-				gameCompleteDlg.SetActive (true);
-			}
-			else{
-				levelCompleteDlg.SetActive (true);
-			}
-		}
-		else{
-			levelCompleteDlg.SetActive (false);
-			gameCompleteDlg.SetActive (false);
-		}
-		sidePanel.transform.FindChild("ExcludeToggle").gameObject.SetActive(AVOWConfig.singleton.levelExcludeEdit);
-		sidePanel.transform.FindChild("ExcludeToggle").GetComponent<Text>().text = AVOWObjectiveManager.singleton.IsCurrentGoalExcluded() ? "Include Goal" : "Exclude Goal";
+		
 		
 
 		
 		switch (state){
-		case GameModeState.kMainMenu:{
-			whitePanel.SetActive(false);
-			break;
-			
-		}
-		case GameModeState.kPlayStage:{
-			whitePanel.SetActive(false);
-			break;
-			
-		}
-		case GameModeState.kStageComplete0:{
+			case GameModeState.kMainMenu:{
+				AVOWUpdateManager.singleton.ResetGameTime();
+				
+				break;
+			}
+
+			case GameModeState.kStageComplete0:{
 			// Get rid of all our resistance squares
 			foreach (GameObject go in AVOWGraph.singleton.allComponents){
 				AVOWComponent component = go.GetComponent<AVOWComponent>();
@@ -170,9 +200,38 @@ public class AVOWGameModes : MonoBehaviour {
 	// Update is called once per frame
 	public void RenderUpdate () {
 	
+		//dlgPanel.SetActive(state == GameModeState.kGameOver || state == GameModeState.kStageComplete3);
+		mainMenuPanel.SetActive(state == GameModeState.kMainMenu);
+		if (state == GameModeState.kStageComplete3 || state == GameModeState.kStageComplete4){
+			if (AVOWObjectiveManager.singleton.IsOnLastLevel()){
+				gameCompleteDlg.SetActive (true);
+			}
+			else{
+				levelCompleteDlg.SetActive (true);
+			}
+		}
+		else{
+			levelCompleteDlg.SetActive (false);
+			gameCompleteDlg.SetActive (false);
+		}
+		sidePanel.transform.FindChild("ExcludeToggle").gameObject.SetActive(AVOWConfig.singleton.levelExcludeEdit);
+		sidePanel.transform.FindChild("ExcludeToggle").GetComponent<Text>().text = AVOWObjectiveManager.singleton.IsCurrentGoalExcluded() ? "Include Goal" : "Exclude Goal";
+		
+		
+		
 		HandleLevelStartMsg();
 		
 		switch (state){
+			case GameModeState.kMainMenu:{
+				whitePanel.SetActive(false);
+				break;
+				
+			}
+			case GameModeState.kPlayStage:{
+				whitePanel.SetActive(false);
+				break;
+				
+			}			
 			case GameModeState.kStageComplete1:{
 				// Get rid of all our resistance squares
 				float scaleVal = scenery.transform.localScale.x;
@@ -217,7 +276,7 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 	
 	public void TriggerLevelStartMessage(){
-		levelStartMsgTime = Time.time;
+		levelStartMsgTime = AVOWUpdateManager.singleton.GetGameTime();
 		levelStartMsg.transform.FindChild ("LevelTitle").GetComponent<Text>().text = GetLevelName(currentLevel);
 	
 	}
@@ -265,6 +324,7 @@ public class AVOWGameModes : MonoBehaviour {
 
 	
 	void SelectCamera(CameraChoice cam){
+		currentCamSelect = cam;
 		// First set them all inactive
 		BackStoryCamera.singleton.gameObject.SetActive(false);
 		AVOWCamControl.singleton.gameObject.SetActive(false);
@@ -284,7 +344,7 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	
 	// THe level complete routine rather messes up the scenery - this puts it all back
-	void ResetScenery(){
+	public void ResetScenery(){
 		scenery.transform.localScale = new Vector3(1, 1, 1);	
 		whitePanel.SetActive(false);
 		levelCompleteDlg.SetActive(false);
@@ -329,12 +389,15 @@ public class AVOWGameModes : MonoBehaviour {
 
 
 	
-	public void StartLevel(int levelNum){
+	void StartLevel(int levelNum){
 		ResetScenery();
-		AVOWUpdateManager.singleton.ResetGameTime();
+		
 		
 		if (IsTelemPlaybackLevel(levelNum)){
 			RestartNormalGame();
+			AVOWObjectiveManager.singleton.InitialiseLimitsOnly(7);
+			AVOWUpdateManager.singleton.ResetGameTime();
+			
 			Telemetry.singleton.StartPlayback();
 			return;
 		}
@@ -377,14 +440,14 @@ public class AVOWGameModes : MonoBehaviour {
 		
 	}
 	
-	public void StartNextLevel(){
-		currentLevel++;
-		StartLevel (currentLevel);
-		
-	}
+//	void StartNextLevel(){
+//		currentLevel++;
+//		TriggerStartLevel (currentLevel);
+//		
+//	}
 	
 	void HandleLevelStartMsg(){
-		if (Time.time > levelStartMsgTime + levelStartMsgDuration || Time.time < levelStartMsgTime){
+		if (AVOWUpdateManager.singleton.GetGameTime() > levelStartMsgTime + levelStartMsgDuration || AVOWUpdateManager.singleton.GetGameTime() < levelStartMsgTime){
 			levelStartMsg.SetActive(false);
 		}
 		else{
@@ -392,12 +455,12 @@ public class AVOWGameModes : MonoBehaviour {
 			// work out the alpha value of the text
 			float alpha = 1;
 			// If fade in
-			if (Time.time < levelStartMsgTime + levelStartFadeInDuration){
-				alpha = (Time.time - levelStartMsgTime) / levelStartFadeInDuration;
+			if (AVOWUpdateManager.singleton.GetGameTime() < levelStartMsgTime + levelStartFadeInDuration){
+				alpha = (AVOWUpdateManager.singleton.GetGameTime() - levelStartMsgTime) / levelStartFadeInDuration;
 			}
 			// If fade out
-			else if (Time.time > levelStartMsgTime + levelStartMsgDuration - levelStartFadeOutDuration){
-				alpha = (levelStartMsgTime + levelStartMsgDuration - Time.time) / levelStartFadeOutDuration;
+			else if (AVOWUpdateManager.singleton.GetGameTime() > levelStartMsgTime + levelStartMsgDuration - levelStartFadeOutDuration){
+				alpha = (levelStartMsgTime + levelStartMsgDuration - AVOWUpdateManager.singleton.GetGameTime()) / levelStartFadeOutDuration;
 			}
 			// Set the title color
 			Color titleCol = levelStartMsg.transform.FindChild ("LevelTitle").GetComponent<Text>().color;

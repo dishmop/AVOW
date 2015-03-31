@@ -25,7 +25,7 @@ public class AVOWTelemetry : MonoBehaviour, TelemetryListener{
 	
 	public void ReadStartGoalEvent(TelemEvent e){
 		BinaryReader br = new BinaryReader(e.stream);
-		int goalNum = br.ReadInt32();
+		/*int goalNum =*/ br.ReadInt32();
 	}
 	
 	public void WriteStartLevelEvent(int levelNum){
@@ -36,7 +36,9 @@ public class AVOWTelemetry : MonoBehaviour, TelemetryListener{
 	
 	public void ReadStartLevelEvent(TelemEvent e){
 		BinaryReader br = new BinaryReader(e.stream);
-		int level = br.ReadInt32();
+		/*int level = */br.ReadInt32();
+		// Need to do this manually as we don't record all the scenery moving around stuff - but it can get updated by virtue of being in different states
+		AVOWGameModes.singleton.ResetScenery();
 	}
 	
 	public void WriteGameUpdateEvent(){

@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 using System.Text;
 using UnityEngine.UI;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class AVOWTutorialText : MonoBehaviour {
 	public static AVOWTutorialText singleton = null;
@@ -15,6 +17,8 @@ public class AVOWTutorialText : MonoBehaviour {
 	
 	public Color		textColor;
 	public Color		highlightColor;
+	
+	const int			kLoadSaveVersion = 1;	
 	
 	float				lettersPerSecond = 0;
 	float 				lastNonForcedSpeed = 0;
@@ -30,6 +34,24 @@ public class AVOWTutorialText : MonoBehaviour {
 	const string 		kPauseKey = "PAUSE";	
 	const string 		kSpeedKey = "SPEED";	
 	const string		kTriggerKey = "TRIGGER";
+	
+	public void Serialise(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		bw.Write (textBox.GetComponent<Text>().text);
+		
+	}
+	
+	public void Deserialise(BinaryReader br){
+		
+		int version = br.ReadInt32();
+		switch (version){
+			case kLoadSaveVersion:{
+				textBox.GetComponent<Text>().text = br.ReadString();
+				
+				break;
+			}
+		}
+	}
 	
 	public void AddText(string text){
 		queuedString.Append(text + "\n");
@@ -105,7 +127,7 @@ public class AVOWTutorialText : MonoBehaviour {
 	
 
 	// Use this for initialization
-	void Start () {
+	public void Initialise () {
 		lettersPerSecond = defaultLettersPerSecond;
 		ClearDisplayString();
 		textBox.GetComponent<Text>().lineSpacing = 1.5f;
@@ -127,8 +149,7 @@ public class AVOWTutorialText : MonoBehaviour {
 	
 	
 	// Update is called once per frame
-	void Update () {
-//		Debug.Log (lettersPerSecond.ToString() + ": " + queuedString.ToString());
+	public void GameUpdate () {
 		HandleText();
 		
 		

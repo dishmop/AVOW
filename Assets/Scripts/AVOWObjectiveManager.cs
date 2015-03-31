@@ -43,6 +43,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	int currentGoalIndex = -1;
 	int currentLevel = -1;
 	
+	
+	// Not serialised
+	bool initialisedLimitsOnly;
+	
 	enum State{
 		kNone,
 		kPauseOnLevelStart,
@@ -59,6 +63,13 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	
 	State state = State.kNone;
 	
+	// This must be reset at the beginning of each GameUpdate frame
+	public void ResetOptFlags(){
+		if (boards[0] != null){
+			boards[0].GetComponent<AVOWObjectiveBoard>().ResetOptFlags();
+			boards[1].GetComponent<AVOWObjectiveBoard>().ResetOptFlags();
+		}
+	}
 	
 	public void Serialise(BinaryWriter bw){
 		bw.Write (kLoadSaveVersion);
@@ -142,6 +153,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	
 	public void InitialiseLimitsOnly(int limit){
 		resistorLimit = limit;
+		initialisedLimitsOnly = true;
 	}
 		
 
@@ -162,6 +174,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	
 	public void InitialiseLevel(int level){
 		currentLevel = level;
+		initialisedLimitsOnly = false;
 		numBoardsToUnstack = 0;
 		switch (level){
 			case 1:{
@@ -406,6 +419,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	
 	
 	public void GameUpdate(){
+		// We need to do this because when we stop playback we can be in some kind of state which we no longer want to be in
+		if (initialisedLimitsOnly){
+			state = State.kNone;
+		}
 		
 		if (firstUpdate){
 			ConstructExcludedGoals();

@@ -14,6 +14,7 @@ using System.Threading;
 public class DCOutputStream : ICSharpCode.SharpZipLib.GZip.GZipOutputStream{
 
 	public long writeCount = 0;
+
 	
 
 	public DCOutputStream(Stream other, int size): base(other, size){
@@ -407,14 +408,12 @@ public class Telemetry : MonoBehaviour, TelemetryListener {
 		mode = Mode.kPlayback;
 		isPlaying = true;
 		OpenFileForReading();
-		// Debug temp
-		
-		PlaybackUpdate();
 	}
 	
 	public void StopPlayback(){
 		CloseFile();
 		isPlaying = false;
+		nextPlaybackEvent = null;
 		
 	}
 	
@@ -547,20 +546,22 @@ public class Telemetry : MonoBehaviour, TelemetryListener {
 //	}
 //
 	void PlaybackUpdate(){
-		// If we don't have an event to deal with, get one
-		if (nextPlaybackEvent == null){
-			nextPlaybackEvent = ConstructReadEvent();
-			nextPlaybackEvent.DeserialiseEventHeader();
-		}
-		// If it is time to process our event - then do so
-		if (AVOWUpdateManager.singleton.GetGameTime() > nextPlaybackEvent.gameTime){
-			foreach (TelemetryListener listener in listeners){
-				if (nextPlaybackEvent.id > listener.RangeIdMin() && nextPlaybackEvent.id < listener.RangeIdMax()){
-					listener.OnEvent(nextPlaybackEvent);
-				}
+		do{
+			// If we don't have an event to deal with, get one
+			if (nextPlaybackEvent == null){
+				nextPlaybackEvent = ConstructReadEvent();
+				nextPlaybackEvent.DeserialiseEventHeader();
 			}
-			nextPlaybackEvent = null;
-		}
+			// If it is time to process our event - then do so
+			if (AVOWUpdateManager.singleton.GetGameTime() > nextPlaybackEvent.gameTime){
+				foreach (TelemetryListener listener in listeners){
+					if (nextPlaybackEvent != null && nextPlaybackEvent.id > listener.RangeIdMin() && nextPlaybackEvent.id < listener.RangeIdMax()){
+						listener.OnEvent(nextPlaybackEvent);
+					}
+				}
+				nextPlaybackEvent = null;
+			}
+		} while (nextPlaybackEvent == null && isPlaying);
 		
 	}
 	

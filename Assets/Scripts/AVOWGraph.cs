@@ -27,6 +27,10 @@ public class AVOWGraph : MonoBehaviour {
 	
 	const int		kLoadSaveVersion = 1;	
 	
+
+	// Optmisation flags
+	bool hasTopologyChanged;
+	
 	
 	List<GameObject> componentsToRemove = new List<GameObject>();
 	
@@ -36,6 +40,11 @@ public class AVOWGraph : MonoBehaviour {
 		if (go.GetComponent<AVOWNode>()) return 1;
 		else if (go.GetComponent<AVOWComponent>()) return 2;
 		else return -1;
+	}
+	
+	// This must be reset at the beginning of each GameUpdate frame
+	public void ResetOptFlags(){
+		hasTopologyChanged = false;
 	}
 	
 	// Serialise a pointer to either a component or a node
@@ -85,21 +94,27 @@ public class AVOWGraph : MonoBehaviour {
 	
 	public void Serialise(BinaryWriter bw){
 		bw.Write (kLoadSaveVersion);
-		bw.Write (allComponents.Count);
+		bw.Write (hasTopologyChanged);
+		if (hasTopologyChanged){
+			bw.Write (allComponents.Count);
+			for (int i = 0; i < allComponents.Count; ++i){
+				bw.Write ((int)allComponents[i].GetComponent<AVOWComponent>().type);
+			}
+		}
 		for (int i = 0; i < allComponents.Count; ++i){
-			bw.Write ((int)allComponents[i].GetComponent<AVOWComponent>().type);
 			allComponents[i].GetComponent<AVOWComponent>().SerialiseData(bw);
 		}
 		bw.Write (allNodes.Count);
 		for (int i = 0; i < allNodes.Count; ++i){
 			allNodes[i].GetComponent<AVOWNode>().SerialiseData(bw);
 		}
-		
-		for (int i = 0; i < allComponents.Count; ++i){
-			allComponents[i].GetComponent<AVOWComponent>().SerialiseConnections(bw);
-		}
-		for (int i = 0; i < allNodes.Count; ++i){
-			allNodes[i].GetComponent<AVOWNode>().SerialiseConnections(bw);
+		if (hasTopologyChanged){
+			for (int i = 0; i < allComponents.Count; ++i){
+				allComponents[i].GetComponent<AVOWComponent>().SerialiseConnections(bw);
+			}
+			for (int i = 0; i < allNodes.Count; ++i){
+				allNodes[i].GetComponent<AVOWNode>().SerialiseConnections(bw);
+			}
 		}
 	
 		bw.Write (xMin);
@@ -115,64 +130,84 @@ public class AVOWGraph : MonoBehaviour {
 		int version = br.ReadInt32();
 		switch (version){
 			case kLoadSaveVersion:{
-				foreach (GameObject go in allComponents){
-					GameObject.Destroy (go);
-				}
-				allComponents = new List<GameObject>();
+				hasTopologyChanged = br.ReadBoolean();
 			
-				int numComponents = br.ReadInt32 ();
-				for (int i = 0; i < numComponents; ++i){
-					GameObject newComponenent = null;
-					AVOWComponent.Type thisType = (AVOWComponent.Type)br.ReadInt32 ();
-					switch (thisType){
-						case AVOWComponent.Type.kLoad:{
-							newComponenent = GameObject.Instantiate(AVOWUI.singleton.resistorPrefab);
-							break;
-						}
-						case AVOWComponent.Type.kVoltageSource:{
-							newComponenent = GameObject.Instantiate(AVOWUI.singleton.cellPrefab);
-							break;
-						}
+				if (hasTopologyChanged){
+					int numComponents = br.ReadInt32 ();
+					foreach (GameObject go in allComponents){
+						GameObject.Destroy (go);
 					}
-					newComponenent.transform.parent = transform;
-					newComponenent.GetComponent<AVOWComponent>().DeserialiseData(br);
-					allComponents.Add (newComponenent);
-					
+					allComponents = new List<GameObject>();
+			
+					for (int i = 0; i < numComponents; ++i){
+						GameObject newComponenent = null;
+						AVOWComponent.Type thisType = (AVOWComponent.Type)br.ReadInt32 ();
+						switch (thisType){
+							case AVOWComponent.Type.kLoad:{
+								newComponenent = GameObject.Instantiate(AVOWUI.singleton.resistorPrefab);
+								break;
+							}
+							case AVOWComponent.Type.kVoltageSource:{
+								newComponenent = GameObject.Instantiate(AVOWUI.singleton.cellPrefab);
+								break;
+							}
+						}
+						newComponenent.transform.parent = transform;
+						allComponents.Add (newComponenent);
+					}
 				}
+				for (int i = 0; i < allComponents.Count; ++i){
+					allComponents[i].GetComponent<AVOWComponent>().DeserialiseData(br);
+				}
+				
+			
+				int numNodes = br.ReadInt32 ();
+				if (hasTopologyChanged){
+					foreach (GameObject go in allNodes){
+						GameObject.Destroy (go);
+					}
+					allNodes = new List<GameObject>();
+					
+					
+					for (int i = 0; i < numNodes; ++i){
+						GameObject newNode = GameObject.Instantiate(nodePrefab);
+						allNodes.Add (newNode);
+					}
+				}
+				for (int i = 0; i < numNodes; ++i){
+					allNodes[i].GetComponent<AVOWNode>().DeserialiseData(br);
+				}
+				
+				if (hasTopologyChanged){
+					for (int i = 0; i < allComponents.Count; ++i){
+						allComponents[i].GetComponent<AVOWComponent>().DeserialiseConnections(br);
+					}
+					for (int i = 0; i < allNodes.Count; ++i){
+						allNodes[i].GetComponent<AVOWNode>().DeserialiseConnections(br);
+					}
+				}
+				
+				xMin = br.ReadSingle();
+				xMax = br.ReadSingle();
+				yMin = br.ReadSingle();
+				yMax = br.ReadSingle();
+				
+				
 				break;
 			}
 			
 		}
-		
-		foreach (GameObject go in allNodes){
-			GameObject.Destroy (go);
-		}
-		allNodes = new List<GameObject>();
-		
-		int numNodes = br.ReadInt32 ();
-		for (int i = 0; i < numNodes; ++i){
-			GameObject newNode = GameObject.Instantiate(nodePrefab);
-			newNode.GetComponent<AVOWNode>().DeserialiseData(br);
-			allNodes.Add (newNode);
-		}
-		
-		for (int i = 0; i < allComponents.Count; ++i){
-			allComponents[i].GetComponent<AVOWComponent>().DeserialiseConnections(br);
-		}
-		for (int i = 0; i < allNodes.Count; ++i){
-			allNodes[i].GetComponent<AVOWNode>().DeserialiseConnections(br);
-		}
-		
-		xMin = br.ReadSingle();
-		xMax = br.ReadSingle();
-		yMin = br.ReadSingle();
-		yMax = br.ReadSingle();
 
-				
-		
 	}
+	
+	public void Initialise(){
+		hasTopologyChanged = false;
+	}
+	
+	
 	// Place an new component between two existing nodes
 	public void PlaceComponent(GameObject newGO, GameObject node0, GameObject node1){
+		hasTopologyChanged = true;
 
 		newGO.transform.parent = transform;
 		AVOWComponent newComponent = newGO.GetComponent<AVOWComponent>();
@@ -219,6 +254,7 @@ public class AVOWGraph : MonoBehaviour {
 			node0.GetComponent<AVOWNode>().components.Remove (obj);
 			node1.GetComponent<AVOWNode>().components.Remove (obj);
 			GameObject.Destroy(obj);
+			hasTopologyChanged = true;
 		}
 		
 		componentsToRemove.Clear();
@@ -226,6 +262,7 @@ public class AVOWGraph : MonoBehaviour {
 	}
 	
 	public void ClearCircuit(){
+		hasTopologyChanged = true;
 		foreach (GameObject go in allComponents){
 			GameObject.Destroy(go);
 		}
@@ -322,7 +359,8 @@ public class AVOWGraph : MonoBehaviour {
 	
 	
 	public GameObject AddNode(){
-		GameObject newNodeGO = Instantiate(nodePrefab) as GameObject;
+		hasTopologyChanged = true;
+		GameObject newNodeGO = GameObject.Instantiate(nodePrefab);
 		newNodeGO.transform.parent = transform;
 		
 		allNodes.Add (newNodeGO);

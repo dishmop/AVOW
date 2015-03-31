@@ -59,6 +59,13 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	State state = State.kReady;
 	
 	
+	// True if the objects on the board have changed (either their quanitity or size)
+	bool boardHasChanged;
+	
+	// This must be reset at the beginning of each GameUpdate frame
+	public void ResetOptFlags(){
+		boardHasChanged = false;
+	}
 	
 	public void Serialise(BinaryWriter bw){
 		bw.Write (kLoadSaveVersion);
@@ -88,12 +95,16 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 				bw.Write (displayToCoversMapping[i]);
 			}
 		}
-		
+		bw.Write (boardHasChanged);
 		bw.Write (currentWood != null);
 		if (currentWood != null){
 			bw.Write (currentWood.Length);
+			if (boardHasChanged){
+				for (int i = 0; i < currentWood.Length; ++i){
+					bw.Write (currentWood[i].name);
+				}
+			}
 			for (int i = 0; i < currentWood.Length; ++i){
-				bw.Write (currentWood[i].name);
 				bw.Write (currentWood[i].transform.localPosition);
 				bw.Write (currentWood[i].transform.localRotation);
 				bw.Write (currentWood[i].transform.localScale);
@@ -103,8 +114,12 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		bw.Write (currentCovers != null);
 		if (currentCovers != null){
 			bw.Write (currentCovers.Length);
+			if (boardHasChanged){
+				for (int i = 0; i < currentCovers.Length; ++i){
+					bw.Write (currentCovers[i].name);
+				}
+			}
 			for (int i = 0; i < currentCovers.Length; ++i){
-				bw.Write (currentCovers[i].name);
 				bw.Write (currentCovers[i].transform.localPosition);
 				bw.Write (currentCovers[i].transform.localRotation);
 				bw.Write (currentCovers[i].transform.localScale);
@@ -163,7 +178,9 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 				bool hasMapping = br.ReadBoolean();
 				if (hasMapping){
 					int size = br.ReadInt32 ();
-					displayToCoversMapping = new int[size];
+					if (displayToCoversMapping == null || displayToCoversMapping.Length != size){
+				    	displayToCoversMapping = new int[size];
+				    }
 					for (int i = 0; i < size; ++i){
 						displayToCoversMapping[i] = br.ReadInt32();
 					}
@@ -172,45 +189,62 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 					displayToCoversMapping = null;
 				}
 				
-				
-				if (currentWood != null){
-					foreach (GameObject go in currentWood){
-						GameObject.Destroy(go);
+				boardHasChanged = br.ReadBoolean();
+				if (boardHasChanged){
+					if (boardHasChanged){
+						if (currentWood != null){
+							foreach (GameObject go in currentWood){
+								GameObject.Destroy(go);
+							}
+							currentWood = null;
+						}	
 					}
-					currentWood = null;
-				}		
-						
+					
+				}
 				bool hasWood = br.ReadBoolean ();
 				if (hasWood){
-
 					int size = br.ReadInt32 ();
-					currentWood = new GameObject[size];
+					if (boardHasChanged){
+						currentWood = new GameObject[size];
+						for (int i = 0; i < size; ++i){
+							string name = br.ReadString();
+							currentWood[i] = GameObject.Instantiate(woodPrefabs[Convert.ToInt32(name)]);
+						}
+						
+					}
+					
 					for (int i = 0; i < size; ++i){
-						string name = br.ReadString();
-						currentWood[i] = GameObject.Instantiate(woodPrefabs[Convert.ToInt32(name)]);
+
 						currentWood[i].transform.parent = transform;
 						currentWood[i].transform.localPosition = br.ReadVector3();
 						currentWood[i].transform.localRotation = br.ReadQuaternion();
 						currentWood[i].transform.localScale = br.ReadVector3();
 					}
 				}
-
 				
 					
-				if (currentCovers != null){
-					foreach (GameObject go in currentCovers){
-						GameObject.Destroy(go);
-					}
-					currentCovers = null;
-				}			
+				if (boardHasChanged){
+					if (currentCovers != null){
+						foreach (GameObject go in currentCovers){
+							GameObject.Destroy(go);
+						}
+						currentCovers = null;
+					}			
+				}
 					
+	
 				bool hasCovers = br.ReadBoolean ();
 				if (hasCovers){
 					int size = br.ReadInt32 ();
-					currentCovers = new GameObject[size];
-					for (int i = 0; i < size; ++i){
-						string name = br.ReadString();
-						currentCovers[i] = GameObject.Instantiate(coverPrefabs[Convert.ToInt32(name)]);
+					if (boardHasChanged){
+						currentCovers = new GameObject[size];
+						for (int i = 0; i < size; ++i){
+							string name = br.ReadString();
+							currentCovers[i] = GameObject.Instantiate(coverPrefabs[Convert.ToInt32(name)]);
+						}
+				}
+				for (int i = 0; i < size; ++i){
+						
 						currentCovers[i].transform.parent = transform;
 						currentCovers[i].transform.localPosition = br.ReadVector3();
 						currentCovers[i].transform.localRotation = br.ReadQuaternion();
@@ -219,12 +253,14 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 				}
 				
 				
-				if (shadedSquare != null){
+				bool hasShadedSquare = br.ReadBoolean();
+				if (!hasShadedSquare && shadedSquare != null){
 					GameObject.Destroy(shadedSquare);
 				}
-				bool hasShadedSquare = br.ReadBoolean();
-				if (hasShadedSquare){
+				else if (hasShadedSquare && shadedSquare == null){
 					shadedSquare = GameObject.Instantiate(shadedPrefab);
+				}
+				if (hasShadedSquare){
 					shadedSquare.transform.parent = transform;
 					shadedSquare.transform.localPosition = br.ReadVector3();
 					shadedSquare.transform.localRotation = br.ReadQuaternion();
@@ -314,6 +350,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public void ConstructBlankBoard(){
+		boardHasChanged = true;
 		if (currentWood != null){
 			foreach (GameObject go in currentWood){
 				GameObject.Destroy(go);
@@ -351,6 +388,8 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public void ConstructGrid(AVOWCircuitTarget target){
+		boardHasChanged = true;
+		
 		int division = target.lcm;
 		int width = target.widthInLCMs;
 		
@@ -536,6 +575,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public void CreateCovers(AVOWCircuitTarget target){
+		boardHasChanged = true;
 		displayTarget = target;
 		if (currentCovers != null){
 			foreach (GameObject go in currentCovers){

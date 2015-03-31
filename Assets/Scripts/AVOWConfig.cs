@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class AVOWConfig : MonoBehaviour {
 
@@ -35,6 +37,8 @@ public class AVOWConfig : MonoBehaviour {
 	public bool tutDisable2ndComponentConnections = false;
 	public bool tutDisable2ndBarConnections = false;
 	public bool tutDisableComponentConstruction = false;
+	
+	const int		kLoadSaveVersion = 1;	
 	
 	SpringValue bottomPanelUseFrac = new SpringValue(0, SpringValue.Mode.kLinear);
 	SpringValue sidePanelUseFrac = new SpringValue(0, SpringValue.Mode.kLinear);
@@ -113,4 +117,30 @@ public class AVOWConfig : MonoBehaviour {
 		cubeToCursor.Update ();
 		
 	}
+	
+	public void Serialise(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		bottomPanelUseFrac.Serialise(bw);
+		sidePanelUseFrac.Serialise(bw);
+		bw.Write (sideBarFrac);
+		
+	}
+	
+
+	public void Deserialise(BinaryReader br){
+		
+		int version = br.ReadInt32();
+		switch (version){
+			case kLoadSaveVersion:{
+				bottomPanelUseFrac.Deserialise(br);
+				sidePanelUseFrac.Deserialise(br);
+				sideBarFrac = br.ReadSingle ();
+				break;
+			}
+		
+		}
+	}
+
+
+		
 }
