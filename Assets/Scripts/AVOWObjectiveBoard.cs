@@ -25,7 +25,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		kGappedRow,
 	};	
 	
-	const int		kLoadSaveVersion = 1;
+	const int		kLoadSaveVersion = 2;
 	
 	float maxShade = 0.675f;
 	AVOWCircuitTarget currentTarget;
@@ -60,78 +60,209 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	
 	
 	// True if the objects on the board have changed (either their quanitity or size)
-	bool boardHasChanged;
+	bool topologyHasChanged;
+	bool transformHasChanged;
+	bool valuesHaveChanged;
+	bool somethingHasChanged;
+	
+	float[] transformOptValues = new float[10];
+	float[] coverOptValues = new float[5000];
+	float[] somethingOptValues = new float[100];
+	
+	void ResetTransform(Transform thisTransform, float[] values, int index0){
+		int i = index0;
+		values[i++] = thisTransform.localPosition[0];
+		values[i++] = thisTransform.localPosition[1];
+		values[i++] = thisTransform.localPosition[2];
+		
+		values[i++] = thisTransform.localRotation[0];
+		values[i++] = thisTransform.localRotation[1];
+		values[i++] = thisTransform.localRotation[2];
+		values[i++] = thisTransform.localRotation[3];
+		
+		values[i++] = thisTransform.localScale[0];
+		values[i++] = thisTransform.localScale[1];
+		values[i++] = thisTransform.localScale[2];
+		
+	}
+	
+	void ResetTransformOptValues(){
+		ResetTransform(transform, transformOptValues, 0);
+	}
+	
+	void TestIfTransformHasChanged(){
+		if (TestTransformChanged(transform, transformOptValues, 0)){
+			transformHasChanged = true;
+			ResetTransformOptValues();
+		}
+		
+	}
+	
+	bool TestTransformChanged(Transform testTransform, float[] values, int index0){
+		int i = index0;
+		if (!MathUtils.FP.Feq (values[i++], testTransform.localPosition[0])) return true;
+		if (!MathUtils.FP.Feq (values[i++], testTransform.localPosition[1])) return true;
+		if (!MathUtils.FP.Feq (values[i++], testTransform.localPosition[2])) return true;
+	
+		if (!MathUtils.FP.Feq (values[i++], testTransform.localRotation[0])) return true;
+		if (!MathUtils.FP.Feq (values[i++], testTransform.localRotation[1])) return true;
+		if (!MathUtils.FP.Feq (values[i++], testTransform.localRotation[2])) return true;
+		if (!MathUtils.FP.Feq (values[i++], testTransform.localRotation[3])) return true;
+	
+		if (!MathUtils.FP.Feq (values[i++], testTransform.localScale[0])) return true;
+		if (!MathUtils.FP.Feq (values[i++], testTransform.localScale[1])) return true;
+		if (!MathUtils.FP.Feq (values[i++], testTransform.localScale[2])) return true;
+	
+		return false;
+		
+	}
+	
+	
+	void ResetCoverOptValues(){
+		if (currentCovers == null) return;
+		for (int i = 0; i < currentCovers.Length; ++i){
+			ResetTransform(currentCovers[i].transform, coverOptValues, i * 10);
+		}
+			
+	}
+	
+	void TestIfCoverValuesHaveChanged(){
+		if (topologyHasChanged){
+			valuesHaveChanged = true;
+			ResetCoverOptValues();
+			return;
+		}
+		if (currentCovers == null) return;
+		
+		for (int i = 0; i < currentCovers.Length; ++i){
+			if (TestTransformChanged(currentCovers[i].transform, coverOptValues, i * 10)){
+				valuesHaveChanged = true;
+				ResetCoverOptValues();
+				return;
+			}
+		}
+		
+	}
+	
+	void ResetSomethingValues(){
+		int i = 0;
+		
+		somethingOptValues[i++] = Convert.ToSingle(horizontalFirst);
+		somethingOptValues[i++] = Convert.ToSingle(completeWaitTime);
+		somethingOptValues[i++] = Convert.ToSingle(gridWidth);
+		somethingOptValues[i++] = Convert.ToSingle(currentWood != null);
+		somethingOptValues[i++] = Convert.ToSingle(currentCovers != null);
+		somethingOptValues[i++] = Convert.ToSingle(shadedSquare != null);
+		somethingOptValues[i++] = Convert.ToSingle(shadeVal != null);
+		somethingOptValues[i++] = Convert.ToSingle(state);
+		if (shadeVal != null){
+			somethingOptValues[i++] = Convert.ToSingle(shadeVal.GetValue());
+			somethingOptValues[i++] = Convert.ToSingle(shadeVal.GetDesValue());
+		}
+		
+	}
+	
+	void TestIfSomethingHasChanged(){
+		if (topologyHasChanged || transformHasChanged ||valuesHaveChanged){
+			somethingHasChanged = true;
+			ResetSomethingValues();
+			return;
+		}
+		
+		int i = 0;
+		bool diff = false;
+		diff = diff || !MathUtils.FP.Feq (somethingOptValues[i++], Convert.ToSingle(horizontalFirst));
+		diff = diff || !MathUtils.FP.Feq (somethingOptValues[i++], Convert.ToSingle(completeWaitTime));
+		diff = diff || !MathUtils.FP.Feq (somethingOptValues[i++], Convert.ToSingle(gridWidth));
+		diff = diff || !MathUtils.FP.Feq (somethingOptValues[i++], Convert.ToSingle(currentWood != null));
+		diff = diff || !MathUtils.FP.Feq (somethingOptValues[i++], Convert.ToSingle(currentCovers != null));
+		diff = diff || !MathUtils.FP.Feq (somethingOptValues[i++], Convert.ToSingle(shadedSquare != null));
+		diff = diff || !MathUtils.FP.Feq (somethingOptValues[i++], Convert.ToSingle(shadeVal != null));
+		diff = diff || !MathUtils.FP.Feq (somethingOptValues[i++], Convert.ToSingle(state));
+		if (shadeVal != null){
+			diff = diff || !MathUtils.FP.Feq (somethingOptValues[i++], Convert.ToSingle(shadeVal.GetValue()));
+			diff = diff || !MathUtils.FP.Feq (somethingOptValues[i++], Convert.ToSingle(shadeVal.GetDesValue()));
+		}
+		
+		if (diff){
+			somethingHasChanged = true;
+			ResetSomethingValues();
+		}
+		
+		
+	}
 	
 	// This must be reset at the beginning of each GameUpdate frame
 	public void ResetOptFlags(){
-		boardHasChanged = false;
+		topologyHasChanged = false;
+		transformHasChanged = false;
+		valuesHaveChanged = false;
+		somethingHasChanged = false;
 	}
 	
 	public void Serialise(BinaryWriter bw){
 		bw.Write (kLoadSaveVersion);
+		bw.Write (somethingHasChanged);
 		
-		bw.Write (transform.localPosition);
-		bw.Write (transform.localRotation);
-		bw.Write (transform.localScale);
+		if (!somethingHasChanged) return;
 		
-		bw.Write (renderBackwards);
-		bw.Write (currentTarget != null);
-		if (currentTarget != null){
-			currentTarget.Serialise(bw);
+		bw.Write (transformHasChanged);
+		if (transformHasChanged){
+			bw.Write (transform.localPosition);
+			bw.Write (transform.localRotation);
+			bw.Write (transform.localScale);
 		}
-		bw.Write (displayTarget != null);
-		if (displayTarget != null){
-			displayTarget.Serialise(bw);
-		}
-
+			
+//		bw.Write (renderBackwards);
+//		bw.Write (currentTarget != null);
+//		if (currentTarget != null){
+//			currentTarget.Serialise(bw);
+//		}
+//		bw.Write (displayTarget != null);
+//		if (displayTarget != null){
+//			displayTarget.Serialise(bw);
+//		}
+		
 		bw.Write (horizontalFirst);
 		bw.Write (completeWaitTime);
 		bw.Write (gridWidth);
-		
-		bw.Write (displayToCoversMapping != null);
-		if (displayToCoversMapping != null){
-			bw.Write (displayToCoversMapping.Length);
-			for (int i = 0; i < displayToCoversMapping.Length; ++i){
-				bw.Write (displayToCoversMapping[i]);
-			}
-		}
-		bw.Write (boardHasChanged);
+//		
+//		bw.Write (displayToCoversMapping != null);
+//		if (displayToCoversMapping != null){
+//			bw.Write (displayToCoversMapping.Length);
+//			for (int i = 0; i < displayToCoversMapping.Length; ++i){
+//				bw.Write (displayToCoversMapping[i]);
+//			}
+//		}
+		bw.Write (topologyHasChanged);
 		bw.Write (currentWood != null);
 		if (currentWood != null){
-			bw.Write (currentWood.Length);
-			if (boardHasChanged){
-				for (int i = 0; i < currentWood.Length; ++i){
-					bw.Write (currentWood[i].name);
-				}
+			if (topologyHasChanged){
+				bw.Write (currentWood[0].name);
 			}
-			for (int i = 0; i < currentWood.Length; ++i){
-				bw.Write (currentWood[i].transform.localPosition);
-				bw.Write (currentWood[i].transform.localRotation);
-				bw.Write (currentWood[i].transform.localScale);
-			}
+			
 		}
 		
 		bw.Write (currentCovers != null);
 		if (currentCovers != null){
 			bw.Write (currentCovers.Length);
-			if (boardHasChanged){
+			if (topologyHasChanged){
 				for (int i = 0; i < currentCovers.Length; ++i){
 					bw.Write (currentCovers[i].name);
 				}
 			}
-			for (int i = 0; i < currentCovers.Length; ++i){
-				bw.Write (currentCovers[i].transform.localPosition);
-				bw.Write (currentCovers[i].transform.localRotation);
-				bw.Write (currentCovers[i].transform.localScale);
+			bw.Write (valuesHaveChanged);
+			if (valuesHaveChanged){
+				for (int i = 0; i < currentCovers.Length; ++i){
+					bw.Write (currentCovers[i].transform.localPosition);
+					bw.Write (currentCovers[i].transform.localRotation);
+					bw.Write (currentCovers[i].transform.localScale);
+				}
 			}
 		}
 		
 		bw.Write (shadedSquare != null);
-		if (shadedSquare != null){
-			bw.Write (shadedSquare.transform.localPosition);
-			bw.Write (shadedSquare.transform.localRotation);
-			bw.Write (shadedSquare.transform.localScale);
-		}
+
 		bw.Write (shadeVal != null);
 		if (shadeVal != null){
 			shadeVal.Serialise(bw);
@@ -147,51 +278,59 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		int version = br.ReadInt32();
 		switch (version){
 			case kLoadSaveVersion:{
-				transform.localPosition = br.ReadVector3 ();
-				transform.localRotation = br.ReadQuaternion ();
-				transform.localScale = br.ReadVector3 ();
-				
+				somethingHasChanged = br.ReadBoolean();
+				if (!somethingHasChanged){
+					break;
+				}
 			
-				renderBackwards = br.ReadBoolean();
-				bool hasCurrentTarget = br.ReadBoolean();
-				if (hasCurrentTarget){
-					currentTarget = new AVOWCircuitTarget();
-					currentTarget.Deserialise(br);
-				}
-				else{
-					currentTarget = null;
+				transformHasChanged = br.ReadBoolean();
+				if (transformHasChanged){
+					transform.localPosition = br.ReadVector3 ();
+					transform.localRotation = br.ReadQuaternion ();
+					transform.localScale = br.ReadVector3 ();
 				}
 				
-				bool hasDisplayTarget = br.ReadBoolean();
-				if (hasDisplayTarget){
-					displayTarget = new AVOWCircuitTarget();
-					displayTarget.Deserialise(br);
-				}
-				else{
-					displayTarget = null;
-				}
-					
+				
+//				renderBackwards = br.ReadBoolean();
+//				bool hasCurrentTarget = br.ReadBoolean();
+//				if (hasCurrentTarget){
+//					currentTarget = new AVOWCircuitTarget();
+//					currentTarget.Deserialise(br);
+//				}
+//				else{
+//					currentTarget = null;
+//				}
+//				
+//				bool hasDisplayTarget = br.ReadBoolean();
+//				if (hasDisplayTarget){
+//					displayTarget = new AVOWCircuitTarget();
+//					displayTarget.Deserialise(br);
+//				}
+//				else{
+//					displayTarget = null;
+//				}
+				
 				horizontalFirst = br.ReadBoolean ();
 				completeWaitTime = br.ReadSingle();
 				gridWidth = br.ReadSingle();
-			
-				bool hasMapping = br.ReadBoolean();
-				if (hasMapping){
-					int size = br.ReadInt32 ();
-					if (displayToCoversMapping == null || displayToCoversMapping.Length != size){
-				    	displayToCoversMapping = new int[size];
-				    }
-					for (int i = 0; i < size; ++i){
-						displayToCoversMapping[i] = br.ReadInt32();
-					}
-				}
-				else{
-					displayToCoversMapping = null;
-				}
 				
-				boardHasChanged = br.ReadBoolean();
-				if (boardHasChanged){
-					if (boardHasChanged){
+//				bool hasMapping = br.ReadBoolean();
+//				if (hasMapping){
+//					int size = br.ReadInt32 ();
+//					if (displayToCoversMapping == null || displayToCoversMapping.Length != size){
+//						displayToCoversMapping = new int[size];
+//					}
+//					for (int i = 0; i < size; ++i){
+//						displayToCoversMapping[i] = br.ReadInt32();
+//					}
+//				}
+//				else{
+//					displayToCoversMapping = null;
+//				}
+				
+				topologyHasChanged = br.ReadBoolean();
+				if (topologyHasChanged){
+					if (topologyHasChanged){
 						if (currentWood != null){
 							foreach (GameObject go in currentWood){
 								GameObject.Destroy(go);
@@ -203,27 +342,14 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 				}
 				bool hasWood = br.ReadBoolean ();
 				if (hasWood){
-					int size = br.ReadInt32 ();
-					if (boardHasChanged){
-						currentWood = new GameObject[size];
-						for (int i = 0; i < size; ++i){
-							string name = br.ReadString();
-							currentWood[i] = GameObject.Instantiate(woodPrefabs[Convert.ToInt32(name)]);
-						}
-						
-					}
-					
-					for (int i = 0; i < size; ++i){
-
-						currentWood[i].transform.parent = transform;
-						currentWood[i].transform.localPosition = br.ReadVector3();
-						currentWood[i].transform.localRotation = br.ReadQuaternion();
-						currentWood[i].transform.localScale = br.ReadVector3();
+					if (topologyHasChanged){
+						string name = br.ReadString();
+						ConstructGrid(Convert.ToInt32(name));
 					}
 				}
 				
-					
-				if (boardHasChanged){
+				
+				if (topologyHasChanged){
 					if (currentCovers != null){
 						foreach (GameObject go in currentCovers){
 							GameObject.Destroy(go);
@@ -231,24 +357,27 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 						currentCovers = null;
 					}			
 				}
-					
-	
+				
+				
 				bool hasCovers = br.ReadBoolean ();
 				if (hasCovers){
 					int size = br.ReadInt32 ();
-					if (boardHasChanged){
+					if (topologyHasChanged){
 						currentCovers = new GameObject[size];
 						for (int i = 0; i < size; ++i){
 							string name = br.ReadString();
 							currentCovers[i] = GameObject.Instantiate(coverPrefabs[Convert.ToInt32(name)]);
 						}
-				}
-				for (int i = 0; i < size; ++i){
-						
-						currentCovers[i].transform.parent = transform;
-						currentCovers[i].transform.localPosition = br.ReadVector3();
-						currentCovers[i].transform.localRotation = br.ReadQuaternion();
-						currentCovers[i].transform.localScale = br.ReadVector3();
+					}
+					valuesHaveChanged = br.ReadBoolean();
+					if (valuesHaveChanged){
+					    for (int i = 0; i < size; ++i){
+							
+							currentCovers[i].transform.parent = transform;
+							currentCovers[i].transform.localPosition = br.ReadVector3();
+							currentCovers[i].transform.localRotation = br.ReadQuaternion();
+							currentCovers[i].transform.localScale = br.ReadVector3();
+						}
 					}
 				}
 				
@@ -258,14 +387,14 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 					GameObject.Destroy(shadedSquare);
 				}
 				else if (hasShadedSquare && shadedSquare == null){
-					shadedSquare = GameObject.Instantiate(shadedPrefab);
+					ConstructShadedSquare();
 				}
-				if (hasShadedSquare){
-					shadedSquare.transform.parent = transform;
-					shadedSquare.transform.localPosition = br.ReadVector3();
-					shadedSquare.transform.localRotation = br.ReadQuaternion();
-					shadedSquare.transform.localScale = br.ReadVector3();
-				}
+//				if (hasShadedSquare){
+//					shadedSquare.transform.parent = transform;
+//					shadedSquare.transform.localPosition = br.ReadVector3();
+//					shadedSquare.transform.localRotation = br.ReadQuaternion();
+//					shadedSquare.transform.localScale = br.ReadVector3();
+//				}
 				bool hasShadeVale = br.ReadBoolean();
 				if (hasShadeVale){
 					shadeVal = new SpringValue(0);
@@ -275,10 +404,11 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 					shadeVal = null;
 				}
 				
-
+				
 				state = (State)br.ReadInt32 ();;
 				break;
 			}
+
 		}
 	}
 	
@@ -350,7 +480,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public void ConstructBlankBoard(){
-		boardHasChanged = true;
+		topologyHasChanged = true;
 		if (currentWood != null){
 			foreach (GameObject go in currentWood){
 				GameObject.Destroy(go);
@@ -388,7 +518,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public void ConstructGrid(AVOWCircuitTarget target){
-		boardHasChanged = true;
+		topologyHasChanged = true;
 		
 		int division = target.lcm;
 		int width = target.widthInLCMs;
@@ -400,7 +530,10 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			gridWidth = target.totalCurrent;
 		}
 		
-		
+		ConstructGrid (division);
+	}
+	
+	public void ConstructGrid(int division){
 		if (currentWood != null){
 			foreach (GameObject go in currentWood){
 				GameObject.Destroy(go);
@@ -417,13 +550,17 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			currentWood[i].name = division.ToString();
 			
 		}
-		
+		ConstructShadedSquare();
+
+		shadeVal = new SpringValue(maxShade);
+		UpdateShadedSquare();
+	}
+	
+	void ConstructShadedSquare(){
 		shadedSquare = GameObject.Instantiate(shadedPrefab);
 		shadedSquare.transform.parent = transform;
 		shadedSquare.transform.localPosition = new Vector3(0, 0, -0.1f);
-		shadedSquare.transform.localScale = new Vector3(renderBackwards ? -numPanels : numPanels, 1, 1);
-		shadeVal = new SpringValue(maxShade);
-		UpdateShadedSquare();
+		shadedSquare.transform.localScale = new Vector3(renderBackwards ? -totalNumPanels : totalNumPanels, 1, 1);
 	}
 	
 	// This constructs a target which we can display given that our goal is "target" - our covers may not currently
@@ -575,7 +712,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public void CreateCovers(AVOWCircuitTarget target){
-		boardHasChanged = true;
+		topologyHasChanged = true;
 		displayTarget = target;
 		if (currentCovers != null){
 			foreach (GameObject go in currentCovers){
@@ -786,10 +923,10 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 				if (DroppingOff()) state = State.kReady;
 				break;
 			}
-			
-			
-			
 		}
+		TestIfTransformHasChanged();
+		TestIfCoverValuesHaveChanged();
+		TestIfSomethingHasChanged();
 	}
 	
 	bool UpdateMoveToTargetHorzontal(){

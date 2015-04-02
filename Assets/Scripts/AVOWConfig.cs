@@ -11,6 +11,7 @@ public class AVOWConfig : MonoBehaviour {
 	public bool showIndividuals = true;
 	public bool showObjectives = true;
 	public bool objectivesAsText = true;
+	public bool playbackEnable = true;
 
 	public bool  modifiedNodeLengths = false;
 	public float tutorialSpeed = 1;

@@ -1,36 +1,12 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWUpdateManager.cs">
+  <MonoDevelop.Ide.Workspace />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWBackStoryCutscene.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="4" Column="1" />
-      <File FileName="Assets/Scripts/AVOWObjectiveBoard.cs" Line="236" Column="30" />
-      <File FileName="Assets/Scripts/AVOWCircuitTarget.cs" Line="34" Column="3" />
-      <File FileName="Assets/Scripts/AVOWTelemetry.cs" Line="52" Column="31" />
-      <File FileName="Assets/Scripts/AVOWUpdateManager.cs" Line="55" Column="63" />
-      <File FileName="Assets/Scripts/AVOWUI.cs" Line="268" Column="1" />
-      <File FileName="Assets/Scripts/AVOWUITool.cs" Line="82" Column="33" />
-      <File FileName="Assets/Scripts/AVOWUICreateTool.cs" Line="125" Column="1" />
-      <File FileName="Assets/Scripts/AVOWUIDeleteTool.cs" Line="202" Column="3" />
-      <File FileName="Assets/Scripts/AVOWUIDisabledTool.cs" Line="42" Column="4" />
-      <File FileName="Assets/Scripts/AVOWGameModes.cs" Line="72" Column="1" />
-      <File FileName="Assets/Scripts/Telemetry.cs" Line="6" Column="1" />
-      <File FileName="Assets/Scripts/AVOWObjectiveGrid.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWTutorialManager.cs" Line="243" Column="64" />
-      <File FileName="Assets/Scripts/AVOWTutorialText.cs" Line="50" Column="5" />
-      <File FileName="Assets/Scripts/AVOWConfig.cs" Line="137" Column="20" />
-      <File FileName="Assets/Scripts/AVOWObjectiveManager.cs" Line="92" Column="1" />
+      <File FileName="Assets/Scripts/AVOWObjectiveBoard.cs" Line="134" Column="3" />
+      <File FileName="Assets/Scripts/AVOWBackStoryCutscene.cs" Line="371" Column="24" />
+      <File FileName="Assets/Scripts/TextScaler.cs" Line="18" Column="1" />
+      <File FileName="Assets/Scripts/AVOWSideBar.cs" Line="4" Column="43" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="Assembly-CSharp" expanded="True">
-            <Node name="Scripts" expanded="True">
-              <Node name="AVOWUpdateManager.cs" selected="True" />
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

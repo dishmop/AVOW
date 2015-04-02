@@ -51,6 +51,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 		kCreateSeriesSquare1,
 		kCreateSeriesSquare2,
 		kCreateSeriesSquare3,
+		kCreateSeriesSquare3_NodeNode,
 		kConstructedSeries,
 		kCreateSeriesSquareLostGap,
 		kMakeFourthSquare,
@@ -687,7 +688,13 @@ public class AVOWTutorialManager : MonoBehaviour {
 				if (onEnterState){
 				}
 				if (AVOWUI.singleton.GetUITool().GetNumConnections() == 2){
-					state = State.kCreateSeriesSquare3;
+					if (AVOWUI.singleton.GetUITool().GetConnection(1).GetComponent<AVOWComponent>()){
+						state = State.kCreateSeriesSquare3;
+					}
+					else{
+						state = State.kCreateSeriesSquare3_NodeNode;
+					
+					}
 				}
 				if (AVOWGraph.singleton.GetNumConfirmedLoads() == 3){
 					state = State.kConstructedSeries;
@@ -695,6 +702,22 @@ public class AVOWTutorialManager : MonoBehaviour {
 	
 				break;
 			}	
+			case State.kCreateSeriesSquare3_NodeNode:{
+				if (onEnterState){
+					AVOWTutorialText.singleton.InterruptText("You tried to placed a square between two connection bars - You need to create one between a connection bar and an existing square.");
+					SetTextTrigger();
+				}
+				if (onTextTrigger){
+					state = State.kCreateSeriesSquare1;
+				}
+				if (AVOWUI.singleton.GetUITool().GetNumConnections() == 2){
+					if (AVOWUI.singleton.GetUITool().GetConnection(1).GetComponent<AVOWComponent>()){
+						state = State.kCreateSeriesSquare3;
+					}
+				}
+				break;
+			}
+				
 			case State.kCreateSeriesSquare3:{
 				if (onEnterState){
 					AVOWTutorialText.singleton.InterruptText("Good, now move me inside the gap and release the mouse button to fix the square in place.");

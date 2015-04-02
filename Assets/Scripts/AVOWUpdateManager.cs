@@ -20,6 +20,7 @@ public class AVOWUpdateManager : MonoBehaviour {
 	public GameObject camController;
 	public GameObject objectiveManager;
 	public GameObject telemetry;
+	public GameObject serverUpload;
 	public GameObject battery;
 	
 	public float playbackSpeed = 1;
@@ -36,14 +37,36 @@ public class AVOWUpdateManager : MonoBehaviour {
 	
 	}
 	
+	public long lastCount = 0;
+	
+	public long GetCountDelta(){
+		long thisCount = Telemetry.singleton.gZipOutStream.writeCount;
+		long thisDelta = thisCount - lastCount;
+		lastCount = thisCount;
+		return thisDelta;
+		
+	}
+	
 	// need to seralise the graph first becuase when we deserialise, we need to refernce objects whcih need to be thte
 	public void SerialiseGameState(BinaryWriter bw){
+		Debug.Log("SerialiseGameState: " + GetCountDelta());
 		config.GetComponent<AVOWConfig>().Serialise(bw);
+		Debug.Log("AVOWConfig: " + GetCountDelta());
+		
 		gameModes.GetComponent<AVOWGameModes>().Serialise(bw);
+		Debug.Log("AVOWGameModes: " + GetCountDelta());
+		
 		graph.GetComponent<AVOWGraph>().Serialise(bw);
+		Debug.Log("AVOWGraph: " + GetCountDelta());
+		
 		ui.GetComponent<AVOWUI>().Serialise(bw);
+		Debug.Log("AVOWUI: " + GetCountDelta());
+		
 		objectiveManager.GetComponent<AVOWObjectiveManager>().Serialise(bw);
+		Debug.Log("AVOWObjectiveManager: " + GetCountDelta());
+		
 		tutorialText.GetComponent<AVOWTutorialText>().Serialise(bw);
+		Debug.Log("AVOWTutorialText: " + GetCountDelta());
 	}
 	
 	public void DeserialiseGameState(BinaryReader br){
@@ -93,6 +116,9 @@ public class AVOWUpdateManager : MonoBehaviour {
 			AVOWTelemetry.singleton.WriteGameUpdateEvent();
 		}
 		telemetry.GetComponent<Telemetry>().GameUpdate();
+		if (!telemetry.GetComponent<Telemetry>().isRecording && !telemetry.GetComponent<Telemetry>().isPlaying){
+			serverUpload.GetComponent<ServerUpload>().GameUpdate();
+		}
 		
 		
 	}

@@ -18,6 +18,7 @@ public class AVOWTelemetry : MonoBehaviour, TelemetryListener{
 	}
 
 	public void WriteStartGoalEvent(int goalNum){
+		if (!Telemetry.singleton.enableTelemetry) return;
 		TelemEvent e = Telemetry.singleton.ConstructWriteEvent((int)AVOWEventType.kStartGoal, AVOWUpdateManager.singleton.GetGameTime());
 		BinaryWriter bw = new BinaryWriter(e.stream);
 		bw.Write(goalNum);
@@ -29,6 +30,7 @@ public class AVOWTelemetry : MonoBehaviour, TelemetryListener{
 	}
 	
 	public void WriteStartLevelEvent(int levelNum){
+		if (!Telemetry.singleton.enableTelemetry) return;
 		TelemEvent e = Telemetry.singleton.ConstructWriteEvent((int)AVOWEventType.kStartLevel, AVOWUpdateManager.singleton.GetGameTime());
 		BinaryWriter bw = new BinaryWriter(e.stream);
 		bw.Write(levelNum);
@@ -42,6 +44,7 @@ public class AVOWTelemetry : MonoBehaviour, TelemetryListener{
 	}
 	
 	public void WriteGameUpdateEvent(){
+		if (!Telemetry.singleton.enableTelemetry) return;
 		TelemEvent e = Telemetry.singleton.ConstructWriteEvent((int)AVOWEventType.kGameUpdate, AVOWUpdateManager.singleton.GetGameTime());
 		BinaryWriter bw = new BinaryWriter(e.stream);
 		AVOWUpdateManager.singleton.SerialiseGameState(bw);

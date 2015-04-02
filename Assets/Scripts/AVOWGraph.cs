@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System;
 
 public class AVOWGraph : MonoBehaviour {
 
@@ -29,7 +30,10 @@ public class AVOWGraph : MonoBehaviour {
 	
 
 	// Optmisation flags
-	bool hasTopologyChanged;
+	bool topologyHasChanged;
+	bool valuesHaveChanged;
+	
+	List<float>	optValues = new List<float>();
 	
 	
 	List<GameObject> componentsToRemove = new List<GameObject>();
@@ -44,8 +48,71 @@ public class AVOWGraph : MonoBehaviour {
 	
 	// This must be reset at the beginning of each GameUpdate frame
 	public void ResetOptFlags(){
-		hasTopologyChanged = false;
+		topologyHasChanged = false;
+		valuesHaveChanged = false;
 	}
+	
+	void ReassignOptValues(){
+		optValues = new List<float>();
+		for (int i = 0; i < allComponents.Count; ++i){
+			AVOWComponent component = allComponents[i].GetComponent<AVOWComponent>();
+			if (component.type == AVOWComponent.Type.kLoad){
+				optValues.Add (component.resistanceAngle.GetValue());
+			}
+			else{
+				optValues.Add (component.voltage);
+			}
+			optValues.Add (Convert.ToSingle(component.isInteractive));
+			optValues.Add (Convert.ToSingle(component.showResistance));
+			
+		}
+		optValues.Add (xMax);
+	}
+	
+	void TestIfValuesHaveChanged(){
+		if (topologyHasChanged || optValues.Count != 3 * allComponents.Count+1){
+			valuesHaveChanged = true;
+			ReassignOptValues();
+			return;
+			
+		}
+
+		int optIndex = 0;
+		for (int i = 0; i < allComponents.Count; ++i){
+			AVOWComponent component = allComponents[i].GetComponent<AVOWComponent>();
+			bool diff = false;
+			if (component.type == AVOWComponent.Type.kLoad){
+				if (!MathUtils.FP.Feq (optValues[optIndex++], component.resistanceAngle.GetValue())){
+					diff = true;
+				}
+
+			}
+			else{
+				if (!MathUtils.FP.Feq (optValues[optIndex++], component.voltage)){
+					diff = true;
+				}
+			}
+			if (optValues[optIndex++] != Convert.ToSingle(component.isInteractive)){
+				diff = true;
+			}
+			if (optValues[optIndex++] != Convert.ToSingle(component.showResistance)){
+				diff = true;
+			}
+			if (diff){
+				valuesHaveChanged = true;
+				ReassignOptValues();
+				return;
+			
+			}
+		}
+		if (!MathUtils.FP.Feq (optValues[optIndex++], xMax)){
+			valuesHaveChanged = true;
+			ReassignOptValues();
+			return;
+		}
+		
+	}
+	
 	
 	// Serialise a pointer to either a component or a node
 	public void SerialiseRef(BinaryWriter bw, GameObject go){
@@ -94,8 +161,11 @@ public class AVOWGraph : MonoBehaviour {
 	
 	public void Serialise(BinaryWriter bw){
 		bw.Write (kLoadSaveVersion);
-		bw.Write (hasTopologyChanged);
-		if (hasTopologyChanged){
+		bw.Write (valuesHaveChanged);
+		if (!valuesHaveChanged) return;
+		
+		bw.Write (topologyHasChanged);
+		if (topologyHasChanged){
 			bw.Write (allComponents.Count);
 			for (int i = 0; i < allComponents.Count; ++i){
 				bw.Write ((int)allComponents[i].GetComponent<AVOWComponent>().type);
@@ -108,7 +178,7 @@ public class AVOWGraph : MonoBehaviour {
 		for (int i = 0; i < allNodes.Count; ++i){
 			allNodes[i].GetComponent<AVOWNode>().SerialiseData(bw);
 		}
-		if (hasTopologyChanged){
+		if (topologyHasChanged){
 			for (int i = 0; i < allComponents.Count; ++i){
 				allComponents[i].GetComponent<AVOWComponent>().SerialiseConnections(bw);
 			}
@@ -130,9 +200,13 @@ public class AVOWGraph : MonoBehaviour {
 		int version = br.ReadInt32();
 		switch (version){
 			case kLoadSaveVersion:{
-				hasTopologyChanged = br.ReadBoolean();
+				valuesHaveChanged = br.ReadBoolean();
+				if (!valuesHaveChanged){
+					break;
+				}
+				topologyHasChanged = br.ReadBoolean();
 			
-				if (hasTopologyChanged){
+				if (topologyHasChanged){
 					int numComponents = br.ReadInt32 ();
 					foreach (GameObject go in allComponents){
 						GameObject.Destroy (go);
@@ -162,7 +236,7 @@ public class AVOWGraph : MonoBehaviour {
 				
 			
 				int numNodes = br.ReadInt32 ();
-				if (hasTopologyChanged){
+				if (topologyHasChanged){
 					foreach (GameObject go in allNodes){
 						GameObject.Destroy (go);
 					}
@@ -178,7 +252,7 @@ public class AVOWGraph : MonoBehaviour {
 					allNodes[i].GetComponent<AVOWNode>().DeserialiseData(br);
 				}
 				
-				if (hasTopologyChanged){
+				if (topologyHasChanged){
 					for (int i = 0; i < allComponents.Count; ++i){
 						allComponents[i].GetComponent<AVOWComponent>().DeserialiseConnections(br);
 					}
@@ -201,13 +275,13 @@ public class AVOWGraph : MonoBehaviour {
 	}
 	
 	public void Initialise(){
-		hasTopologyChanged = false;
+		topologyHasChanged = false;
 	}
 	
 	
 	// Place an new component between two existing nodes
 	public void PlaceComponent(GameObject newGO, GameObject node0, GameObject node1){
-		hasTopologyChanged = true;
+		topologyHasChanged = true;
 
 		newGO.transform.parent = transform;
 		AVOWComponent newComponent = newGO.GetComponent<AVOWComponent>();
@@ -254,7 +328,7 @@ public class AVOWGraph : MonoBehaviour {
 			node0.GetComponent<AVOWNode>().components.Remove (obj);
 			node1.GetComponent<AVOWNode>().components.Remove (obj);
 			GameObject.Destroy(obj);
-			hasTopologyChanged = true;
+			topologyHasChanged = true;
 		}
 		
 		componentsToRemove.Clear();
@@ -262,7 +336,7 @@ public class AVOWGraph : MonoBehaviour {
 	}
 	
 	public void ClearCircuit(){
-		hasTopologyChanged = true;
+		topologyHasChanged = true;
 		foreach (GameObject go in allComponents){
 			GameObject.Destroy(go);
 		}
@@ -359,7 +433,7 @@ public class AVOWGraph : MonoBehaviour {
 	
 	
 	public GameObject AddNode(){
-		hasTopologyChanged = true;
+		topologyHasChanged = true;
 		GameObject newNodeGO = GameObject.Instantiate(nodePrefab);
 		newNodeGO.transform.parent = transform;
 		
@@ -584,6 +658,8 @@ public class AVOWGraph : MonoBehaviour {
 			xMin = 0;
 			xMax = Mathf.Abs (allComponents[0].GetComponent<AVOWComponent>().fwCurrent);
 		}
+		
+		TestIfValuesHaveChanged();
 	}
 	
 	

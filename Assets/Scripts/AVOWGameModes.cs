@@ -3,12 +3,13 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Text.RegularExpressions;
 
 public class AVOWGameModes : MonoBehaviour {
 	public static AVOWGameModes singleton = null;
 
 	public enum GameModeState{
-		kStartup,
+		kSplashScreen,
 		kMainMenu,
 		kPlayStage,
 		kStageComplete0,
@@ -24,6 +25,7 @@ public class AVOWGameModes : MonoBehaviour {
 	public GameObject mainMenuPanel;
 	public GameObject levelCompleteDlg;
 	public GameObject gameCompleteDlg;
+	public GameObject splashScreen;
 	public GameObject whitePanel;
 	public GameObject levelStartMsg;
 	public GameObject sidePanel;
@@ -37,7 +39,10 @@ public class AVOWGameModes : MonoBehaviour {
 	public float levelStartFadeInDuration;
 	public float levelStartFadeOutDuration;
 	
-	public GameModeState state = GameModeState.kMainMenu;
+	public GameModeState state = GameModeState.kSplashScreen;
+	
+	
+
 	
 	const int		kLoadSaveVersion = 1;	
 	
@@ -105,13 +110,37 @@ public class AVOWGameModes : MonoBehaviour {
 		backStory.SetActive(false);
 		SelectCamera(CameraChoice.kGameCam);
 		tutorialText.SetActive(true);
-		
-		
+		if (!Telemetry.singleton.enableTelemetry && state == GameModeState.kSplashScreen){
+			state = GameModeState.kMainMenu;
+		}
+		else{
+			OnActivateSplash();
+		}
+	}
+	
+	
+	void OnLeaveSplashScreen(){
+		string name = splashScreen.transform.FindChild("InputField").FindChild("Text").GetComponent<Text>().text;
+		string safeName = Regex.Replace(name, "[^A-Za-z0-9] ","-");	
+		PlayerPrefs.SetString(Telemetry.playerNameKey, safeName);
 		
 	}
 	
+	
+	
+		
+	void OnActivateSplash(){
+		if (PlayerPrefs.HasKey(Telemetry.playerNameKey)){
+			string name = PlayerPrefs.GetString(Telemetry.playerNameKey);
+			splashScreen.transform.FindChild("InputField").GetComponent<InputField>().text = name;
+		}
+//		if (splashScreen.transform.FindChild("InputField").FindChild("Text").GetComponent<Text>().text != ""){
+//			splashScreen.transform.FindChild("InputField").FindChild("Placeholder").GetComponent<Text>().enabled = false;
+//		}
+	}
+	
 	public int GetNumMainMenuButtons(){
-		return 12;
+		return AVOWConfig.singleton.playbackEnable ? 12 : 11;
 	}
 	
 	public int GetMinMainMenuButton(){
@@ -217,7 +246,7 @@ public class AVOWGameModes : MonoBehaviour {
 		sidePanel.transform.FindChild("ExcludeToggle").gameObject.SetActive(AVOWConfig.singleton.levelExcludeEdit);
 		sidePanel.transform.FindChild("ExcludeToggle").GetComponent<Text>().text = AVOWObjectiveManager.singleton.IsCurrentGoalExcluded() ? "Include Goal" : "Exclude Goal";
 		
-		
+		splashScreen.SetActive(state == GameModeState.kSplashScreen);
 		
 		HandleLevelStartMsg();
 		
@@ -277,7 +306,6 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	public void TriggerLevelStartMessage(){
 		levelStartMsgTime = AVOWUpdateManager.singleton.GetGameTime();
-		levelStartMsg.transform.FindChild ("LevelTitle").GetComponent<Text>().text = GetLevelName(currentLevel);
 	
 	}
 	
@@ -352,9 +380,6 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWCamControl.singleton.disableMovement = false;
 		AVOWConfig.singleton.tutDisableConnections = false;
 		greenBackground.GetComponent<AVOWGreenBackground>().MakeSmall();
-		
-		
-		
 	}
 	
 	void RestartTutorialGame(){
@@ -383,7 +408,7 @@ public class AVOWGameModes : MonoBehaviour {
 
 	
 	public bool IsTelemPlaybackLevel(int index){
-		return (index == GetNumMainMenuButtons() + GetMinMainMenuButton() - 1);
+		return (index == GetNumMainMenuButtons() + GetMinMainMenuButton() - 1) && AVOWConfig.singleton.playbackEnable;
 	}
 	
 
@@ -406,7 +431,7 @@ public class AVOWGameModes : MonoBehaviour {
 		currentLevel = levelNum;
 		
 		/// Sert up recoring
-		if (true){
+		if (Telemetry.singleton.enableTelemetry){
 			if (!Telemetry.singleton.isRecording){
 				Telemetry.singleton.StartRecording();
 			}
@@ -471,6 +496,8 @@ public class AVOWGameModes : MonoBehaviour {
 			Color msgCol = levelStartMsg.transform.FindChild ("Message").GetComponent<Text>().color;
 			msgCol.a = alpha;
 			levelStartMsg.transform.FindChild ("Message").GetComponent<Text>().color = msgCol;
+			levelStartMsg.transform.FindChild ("LevelTitle").GetComponent<Text>().text = GetLevelName(currentLevel);
+			
 		}
 	}
 	
@@ -506,6 +533,7 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWObjectiveManager.singleton.ToggleExcludeCurrentGoal();
 	}
 	
+	
 	public void GoToMain(){
 		backStory.SetActive(false);
 		
@@ -522,6 +550,9 @@ public class AVOWGameModes : MonoBehaviour {
 		}
 		if (Telemetry.singleton.mode == Telemetry.Mode.kPlayback && Telemetry.singleton.isPlaying){
 			Telemetry.singleton.StopPlayback();
+		}
+		if (state == GameModeState.kSplashScreen){
+			OnLeaveSplashScreen();
 		}
 		state = GameModeState.kMainMenu;
 	}

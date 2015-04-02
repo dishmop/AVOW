@@ -24,12 +24,16 @@ public class QuitOnEsc : MonoBehaviour {
 		
 		// Test for exit
 		if (Input.GetKeyDown (KeyCode.Escape)) {
+			if (Telemetry.singleton.isRecording){
+				Telemetry.singleton.StopRecording(AVOWUpdateManager.singleton.GetGameTime());
+			}
 			AppHelper.Quit();
 		}
 		
 		Vector3 mousePos = Input.mousePosition;
 		if (mousePos.x < Screen.width * AVOWConfig.singleton.GetSidePanelFrac() || 
-			AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kMainMenu || 
+			AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kSplashScreen || 
+		    AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kMainMenu || 
 		    AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kStageComplete3 ||
 		    AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kStageComplete4 ||
 		    AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kGameOver ){

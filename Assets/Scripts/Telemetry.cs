@@ -14,6 +14,7 @@ using System.Threading;
 public class DCOutputStream : ICSharpCode.SharpZipLib.GZip.GZipOutputStream{
 
 	public long writeCount = 0;
+	
 
 	
 
@@ -77,6 +78,7 @@ public class Telemetry : MonoBehaviour, TelemetryListener {
 	public static Telemetry singleton = null;
 	
 	public static string playerNameKey = "PlayerNameKey";
+	
 	public bool enableTelemetry;
 	public string gameName;
 	public string gameVersion = null;
@@ -200,7 +202,7 @@ public class Telemetry : MonoBehaviour, TelemetryListener {
 	
 	// The compressed stream
 	ICSharpCode.SharpZipLib.GZip.GZipInputStream  gZipInStream = null;
-	DCOutputStream  gZipOutStream = null;
+	public DCOutputStream  gZipOutStream = null;
 	
 	// The one we use to write data to
 	Stream		useStream = null;
@@ -696,7 +698,7 @@ public class Telemetry : MonoBehaviour, TelemetryListener {
 //	
 	
 	public static string GetPathName(){
-		return Application.persistentDataPath + "/LeccyTelemetry/";
+		return Application.persistentDataPath + "/AVOWTelemetry/";
 	}
 	
 	public static string BuildExtension(){
@@ -726,9 +728,9 @@ public class Telemetry : MonoBehaviour, TelemetryListener {
 		
 		
 		// Tempoerarily always use same filename
-		
-		writeFilename =  gameName + "_Debug" + BuildExtension();
-		writeFilenameFinal =  gameName + "_Debug" + BuildFinalExtension();
+//		
+//		writeFilename =  gameName + "_Debug" + BuildExtension();
+//		writeFilenameFinal =  gameName + "_Debug" + BuildFinalExtension();
 	}
 	
 	void RenameFiletoFinal(){

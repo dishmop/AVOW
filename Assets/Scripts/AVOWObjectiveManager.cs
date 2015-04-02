@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System;
 
 public class AVOWObjectiveManager : MonoBehaviour {
 
@@ -43,6 +44,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	int currentGoalIndex = -1;
 	int currentLevel = -1;
 	
+	float[] optValues = new float[13];
+	bool valuesHaveChanged;
+		
+	
 	
 	// Not serialised
 	bool initialisedLimitsOnly;
@@ -69,11 +74,11 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			boards[0].GetComponent<AVOWObjectiveBoard>().ResetOptFlags();
 			boards[1].GetComponent<AVOWObjectiveBoard>().ResetOptFlags();
 		}
+		valuesHaveChanged = false;
 	}
 	
 	public void Serialise(BinaryWriter bw){
 		bw.Write (kLoadSaveVersion);
-		bw.Write (firstUpdate);
 		
 		bw.Write (boards[0] != null);
 		if (boards[0] != null){
@@ -81,20 +86,24 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			boards[1].GetComponent<AVOWObjectiveBoard>().Serialise(bw);
 		}
 		
-		bw.Write (frontIndex);
-		bw.Write (backIndex);
-		bw.Write (waitTime);
-		bw.Write (numBoardsToUnstack);
-		bw.Write (hasMovedToRow);
-		bw.Write ((int)layoutMode);
-		bw.Write (backBoardDepth);
-		bw.Write (frontBoardDepth);
-		
-		bw.Write (resistorLimit);
-		bw.Write (currentGoalIndex);
-	   	bw.Write (currentLevel);
-		
-		bw.Write ((int)state);
+		bw.Write (valuesHaveChanged);
+		if (valuesHaveChanged){
+			bw.Write (firstUpdate);
+			bw.Write (frontIndex);
+			bw.Write (backIndex);
+			bw.Write (waitTime);
+			bw.Write (numBoardsToUnstack);
+			bw.Write (hasMovedToRow);
+			bw.Write ((int)layoutMode);
+			bw.Write (backBoardDepth);
+			bw.Write (frontBoardDepth);
+			
+			bw.Write (resistorLimit);
+			bw.Write (currentGoalIndex);
+		   	bw.Write (currentLevel);
+			
+			bw.Write ((int)state);
+		}
 	}
 	
 	public void Deserialise(BinaryReader br){
@@ -102,7 +111,6 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		int version = br.ReadInt32();
 		switch (version){
 			case kLoadSaveVersion:{
-				firstUpdate = br.ReadBoolean();
 				bool hasBoards = br.ReadBoolean();
 				if (hasBoards && boards[0] == null){
 					ConstructBoards();
@@ -119,22 +127,72 @@ public class AVOWObjectiveManager : MonoBehaviour {
 					boards[1].GetComponent<AVOWObjectiveBoard>().Deserialise(br);
 				}
 				
-				frontIndex = 			br.ReadInt32();
-				backIndex = 			br.ReadInt32();
-				waitTime = 				br.ReadSingle();
-				numBoardsToUnstack = 	br.ReadInt32();
-				hasMovedToRow = 		br.ReadBoolean();
-				layoutMode = 			(AVOWObjectiveBoard.LayoutMode)br.ReadInt32();
-				backBoardDepth = 		br.ReadSingle();
-				frontBoardDepth = 		br.ReadSingle();		
-				resistorLimit = 		br.ReadInt32();
-				currentGoalIndex = 		br.ReadInt32();
-				currentLevel = 			br.ReadInt32();
-				state = 				(State)br.ReadInt32 ();
+				valuesHaveChanged = 	br.ReadBoolean();
+				if (valuesHaveChanged){
+					firstUpdate = 			br.ReadBoolean();
+					frontIndex = 			br.ReadInt32();
+					backIndex = 			br.ReadInt32();
+					waitTime = 				br.ReadSingle();
+					numBoardsToUnstack = 	br.ReadInt32();
+					hasMovedToRow = 		br.ReadBoolean();
+					layoutMode = 			(AVOWObjectiveBoard.LayoutMode)br.ReadInt32();
+					backBoardDepth = 		br.ReadSingle();
+					frontBoardDepth = 		br.ReadSingle();		
+					resistorLimit = 		br.ReadInt32();
+					currentGoalIndex = 		br.ReadInt32();
+					currentLevel = 			br.ReadInt32();
+					state = 				(State)br.ReadInt32 ();
+				}
 
 				break;
 			}
 		}
+	}
+	
+	void ResetOptValues(){
+		int i = 0;
+		optValues[i++] = Convert.ToSingle(firstUpdate);
+		optValues[i++] = Convert.ToSingle(frontIndex);
+		optValues[i++] = Convert.ToSingle(backIndex);
+		optValues[i++] = Convert.ToSingle(waitTime);
+		optValues[i++] = Convert.ToSingle(numBoardsToUnstack);
+		optValues[i++] = Convert.ToSingle(hasMovedToRow);
+		optValues[i++] = Convert.ToSingle(layoutMode);
+		optValues[i++] = Convert.ToSingle(backBoardDepth);
+		optValues[i++] = Convert.ToSingle(frontBoardDepth);
+		optValues[i++] = Convert.ToSingle(resistorLimit);
+		optValues[i++] = Convert.ToSingle(currentGoalIndex);
+		optValues[i++] = Convert.ToSingle(currentLevel);
+		optValues[i++] = Convert.ToSingle(state);
+
+			
+	}
+	
+	
+	void TestIfValuesHaveChanged(){
+		bool diff = false;
+		int i = 0;
+		diff = diff || (!MathUtils.FP.Feq (optValues[i++], Convert.ToSingle(firstUpdate)));
+		diff = diff || (!MathUtils.FP.Feq (optValues[i++], Convert.ToSingle(frontIndex)));
+		diff = diff || (!MathUtils.FP.Feq (optValues[i++], Convert.ToSingle(backIndex)));
+		diff = diff || (!MathUtils.FP.Feq (optValues[i++], Convert.ToSingle(waitTime)));
+		diff = diff || (!MathUtils.FP.Feq (optValues[i++], Convert.ToSingle(numBoardsToUnstack)));
+		diff = diff || (!MathUtils.FP.Feq (optValues[i++], Convert.ToSingle(hasMovedToRow)));
+		diff = diff || (!MathUtils.FP.Feq (optValues[i++], Convert.ToSingle(layoutMode)));
+		diff = diff || (!MathUtils.FP.Feq (optValues[i++], Convert.ToSingle(backBoardDepth)));
+		diff = diff || (!MathUtils.FP.Feq (optValues[i++], Convert.ToSingle(frontBoardDepth)));
+		diff = diff || (!MathUtils.FP.Feq (optValues[i++], Convert.ToSingle(resistorLimit)));
+		diff = diff || (!MathUtils.FP.Feq (optValues[i++], Convert.ToSingle(currentGoalIndex)));
+		diff = diff || (!MathUtils.FP.Feq (optValues[i++], Convert.ToSingle(currentLevel)));
+		diff = diff || (!MathUtils.FP.Feq (optValues[i++], Convert.ToSingle(state)));
+		
+		
+		//also want to force the firs ttime through to update everytthing
+		if (diff){
+			valuesHaveChanged = true;
+			ResetOptValues();
+		}
+		
 	}
 	
 	
@@ -142,7 +200,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	public int GetResistorLimit(){
 		return resistorLimit;
 	}
-	
+		
 	
 	public float GetMinX(){
 	
@@ -573,6 +631,8 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		for (int i = 0; i < 2; ++i){
 			boards[i].GetComponent<AVOWObjectiveBoard>().GameUpdate();
 		}
+		
+		TestIfValuesHaveChanged();
 		
 	}
 

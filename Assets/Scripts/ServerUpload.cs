@@ -28,7 +28,7 @@ public class ServerUpload : MonoBehaviour {
 	State state = State.kStartup;
 	float waitStartTime;
 	
-	string uploadURL = "http://toby.eng.cam.ac.uk/leccy/upload.php";
+	string uploadURL = "http://toby.eng.cam.ac.uk/avow/upload.php";
 	
 
 	// Call to check if it is OK to quit the application
@@ -178,6 +178,12 @@ public class ServerUpload : MonoBehaviour {
 	void FillFileList(){
 
 		// Fil the file list
+		if (!Directory.Exists(Telemetry.GetPathName())){
+			Directory.CreateDirectory(Telemetry.GetPathName());
+		}
+		if (!Directory.Exists(Telemetry.GetPathName() + Telemetry.errorPathName)){
+			Directory.CreateDirectory(Telemetry.GetPathName() + Telemetry.errorPathName);
+		}
 		DirectoryInfo dir = new DirectoryInfo(Telemetry.GetPathName());
 		FileInfo[] fileListFinal = dir.GetFiles("*" + Telemetry.BuildExtension());	
 		FileInfo[] fileListInt = dir.GetFiles("*" + Telemetry.BuildFinalExtension());
