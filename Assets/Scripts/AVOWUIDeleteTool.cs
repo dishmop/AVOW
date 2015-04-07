@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System;
 
 public class AVOWUIDeleteTool :  AVOWUITool{
 	
@@ -40,6 +41,138 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 	float					minLerpSpeed = 0f;
 	float 					insideLerpSpeed;
 	
+	bool valuesHaveChanged;
+	float[] optValues = new float[100];
+	
+	void ResetOptValues(){
+		
+		int i = 0;
+
+		optValues[i++] = Convert.ToSingle (connectionGO != null ? connectionGO.GetInstanceID() : 0);
+		optValues[i++] = Convert.ToSingle (connectionPos[0]);
+		optValues[i++] = Convert.ToSingle (connectionPos[1]);
+		optValues[i++] = Convert.ToSingle (connectionPos[2]);
+		optValues[i++] = Convert.ToSingle (heldConnection);
+		
+		optValues[i++] = Convert.ToSingle (heldGapCommand != null);
+		optValues[i++] = Convert.ToSingle (heldGapConnection != null ? heldGapConnection.GetInstanceID() : 0);
+		optValues[i++] = Convert.ToSingle (mouseWorldPos[0]);
+		optValues[i++] = Convert.ToSingle (mouseWorldPos[1]);
+		optValues[i++] = Convert.ToSingle (mouseWorldPos[2]);
+		
+		optValues[i++] = Convert.ToSingle (cursorCube != null);
+		if (cursorCube != null){
+			optValues[i++] = Convert.ToSingle (cursorCube.transform.localPosition[0]);
+			optValues[i++] = Convert.ToSingle (cursorCube.transform.localPosition[1]);
+			optValues[i++] = Convert.ToSingle (cursorCube.transform.localPosition[2]);
+			
+			optValues[i++] = Convert.ToSingle (cursorCube.transform.localScale[0]);
+			optValues[i++] = Convert.ToSingle (cursorCube.transform.localScale[1]);
+			optValues[i++] = Convert.ToSingle (cursorCube.transform.localScale[2]);
+			
+		}
+		
+		// We only look at a few bits of info about the lightening
+		optValues[i++] = Convert.ToSingle (lightening0GO != null);
+		if (lightening0GO != null){
+			optValues[i++] = Convert.ToSingle (lightening0GO.GetComponent<Lightening>().startPoint[0]);
+			optValues[i++] = Convert.ToSingle (lightening0GO.GetComponent<Lightening>().startPoint[1]);
+			optValues[i++] = Convert.ToSingle (lightening0GO.GetComponent<Lightening>().startPoint[2]);
+			
+			optValues[i++] = Convert.ToSingle (lightening0GO.GetComponent<Lightening>().endPoint[0]);
+			optValues[i++] = Convert.ToSingle (lightening0GO.GetComponent<Lightening>().endPoint[1]);
+			optValues[i++] = Convert.ToSingle (lightening0GO.GetComponent<Lightening>().endPoint[2]);
+		}
+		
+		// We only look at a few bits of info about the lightening
+		optValues[i++] = Convert.ToSingle (lightening1GO != null);
+		if (lightening1GO != null){
+			optValues[i++] = Convert.ToSingle (lightening1GO.GetComponent<Lightening>().startPoint[0]);
+			optValues[i++] = Convert.ToSingle (lightening1GO.GetComponent<Lightening>().startPoint[1]);
+			optValues[i++] = Convert.ToSingle (lightening1GO.GetComponent<Lightening>().startPoint[2]);
+			
+			optValues[i++] = Convert.ToSingle (lightening1GO.GetComponent<Lightening>().endPoint[0]);
+			optValues[i++] = Convert.ToSingle (lightening1GO.GetComponent<Lightening>().endPoint[1]);
+			optValues[i++] = Convert.ToSingle (lightening1GO.GetComponent<Lightening>().endPoint[2]);
+		}
+		
+		optValues[i++] = Convert.ToSingle (isOutside);
+		optValues[i++] = Convert.ToSingle (insideState);
+		optValues[i++] = Convert.ToSingle (maxLerpSpeed);
+		optValues[i++] = Convert.ToSingle (minLerpSpeed);
+		optValues[i++] = Convert.ToSingle (insideLerpSpeed);
+				
+		
+	}
+	
+	
+	void TestIfValuesHaveChanged(){
+		int i = 0;
+		bool diff = false;
+		
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (connectionGO != null ? connectionGO.GetInstanceID() : 0));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (connectionPos[0]));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (connectionPos[1]));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (connectionPos[2]));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (heldConnection));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (heldGapCommand != null));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (heldGapConnection != null ? heldGapConnection.GetInstanceID() : 0));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (mouseWorldPos[0]));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (mouseWorldPos[1]));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (mouseWorldPos[2]));
+		
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube != null));
+		if (cursorCube != null){
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube.transform.localPosition[0]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube.transform.localPosition[1]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube.transform.localPosition[2]));
+			
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube.transform.localScale[0]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube.transform.localScale[1]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube.transform.localScale[2]));
+		}
+
+		// We only look at a few bits of info about the lightening
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening0GO != null));
+		if (lightening0GO != null){
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening0GO.GetComponent<Lightening>().startPoint[0]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening0GO.GetComponent<Lightening>().startPoint[1]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening0GO.GetComponent<Lightening>().startPoint[2]));
+			
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening0GO.GetComponent<Lightening>().endPoint[0]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening0GO.GetComponent<Lightening>().endPoint[1]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening0GO.GetComponent<Lightening>().endPoint[2]));
+		}
+		
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening1GO != null));
+		if (lightening1GO != null){
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening1GO.GetComponent<Lightening>().startPoint[0]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening1GO.GetComponent<Lightening>().startPoint[1]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening1GO.GetComponent<Lightening>().startPoint[2]));
+			
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening1GO.GetComponent<Lightening>().endPoint[0]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening1GO.GetComponent<Lightening>().endPoint[1]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (lightening1GO.GetComponent<Lightening>().endPoint[2]));
+		}
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (isOutside));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (insideState));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (maxLerpSpeed));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (minLerpSpeed));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (insideLerpSpeed));
+
+		if (diff){
+			valuesHaveChanged = true;
+			ResetOptValues();
+		}
+		
+	}
+	
+	
+	public override void ResetOptFlags(){
+		valuesHaveChanged = false;
+	}
+	
+	
 	
 	public override GameObject GetCursorCube(){
 		return cursorCube;
@@ -57,6 +190,9 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 	public override void Serialise(BinaryWriter bw){
 		base.Serialise(bw);
 		bw.Write (kLoadSaveVersion);
+		bw.Write (valuesHaveChanged);
+		if (!valuesHaveChanged) return;
+		
 		
 		AVOWGraph.singleton.SerialiseRef(bw, connectionGO);
 		
@@ -73,7 +209,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		bw.Write (cursorCube != null);
 		if (cursorCube != null){
 			bw.Write (cursorCube.transform.localPosition);
-			bw.Write (cursorCube.transform.localRotation);
+//			bw.Write (cursorCube.transform.localRotation);
 			bw.Write (cursorCube.transform.localScale);
 		}
 		bw.Write (lightening0GO != null);
@@ -102,6 +238,9 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		int version = br.ReadInt32();
 		switch (version){
 			case kLoadSaveVersion:{
+				valuesHaveChanged = br.ReadBoolean();
+				if (!valuesHaveChanged) break;
+				
 				connectionGO = AVOWGraph.singleton.DeseraliseRef(br);
 				connectionPos = br.ReadVector3 ();
 				heldConnection = br.ReadBoolean();
@@ -126,7 +265,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 				
 				if (cursorCube != null){
 					cursorCube.transform.localPosition = br.ReadVector3 ();
-					cursorCube.transform.localRotation = br.ReadQuaternion ();
+//					cursorCube.transform.localRotation = br.ReadQuaternion ();
 					cursorCube.transform.localScale = br.ReadVector3 ();
 				}
 				
@@ -224,11 +363,12 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 	}
 		
 	
-	public override void FixedUpdate () {
+	public override void GameUpdate () {
 		//		Debug.Log(Time.time + ": UICreateTool Update");
 		StateUpdate();
 		CommandsUpdate();
 		ResetButtonFlags();
+		TestIfValuesHaveChanged();
 		
 	}
 	

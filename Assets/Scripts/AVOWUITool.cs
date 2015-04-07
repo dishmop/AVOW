@@ -81,8 +81,9 @@ public class AVOWUITool{
 	
 	public virtual void Startup(){}
 	public virtual void RenderUpdate(){}
-	public virtual void FixedUpdate(){}
+	public virtual void GameUpdate(){}
 	public virtual void OnDestroy(){}
+	public virtual void ResetOptFlags(){}
 	
 	public virtual void Serialise(BinaryWriter bw){
 		bw.Write (kLoadSaveVersion);

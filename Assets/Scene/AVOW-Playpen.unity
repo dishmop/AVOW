@@ -2589,7 +2589,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AspectMode: 0
-  m_AspectRatio: 1.35838449
+  m_AspectRatio: 1.73598468
 --- !u!114 &689694817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2776,7 +2776,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &719476437
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5184,11 +5184,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22436484, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.x
-      value: -29.0598679
+      value: -47.0243759
       objectReference: {fileID: 0}
     - target: {fileID: 22474278, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.y
-      value: -4.57062674
+      value: -4.97503519
       objectReference: {fileID: 0}
     - target: {fileID: 22491496, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_LocalPosition.x
@@ -5857,11 +5857,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f34773e0172b4446190a06d46b8cfd7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ctrlDistMovedThreshold: 0
-  holdDistMovedThreshold: 0
-  timeoutTime: 0
+  ctrlDistMovedThreshold: 2
+  holdDistMovedThreshold: .75
+  timeoutTime: 20
   thresholdInOutGapCount: 0
-  largeCubeMul: 0
+  largeCubeMul: 10
 --- !u!4 &1404304742
 Transform:
   m_ObjectHideFlags: 0
@@ -6039,7 +6039,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11449800, guid: 096d17ed368bd4830afcec287da33923, type: 2}
       propertyPath: playbackFilename
-      value: AVOW_1_Diarmid_TestSize_20150402_122517_0358fb1c-94f2-4156-8c1a-61467582f9a2_e79f4ecd-a332-4543-bd87-55effaf9bdb1.telemetry
+      value: AVOW_1_BackFromWales_20150407_125854_0358fb1c-94f2-4156-8c1a-61467582f9a2_f2bd81dd-8887-4fd3-940a-546aafdee7a6.telemetry
       objectReference: {fileID: 0}
     - target: {fileID: 11449800, guid: 096d17ed368bd4830afcec287da33923, type: 2}
       propertyPath: enableTelemetry
@@ -7191,7 +7191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa0240f90c59d45feb822ae6cdb6997a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numLinesToFit: 0
+  numLinesToFit: 1
   sizeGO: {fileID: 2016884029}
 --- !u!1 &2039787096
 GameObject:
@@ -7680,7 +7680,7 @@ Prefab:
       objectReference: {fileID: 1813380714}
     - target: {fileID: 22474278, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.y
-      value: -4.57062387
+      value: -4.97503281
       objectReference: {fileID: 0}
     - target: {fileID: 22436484, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_AnchorMax.x
@@ -7692,7 +7692,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22436484, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.x
-      value: -29.059845
+      value: -47.0243912
       objectReference: {fileID: 0}
     - target: {fileID: 199004, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_Name

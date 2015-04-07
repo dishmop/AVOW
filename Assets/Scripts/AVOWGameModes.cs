@@ -432,10 +432,10 @@ public class AVOWGameModes : MonoBehaviour {
 		
 		/// Sert up recoring
 		if (Telemetry.singleton.enableTelemetry){
-			if (!Telemetry.singleton.isRecording){
+			if (!Telemetry.singleton.isRecording && currentLevel != kBackStoryIndex){
 				Telemetry.singleton.StartRecording();
 			}
-			AVOWTelemetry.singleton.WriteStartLevelEvent(currentLevel);
+			if (Telemetry.singleton.isRecording) AVOWTelemetry.singleton.WriteStartLevelEvent(currentLevel);
 		}
 		
 		if (currentLevel > 0){

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System;
 
 public class AVOWUIDisabledTool :  AVOWUITool{
 	
@@ -12,6 +13,66 @@ public class AVOWUIDisabledTool :  AVOWUITool{
 	GameObject 				cursorCube;
 	
 	const int		kLoadSaveVersion = 1;	
+	
+	
+	bool valuesHaveChanged;
+	float[] optValues = new float[100];
+	
+	void ResetOptValues(){
+		
+		int i = 0;
+		
+		optValues[i++] = Convert.ToSingle (mouseWorldPos[0]);
+		optValues[i++] = Convert.ToSingle (mouseWorldPos[1]);
+		optValues[i++] = Convert.ToSingle (mouseWorldPos[2]);
+		
+		optValues[i++] = Convert.ToSingle (cursorCube != null);
+		if (cursorCube != null){
+			optValues[i++] = Convert.ToSingle (cursorCube.transform.localPosition[0]);
+			optValues[i++] = Convert.ToSingle (cursorCube.transform.localPosition[1]);
+			optValues[i++] = Convert.ToSingle (cursorCube.transform.localPosition[2]);
+			
+			optValues[i++] = Convert.ToSingle (cursorCube.transform.localScale[0]);
+			optValues[i++] = Convert.ToSingle (cursorCube.transform.localScale[1]);
+			optValues[i++] = Convert.ToSingle (cursorCube.transform.localScale[2]);
+			
+		}
+		
+	}
+	
+	
+	void TestIfValuesHaveChanged(){
+		int i = 0;
+		bool diff = false;
+		
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (mouseWorldPos[0]));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (mouseWorldPos[1]));
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (mouseWorldPos[2]));
+		
+		diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube != null));
+		if (cursorCube != null){
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube.transform.localPosition[0]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube.transform.localPosition[1]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube.transform.localPosition[2]));
+			
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube.transform.localScale[0]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube.transform.localScale[1]));
+			diff = diff || !MathUtils.FP.Feq (optValues[i++], Convert.ToSingle (cursorCube.transform.localScale[2]));
+		}
+		
+		if (diff){
+			valuesHaveChanged = true;
+			ResetOptValues();
+		}
+		
+	}
+	
+	
+	public override void ResetOptFlags(){
+		valuesHaveChanged = false;
+	}
+	
+	
 	
 	public override void Startup(){
 		cursorCube = InstantiateCursorCube();
@@ -32,38 +93,59 @@ public class AVOWUIDisabledTool :  AVOWUITool{
 	}
 	
 	public override void Serialise(BinaryWriter bw){
+		bw.Write (kLoadSaveVersion);
+		bw.Write (valuesHaveChanged);
+		if (!valuesHaveChanged) return;
+		
 		bw.Write (mouseWorldPos);
 		
 		bw.Write (cursorCube != null);
 		if (cursorCube != null){
 			bw.Write (cursorCube.transform.localPosition);
-			bw.Write (cursorCube.transform.localRotation);
 			bw.Write (cursorCube.transform.localScale);
 		}
 		
 	}
 	
 	public override void Deserialise(BinaryReader br){
-		mouseWorldPos = br.ReadVector3();
+		int version = br.ReadInt32 ();
 		
-		bool hasCursorCube = br.ReadBoolean();
-		if (hasCursorCube && cursorCube == null){
-			cursorCube = InstantiateCursorCube();
-		}
-		else if (!hasCursorCube && cursorCube != null){
-			GameObject.Destroy(cursorCube);
-			cursorCube = null;
+		switch (version){
+			case kLoadSaveVersion:{
+				valuesHaveChanged = br.ReadBoolean();
+				
+				if (!valuesHaveChanged) break;
+				
+				mouseWorldPos = br.ReadVector3();
+			
+				bool hasCursorCube = br.ReadBoolean();
+				if (hasCursorCube && cursorCube == null){
+					cursorCube = InstantiateCursorCube();
+				}
+				else if (!hasCursorCube && cursorCube != null){
+					GameObject.Destroy(cursorCube);
+					cursorCube = null;
+				}
+				
+				if (cursorCube != null){
+					cursorCube.transform.localPosition = br.ReadVector3 ();
+			//		cursorCube.transform.localRotation = br.ReadQuaternion ();
+					cursorCube.transform.localScale = br.ReadVector3 ();
+				}
+				break;
+			
+			}
 		}
 		
-		if (cursorCube != null){
-			cursorCube.transform.localPosition = br.ReadVector3 ();
-			cursorCube.transform.localRotation = br.ReadQuaternion ();
-			cursorCube.transform.localScale = br.ReadVector3 ();
-		}
+
 	}
 	
 	
-
+	public override void GameUpdate () {
+		//		Debug.Log(Time.time + ": UICreateTool Update");
+		TestIfValuesHaveChanged();
+		
+	}
 
 	
 	public override void RenderUpdate () {

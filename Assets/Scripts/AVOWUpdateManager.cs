@@ -101,6 +101,7 @@ public class AVOWUpdateManager : MonoBehaviour {
 		if (!telemetry.GetComponent<Telemetry>().isPlaying){
 			graph.GetComponent<AVOWGraph>().ResetOptFlags();
 			objectiveManager.GetComponent<AVOWObjectiveManager>().ResetOptFlags();
+			ui.GetComponent<AVOWUI>().ResetOptFlags();
 			
 			ui.GetComponent<AVOWUI>().GameUpdate();
 			gameModes.GetComponent<AVOWGameModes>().GameUpdate();
@@ -131,6 +132,7 @@ public class AVOWUpdateManager : MonoBehaviour {
 
 		config.GetComponent<AVOWConfig>().RenderUpdate();
 		gameModes.GetComponent<AVOWGameModes>().RenderUpdate();
+		tutorialText.GetComponent<AVOWTutorialText>().RenderUpdate();
 		graph.GetComponent<AVOWGraph>().RenderUpdate();
 		backStory.GetComponent<AVOWBackStoryCutscene>().RenderUpdate();
 		camController.GetComponent<AVOWCamControl>().RenderUpdate();

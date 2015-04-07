@@ -43,7 +43,11 @@ public class AVOWUI : MonoBehaviour {
 
 	public Stack<AVOWCommand> 	commands = new Stack<AVOWCommand>();
 
-	
+	public void ResetOptFlags(){
+		if (uiTool != null){
+			uiTool.ResetOptFlags();
+		}
+	}
 	
 	// Use this for initialization
 	void Awake () {
@@ -107,7 +111,6 @@ public class AVOWUI : MonoBehaviour {
 	}
 	
 
-
 	
 	public void GameUpdate(){
 		
@@ -129,7 +132,7 @@ public class AVOWUI : MonoBehaviour {
 				RemakeUITool();
 			
 			}
-			uiTool.FixedUpdate();
+			uiTool.GameUpdate();
 		}
 
 	}

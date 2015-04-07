@@ -4,6 +4,7 @@ using System.Text;
 using UnityEngine.UI;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System;
 
 public class AVOWTutorialText : MonoBehaviour {
 	public static AVOWTutorialText singleton = null;
@@ -26,19 +27,31 @@ public class AVOWTutorialText : MonoBehaviour {
 	float				nextletterTime = 0;
 	string 				closingString = "</color>";
 	string				highlightLetter;
-	string				highlightString;
+//	string				highlightString;
 	
 	StringBuilder		queuedString = new StringBuilder();
 	StringBuilder		displayedString = new StringBuilder();
+	
+	string lastString = "";
 	
 	const string 		kPauseKey = "PAUSE";	
 	const string 		kSpeedKey = "SPEED";	
 	const string		kTriggerKey = "TRIGGER";
 	
+	const int 			kMaxNumCharacters = 500;
+	
 	public void Serialise(BinaryWriter bw){
 		bw.Write (kLoadSaveVersion);
-		bw.Write (textBox.GetComponent<Text>().text);
-		
+		string newString = displayedString.ToString();
+	
+		bw.Write ((newString.Length > lastString.Length));
+		if ((newString.Length > lastString.Length)){
+			string deltaString = newString.Substring(lastString.Length);
+			bw.Write (deltaString);
+			lastString = newString;
+		}
+		bw.Write (highlightLetter);
+	
 	}
 	
 	public void Deserialise(BinaryReader br){
@@ -46,8 +59,13 @@ public class AVOWTutorialText : MonoBehaviour {
 		int version = br.ReadInt32();
 		switch (version){
 			case kLoadSaveVersion:{
-				textBox.GetComponent<Text>().text = br.ReadString();
-				
+				bool stringHasChanged = br.ReadBoolean();
+				if (stringHasChanged){
+					string deltaString = br.ReadString();
+					displayedString.Append(deltaString);
+				}
+				highlightLetter = br.ReadString();
+			
 				break;
 			}
 		}
@@ -109,7 +127,7 @@ public class AVOWTutorialText : MonoBehaviour {
 		lettersPerSecond = defaultLettersPerSecond;
 		ClearDisplayString();
 		highlightLetter = "";
-		highlightString = "";
+//		highlightString = "";
 		PlaceTextOnScreen();
 	}
 	
@@ -143,16 +161,28 @@ public class AVOWTutorialText : MonoBehaviour {
 	
 	void ClearDisplayString(){
 		displayedString = new StringBuilder();
-		displayedString.Append ("<color=" + CreateColorString(textColor) + ">");
 	}
 	
+	
+	
+	void TrimDisplayString(){
+		if (displayedString.Length > kMaxNumCharacters){
+			displayedString.Remove(0, displayedString.Length - kMaxNumCharacters);
+		}
+	}
 	
 	
 	// Update is called once per frame
 	public void GameUpdate () {
 		HandleText();
+	//	TrimDisplayString();
 		
 		
+	}
+	
+	
+	public void RenderUpdate(){
+		PlaceTextOnScreen();
 	}
 	
 	bool HandleSpecials(){
@@ -211,7 +241,7 @@ public class AVOWTutorialText : MonoBehaviour {
 	
 	
 	void PlaceTextOnScreen(){
-		textBox.GetComponent<Text>().text = displayedString.ToString() + closingString + highlightString;
+		textBox.GetComponent<Text>().text = "<color=" + CreateColorString(textColor) + ">" + displayedString.ToString() + closingString + "<color=" + CreateColorString(highlightColor) + ">" + highlightLetter + "</color>";
 	}
 	
 	
@@ -225,9 +255,9 @@ public class AVOWTutorialText : MonoBehaviour {
 				if (queuedString.Length > 0){
 					if (highlightLetter != null) displayedString.Append(highlightLetter);
 					highlightLetter = queuedString.ToString().Substring(0, 1);
-					highlightString = "<color=" + CreateColorString(highlightColor) + ">" + highlightLetter + "</color>";
 					queuedString.Remove(0,1);
-					PlaceTextOnScreen();
+					// this now happends in render update
+//					PlaceTextOnScreen();
 					if (highlightLetter != " " && highlightLetter != "\n"){
 						if (!GetComponent<AudioSource>().isPlaying) GetComponent<AudioSource>().Play();
 						AVOWBackStoryCutscene.singleton.TriggerLight();
@@ -235,7 +265,7 @@ public class AVOWTutorialText : MonoBehaviour {
 					}
 				}
 				float timeDeltaRaw = (1.0f/AVOWConfig.singleton.tutorialSpeed)* 1.0f/lettersPerSecond;
-				float timeDelta = Random.Range(0.1f * timeDeltaRaw, 2.0f * timeDeltaRaw);
+				float timeDelta = UnityEngine.Random.Range(0.1f * timeDeltaRaw, 2.0f * timeDeltaRaw);
 				if (highlightLetter == "," || highlightLetter == "-"){
 					nextletterTime = Time.time + 2 * timeDelta;
 				}
