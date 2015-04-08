@@ -1679,7 +1679,7 @@ MonoBehaviour:
   showIndividuals: 0
   showObjectives: 1
   objectivesAsText: 0
-  playbackEnable: 1
+  playbackEnable: 0
   modifiedNodeLengths: 1
   tutorialSpeed: 1
   sideBarPixels: 200
@@ -2589,7 +2589,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AspectMode: 0
-  m_AspectRatio: 1.73598468
+  m_AspectRatio: 1.57844388
 --- !u!114 &689694817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5184,11 +5184,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22436484, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.x
-      value: -47.0243759
+      value: -49.668457
       objectReference: {fileID: 0}
     - target: {fileID: 22474278, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.y
-      value: -4.97503519
+      value: -4.59851551
       objectReference: {fileID: 0}
     - target: {fileID: 22491496, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_LocalPosition.x
@@ -7342,6 +7342,7 @@ MonoBehaviour:
   loveLook: {x: 0, y: 0, z: 0}
   bePos: {x: 0, y: 0, z: 0}
   mouseMul: 4
+  lookOverride: 0
   ctrlLerpVal: 0
   state: 0
 --- !u!1 &2073706075
@@ -7680,7 +7681,7 @@ Prefab:
       objectReference: {fileID: 1813380714}
     - target: {fileID: 22474278, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.y
-      value: -4.97503281
+      value: -4.59851074
       objectReference: {fileID: 0}
     - target: {fileID: 22436484, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_AnchorMax.x
@@ -7692,7 +7693,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22436484, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.x
-      value: -47.0243912
+      value: -49.6684799
       objectReference: {fileID: 0}
     - target: {fileID: 199004, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_Name

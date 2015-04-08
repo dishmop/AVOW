@@ -995,21 +995,29 @@ public class AVOWSim : MonoBehaviour {
 		}
 		
 	}
+	
+	// Should also check if topology has not changrd, but the list of diections has changed
+	bool TestForChanges(){
+		return true;
+	}
 
 	void LayoutHOrder(){	
 	
-		// Construct simBlock and SimNodes according to direction of current flow
-		ConstructLists();
+		if (TestForChanges()){
+			// Construct simBlock and SimNodes according to direction of current flow
+			ConstructLists();
 		
-		// Create list of all permutations or orderings of blocks on nodes
-		ConstructPermutations();
+			// Create list of all permutations or orderings of blocks on nodes
+			ConstructPermutations();
+			
+			// For each permuation, set up positions of each componetn and each node early existing if we ever get a contradiction
+			// Note that we can set localH0 on each component - at sme point, we can infer h0 on node and when we do, we can start testing validite.
+			TestPermutations();
+			
+			// For all valid permutations, pick the best one (according to lexographical hOrder)
+			ApplyBestPermutation();
+		}
 		
-		// For each permuation, set up positions of each componetn and each node early existing if we ever get a contradiction
-		// Note that we can set localH0 on each component - at sme point, we can infer h0 on node and when we do, we can start testing validite.
-		TestPermutations();
-		
-		// For all valid permutations, pick the best one (according to lexographical hOrder)
-		ApplyBestPermutation();
 		
 	}
 

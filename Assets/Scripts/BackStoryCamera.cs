@@ -12,6 +12,7 @@ public class BackStoryCamera : MonoBehaviour {
 	public Vector3 bePos;
 	public float mouseMul = 10;
 	
+	public bool lookOverride = false;
 	
 	Vector3 	mousePos = Vector3.zero;
 	
@@ -107,6 +108,7 @@ public class BackStoryCamera : MonoBehaviour {
 				break;
 			}
 			case State.kEnvyFollow:{
+				if (lookOverride) break;
 				float envyLerp = Mathf.Lerp(0, 0.1f, envyRampUp);
 				Quaternion currRot = transform.rotation; 	
 				// Get the current up direction

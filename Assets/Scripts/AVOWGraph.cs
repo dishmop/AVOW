@@ -30,8 +30,8 @@ public class AVOWGraph : MonoBehaviour {
 	
 
 	// Optmisation flags
-	bool topologyHasChanged;
-	bool valuesHaveChanged;
+	public bool topologyHasChanged;
+	public bool valuesHaveChanged;
 	
 	List<float>	optValues = new List<float>();
 	

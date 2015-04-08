@@ -82,6 +82,7 @@ public class Telemetry : MonoBehaviour, TelemetryListener {
 	public bool enableTelemetry;
 	public string gameName;
 	public string gameVersion = null;
+	string fullWriteFilename = "";
 	
 	public enum Mode{
 		kRecord,
@@ -428,6 +429,10 @@ public class Telemetry : MonoBehaviour, TelemetryListener {
 			useStream.Flush();
 	}	
 	
+	public string GetCurrentWriteFilename(){
+		return isRecording ? writeFilename : "";
+	}
+	
 	
 	
 	void OpenFileForWriting(){
@@ -439,9 +444,9 @@ public class Telemetry : MonoBehaviour, TelemetryListener {
 		Debug.Log ("Name file created in: " + GetPathName());
 			
 		BuildFileNames();
-		string fullFilename = GetPathName() + writeFilename;
+		fullWriteFilename = GetPathName() + writeFilename;
 		
-		fileStream = File.Create(fullFilename);
+		fileStream = File.Create(fullWriteFilename);
 		// The compressed stream
 		gZipOutStream = new DCOutputStream(fileStream, 65536);
 		// The one we use
@@ -449,6 +454,7 @@ public class Telemetry : MonoBehaviour, TelemetryListener {
 	}
 	
 	void FinaliseRecording(){
+		fullWriteFilename = "";
 		CloseFile();
 		RenameFiletoFinal();
 	}

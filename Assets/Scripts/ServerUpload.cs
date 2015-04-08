@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.IO;
+using System;
 
 
 #if !UNITY_WEBPLAYER
@@ -11,6 +12,8 @@ public class ServerUpload : MonoBehaviour {
 	public float waitDuration = 1f;
 	
 	public bool enableUpload;
+	bool uploadOnlyComplete = false;
+	string ignoreFile = "";
 	
 
 	FileInfo[] fileList;
@@ -43,6 +46,16 @@ public class ServerUpload : MonoBehaviour {
 			state = State.kUploadFile;
 		}
 	}
+	
+	public void UploadOnlyComplete(bool enable){
+		uploadOnlyComplete = enable;
+	}
+	
+	public void SetIgnoreFilename(string igoreFilename){
+		ignoreFile = igoreFilename;
+	}
+	
+	
 	// Use this for initialization
 	public void GameUpdate () {
 		if (!enableUpload) return;
@@ -185,32 +198,55 @@ public class ServerUpload : MonoBehaviour {
 			Directory.CreateDirectory(Telemetry.GetPathName() + Telemetry.errorPathName);
 		}
 		DirectoryInfo dir = new DirectoryInfo(Telemetry.GetPathName());
-		FileInfo[] fileListFinal = dir.GetFiles("*" + Telemetry.BuildExtension());	
-		FileInfo[] fileListInt = dir.GetFiles("*" + Telemetry.BuildFinalExtension());
+		FileInfo[] fileListInt = dir.GetFiles("*" + Telemetry.BuildExtension());	
+		FileInfo[] fileListFinal = dir.GetFiles("*" + Telemetry.BuildFinalExtension());
 		
 		DirectoryInfo errDir = new DirectoryInfo(Telemetry.GetPathName() + Telemetry.errorPathName);
-		FileInfo[] fileListFinalErr = errDir.GetFiles("*" + Telemetry.BuildExtension());	
-		FileInfo[] fileListIntErr = errDir.GetFiles("*" + Telemetry.BuildFinalExtension());
+		FileInfo[] fileListIntErr = errDir.GetFiles("*" + Telemetry.BuildExtension());	
+		FileInfo[] fileListFinalErr = errDir.GetFiles("*" + Telemetry.BuildFinalExtension());
 		
-		fileList = new FileInfo[fileListFinal.Length + fileListInt.Length + fileListFinalErr.Length + fileListIntErr.Length];
 		
 		// Normal list
-		for (int i = 0; i < fileListFinal.Length; ++i){
-			fileList[i] = fileListFinal[i];
+		if (!uploadOnlyComplete){
+			fileList = new FileInfo[fileListInt.Length + fileListFinal.Length + fileListIntErr.Length + fileListFinalErr.Length];
+			for (int i = 0; i < fileListInt.Length; ++i){
+				fileList[i] = fileListInt[i];
+			}
+			
+			for (int i = 0; i < fileListIntErr.Length; ++i){
+				fileList[fileListFinal.Length + fileListInt.Length + i] = fileListIntErr[i];
+			}
+			for (int i = 0; i < fileListFinal.Length; ++i){
+				fileList[fileListInt.Length + i] = fileListFinal[i];
+			}		
+			for (int i = 0; i < fileListFinalErr.Length; ++i){
+				fileList[fileListIntErr.Length + fileListFinal.Length + fileListInt.Length + i] = fileListFinalErr[i];
+			}
 		}
-		for (int i = 0; i < fileListInt.Length; ++i){
-			fileList[fileListFinal.Length + i] = fileListInt[i];
-		}		
-		
-		for (int i = 0; i < fileListFinalErr.Length; ++i){
-			fileList[fileListInt.Length + fileListFinal.Length + i] = fileListFinalErr[i];
+		else{
+			fileList = new FileInfo[fileListFinal.Length + fileListFinalErr.Length];
+			
+			for (int i = 0; i < fileListFinal.Length; ++i){
+				fileList[i] = fileListFinal[i];
+			}		
+			for (int i = 0; i < fileListFinalErr.Length; ++i){
+				fileList[fileListFinal.Length + i] = fileListFinalErr[i];
+			}
 		}
-		for (int i = 0; i < fileListIntErr.Length; ++i){
-			fileList[fileListFinalErr.Length + fileListInt.Length + fileListFinal.Length + i] = fileListIntErr[i];
+		
+		
+		// Remove the ignored file if it is there
+		int index = Array.FindIndex(fileList, obj => obj.Name == ignoreFile);
+		if (index != -1){
+			FileInfo[] fileListNew = new FileInfo[fileList.Length - 1];
+			int j = 0;
+			for (int i = 0 ; i < fileList.Length; ++i){
+				if (i != index){
+					fileListNew[j++] = fileList[i];
+				}
+			}
+			fileList = fileListNew;
 		}
-		
-				
-		
 	}
 	
 	void Awake(){

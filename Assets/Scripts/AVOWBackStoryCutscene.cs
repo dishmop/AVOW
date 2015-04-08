@@ -73,7 +73,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	
 	
 	int largeSphereCount = -1;
-	int idealLargeSphereCount = 500;
+	int idealLargeSphereCount = 300;
 	Vector3[] sphereTargets;
 	
 	
@@ -167,7 +167,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 		
 		largeSphereCount = GenerateSpherePoints(idealLargeSphereCount, steerSphereRadius);
 		
-		//state = State.kDebugJumpToDance2;
+		//state = State.kDebugJumpToDance;
 		//state = State.kDebugJumpToOutro;
 		//state = State.kIntro2;
 		//state = State.kTheWorldOfSpheres0;
@@ -861,9 +861,10 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 				if (lightIntensityIntro.IsAtTarget()){
 					AVOWTutorialText.singleton.AddText("I have been here ever since.");
 					AVOWTutorialText.singleton.AddPause(3);
-					AVOWTutorialText.singleton.AddText("I am Cube - an idea...and an idea cannot move physical things on its own. I doubt even you could move me now.");
+					AVOWTutorialText.singleton.AddText("I am Cube - an idea...and an idea cannot move physical things on its own. Maybe you can help me?.");
+					AVOWTutorialText.singleton.AddPause(3);
 				
-					WaitForTextToFinish(State.kOutro1);
+					WaitForTextToFinish(State.kOutro5);
 				}
 				break;
 			}
@@ -904,6 +905,8 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 			}		
 			case State.kOutro5:{
 				lightIntensityIntro.Set (0);
+				AVOWBackStoryCutscene.singleton.backStory.transform.FindChild("Music").GetComponent<AudioSource>().volume = 0.3f * lightIntensityIntro.GetValue();
+				
 				if (lightIntensityIntro.IsAtTarget()){
 					state = State.kOutro6;		
 					
@@ -1068,7 +1071,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	}
 	
 	int GenerateSpherePoints(int N, float r){
-		sphereTargets = new Vector3[N];
+		sphereTargets = new Vector3[N+10];
 		
 		int index= 0;
 		float a = 4 * Mathf.PI / N;
@@ -1638,7 +1641,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	
 	void OnGUI(){
 	
-//		GUI.Box (new Rect(50, 50, 500, 30), "BackStory: " + state.ToString());
+//		GUI.Box (new Rect(50, 50, 500, 30), "BackStory: " + state.ToString() + " numSpheres = " + spheres.Count);
 	}
 	
 }

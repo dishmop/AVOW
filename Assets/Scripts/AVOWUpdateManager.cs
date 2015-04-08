@@ -28,6 +28,10 @@ public class AVOWUpdateManager : MonoBehaviour {
 	float gameStartTime;
 	float gameTime;
 	
+	float lastFrameTime = -0.016666f;
+	float thisFrameTime = 0;
+	float fps;
+	
 	public float GetGameTime(){
 		return gameTime;
 	}
@@ -49,24 +53,27 @@ public class AVOWUpdateManager : MonoBehaviour {
 	
 	// need to seralise the graph first becuase when we deserialise, we need to refernce objects whcih need to be thte
 	public void SerialiseGameState(BinaryWriter bw){
-		Debug.Log("SerialiseGameState: " + GetCountDelta());
+//		Debug.Log("SerialiseGameState: " + GetCountDelta());
 		config.GetComponent<AVOWConfig>().Serialise(bw);
-		Debug.Log("AVOWConfig: " + GetCountDelta());
+//		Debug.Log("AVOWConfig: " + GetCountDelta());
 		
 		gameModes.GetComponent<AVOWGameModes>().Serialise(bw);
-		Debug.Log("AVOWGameModes: " + GetCountDelta());
+//		Debug.Log("AVOWGameModes: " + GetCountDelta());
 		
 		graph.GetComponent<AVOWGraph>().Serialise(bw);
-		Debug.Log("AVOWGraph: " + GetCountDelta());
+//		Debug.Log("AVOWGraph: " + GetCountDelta());
 		
 		ui.GetComponent<AVOWUI>().Serialise(bw);
-		Debug.Log("AVOWUI: " + GetCountDelta());
+//		Debug.Log("AVOWUI: " + GetCountDelta());
 		
 		objectiveManager.GetComponent<AVOWObjectiveManager>().Serialise(bw);
-		Debug.Log("AVOWObjectiveManager: " + GetCountDelta());
+//		Debug.Log("AVOWObjectiveManager: " + GetCountDelta());
 		
 		tutorialText.GetComponent<AVOWTutorialText>().Serialise(bw);
-		Debug.Log("AVOWTutorialText: " + GetCountDelta());
+//		Debug.Log("AVOWTutorialText: " + GetCountDelta());
+
+		// Do global game stats
+		bw.Write (fps);
 	}
 	
 	public void DeserialiseGameState(BinaryReader br){
@@ -76,6 +83,8 @@ public class AVOWUpdateManager : MonoBehaviour {
 		ui.GetComponent<AVOWUI>().Deserialise(br);
 		objectiveManager.GetComponent<AVOWObjectiveManager>().Deserialise(br);
 		tutorialText.GetComponent<AVOWTutorialText>().Deserialise(br);
+		fps = br.ReadSingle();
+		Debug.Log ("FPS = " + fps);
 	}
 	
 	// Use this for initialization
@@ -117,15 +126,18 @@ public class AVOWUpdateManager : MonoBehaviour {
 			AVOWTelemetry.singleton.WriteGameUpdateEvent();
 		}
 		telemetry.GetComponent<Telemetry>().GameUpdate();
-		if (!telemetry.GetComponent<Telemetry>().isRecording && !telemetry.GetComponent<Telemetry>().isPlaying){
-			serverUpload.GetComponent<ServerUpload>().GameUpdate();
-		}
+		serverUpload.GetComponent<ServerUpload>().SetIgnoreFilename(telemetry.GetComponent<Telemetry>().GetCurrentWriteFilename());
+		serverUpload.GetComponent<ServerUpload>().GameUpdate();
 		
 		
 	}
 	
 	
 	void Update(){
+		thisFrameTime = Time.time;
+		fps = 1/(thisFrameTime - lastFrameTime);
+		lastFrameTime = thisFrameTime;
+		
 		if (!telemetry.GetComponent<Telemetry>().isPlaying){
 			ui.GetComponent<AVOWUI>().RenderUpdate();
 		}

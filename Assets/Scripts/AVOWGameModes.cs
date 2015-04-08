@@ -339,6 +339,8 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 	
 	public void PlayBackStory(){
+		scenery.SetActive(false);
+		
 		AVOWTutorialText.singleton.activated = true;
 		AVOWConfig.singleton.DisplayBottomPanel(true);
 		AVOWConfig.singleton.DisplaySidePanel(false);
@@ -373,6 +375,7 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	// THe level complete routine rather messes up the scenery - this puts it all back
 	public void ResetScenery(){
+		scenery.SetActive(true);
 		scenery.transform.localScale = new Vector3(1, 1, 1);	
 		whitePanel.SetActive(false);
 		levelCompleteDlg.SetActive(false);
@@ -430,9 +433,12 @@ public class AVOWGameModes : MonoBehaviour {
 		
 		currentLevel = levelNum;
 		
-		/// Sert up recoring
+		/// Sert up recording
 		if (Telemetry.singleton.enableTelemetry){
-			if (!Telemetry.singleton.isRecording && currentLevel != kBackStoryIndex){
+			if (Telemetry.singleton.isRecording){
+				Telemetry.singleton.StopRecording(AVOWUpdateManager.singleton.GetGameTime());
+			}
+			if (currentLevel != kBackStoryIndex){
 				Telemetry.singleton.StartRecording();
 			}
 			if (Telemetry.singleton.isRecording) AVOWTelemetry.singleton.WriteStartLevelEvent(currentLevel);
