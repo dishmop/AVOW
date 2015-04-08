@@ -65,6 +65,7 @@
      <Compile Include="Assets\Scripts\AVOWGraph.cs" />
      <Compile Include="Assets\Scripts\AVOWGreenBackground.cs" />
      <Compile Include="Assets\Scripts\AVOWGreySphere.cs" />
+     <Compile Include="Assets\Scripts\AVOWHighlightRect.cs" />
      <Compile Include="Assets\Scripts\AVOWMainMenu.cs" />
      <Compile Include="Assets\Scripts\AVOWMenuButton.cs" />
      <Compile Include="Assets\Scripts\AVOWNode.cs" />

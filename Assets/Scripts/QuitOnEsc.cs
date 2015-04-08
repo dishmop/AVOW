@@ -47,8 +47,9 @@ public class QuitOnEsc : MonoBehaviour {
 				
 			}
 			else{
-				//otherwise we are probably just playing the game, so want to use the gane cursor
-				Cursor.visible = false;
+				//otherwise we are probably just playing the game, so want to use the game cursor - unless gamemode thinks otherwise
+				
+				Cursor.visible = AVOWGameModes.singleton.showPointer;
 			}
 			
 		}

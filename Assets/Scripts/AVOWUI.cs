@@ -133,6 +133,7 @@ public class AVOWUI : MonoBehaviour {
 			
 			}
 			uiTool.GameUpdate();
+			uiTool.GetCursorCube().SetActive(!AVOWGameModes.singleton.showPointer);
 		}
 
 	}

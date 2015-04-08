@@ -11,6 +11,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	// When instantiasting this we give them a name which is the index of the prefab - so we can save it out easily
 	public GameObject[] woodPrefabs;
 	public GameObject[] coverPrefabs;
+	public GameObject highlightSquarePrefab;
 	public GameObject shadedPrefab;
 	public int totalNumPanels = 50;
 	
@@ -34,6 +35,8 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	
 	bool	horizontalFirst;
 	
+	GameObject highlightSquare;
+	
 	
 	float completeWaitTime;
 	
@@ -52,7 +55,8 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	enum State{
 		kReady,
 		kMovingToTarget,
-		kMovingToComplete,
+		kMovingToComplete0,
+		kMovingToComplete1,
 		kWaitingCompleted,
 		kDroppingOff,
 	};
@@ -445,7 +449,8 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public void MoveToComplete(){
-		state = State.kMovingToComplete;
+		TrigggerHighlight();
+		state = State.kMovingToComplete0;
 	}
 	
 	public void PrepareBoard(AVOWCircuitTarget target, LayoutMode layoutMode){
@@ -890,11 +895,39 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 	
+		highlightSquare = GameObject.Instantiate (highlightSquarePrefab);
+		highlightSquare.transform.parent = transform;
+	
 	}
 	
 	public void RenderUpdate(){
 		UpdateShadedSquare();
 	}
+	
+	public void TrigggerHighlight(){
+		Vector3 bottomLeft = transform.position + GamePosToTransformPos(new Vector3(0, 0, 0), currentTarget.totalCurrent, currentTarget.totalCurrent);
+		Vector3 topRight = transform.position + GamePosToTransformPos(new Vector3(currentTarget.totalCurrent, 1, 0), currentTarget.totalCurrent, currentTarget.totalCurrent);
+		
+		
+//		
+//		foreach (Vector3 vals in currentTarget.componentDesc){
+//			Vector3 thisBottomLeft = GamePosToTransformPos(new Vector3(vals[1], vals[2], 0), vals[0], currentTarget.totalCurrent);
+//			Vector3 thisTopRight = GamePosToTransformPos(new Vector3(vals[1], vals[2], 0), vals[0], currentTarget.totalCurrent);
+//			
+//			if (thisBottomLeft.x < bottomLeft.x) bottomLeft.x = thisBottomLeft.x;
+//			if (thisBottomLeft.y < bottomLeft.y) bottomLeft.y = thisBottomLeft.y;
+//			
+//			if (thisTopRight.x > topRight.x) topRight.x = thisTopRight.x;
+//			if (thisTopRight.y > topRight.y) topRight.y = thisTopRight.y;
+//		}
+		highlightSquare.GetComponent<AVOWHighlightRect>().Trigger (bottomLeft, topRight);
+		
+	}
+	
+	public bool IsHighlightFinished(){
+		return highlightSquare.GetComponent<AVOWHighlightRect>().IsFinished();
+	}
+	
 	
 	// Update is called once per frame
 	public void GameUpdate () {
@@ -902,10 +935,18 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		
 		switch (state){
 			case State.kMovingToTarget:{
-				if (UpdateMoveToTarget ()) state = State.kReady;
+				if (UpdateMoveToTarget ()){
+					state = State.kReady;
+				}
 				break;
 			}
-			case State.kMovingToComplete:{
+			case State.kMovingToComplete0:{
+				if (IsHighlightFinished ()){
+					state = State.kMovingToComplete1;
+				}
+				break;
+			}
+			case State.kMovingToComplete1:{
 				if (UpdateMoveToComplete ()){
 					completeWaitTime = Time.time + completeWaitDuration;
 					state = State.kWaitingCompleted;

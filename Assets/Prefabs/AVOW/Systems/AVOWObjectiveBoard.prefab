@@ -58,6 +58,8 @@ MonoBehaviour:
   - {fileID: 194954, guid: 34eb6d76f67f34393a6cb3734cca633f, type: 2}
   - {fileID: 134162, guid: 1ab61f326a51a4d6d8cd89af1b3e59b0, type: 2}
   - {fileID: 134162, guid: 1ab61f326a51a4d6d8cd89af1b3e59b0, type: 2}
+  highlightSquarePrefab: {fileID: 149372, guid: c47698c6bf9114efc87af4c6b8e9c606,
+    type: 2}
   shadedPrefab: {fileID: 182376, guid: d2ce0c8d57bed482d8cfef96bb814719, type: 2}
   totalNumPanels: 50
   coverMoveSpeed: 2

@@ -1,5 +1,6 @@
 ﻿Shader "Custom/AVOWNodeGlow" {
        Properties {
+     		 _IntensityFull ("IntensityFull", Range(0, 1)) = 1
              _Intensity ("Intensity", Range(0, 1)) = 0
              _GapProp("GapProp", Range(0,1)) = 0.9
         }
@@ -18,6 +19,7 @@
 		        
 		
 		        uniform float _Intensity;
+		        uniform float _IntensityFull;
 		        uniform float _GapProp;
 		    
 		
@@ -58,7 +60,7 @@
 		        	float4 col0 = float4(xMul *  CalcCurve(y, 0.01), xMul * CalcCurve(y, 0.02),  xMul * CalcCurve(y, 0.2),  xMul * CalcCurve(y, 0.075));
 		        	float4 col1 = float4(xMul *  CalcCurve(y, 0.01), xMul * CalcCurve(y, 0.02),  xMul * CalcCurve(y, 0.2),  xMul * CalcCurve(y, 0.5));
 
-		        	return   lerp(col0, col1, _Intensity);
+		        	return   _IntensityFull * lerp(col0, col1, _Intensity);
 		        	
 		        }
 ////		        

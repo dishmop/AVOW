@@ -574,19 +574,21 @@ public class AVOWObjectiveManager : MonoBehaviour {
 					if (layoutMode != AVOWObjectiveBoard.LayoutMode.kGappedRow){
 						if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatchWithGaps(currentGraphAsTarget)){
 							boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToTarget(currentGraphAsTarget);
-							state = State.kGoalComplete0;
+						state = State.kGoalComplete0;
 						}
 					}
 					else{
 						if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatchWithGaps(currentGraphAsTarget)){
 							boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToTarget(currentGraphAsTarget);
-							state = State.kGoalComplete0;
+						state = State.kGoalComplete0;
 						}
 					}
 				}
 				break;
 			}
+			
 			case State.kGoalComplete0:{
+				AVOWGameModes.singleton.OnGoalComplete();
 				if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().IsReady()){
 					boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToComplete();
 					numBoardsToUnstack--;

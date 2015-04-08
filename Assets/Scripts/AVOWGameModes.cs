@@ -31,6 +31,8 @@ public class AVOWGameModes : MonoBehaviour {
 	public GameObject sidePanel;
 	public GameObject backStory;
 	public GameObject tutorialText;
+	public GameObject hintButton;
+	public GameObject levelDisplay;
 	public GameObject greenBackground;
 	public GameObject scenery;
 	public GameObject pusher;
@@ -41,12 +43,13 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	public GameModeState state = GameModeState.kSplashScreen;
 	
-	
-
+	public bool showPointer = false;
+	public float waitForTimedHintDuration;
 	
 	const int		kLoadSaveVersion = 1;	
 	
 	int currentLevel = -1;
+
 	
 	const int kBackStoryIndex = -2;
 	const int kTutorialIndex = -1;
@@ -62,6 +65,10 @@ public class AVOWGameModes : MonoBehaviour {
 	CameraChoice currentCamSelect = CameraChoice.kNone;
 	
 	float levelStartMsgTime = -100f;
+	bool showHint = false;
+	bool showTimeHint = false;
+	bool hasShownHint = false;
+	float lastGoalTime = 10000f;
 	
 	
 	// Set by buttons - and the level only ACTUALLY started from the gameupdate
@@ -83,6 +90,11 @@ public class AVOWGameModes : MonoBehaviour {
 		bw.Write ((int)currentCamSelect);
 		bw.Write (levelStartMsgTime);
 		bw.Write (triggerStartLevel);
+		bw.Write (showPointer);
+		bw.Write (showHint);
+		bw.Write (showTimeHint);
+		bw.Write (hasShownHint);
+		bw.Write (lastGoalTime);
 		
 	}
 	
@@ -97,7 +109,11 @@ public class AVOWGameModes : MonoBehaviour {
 				currentCamSelect = (CameraChoice)br.ReadInt32();
 				levelStartMsgTime = br.ReadSingle();
 				triggerStartLevel = br.ReadInt32 ();
-			
+				showPointer = br.ReadBoolean();
+				showHint = br.ReadBoolean ();
+				showTimeHint = br.ReadBoolean();
+				hasShownHint = br.ReadBoolean();
+				lastGoalTime = br.ReadSingle();
 				SelectCamera(currentCamSelect);
 				
 				break;
@@ -164,12 +180,72 @@ public class AVOWGameModes : MonoBehaviour {
 		singleton = null;
 	}	
 	
+	void CreateHintText(){
+		AVOWTutorialText.singleton.ClearText();
+		AVOWTutorialText.singleton.AddPause(1);
+		if (showTimeHint){
+			AVOWTutorialText.singleton.AddText("If you get stuck, there is a hint button on the top right corner of the screen.");
+			lastGoalTime = 10000f;
+			return;
+		}
+		if (currentLevel == 1 || currentLevel == 2 || currentLevel == 3){
+			AVOWTutorialText.singleton.AddText("Levels 1, 2 and 3 hint:");
+			AVOWTutorialText.singleton.AddText("See the pattern made by the metal frames on the wooden panel? - try to make the same pattern with your resistance squares.");
+			AVOWTutorialText.singleton.AddText("Remember there are two tools you can use: Create or Destroy.");
+			
+		}
+		if (currentLevel == 4 || currentLevel == 5){
+			AVOWTutorialText.singleton.AddText("Levels 4 and 5 hint:");
+			AVOWTutorialText.singleton.AddText("Imagine how the metal frames can be stacked up from the bottom to the top to create a rectangle with no gaps.");
+			AVOWTutorialText.singleton.AddText("That's the pattern you must make with your resistance squares.");
+			
+		}
+		if (currentLevel == 6 || currentLevel == 7 || currentLevel == 8){
+			AVOWTutorialText.singleton.AddText("Levels 6, 7 and 8 hint:");
+			AVOWTutorialText.singleton.AddText("Imagine adding some additional square frames and then stacking them all from the bottom to the top to create a rectangle with no gaps");
+			AVOWTutorialText.singleton.AddText("That's the pattern you must make with your resistance squares.");
+			
+		}
+	}
+	
+	public void ShowPointer(){
+		showPointer = true;
+	}
+	
+	public void HidePointer(){
+		showPointer = false;;
+	}
+	
+	public void TriggerHint(){
+		showHint = true;
+		showTimeHint = false;
+		hasShownHint = true;
+		CreateHintText();
+	}
+	
+	public void TriggerTimerHint(){
+		showHint = true;
+		showTimeHint = true;
+		CreateHintText();
+	}
+	
+	public void OnGoalComplete(){
+		showHint = false;
+		showTimeHint = false;
+		lastGoalTime = AVOWUpdateManager.singleton.GetGameTime();
+		AVOWTutorialText.singleton.ClearText();
+	}
+	
 	public void GameUpdate(){
 		if (triggerStartLevel >= kBackStoryIndex){
 			StartLevel(triggerStartLevel);
 			triggerStartLevel = kBackStoryIndex-1;
 		
 		}
+		if (currentLevel > 0 && !hasShownHint && AVOWUpdateManager.singleton.GetGameTime() >  lastGoalTime + waitForTimedHintDuration){
+			TriggerTimerHint();
+		}
+		
 		if (AVOWBattery.singleton.IsDepleated()){
 			AVOWBattery.singleton.FreezeBattery();
 			state = GameModeState.kGameOver;
@@ -182,9 +258,7 @@ public class AVOWGameModes : MonoBehaviour {
 		}
 		
 		
-		
 
-		
 		switch (state){
 			case GameModeState.kMainMenu:{
 				AVOWUpdateManager.singleton.ResetGameTime();
@@ -228,6 +302,15 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	// Update is called once per frame
 	public void RenderUpdate () {
+	
+		// Hints
+		hintButton.SetActive(currentLevel > 0 && state == GameModeState.kPlayStage);
+		if (currentLevel > 0 && state == GameModeState.kPlayStage){
+			AVOWConfig.singleton.DisplayBottomPanel(showHint);
+		}
+		levelDisplay.transform.FindChild("ButtonPanel").FindChild("LevelText").GetComponent<Text>().text = GetLevelName(currentLevel);
+		
+		
 	
 		//dlgPanel.SetActive(state == GameModeState.kGameOver || state == GameModeState.kStageComplete3);
 		mainMenuPanel.SetActive(state == GameModeState.kMainMenu);
@@ -420,7 +503,6 @@ public class AVOWGameModes : MonoBehaviour {
 	void StartLevel(int levelNum){
 		ResetScenery();
 		
-		
 		if (IsTelemPlaybackLevel(levelNum)){
 			RestartNormalGame();
 			AVOWObjectiveManager.singleton.InitialiseLimitsOnly(7);
@@ -432,6 +514,9 @@ public class AVOWGameModes : MonoBehaviour {
 		
 		
 		currentLevel = levelNum;
+		hasShownHint = false;
+		lastGoalTime = 0;
+		
 		
 		/// Sert up recording
 		if (Telemetry.singleton.enableTelemetry){
@@ -440,6 +525,7 @@ public class AVOWGameModes : MonoBehaviour {
 			}
 			if (currentLevel != kBackStoryIndex){
 				Telemetry.singleton.StartRecording();
+				AVOWUpdateManager.singleton.ResetGameTime();
 			}
 			if (Telemetry.singleton.isRecording) AVOWTelemetry.singleton.WriteStartLevelEvent(currentLevel);
 		}

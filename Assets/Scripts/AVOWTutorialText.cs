@@ -241,7 +241,16 @@ public class AVOWTutorialText : MonoBehaviour {
 	
 	
 	void PlaceTextOnScreen(){
-		textBox.GetComponent<Text>().text = "<color=" + CreateColorString(textColor) + ">" + displayedString.ToString() + closingString + "<color=" + CreateColorString(highlightColor) + ">" + highlightLetter + "</color>";
+		string useString = displayedString.ToString ();
+//		if (displayedString.Length > 0 && useString[displayedString.Length-1] == '\n'){
+//			useString = useString.Substring(0, displayedString.Length-1);
+//		}
+		string useHighlightLetter = highlightLetter;
+		if (highlightLetter != null && highlightLetter.Length > 0 && highlightLetter[0] == '\n'){
+			useHighlightLetter = "";
+		}
+		
+		textBox.GetComponent<Text>().text = "<color=" + CreateColorString(textColor) + ">" + useString+ closingString + "<color=" + CreateColorString(highlightColor) + ">" + useHighlightLetter + "</color>";
 	}
 	
 	
