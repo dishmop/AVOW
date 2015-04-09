@@ -516,6 +516,7 @@ public class AVOWGameModes : MonoBehaviour {
 		currentLevel = levelNum;
 		hasShownHint = false;
 		lastGoalTime = 0;
+		showHint = false;
 		
 		
 		/// Sert up recording

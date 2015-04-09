@@ -44,6 +44,11 @@ public class AVOWTutorialText : MonoBehaviour {
 		bw.Write (kLoadSaveVersion);
 		string newString = displayedString.ToString();
 	
+		bw.Write (newString.Length < lastString.Length);
+		if (newString.Length < lastString.Length){
+			bw.Write (newString);
+		}
+		
 		bw.Write ((newString.Length > lastString.Length));
 		if ((newString.Length > lastString.Length)){
 			string deltaString = newString.Substring(lastString.Length);
@@ -59,6 +64,12 @@ public class AVOWTutorialText : MonoBehaviour {
 		int version = br.ReadInt32();
 		switch (version){
 			case kLoadSaveVersion:{
+				bool clearText = br.ReadBoolean();
+				if (clearText){
+					displayedString.Length = 0;
+					string deltaString = br.ReadString();
+					displayedString.Append(deltaString);
+				}
 				bool stringHasChanged = br.ReadBoolean();
 				if (stringHasChanged){
 					string deltaString = br.ReadString();
