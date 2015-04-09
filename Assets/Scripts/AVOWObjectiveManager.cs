@@ -534,6 +534,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				AVOWTelemetry.singleton.WriteStartGoalEvent(currentGoalIndex);
 				
 				state = State.kSwapBoards0;
+				boards[backIndex].GetComponent<AVOWObjectiveBoard>().TriggerWhoosh();
 				break;
 			}
 			case State.kSwapBoards0:{
@@ -574,13 +575,13 @@ public class AVOWObjectiveManager : MonoBehaviour {
 					if (layoutMode != AVOWObjectiveBoard.LayoutMode.kGappedRow){
 						if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatchWithGaps(currentGraphAsTarget)){
 							boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToTarget(currentGraphAsTarget);
-						state = State.kGoalComplete0;
+							state = State.kGoalComplete0;
 						}
 					}
 					else{
 						if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatchWithGaps(currentGraphAsTarget)){
 							boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToTarget(currentGraphAsTarget);
-						state = State.kGoalComplete0;
+							state = State.kGoalComplete0;
 						}
 					}
 				}

@@ -41,6 +41,7 @@ public class Lightening : MonoBehaviour {
 	void Start () {
 	
 		ConstructMesh();
+
 	
 	}
 	
@@ -367,9 +368,13 @@ public class Lightening : MonoBehaviour {
 		
 	}
 	
+	void OnDisable(){
+	}
+	
 	// Update is called once per frame
 	void Update () {
 		HandleOrientation();
+		
 //		UpdateMesh();
 //		for (int i = 0; i < vertices.Length-1; ++i){
 //			Debug.DrawLine(transform.position + vertices[i], transform.position + vertices[i+1], Color.green);

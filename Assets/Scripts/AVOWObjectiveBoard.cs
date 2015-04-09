@@ -14,6 +14,8 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	public GameObject highlightSquarePrefab;
 	public GameObject shadedPrefab;
 	public int totalNumPanels = 50;
+	public AudioClip cPing;
+	public AudioClip whoosh;
 	
 	public float coverMoveSpeed;
 	public float completeWaitDuration;
@@ -27,6 +29,8 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	};	
 	
 	const int		kLoadSaveVersion = 2;
+	
+
 	
 	float maxShade = 0.675f;
 	AVOWCircuitTarget currentTarget;
@@ -417,6 +421,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public void MoveToRow(){
+		TriggerWhoosh();
 		displayTarget = CreateRowTarget (displayTarget, false);
 		RecreateDisplayMapping();
 		state = State.kMovingToTarget;
@@ -426,6 +431,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	
 	
 	public void MoveToGappedRow(){
+		TriggerWhoosh();
 		displayTarget = CreateRowTarget (currentTarget, false);
 		ReorderCoversToMatch(displayTarget);
 		RecreateDisplayMapping();
@@ -435,6 +441,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	
 	
 	public void MoveToTarget(AVOWCircuitTarget target){
+		TriggerWhoosh();
 		displayTarget = ConstructCompatibleDisplayTarget(target);
 		RecreateDisplayMapping();
 		state = State.kMovingToTarget;
@@ -442,6 +449,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public void MoveToOriginalTarget(){
+		
 		displayTarget = currentTarget;
 		RecreateDisplayMapping();
 		state = State.kMovingToTarget;
@@ -449,6 +457,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public void MoveToComplete(){
+		
 		TrigggerHighlight();
 		state = State.kMovingToComplete0;
 	}
@@ -904,6 +913,14 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		UpdateShadedSquare();
 	}
 	
+	public void TriggerWhoosh(){
+		AudioSource audioSource = gameObject.AddComponent<AudioSource>();
+		audioSource.clip = whoosh;
+		audioSource.Play();
+		audioSource.volume = 1f;
+		
+	}
+	
 	public void TrigggerHighlight(){
 		Vector3 bottomLeft = transform.position + GamePosToTransformPos(new Vector3(0, 0, 0), currentTarget.totalCurrent, currentTarget.totalCurrent);
 		Vector3 topRight = transform.position + GamePosToTransformPos(new Vector3(currentTarget.totalCurrent, 1, 0), currentTarget.totalCurrent, currentTarget.totalCurrent);
@@ -922,6 +939,13 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 //		}
 		highlightSquare.GetComponent<AVOWHighlightRect>().Trigger (bottomLeft, topRight);
 		
+		foreach (Vector3 vals in currentTarget.componentDesc){
+			AudioSource audioSource = gameObject.AddComponent<AudioSource>();
+			audioSource.clip = cPing;
+			audioSource.PlayDelayed(highlightSquare.GetComponent<AVOWHighlightRect>().fadeDuration * 0.25f);
+			audioSource.pitch = 1/vals[0];
+		}
+		
 	}
 	
 	public bool IsHighlightFinished(){
@@ -932,6 +956,13 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	// Update is called once per frame
 	public void GameUpdate () {
 
+		// Check if the audio sources have finished playing
+		AudioSource[] sources = GetComponents<AudioSource>();
+		foreach(AudioSource source in sources){
+			if (!source.isPlaying){
+				Destroy (source);
+			}
+		}
 		
 		switch (state){
 			case State.kMovingToTarget:{
@@ -942,6 +973,8 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			}
 			case State.kMovingToComplete0:{
 				if (IsHighlightFinished ()){
+					TriggerWhoosh();
+				
 					state = State.kMovingToComplete1;
 				}
 				break;
@@ -955,6 +988,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			}
 			case State.kWaitingCompleted:{
 				if (Time.time > completeWaitTime){
+					TriggerWhoosh();
 					state = State.kDroppingOff;
 				}
 			    

@@ -8,7 +8,7 @@ public class AVOWHighlightRect : MonoBehaviour {
 	public Vector3 topRight;
 	
 	float timeAtTrigger = -100;
-	float fadeDuration = 1;
+	public float fadeDuration = 1;
 	
 	GameObject[] sides = new GameObject[4];
 	

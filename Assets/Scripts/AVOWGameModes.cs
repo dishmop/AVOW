@@ -518,7 +518,8 @@ public class AVOWGameModes : MonoBehaviour {
 		lastGoalTime = 0;
 		showHint = false;
 		
-		
+		AVOWUpdateManager.singleton.ResetGameTime();
+
 		/// Sert up recording
 		if (Telemetry.singleton.enableTelemetry){
 			if (Telemetry.singleton.isRecording){
@@ -526,7 +527,6 @@ public class AVOWGameModes : MonoBehaviour {
 			}
 			if (currentLevel != kBackStoryIndex){
 				Telemetry.singleton.StartRecording();
-				AVOWUpdateManager.singleton.ResetGameTime();
 			}
 			if (Telemetry.singleton.isRecording) AVOWTelemetry.singleton.WriteStartLevelEvent(currentLevel);
 		}

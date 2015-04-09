@@ -825,6 +825,20 @@ public class AVOWUICreateTool :  AVOWUITool{
 			cursorCube.transform.Rotate (new Vector3(1, 2, 4));
 		}
 		
+		if (connection0 != null){
+			if (heldConnection){
+				AVOWUI.singleton.SetElectricAudioVolume(1f);
+			}
+			else{
+				AVOWUI.singleton.SetElectricAudioVolume(0.5f);
+			}
+			
+		}
+		else{
+			AVOWUI.singleton.SetElectricAudioVolume(0);
+		}
+		
+		
 	}
 	
 	

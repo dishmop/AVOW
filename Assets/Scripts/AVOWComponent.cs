@@ -9,12 +9,19 @@ public class AVOWComponent : MonoBehaviour {
 	// Intrinsic data
 	public GameObject node0GO;
 	public GameObject node1GO;
+//	public SpringValue resistanceAngle = new SpringValue(45, SpringValue.Mode.kLinear, 5);
 	public SpringValue resistanceAngle = new SpringValue(45, SpringValue.Mode.kLinear, 40);
 	public float connectorProp = 0.1f;
 	public float squareGap = 0.02f;
 	public float lighteningSize = 0.5f;
 	public bool isInteractive = true;	
 	public bool showResistance = true;
+	public AudioSource motorStart;
+	public AudioSource motorSustain;
+	
+	float thisXScale;
+	float lastXScale;
+	public bool motorRunning;
 	
 	
 	
@@ -199,6 +206,8 @@ public class AVOWComponent : MonoBehaviour {
 		}
 		bw.Write (onDeadCommandDoExecutate);
 		
+		bw.Write (lastXScale);
+		bw.Write (motorRunning);
 		
 	}
 	
@@ -265,11 +274,13 @@ public class AVOWComponent : MonoBehaviour {
 					onDeadCommand.Deserialise(br);
 				}
 				onDeadCommandDoExecutate = br.ReadBoolean();
+				lastXScale = br.ReadSingle();
+				motorRunning =br.ReadBoolean();
 				break;
 			}
 		}
 
-		}
+	}
 	
 	
 	public void SerialiseConnections(BinaryWriter bw){
@@ -511,6 +522,12 @@ public class AVOWComponent : MonoBehaviour {
 	
 	public void GameUpdate (){
 		CheckForKillResistance();
+		motorRunning = (!MathUtils.FP.Feq (lastXScale, thisXScale));
+		lastXScale = thisXScale;
+		
+		
+		
+
 	}
 	
 
@@ -562,11 +579,13 @@ public class AVOWComponent : MonoBehaviour {
 			transform.FindChild("Resistance").position = new Vector3(useH0  + squareGap, Mathf.Min (useV0, useV1) + squareGap, 0);
 			transform.FindChild("BlackSquare").position =  new Vector3(useH0, Mathf.Min (useV0, useV1), 0.01f);
 			
+			
 			float xScale = useH1 -useH0 - 2 * squareGap;
 			float yScale = Mathf.Abs (useV1-useV0) - 2 * squareGap;
 			
 			xScale = Mathf.Max (xScale, 0);
 			yScale = Mathf.Max (yScale, 0);
+			thisXScale = xScale;
 			
 			transform.FindChild("Resistance").localScale = new Vector3(xScale, yScale, 1);
 			transform.FindChild("BlackSquare").localScale = new Vector3(useH1 -useH0, useH1 -useH0, 1);
@@ -650,9 +669,43 @@ public class AVOWComponent : MonoBehaviour {
 		connectionSphere1.position = connector1Pos;
 		connectionSphere1.localScale = new Vector3(scale, scale, scale);
 
-
+		HandleAudio();
 		
 			
+	}
+	
+	void HandleAudio(){
+	
+		if (transform.FindChild("ElectricAudio") != null){
+			if (MathUtils.FP.Feq (hWidth, 0)){
+				transform.FindChild("ElectricAudio").GetComponent<AudioSource>().volume = 0;
+			}
+			else{
+				//	if (isInteractive && showResistance){
+				float volMod = 0.5f + 0.5f * Mathf.Sin (AVOWUpdateManager.singleton.GetGameTime() * 2 * 3.141f / hWidth);
+				volMod = 1;
+				transform.FindChild("ElectricAudio").GetComponent<AudioSource>().volume = Mathf.Lerp (0.015f * hWidth * 0.6f, 0.015f * hWidth, volMod);
+				
+				transform.FindChild("ElectricAudio").GetComponent<AudioSource>().pitch = 1f/hWidth;
+			}
+			if (AVOWGameModes.singleton.state != AVOWGameModes.GameModeState.kPlayStage){
+				transform.FindChild("ElectricAudio").GetComponent<AudioSource>().volume = 0;
+			}
+		}
+		
+		if (GetComponent<ASDAudioSource>() == null) return;
+		
+		GetComponent<AudioSource>().pitch = Mathf.Lerp (2, 0.75f, hWidth);
+		GetComponent<AudioSource>().volume = Mathf.Lerp (0.2f, 1, hWidth);
+		
+		if (motorRunning && !GetComponent<ASDAudioSource>().IsPlaying()){
+			GetComponent<ASDAudioSource>().Play();
+		}
+		else if (!motorRunning && GetComponent<ASDAudioSource>().IsPlaying()){
+			GetComponent<ASDAudioSource>().Stop();
+		}
+		
+		
 	}
 	
 	string CreateFracString(float val){

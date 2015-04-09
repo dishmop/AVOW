@@ -18,6 +18,7 @@ public class AVOWUI : MonoBehaviour {
 	public GameObject cursorGreyCubePrefab;
 	public GameObject lighteningPrefab;
 	public GameObject greenLighteningPrefab;
+	public GameObject electricAudioPrefab;
 	
 	
 	public bool canCreate = true;
@@ -29,7 +30,7 @@ public class AVOWUI : MonoBehaviour {
 	float lastFlashTime = 0;
 	
 	const int		kLoadSaveVersion = 1;		
-
+	GameObject electricAudio;
 		
 	public enum ToolMode{
 		kCreate,
@@ -39,7 +40,7 @@ public class AVOWUI : MonoBehaviour {
 	ToolMode mode = ToolMode.kCreate;
 			
 	AVOWUITool	uiTool;
-	
+		
 
 	public Stack<AVOWCommand> 	commands = new Stack<AVOWCommand>();
 
@@ -67,6 +68,28 @@ public class AVOWUI : MonoBehaviour {
 		graph = null;
 		RemakeUITool();
 		
+		if (electricAudio != null){
+			GameObject.Destroy(electricAudio);
+		}
+		electricAudio = Instantiate(electricAudioPrefab);
+		electricAudio.transform.parent = transform;
+		
+		electricAudio.transform.localPosition = Vector3.zero;
+		electricAudio.GetComponent<AudioSource>().Play();
+		electricAudio.GetComponent<AudioSource>().pitch = 2;
+		SetElectricAudioVolume(0);
+	}
+	
+	public void SetElectricAudioVolume(float vol){
+		if (electricAudio != null){
+			if (AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kPlayStage){
+				electricAudio.GetComponent<AudioSource>().volume = 0.02f * vol;
+			}
+			else{
+				electricAudio.GetComponent<AudioSource>().volume = 0;
+			}
+		}
+	
 	}
 	
 	void RemakeUITool(){
@@ -276,6 +299,7 @@ public class AVOWUI : MonoBehaviour {
 		bw.Write ((int)mode);
 		bw.Write (canCreate);
 		bw.Write (lastCanCreate);
+		bw.Write (electricAudio.GetComponent<AudioSource>().volume);
 		bw.Write (code);
 		if (uiTool != null){
 			uiTool.Serialise(bw);
@@ -291,7 +315,8 @@ public class AVOWUI : MonoBehaviour {
 				mode = (ToolMode) br.ReadInt32();
 				canCreate = br.ReadBoolean();
 				lastCanCreate = br.ReadBoolean();
-				
+				electricAudio.GetComponent<AudioSource>().volume = br.ReadSingle ();
+			
 				int code = br.ReadInt32();
 				ModifyToolSelection(code);
 				if (uiTool != null){
