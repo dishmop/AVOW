@@ -9,6 +9,7 @@ public class AVOWHighlightRect : MonoBehaviour {
 	
 	float timeAtTrigger = -100;
 	public float fadeDuration = 1;
+	bool triggeredAlready;
 	
 	GameObject[] sides = new GameObject[4];
 	
@@ -17,16 +18,26 @@ public class AVOWHighlightRect : MonoBehaviour {
 		this.topRight = topRight;
 		timeAtTrigger = AVOWUpdateManager.singleton.GetGameTime();
 		PositionSquare();
+		triggeredAlready = false;
 		
 		
 	}
 	
 	float CalcBrightness(){
+		// should only ever trigger once
+		if (triggeredAlready) return 0;
+
 		float thisTime = AVOWUpdateManager.singleton.GetGameTime();
-		if (thisTime < timeAtTrigger || thisTime > timeAtTrigger + fadeDuration) return 0;
+		if (thisTime < timeAtTrigger) return 0;
+		if (thisTime > timeAtTrigger + fadeDuration){
+			triggeredAlready = true;
+			return 0;
+		}
 		return 0.5f - 0.5f * Mathf.Cos(2 * 3.14159f * (thisTime - timeAtTrigger) / fadeDuration);
 		
 	}
+
+
 	
 	void ConstructSquare(){
 		for (int i = 0; i < 4; ++i){

@@ -93,6 +93,7 @@ SubShader {
 			noisePos.x =  i2uv.x*0.4;
 			noisePos.y =  i2uv.y;
 			noisePos.z =  19 + _Time.y * staticSpeedParam;
+			noisePos.w = 0;
 			
 			noisePos *= _Freq;
 			

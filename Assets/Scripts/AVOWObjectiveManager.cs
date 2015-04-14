@@ -291,6 +291,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		state = State.kPauseOnLevelStart;
 		waitTime = Time.time + levelStartPauseDuration;
 		
+	
 
 	}
 	
@@ -490,6 +491,18 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		
 		switch (state){
 			case State.kPauseOnLevelStart:{
+				if (AVOWCircuitCreator.singleton.IsReady()){
+					// Calc total numer of valid goals
+					if (excludedGoals != null && excludedGoals[excludedGoals.Length-1] != null){
+						int count = 0;
+						for (int i = 0; i < GetGoalTargets().Count;  ++i){
+							if (!excludedGoals[currentLevel][i]){
+								++count;
+							}
+						}
+						ProgressPanel.singleton.SetGoals(count, 0);
+					}	
+				}
 				if (Time.time > waitTime){
 					currentGoalIndex = FindNextValidGoal(-1);
 					state = State.kWaitForCircuitCreator;

@@ -18,10 +18,11 @@ public class AVOWUICreateTool :  AVOWUITool{
 	public AVOWCommand 	heldGapCommand;
 	public GameObject 	heldGapConnection1;
 	
+	
 	const int		kLoadSaveVersion = 1;	
 	
 	float		newHOrder;
-	
+	float 		heldTime;
 	
 	public enum InsideGapState{	
 		kOutside,
@@ -32,6 +33,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 	};
 	
 	public bool			  	isInside = false;
+	bool					wasInside = false;
 	public InsideGapState 	insideState = InsideGapState.kOutside;
 	float					maxLerpSpeed = 0.5f;
 	float					minLerpSpeed = 0f;
@@ -484,37 +486,35 @@ public class AVOWUICreateTool :  AVOWUITool{
 			}
 			
 			// If not inside the held gap, find the next closest thing - favouring whatever we have connected already
-			if (!isInside){
-				GameObject closestObj = null;
-				Vector3 closestPos = Vector3.zero;
-				
-				float minDist = maxLighteningDist;
-				// Only search for components if there is more than just a battery
-				ghostMousePos = mouseWorldPos + new Vector3(0, (mouseWorldPos.y - confirmedConnectionHeight) * 1.00f, 0);
-				if (AVOWGraph.singleton.allComponents.Count > 1 && !AVOWConfig.singleton.tutDisable2ndComponentConnections){
-					minDist = FindClosestComponent(ghostMousePos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos, ref connection1WhichPoint);
-				}
-				if (!AVOWConfig.singleton.tutDisable2ndBarConnections){
-					minDist = FindClosestNode(ghostMousePos, connection0, minDist, connection1, ref closestObj, ref closestPos);			
-				}
-				connection1 = closestObj;
-				connection1Pos = closestPos;	
-				if (IsButtonReleased()){
+			GameObject closestObj = null;
+			Vector3 closestPos = Vector3.zero;
+			
+			float minDist = maxLighteningDist;
+			// Only search for components if there is more than just a battery
+			ghostMousePos = mouseWorldPos + new Vector3(0, (mouseWorldPos.y - confirmedConnectionHeight) * 1.00f, 0);
+			if (AVOWGraph.singleton.allComponents.Count > 1 && !AVOWConfig.singleton.tutDisable2ndComponentConnections){
+				minDist = FindClosestComponent(ghostMousePos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos, ref connection1WhichPoint);
+			}
+			if (!AVOWConfig.singleton.tutDisable2ndBarConnections){
+				minDist = FindClosestNode(ghostMousePos, connection0, minDist, connection1, ref closestObj, ref closestPos);			
+			}
+			connection1 = closestObj;
+			connection1Pos = closestPos;	
+			if (IsButtonReleased()){
+				if (!isInside){
 					heldConnection = false;
 					connection1 = null;
 				}
-			}
-			else{
-				if (IsButtonReleased()){
+				else{
 					// do logic to see if the thing should be creared
 					// If a node to node connection
 					bool okToCreate = true;
-					if (connection1.GetComponent<AVOWNode>() != null && AVOWConfig.singleton.tutDisableBarConstruction){
+					if (connection1 != null && connection1.GetComponent<AVOWNode>() != null && AVOWConfig.singleton.tutDisableBarConstruction){
 						okToCreate = false;
 					}
 					
 					// If  anode to component connection
-					if (connection1.GetComponent<AVOWComponent>() != null && AVOWConfig.singleton.tutDisableComponentConstruction){
+					if (connection1 != null && connection1.GetComponent<AVOWComponent>() != null && AVOWConfig.singleton.tutDisableComponentConstruction){
 						okToCreate = false;
 					}
 					if (okToCreate){
@@ -533,7 +533,6 @@ public class AVOWUICreateTool :  AVOWUITool{
 					}
 				}
 			}
-			
 			
 			
 		}
@@ -569,6 +568,15 @@ public class AVOWUICreateTool :  AVOWUITool{
 	}
 	
 	void HandleCubeInsideGap(){
+		if (!heldConnection){
+			heldTime = Time.fixedTime ;
+		
+		}
+		
+		if (wasInside != isInside && heldConnection && Time.fixedTime > heldTime + 0.2f){
+			AVOWUI.singleton.PlaySpin();
+			wasInside = isInside;
+		}
 		
 		// Manage the inside state machine
 		switch (insideState){
@@ -610,6 +618,9 @@ public class AVOWUICreateTool :  AVOWUITool{
 			}
 			case InsideGapState.kInside:{
 				AVOWComponent component = GetHeldCommandComponent();
+				if (component != null){
+					EnsureCubeAtComponentCentre(component.gameObject);
+				}
 				if (component == null || !isInside){
 					insideState = InsideGapState.kOutsideAndTransitioning;
 					insideLerpSpeed = minLerpSpeed;

@@ -683,8 +683,7 @@ public class AVOWComponent : MonoBehaviour {
 			else{
 				//	if (isInteractive && showResistance){
 				float volMod = 0.5f + 0.5f * Mathf.Sin (AVOWUpdateManager.singleton.GetGameTime() * 2 * 3.141f / hWidth);
-				volMod = 1;
-				transform.FindChild("ElectricAudio").GetComponent<AudioSource>().volume = Mathf.Lerp (0.015f * hWidth * 0.6f, 0.015f * hWidth, volMod);
+				transform.FindChild("ElectricAudio").GetComponent<AudioSource>().volume = Mathf.Lerp (0.0025f * hWidth * 0.6f, 0.0025f * hWidth, volMod);
 				
 				transform.FindChild("ElectricAudio").GetComponent<AudioSource>().pitch = 1f/hWidth;
 			}
@@ -696,7 +695,7 @@ public class AVOWComponent : MonoBehaviour {
 		if (GetComponent<ASDAudioSource>() == null) return;
 		
 		GetComponent<AudioSource>().pitch = Mathf.Lerp (2, 0.75f, hWidth);
-		GetComponent<AudioSource>().volume = Mathf.Lerp (0.2f, 1, hWidth);
+		GetComponent<AudioSource>().volume = Mathf.Lerp (0.1f, 0.5f, hWidth);
 		
 		if (motorRunning && !GetComponent<ASDAudioSource>().IsPlaying()){
 			GetComponent<ASDAudioSource>().Play();

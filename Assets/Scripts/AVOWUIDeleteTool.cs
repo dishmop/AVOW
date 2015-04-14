@@ -21,6 +21,9 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 	GameObject 				lightening0GO;
 	GameObject 				lightening1GO;
 	
+	float 	heldTime;
+	bool wasOutside;
+	
 	const int		kLoadSaveVersion = 1;	
 	
 	public enum InsideGapState{	
@@ -459,129 +462,139 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 	
 	
 	void HandleCubeInsideGap(){
+	
+		if (!heldConnection){
+			heldTime = Time.fixedTime ;
+			
+		}
+		
+		if (wasOutside != isOutside && heldConnection && Time.fixedTime > heldTime + 0.2f){
+			AVOWUI.singleton.PlaySpin();
+			wasOutside = isOutside;
+		}
 		
 		// Manage the inside state machine
 		switch (insideState){
-		case InsideGapState.kUncreated:{
-			insideState = (isOutside) ? InsideGapState.kCreateOutside : InsideGapState.kCreateInside;
-			break;
-		}
-		case InsideGapState.kCreateOutside:{
-			
-			// Create a new cube which will travel to the gap
-			ActiveCubeAtComponent(connectionGO);
-			connectionGO.GetComponent<AVOWComponent>().isInteractive = false;
-			
-			
-			
-			
-			insideState = InsideGapState.kOutsideAndTransitioning;
-			
-			
-			break;
-		}
-			
-		case InsideGapState.kCreateInside:{
-			insideState = InsideGapState.kInside;
-			
-			
-			break;
-		}
-			
-		case InsideGapState.kInside:{
-			if (isOutside) {
+			case InsideGapState.kUncreated:{
+				insideState = (isOutside) ? InsideGapState.kCreateOutside : InsideGapState.kCreateInside;
+				break;
+			}
+			case InsideGapState.kCreateOutside:{
+				
 				// Create a new cube which will travel to the gap
 				ActiveCubeAtComponent(connectionGO);
+				connectionGO.GetComponent<AVOWComponent>().isInteractive = false;
 				
 				
 				
 				
 				insideState = InsideGapState.kOutsideAndTransitioning;
-				insideLerpSpeed = minLerpSpeed;
-			}
-			break;
-		}
-		case InsideGapState.kOutsideAndTransitioning:{
-			
-			// Move our inside cube to where it needs to be
-			AVOWComponent component = GetHeldCommandComponent();
-			
-			if (component != null && isOutside){
-				float distRemaining = LerpToCursor(cursorCube, insideLerpSpeed);
 				
-				if (MathUtils.FP.Feq(distRemaining, 0, 0.1f)){
-					cursorCube = RejoinToCursor(cursorCube);
-					GameObject.Destroy(insideCube);
-					insideCube = null;
-					insideState = InsideGapState.kOutside;
-					insideLerpSpeed = minLerpSpeed;
-					//RemoveMetal(cursorCube)
-				}
-			}
-			else{
-				insideState = InsideGapState.kInsideAndTransitioning;
-				insideLerpSpeed = minLerpSpeed;
 				
+				break;
 			}
-			
-			insideLerpSpeed = Mathf.Lerp (insideLerpSpeed, maxLerpSpeed, 0.1f);
-			
-			break;
-		}
-		case InsideGapState.kOutside:{
-			AVOWComponent component = GetHeldCommandComponent();
-			if (component == null || !isOutside){
-				insideState = InsideGapState.kInsideAndTransitioning;
-				insideLerpSpeed = minLerpSpeed;
-				// Create a new cube which will travel to the gap
-				ActiveCubeAtCursor(cursorCube);
-				RemoveMetal(cursorCube);
 				
-			}
-			break;
-		}
-		case InsideGapState.kInsideAndTransitioning:{
-			
-			float distRemaining = LerpToComponent(connectionGO.GetComponent<AVOWComponent>(), insideLerpSpeed);
-			
-			if (MathUtils.FP.Feq(distRemaining, 0, 0.01f)){
+			case InsideGapState.kCreateInside:{
 				insideState = InsideGapState.kInside;
 				
-				// Remove our insidecube when it gets there
+				
+				break;
+			}
+				
+			case InsideGapState.kInside:{
+				if (isOutside) {
+					// Create a new cube which will travel to the gap
+					ActiveCubeAtComponent(connectionGO);
+					
+					
+					
+					
+					insideState = InsideGapState.kOutsideAndTransitioning;
+					insideLerpSpeed = minLerpSpeed;
+				}
+				break;
+			}
+			case InsideGapState.kOutsideAndTransitioning:{
+				
+				// Move our inside cube to where it needs to be
+				AVOWComponent component = GetHeldCommandComponent();
+				
+				if (component != null && isOutside){
+					float distRemaining = LerpToCursor(cursorCube, insideLerpSpeed);
+					
+					if (MathUtils.FP.Feq(distRemaining, 0, 0.1f)){
+						cursorCube = RejoinToCursor(cursorCube);
+						GameObject.Destroy(insideCube);
+						insideCube = null;
+						insideState = InsideGapState.kOutside;
+						insideLerpSpeed = minLerpSpeed;
+						//RemoveMetal(cursorCube)
+					}
+				}
+				else{
+					insideState = InsideGapState.kInsideAndTransitioning;
+					insideLerpSpeed = minLerpSpeed;
+					
+				}
+				
+				insideLerpSpeed = Mathf.Lerp (insideLerpSpeed, maxLerpSpeed, 0.1f);
+				
+				break;
+			}
+			case InsideGapState.kOutside:{
+				AVOWComponent component = GetHeldCommandComponent();
+				if (component == null || !isOutside){
+					insideState = InsideGapState.kInsideAndTransitioning;
+					insideLerpSpeed = minLerpSpeed;
+					// Create a new cube which will travel to the gap
+					ActiveCubeAtCursor(cursorCube);
+					RemoveMetal(cursorCube);
+					
+				}
+				break;
+			}
+			case InsideGapState.kInsideAndTransitioning:{
+				
+				float distRemaining = LerpToComponent(connectionGO.GetComponent<AVOWComponent>(), insideLerpSpeed);
+				
+				if (MathUtils.FP.Feq(distRemaining, 0, 0.01f)){
+					insideState = InsideGapState.kInside;
+					
+					// Remove our insidecube when it gets there
+					GameObject.Destroy(insideCube);
+					insideCube = null;
+					connectionGO.GetComponent<AVOWComponent>().isInteractive = true;
+					//cursorCube = RejoinToCursor(cursorCube);
+				}
+				AVOWComponent component = GetHeldCommandComponent();
+				if (component != null && isOutside){
+					insideState = InsideGapState.kOutsideAndTransitioning;	
+					insideLerpSpeed = minLerpSpeed;
+				}
+				insideLerpSpeed = Mathf.Lerp (insideLerpSpeed, maxLerpSpeed, 0.1f);
+				break;
+			}			
+			case InsideGapState.kOnRemove:{
+				insideState = InsideGapState.kUncreated;
+				
+				
 				GameObject.Destroy(insideCube);
 				insideCube = null;
-				connectionGO.GetComponent<AVOWComponent>().isInteractive = true;
-				//cursorCube = RejoinToCursor(cursorCube);
+				break;
 			}
-			AVOWComponent component = GetHeldCommandComponent();
-			if (component != null && isOutside){
-				insideState = InsideGapState.kOutsideAndTransitioning;	
-				insideLerpSpeed = minLerpSpeed;
+			case InsideGapState.kOnCancel:{
+				insideState = InsideGapState.kUncreated;
+				
+				// No components should be non interactive in this case
+				foreach (GameObject go in AVOWGraph.singleton.allComponents){
+					AVOWComponent component = go.GetComponent<AVOWComponent>();
+					component.isInteractive = true;
+				}
+				
+				GameObject.Destroy(insideCube);
+				insideCube = null;
+				break;
 			}
-			insideLerpSpeed = Mathf.Lerp (insideLerpSpeed, maxLerpSpeed, 0.1f);
-			break;
-		}			
-		case InsideGapState.kOnRemove:{
-			insideState = InsideGapState.kUncreated;
-			
-			
-			GameObject.Destroy(insideCube);
-			insideCube = null;
-			break;
-		}
-		case InsideGapState.kOnCancel:{
-			insideState = InsideGapState.kUncreated;
-			
-			
-			AVOWComponent component = GetHeldCommandComponent();
-			if (component != null){
-				component.isInteractive = true;
-			}				
-			
-			GameObject.Destroy(insideCube);
-			insideCube = null;
-			break;
-		}
 		}	
 		
 	}
@@ -649,6 +662,19 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		else{
 			lightening0GO.SetActive(false);
 			
+		}
+		
+		if (connectionGO != null){
+			if (heldConnection){
+				AVOWUI.singleton.SetElectricAudioVolume(1f);
+			}
+			else{
+				AVOWUI.singleton.SetElectricAudioVolume(0.5f);
+			}
+			
+		}
+		else{
+			AVOWUI.singleton.SetElectricAudioVolume(0);
 		}
 
 		

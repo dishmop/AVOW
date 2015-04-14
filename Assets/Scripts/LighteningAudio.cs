@@ -9,7 +9,7 @@ public class LighteningAudio : MonoBehaviour {
 	int periodInSamples = (int)(44100f / fundamentalF);
 
 	void OnAudioFilterRead(float[] data, int channels){
-		int halfPeriod = periodInSamples / 2;
+//		int halfPeriod = periodInSamples / 2;
 		for (int i = 0; i < data.Length; i += 2){
 			int inPeriodIndex = index % periodInSamples;
 			data[i] = 2 * (float)inPeriodIndex / (float)periodInSamples - 1;

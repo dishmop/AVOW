@@ -208,6 +208,10 @@ public class AVOWGameModes : MonoBehaviour {
 		}
 	}
 	
+	public bool IsPlayingLevel(){
+		return state == GameModeState.kPlayStage && currentLevel >= -1;
+	}
+	
 	public void ShowPointer(){
 		showPointer = true;
 	}
@@ -217,6 +221,7 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 	
 	public void TriggerHint(){
+		AVOWUI.singleton.PlayPing();
 		showHint = true;
 		showTimeHint = false;
 		hasShownHint = true;
@@ -244,6 +249,10 @@ public class AVOWGameModes : MonoBehaviour {
 		}
 		if (currentLevel > 0 && !hasShownHint && AVOWUpdateManager.singleton.GetGameTime() >  lastGoalTime + waitForTimedHintDuration){
 			TriggerTimerHint();
+		}
+		
+		if (!IsPlayingLevel()){
+			ProgressPanel.singleton.SetGoals(0, 0);
 		}
 		
 		if (AVOWBattery.singleton.IsDepleated()){
@@ -628,6 +637,7 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	
 	public void GoToMain(){
+		AVOWUI.singleton.PlayPing ();
 		backStory.SetActive(false);
 		
 		AVOWBackStoryCutscene.singleton.StopBackStory();

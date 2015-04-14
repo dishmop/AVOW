@@ -86,7 +86,7 @@ public class AVOWCommandRemove : AVOWCommand{
 				
 				Debug.Log ("Shriking component " + component.GetID() + " of type " + ((gapType == GapType.kOneOfMany) ? "One of many" : "Only one"));
 				
-				component.resistanceAngle.Set((gapType == GapType.kOnlyOne) ? 35 : 55);
+				component.resistanceAngle.Set((gapType == GapType.kOnlyOne) ? 36.86f : 53.13f);		//width of 0.75 : 1/0.75f	
 				undoStep = UndoStepState.kWidenGap;
 				executeStep = ExecuteStepState.kRemoveComponent;
 				break;
@@ -180,7 +180,7 @@ public class AVOWCommandRemove : AVOWCommand{
 					countOutIn++;
 				}
 				else{
-					newNode = thisComponent.outNodeGO.GetComponent<AVOWNode>();
+					newNode = thisComponent.inNodeGO.GetComponent<AVOWNode>();
 				}
 			}
 			if (countOutIn == 0){

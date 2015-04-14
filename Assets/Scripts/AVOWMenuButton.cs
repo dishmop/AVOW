@@ -8,5 +8,6 @@ public class AVOWMenuButton : MonoBehaviour {
 	// Use this for initialization
 	public void OnClick(){
 		AVOWGameModes.singleton.TriggerStartLevel(levelNum);
+		AVOWUI.singleton.PlayPing();
 	}
 }

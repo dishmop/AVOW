@@ -433,6 +433,17 @@ public class AVOWUITool{
 		component.GetComponent<AVOWComponent>().isInteractive = false;
 	}
 	
+	protected void EnsureCubeAtComponentCentre(GameObject component){
+		if (insideCube == null) return;
+		Transform resistanceTransform = component.transform.FindChild("Resistance");
+		
+		Vector3 targetScale = new Vector3(resistanceTransform.localScale.x, resistanceTransform.localScale.x, resistanceTransform.localScale.x);
+		
+		insideCube.transform.localScale = targetScale;
+		insideCube.transform.position = resistanceTransform.position +  + 0.5f * targetScale;
+		insideCube.transform.rotation = resistanceTransform.rotation;
+	}
+	
 	protected void RemoveMetal(GameObject cursor){
 		Material[] highlightMaterials = new Material[1];
 		highlightMaterials[0] = cursor.GetComponent<Renderer>().materials[1];

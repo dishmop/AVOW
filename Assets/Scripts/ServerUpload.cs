@@ -288,6 +288,9 @@ public class ServerUpload : MonoBehaviour {
 
 		
 	}
+	public void SetIgnoreFilename(string igoreFilename){
+	}
+	
 	
 	
 	

@@ -15,6 +15,7 @@
 		
 		        #pragma vertex vert
 		        #pragma fragment frag
+		        #pragma target 3.0
 	
 		        #include "UnityCG.cginc"
 		        

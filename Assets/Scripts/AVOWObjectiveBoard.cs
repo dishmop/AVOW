@@ -917,7 +917,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		AudioSource audioSource = gameObject.AddComponent<AudioSource>();
 		audioSource.clip = whoosh;
 		audioSource.Play();
-		audioSource.volume = 1f;
+		audioSource.volume = 0.25f;
 		
 	}
 	
@@ -944,6 +944,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			audioSource.clip = cPing;
 			audioSource.PlayDelayed(highlightSquare.GetComponent<AVOWHighlightRect>().fadeDuration * 0.25f);
 			audioSource.pitch = 1/vals[0];
+			audioSource.volume = 0.15f;
 		}
 		
 	}
@@ -974,6 +975,8 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			case State.kMovingToComplete0:{
 				if (IsHighlightFinished ()){
 					TriggerWhoosh();
+					ProgressPanel.singleton.IncCompleteGoals();
+				
 				
 					state = State.kMovingToComplete1;
 				}

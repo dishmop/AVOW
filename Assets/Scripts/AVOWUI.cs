@@ -19,6 +19,8 @@ public class AVOWUI : MonoBehaviour {
 	public GameObject lighteningPrefab;
 	public GameObject greenLighteningPrefab;
 	public GameObject electricAudioPrefab;
+	public AudioSource spinAS;
+	public AudioSource pingAS;
 	
 	
 	public bool canCreate = true;
@@ -80,10 +82,18 @@ public class AVOWUI : MonoBehaviour {
 		SetElectricAudioVolume(0);
 	}
 	
+	public void PlaySpin(){
+		spinAS.Play ();
+	}
+	
+	public void PlayPing(){
+		if (!pingAS.isPlaying) pingAS.Play ();
+	}
+	
 	public void SetElectricAudioVolume(float vol){
 		if (electricAudio != null){
-			if (AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kPlayStage){
-				electricAudio.GetComponent<AudioSource>().volume = 0.02f * vol;
+			if (AVOWGameModes.singleton.IsPlayingLevel()){
+				electricAudio.GetComponent<AudioSource>().volume = 0.003f * vol;
 			}
 			else{
 				electricAudio.GetComponent<AudioSource>().volume = 0;
@@ -344,6 +354,7 @@ public class AVOWUI : MonoBehaviour {
 		if (uiTool != null) uiTool.OnDestroy();
 		uiTool = new AVOWUICreateTool();
 		uiTool.Startup();
+		PlayPing ();
 		mode = ToolMode.kCreate;
 	}
 	
@@ -351,6 +362,7 @@ public class AVOWUI : MonoBehaviour {
 		if (uiTool != null) uiTool.OnDestroy();
 		uiTool = new AVOWUIDeleteTool();
 		uiTool.Startup();
+		PlayPing ();
 		mode = ToolMode.kDelete;
 	}
 	
