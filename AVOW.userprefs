@@ -1,24 +1,17 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../AVOW-temp/Assets/Scripts/AVOWGameModes.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWSim.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWLevelEditor.cs" Line="210" Column="16" />
-      <File FileName="Assets/Scripts/AVOWObjectiveManager.cs" Line="321" Column="61" />
-      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="50" Column="1" />
-      <File FileName="Assets/Scripts/AVOWObjectiveBoard.cs" Line="702" Column="23" />
-      <File FileName="Assets/Scripts/AVOWGameModes.cs" Line="194" Column="3" />
-      <File FileName="Assets/Scripts/AVOWMainMenu.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWUpdateManager.cs" Line="143" Column="4" />
-      <File FileName="Assets/Scripts/AVOWSim.cs" Line="107" Column="1" />
-      <File FileName="Assets/Scripts/AVOWUICreateTool.cs" Line="446" Column="23" />
-      <File FileName="Assets/Scripts/Telemetry.cs" Line="236" Column="1" />
-      <File FileName="Assets/Scripts/AVOWSideBar.cs" Line="30" Column="30" />
-      <File FileName="Assets/Scripts/AVOWTutorialManager.cs" Line="436" Column="118" />
-      <File FileName="../AVOW-temp/Assets/Scripts/AVOWGameModes.cs" Line="624" Column="2" />
+      <File FileName="Assets/Scripts/AVOWLevelEditor.cs" Line="27" Column="36" />
+      <File FileName="Assets/Scripts/AVOWGameModes.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWSideBar.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWSim.cs" Line="333" Column="6" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/AVOW/Assets/Scripts/AVOWSim.cs" line="333" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

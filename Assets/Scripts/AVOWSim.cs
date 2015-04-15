@@ -330,7 +330,7 @@ public class AVOWSim : MonoBehaviour {
 		foreach (GameObject componentGO in graph.allComponents){
 			AVOWComponent component = componentGO.GetComponent<AVOWComponent>();
 			if (!component.visited && !component.disable)
-				Debug.LogError ("Spanning tree does not visit very node");
+				Debug.Log ("Error: Spanning tree does not visit very node");
 		}
 		
 	}
