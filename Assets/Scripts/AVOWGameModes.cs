@@ -340,7 +340,7 @@ public class AVOWGameModes : MonoBehaviour {
 			}
 			case GameModeState.kPlayStage:{
 				whitePanel.SetActive(false);
-				levelDisplay.transform.FindChild("ButtonPanel").FindChild("LevelText").GetComponent<Text>().text = GetLevelName(currentLevel);
+				levelDisplay.transform.FindChild("ButtonPanel").FindChild("LevelText").GetComponent<Text>().text = GetLevelName(currentLevel, true);
 				break;
 				
 			}			
@@ -588,7 +588,7 @@ public class AVOWGameModes : MonoBehaviour {
 			Color msgCol = levelStartMsg.transform.FindChild ("Message").GetComponent<Text>().color;
 			msgCol.a = alpha;
 			levelStartMsg.transform.FindChild ("Message").GetComponent<Text>().color = msgCol;
-			levelStartMsg.transform.FindChild ("LevelTitle").GetComponent<Text>().text = GetLevelName(currentLevel);
+			levelStartMsg.transform.FindChild ("LevelTitle").GetComponent<Text>().text = GetLevelName(currentLevel, true);
 			
 		}
 	}
@@ -654,14 +654,24 @@ public class AVOWGameModes : MonoBehaviour {
 //		PlayFree();
 //		state = GameModeState.kMainMenu;
 //	}
-	
+
 	public string GetLevelName(int index){
+		return GetLevelName(index, false);
+	}
+	
+	public string GetLevelName(int index, bool withLineBreak){
 		// Check if it is the last one
 		if (IsTelemPlaybackLevel(index)){
 			return "Playback telemetry";
 		}
 		if (index > 0 && index <=AVOWLevelEditor.singleton.GetNumPlaybackLevels()){
-			return "Level " + index.ToString() + ": " + AVOWLevelEditor.singleton.GetPlaybackLevelName(index-1);
+			if (!withLineBreak){
+				return "Level " + index.ToString() + ": " + AVOWLevelEditor.singleton.GetPlaybackLevelName(index-1);
+			}
+			else{
+				return "Level " + index.ToString() + ":\n" + AVOWLevelEditor.singleton.GetPlaybackLevelName(index-1);
+			}
+			
 		}
 
 		switch (index){

@@ -58,9 +58,9 @@ public class AVOWLevelEditor : MonoBehaviour {
 				for (int i = 0; i < totalNumGoals; ++i){
 					newTargets.Add(targets[i]);
 					newGoalTypes.Add (goalTypes[i]);
-					levelNames.Add (levelName);
-					levelHints.Add (levelHint);
 				}
+				levelNames.Add (levelName);
+				levelHints.Add (levelHint);
 			}
 			levelNum++;
 			
