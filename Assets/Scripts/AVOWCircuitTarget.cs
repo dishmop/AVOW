@@ -75,6 +75,13 @@ public class AVOWCircuitTarget{
 	
 	
 	public AVOWCircuitTarget (){
+		totalCurrent = 0;
+		componentDesc = new List<Vector3>();
+		hiddenComponents = new List<Vector3>();
+
+		lcm = 0;
+		widthInLCMs = 0;
+		orderingValue = 0;
 	}
 
 	// copy constructor

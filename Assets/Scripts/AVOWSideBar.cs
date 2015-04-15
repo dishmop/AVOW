@@ -27,6 +27,7 @@ public class AVOWSideBar : MonoBehaviour {
 		transform.FindChild("IncGoal").gameObject.SetActive(drawTextInButtons && AVOWLevelEditor.singleton.enableEditor);
 		transform.FindChild("DecGoal").gameObject.SetActive(drawTextInButtons && AVOWLevelEditor.singleton.enableEditor);
 		transform.FindChild("DispGoal").gameObject.SetActive(drawTextInButtons && AVOWLevelEditor.singleton.enableEditor);
+		transform.FindChild("CopyPrevious").gameObject.SetActive(drawTextInButtons && AVOWLevelEditor.singleton.enableEditor);
 		transform.FindChild("DispGoal").GetComponent<Text>().text = AVOWLevelEditor.singleton.currentGoal.ToString();
 		
 		

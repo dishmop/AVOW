@@ -79,16 +79,16 @@ public class AVOWGraph : MonoBehaviour {
 		// Make a dictionary lookup for voltages and new nodes
 		Dictionary<int, GameObject> voltagToNodeLookup = new Dictionary<int, GameObject>();
 		voltagToNodeLookup.Add (0, node0GO);
-		voltagToNodeLookup.Add ((int)multiplier, node1GO);
+		voltagToNodeLookup.Add (Mathf.RoundToInt(multiplier), node1GO);
 		
 		// Create nodes and components
 		foreach (Vector3 vals in desc){
-			int minVoltage = (int)(vals[2] * multiplier);
+			int minVoltage = Mathf.RoundToInt(vals[2] * multiplier);
 			if (!voltagToNodeLookup.ContainsKey(minVoltage)){
 				voltagToNodeLookup.Add (minVoltage, AddNode());
 			}
 			
-			int maxVoltage = (int)((vals[2] + vals[0])  * multiplier);
+			int maxVoltage = Mathf.RoundToInt((vals[2] + vals[0])  * multiplier);
 			if (!voltagToNodeLookup.ContainsKey(maxVoltage)){
 				voltagToNodeLookup.Add (maxVoltage, AddNode());
 			}

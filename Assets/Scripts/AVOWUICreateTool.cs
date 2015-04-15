@@ -448,6 +448,11 @@ public class AVOWUICreateTool :  AVOWUITool{
 			return;
 		}
 		
+		if (connection0 == null){
+			heldConnection = false;
+		}
+		
+		
 		
 		//	Debug.Log("Mouse world pos = " + mouseWorldPos.ToString());
 		
@@ -723,6 +728,11 @@ public class AVOWUICreateTool :  AVOWUITool{
 	
 	void VizUpdate(){
 		HandleCubeInsideGap();
+		
+		// Can be made null if somethign else deletes the component
+		if (connection0 == null){
+			heldConnection = false;
+		}
 		
 		
 		// if we are holding a node then select that node

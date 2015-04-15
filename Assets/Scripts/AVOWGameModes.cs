@@ -10,6 +10,7 @@ public class AVOWGameModes : MonoBehaviour {
 
 	public enum GameModeState{
 		kSplashScreen,
+		kPreMainMenu,
 		kMainMenu,
 		kPlayStage,
 		kStageComplete0,
@@ -127,11 +128,12 @@ public class AVOWGameModes : MonoBehaviour {
 		SelectCamera(CameraChoice.kGameCam);
 		tutorialText.SetActive(true);
 		if (!Telemetry.singleton.enableTelemetry && state == GameModeState.kSplashScreen){
-			state = GameModeState.kMainMenu;
+			state = GameModeState.kPreMainMenu;
 		}
 		else{
 			OnActivateSplash();
 		}
+
 	}
 	
 	
@@ -156,7 +158,7 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 	
 	public int GetNumMainMenuButtons(){
-		return AVOWConfig.singleton.playbackEnable ? 12 : 11;
+		return 	AVOWLevelEditor.singleton.GetNumPlaybackLevels() + 3;
 	}
 	
 	public int GetMinMainMenuButton(){
@@ -188,24 +190,7 @@ public class AVOWGameModes : MonoBehaviour {
 			lastGoalTime = 10000f;
 			return;
 		}
-		if (currentLevel == 1 || currentLevel == 2 || currentLevel == 3){
-			AVOWTutorialText.singleton.AddText("Levels 1, 2 and 3 hint:");
-			AVOWTutorialText.singleton.AddText("See the pattern made by the metal frames on the wooden panel? - try to make the same pattern with your resistance squares.");
-			AVOWTutorialText.singleton.AddText("Remember there are two tools you can use: Create or Destroy.");
-			
-		}
-		if (currentLevel == 4 || currentLevel == 5){
-			AVOWTutorialText.singleton.AddText("Levels 4 and 5 hint:");
-			AVOWTutorialText.singleton.AddText("Imagine how the metal frames can be stacked up from the bottom to the top to create a rectangle with no gaps.");
-			AVOWTutorialText.singleton.AddText("That's the pattern you must make with your resistance squares.");
-			
-		}
-		if (currentLevel == 6 || currentLevel == 7 || currentLevel == 8){
-			AVOWTutorialText.singleton.AddText("Levels 6, 7 and 8 hint:");
-			AVOWTutorialText.singleton.AddText("Imagine adding some additional square frames and then stacking them all from the bottom to the top to create a rectangle with no gaps");
-			AVOWTutorialText.singleton.AddText("That's the pattern you must make with your resistance squares.");
-			
-		}
+		AVOWTutorialText.singleton.AddText(AVOWLevelEditor.singleton.GetHint());
 	}
 	
 	public bool IsPlayingLevel(){
@@ -269,6 +254,11 @@ public class AVOWGameModes : MonoBehaviour {
 		
 
 		switch (state){
+			case GameModeState.kPreMainMenu:{
+				AVOWLevelEditor.singleton.LoadAllForPlayback();
+				state = GameModeState.kMainMenu;
+				break;
+			}
 			case GameModeState.kMainMenu:{
 				AVOWUpdateManager.singleton.ResetGameTime();
 				
@@ -317,7 +307,7 @@ public class AVOWGameModes : MonoBehaviour {
 		if (currentLevel > 0 && state == GameModeState.kPlayStage){
 			AVOWConfig.singleton.DisplayBottomPanel(showHint);
 		}
-		levelDisplay.transform.FindChild("ButtonPanel").FindChild("LevelText").GetComponent<Text>().text = GetLevelName(currentLevel);
+		
 		
 		
 	
@@ -350,6 +340,7 @@ public class AVOWGameModes : MonoBehaviour {
 			}
 			case GameModeState.kPlayStage:{
 				whitePanel.SetActive(false);
+				levelDisplay.transform.FindChild("ButtonPanel").FindChild("LevelText").GetComponent<Text>().text = GetLevelName(currentLevel);
 				break;
 				
 			}			
@@ -521,7 +512,6 @@ public class AVOWGameModes : MonoBehaviour {
 			return;
 		}
 		
-		
 		currentLevel = levelNum;
 		hasShownHint = false;
 		lastGoalTime = 0;
@@ -639,7 +629,7 @@ public class AVOWGameModes : MonoBehaviour {
 	public void GoToMain(){
 		AVOWUI.singleton.PlayPing ();
 		backStory.SetActive(false);
-		
+		AVOWLevelEditor.singleton.LoadAllForPlayback();
 		AVOWBackStoryCutscene.singleton.StopBackStory();
 		AVOWTutorialManager.singleton.StopTutorial();
 		AVOWConfig.singleton.DisplayBottomPanel(false);
@@ -657,7 +647,7 @@ public class AVOWGameModes : MonoBehaviour {
 		if (state == GameModeState.kSplashScreen){
 			OnLeaveSplashScreen();
 		}
-		state = GameModeState.kMainMenu;
+		state = GameModeState.kPreMainMenu;
 	}
 	
 //	public void GoToMainFromComplete(){
@@ -670,8 +660,8 @@ public class AVOWGameModes : MonoBehaviour {
 		if (IsTelemPlaybackLevel(index)){
 			return "Playback telemetry";
 		}
-		if (index > 0){
-			return "Level " + index.ToString();
+		if (index > 0 && index <=AVOWLevelEditor.singleton.GetNumPlaybackLevels()){
+			return "Level " + index.ToString() + ": " + AVOWLevelEditor.singleton.GetPlaybackLevelName(index-1);
 		}
 
 		switch (index){

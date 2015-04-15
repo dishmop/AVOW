@@ -33,7 +33,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	
 	float waitTime;
 	
-	int numBoardsToUnstack;
+	int numBoardsToUnstack;	// no longer needed
 	bool hasMovedToRow;
 	
 
@@ -221,7 +221,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 
 	// Levels start at level1 and go up to this number not inclusive
 	public int GetMaxLevelNum(){
-		return AVOWGameModes.singleton.GetNumMainMenuButtons() + AVOWGameModes.singleton.GetMinMainMenuButton();
+		return AVOWLevelEditor.singleton.GetNumPlaybackLevels();
 	}
 	
 	public bool IsCurrentGoalExcluded(){
@@ -234,7 +234,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		SaveExcludedLevels();
 	}
 	
-	public void InitialiseLevelFromEditor(int goal, AVOWLevelEditor.GoalType goalType){
+	public void InitialiseLevelFromEditor(int goal){
 		currentLevel = 0;
 		currentGoalIndex = goal-1;
 		initialisedLimitsOnly = false;
@@ -242,34 +242,34 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		dontComplete = true;
 		
 		InitialiseBlankBoard();
-		
-		switch (goalType){
-			case AVOWLevelEditor.GoalType.kReadyStacked:{
-				layoutMode = AVOWObjectiveBoard.LayoutMode.kStack;
-				numBoardsToUnstack = 0;
-				break;
-			}
-			case AVOWLevelEditor.GoalType.kStackedThenRowed:{
-				layoutMode = AVOWObjectiveBoard.LayoutMode.kRow;
-				numBoardsToUnstack = goal + 1;
-				break;
-			}
-			case AVOWLevelEditor.GoalType.kRowed:{
-				layoutMode = AVOWObjectiveBoard.LayoutMode.kRow;
-				numBoardsToUnstack = 0;
-				break;
-			}
-			case AVOWLevelEditor.GoalType.kRowedThenMissing:{
-				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
-				numBoardsToUnstack = goal + 1;
-				break;
-			}
-			case AVOWLevelEditor.GoalType.kMissing:{
-				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
-				numBoardsToUnstack = 0;
-				break;
-			}
-		}
+//		
+//		switch (goalType){
+//			case AVOWLevelEditor.GoalType.kReadyStacked:{
+//				layoutMode = AVOWObjectiveBoard.LayoutMode.kStack;
+//				numBoardsToUnstack = 0;
+//				break;
+//			}
+//			case AVOWLevelEditor.GoalType.kStackedThenRowed:{
+//				layoutMode = AVOWObjectiveBoard.LayoutMode.kRow;
+//				numBoardsToUnstack = goal + 1;
+//				break;
+//			}
+//			case AVOWLevelEditor.GoalType.kRowed:{
+//				layoutMode = AVOWObjectiveBoard.LayoutMode.kRow;
+//				numBoardsToUnstack = 0;
+//				break;
+//			}
+//			case AVOWLevelEditor.GoalType.kRowedThenMissing:{
+//				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
+//				numBoardsToUnstack = goal + 1;
+//				break;
+//			}
+//			case AVOWLevelEditor.GoalType.kMissing:{
+//				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
+//				numBoardsToUnstack = 0;
+//				break;
+//			}
+//		}
 		
 		state = State.kPauseOnLevelStart;
 		waitTime = Time.time + 0;
@@ -310,6 +310,24 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	}
 	
 	public void InitialiseLevel(int level){
+		AVOWLevelEditor.singleton.LoadAllForPlayback();
+		AVOWLevelEditor.singleton.InitialisePlayback(level-1);
+		
+		currentLevel = level;
+		currentGoalIndex = -1;
+		initialisedLimitsOnly = false;
+		numBoardsToUnstack = 0;
+		dontComplete = false;
+		resistorLimit = AVOWLevelEditor.singleton.maxNumResistors;
+		
+		InitialiseBlankBoard();
+		
+		state = State.kPauseOnLevelStart;
+		waitTime = Time.time + levelStartPauseDuration;
+		
+	}
+	
+	public void InitialiseLevelOld(int level){
 		dontComplete = false;
 		
 		currentLevel = level;
@@ -407,7 +425,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	}
 	
 	public bool IsOnLastLevel(){
-		return currentLevel == GetMaxLevelNum() - 1;
+		return currentLevel == GetMaxLevelNum();
 	}
 	
 	void ConstructBoards(){
@@ -461,10 +479,14 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	
 	public void DeserializeExcludedGoals(Stream stream){
 		BinaryReader br = new BinaryReader(stream);
+
 		
 		int numLevels = br.ReadInt32();
+		excludedGoals = new bool[numLevels][]; 
 		for (int i = 0; i < numLevels; ++i){
 			int numGoals =  br.ReadInt32();
+			
+			excludedGoals[i] = new bool[numGoals]; 
 			
 			for (int j = 0; j < numGoals; ++j){
 				bool exlude = br.ReadBoolean();
@@ -476,18 +498,18 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	}
 	
 	void ConstructExcludedGoals(){
-		
-		excludedGoals = new bool[GetMaxLevelNum()][]; 
-		
-		// Create arrys of the correct suze
-		for (int i = 1; i < GetMaxLevelNum(); ++i){
-			InitialiseLevel(i);
-			while (!AVOWCircuitCreator.singleton.IsReady()){
-				AVOWCircuitCreator.singleton.GameUpdate ();
-			}
-			excludedGoals[i] = new bool[GetGoalTargets().Count];
-		}
-		DeinitialiseLevel();
+		return ;
+//		excludedGoals = new bool[GetMaxLevelNum()][]; 
+//		
+//		// Create arrys of the correct suze
+//		for (int i = 1; i < GetMaxLevelNum(); ++i){
+//			InitialiseLevel(i);
+//			while (!AVOWCircuitCreator.singleton.IsReady()){
+//				AVOWCircuitCreator.singleton.GameUpdate ();
+//			}
+//			excludedGoals[i] = new bool[GetGoalTargets().Count];
+//		}
+//		DeinitialiseLevel();
 	}
 
 
@@ -552,7 +574,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	
 	List<AVOWCircuitTarget> GetGoalTargets(){
 		if (useLevelEditor){
-			return AVOWLevelEditor.singleton.GetCurrentGoal();
+			return AVOWLevelEditor.singleton.GetCurrentGoals();
 		}
 		else{
 			if (layoutMode != AVOWObjectiveBoard.LayoutMode.kGappedRow){
@@ -566,6 +588,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	}
 	
 	public bool ShouldGoalBeExcluded(int levelNum, int goalNum){
+		if (useLevelEditor) return false;
 		if (excludedGoals == null) return false;
 		if (excludedGoals[levelNum] == null) return false;
 		
@@ -614,27 +637,33 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				
 				AVOWObjectiveBoard board = boards[backIndex].GetComponent<AVOWObjectiveBoard>();
 				AVOWCircuitTarget target = GetGoalTargets()[currentGoalIndex];
-				if (layoutMode == AVOWObjectiveBoard.LayoutMode.kStack){
-					board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kStack);
-				}
-				if (layoutMode == AVOWObjectiveBoard.LayoutMode.kRow){
-					if (numBoardsToUnstack > 0){
+				AVOWLevelEditor.GoalType goalType = AVOWLevelEditor.singleton.GetCurrentGoalTypes()[currentGoalIndex];
+				
+				switch (goalType){
+					case AVOWLevelEditor.GoalType.kReadyStacked:{
+						board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kStack);
+						break;
+					}
+					case AVOWLevelEditor.GoalType.kStackedThenRowed:{
 						board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kStack);
 						hasMovedToRow = false;
+						break;
 					}
-					else{
+					case AVOWLevelEditor.GoalType.kRowed:{
 						board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kRow);
+						break;
 					}
-				}
-				if (layoutMode == AVOWObjectiveBoard.LayoutMode.kGappedRow){
-					if (numBoardsToUnstack > 0){
+					case AVOWLevelEditor.GoalType.kRowedThenMissing:{
 						board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kRow);
 						hasMovedToRow = false;
+						break;
 					}
-					else{
+					case AVOWLevelEditor.GoalType.kMissing:{
 						board.PrepareBoard(target, AVOWObjectiveBoard.LayoutMode.kGappedRow);
+						break;
 					}
-				}				
+				}
+							
 				boards[backIndex].transform.localPosition = Vector3.zero;
 				ForceBoardDepths();
 				//				AVOWBattery.singleton.ResetBattery();
@@ -669,16 +698,22 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				break;
 			}
 			case State.kPlay:{
-				
-				if (numBoardsToUnstack > 0 && Time.time > waitTime && !hasMovedToRow){
-					if (layoutMode == AVOWObjectiveBoard.LayoutMode.kRow){
-						boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToRow();
-					}
-					else{
-						boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToGappedRow();
+				if (Time.time > waitTime && !hasMovedToRow){
+					AVOWLevelEditor.GoalType goalType = AVOWLevelEditor.singleton.GetCurrentGoalTypes()[currentGoalIndex];
+					switch (goalType){
+						case AVOWLevelEditor.GoalType.kStackedThenRowed:{
+							boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToRow();
+							break;
+						}
+						case AVOWLevelEditor.GoalType.kRowedThenMissing:{
+							boards[frontIndex].GetComponent<AVOWObjectiveBoard>().MoveToGappedRow();
+							break;
+						}
+					
 					}
 					hasMovedToRow = true;
 				}
+				
 				if (dontComplete) break;
 				if (!AVOWGraph.singleton.HasHalfFinishedComponents()){
 					AVOWCircuitTarget currentGraphAsTarget = new AVOWCircuitTarget(AVOWGraph.singleton);
