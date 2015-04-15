@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class AVOWSideBar : MonoBehaviour {
 
@@ -16,7 +17,19 @@ public class AVOWSideBar : MonoBehaviour {
 		bool drawTextInButtons = (AVOWConfig.singleton.GetSidePanelFrac() > 0.01f);
 		
 		transform.FindChild("ReturnButton").gameObject.SetActive(drawTextInButtons);
-		transform.FindChild("ExcludeToggle").gameObject.SetActive(drawTextInButtons && AVOWConfig.singleton.levelExcludeEdit);
+//		transform.FindChild("ExcludeToggle").gameObject.SetActive(drawTextInButtons && AVOWConfig.singleton.levelExcludeEdit);
+
+		transform.FindChild("DisplayGoal").gameObject.SetActive(drawTextInButtons && AVOWLevelEditor.singleton.enableEditor);
+		transform.FindChild("StoreGoal").gameObject.SetActive(drawTextInButtons && AVOWLevelEditor.singleton.enableEditor);
+		transform.FindChild("LoadLevel").gameObject.SetActive(drawTextInButtons && AVOWLevelEditor.singleton.enableEditor);
+		transform.FindChild("SaveLevel").gameObject.SetActive(drawTextInButtons && AVOWLevelEditor.singleton.enableEditor);
+		transform.FindChild("ClearLevel").gameObject.SetActive(drawTextInButtons && AVOWLevelEditor.singleton.enableEditor);
+		transform.FindChild("IncGoal").gameObject.SetActive(drawTextInButtons && AVOWLevelEditor.singleton.enableEditor);
+		transform.FindChild("DecGoal").gameObject.SetActive(drawTextInButtons && AVOWLevelEditor.singleton.enableEditor);
+		transform.FindChild("DispGoal").gameObject.SetActive(drawTextInButtons && AVOWLevelEditor.singleton.enableEditor);
+		transform.FindChild("DispGoal").GetComponent<Text>().text = AVOWLevelEditor.singleton.currentGoal.ToString();
+		
+		
 		
 	}
 }

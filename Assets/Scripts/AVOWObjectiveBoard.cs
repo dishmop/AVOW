@@ -706,7 +706,28 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		
 	}
 	
-	Vector3 GamePosToTransformPos(Vector3 pos, float sizeOfSquare, float totalCurrent){
+	public int InsideTargetTest(Vector3 pos){
+	
+	
+		for (int i = 0; i < currentCovers.Length; ++i){
+		
+			Rect testRect = new Rect(
+				currentCovers[i].transform.position.x, 
+				currentCovers[i].transform.position.y, 
+				currentCovers[i].transform.localScale.x,
+				currentCovers[i].transform.localScale.x);
+				
+			if (testRect.Contains(pos)){
+				return i;
+			}
+			                         
+			
+		}
+		return -1;
+	}
+		
+	
+	public Vector3 GamePosToTransformPos(Vector3 pos, float sizeOfSquare, float totalCurrent){
 		if(totalCurrent >= 0){
 			return renderBackwards ? new Vector3(-totalCurrent + pos.x, pos.y, pos.z) : pos;
 	  }
@@ -716,7 +737,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 
-	Vector3 TransformPosToGamePos(Vector3 pos, float sizeOfSquare, float totalCurrent){
+	public Vector3 TransformPosToGamePos(Vector3 pos, float sizeOfSquare, float totalCurrent){
 		if(totalCurrent >= 0){
 			return renderBackwards ? new Vector3(pos.x + totalCurrent, pos.y, pos.z) : pos;
 		}

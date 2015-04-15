@@ -335,8 +335,8 @@ public class AVOWGameModes : MonoBehaviour {
 			levelCompleteDlg.SetActive (false);
 			gameCompleteDlg.SetActive (false);
 		}
-		sidePanel.transform.FindChild("ExcludeToggle").gameObject.SetActive(AVOWConfig.singleton.levelExcludeEdit);
-		sidePanel.transform.FindChild("ExcludeToggle").GetComponent<Text>().text = AVOWObjectiveManager.singleton.IsCurrentGoalExcluded() ? "Include Goal" : "Exclude Goal";
+//		sidePanel.transform.FindChild("ExcludeToggle").gameObject.SetActive(AVOWConfig.singleton.levelExcludeEdit);
+//		sidePanel.transform.FindChild("ExcludeToggle").GetComponent<Text>().text = AVOWObjectiveManager.singleton.IsCurrentGoalExcluded() ? "Include Goal" : "Exclude Goal";
 		
 		splashScreen.SetActive(state == GameModeState.kSplashScreen);
 		

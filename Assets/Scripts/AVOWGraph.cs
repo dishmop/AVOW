@@ -46,6 +46,59 @@ public class AVOWGraph : MonoBehaviour {
 		else return -1;
 	}
 	
+	public void ConstructFromTarget(AVOWCircuitTarget target){
+		ClearCircuit();
+		
+		float multiplier = 1*2*3*4*5*6*7*8;
+		
+		
+		// Simple start
+		GameObject node0GO = AddNode ();
+		GameObject node1GO = AddNode ();
+		
+		
+		PlaceComponent(GameObject.Instantiate(AVOWUI.singleton.cellPrefab), node0GO, node1GO);
+		
+		
+		PlaceComponent(GameObject.Instantiate(AVOWUI.singleton.resistorPrefab) as GameObject, node1GO, node0GO);
+		allComponents[1].GetComponent<AVOWComponent>().Kill(45);
+
+
+		AVOWSim.singleton.Recalc();
+		
+		// Make master list of components
+		List<Vector3> desc = new List<Vector3>();
+		foreach (Vector3 vals in target.componentDesc){
+			desc.Add(vals);
+		}
+		foreach (Vector3 vals in target.hiddenComponents){
+			desc.Add(vals);
+		}
+		
+		
+		// Make a dictionary lookup for voltages and new nodes
+		Dictionary<int, GameObject> voltagToNodeLookup = new Dictionary<int, GameObject>();
+		voltagToNodeLookup.Add (0, node0GO);
+		voltagToNodeLookup.Add ((int)multiplier, node1GO);
+		
+		// Create nodes and components
+		foreach (Vector3 vals in desc){
+			int minVoltage = (int)(vals[2] * multiplier);
+			if (!voltagToNodeLookup.ContainsKey(minVoltage)){
+				voltagToNodeLookup.Add (minVoltage, AddNode());
+			}
+			
+			int maxVoltage = (int)((vals[2] + vals[0])  * multiplier);
+			if (!voltagToNodeLookup.ContainsKey(maxVoltage)){
+				voltagToNodeLookup.Add (maxVoltage, AddNode());
+			}
+			
+			PlaceComponent(GameObject.Instantiate(AVOWUI.singleton.resistorPrefab), voltagToNodeLookup[minVoltage], voltagToNodeLookup[maxVoltage]);
+			
+		}
+		
+	}
+	
 	// This must be reset at the beginning of each GameUpdate frame
 	public void ResetOptFlags(){
 		topologyHasChanged = false;
