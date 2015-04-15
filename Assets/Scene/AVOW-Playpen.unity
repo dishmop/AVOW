@@ -2176,7 +2176,7 @@ MonoBehaviour:
   showIndividuals: 0
   showObjectives: 1
   objectivesAsText: 0
-  playbackEnable: 0
+  playbackEnable: 1
   modifiedNodeLengths: 1
   tutorialSpeed: 1
   sideBarPixels: 200
@@ -3304,7 +3304,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AspectMode: 0
-  m_AspectRatio: 1.72385907
+  m_AspectRatio: 1.91209602
 --- !u!114 &689694817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6413,11 +6413,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22436484, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.x
-      value: -55.2553101
+      value: -67.3823013
       objectReference: {fileID: 0}
     - target: {fileID: 22474278, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.y
-      value: -4.28952026
+      value: -4.45791054
       objectReference: {fileID: 0}
     - target: {fileID: 22491496, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_LocalPosition.x
@@ -7390,7 +7390,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11449800, guid: 096d17ed368bd4830afcec287da33923, type: 2}
       propertyPath: playbackFilename
-      value: AVOW_1_Diarmid_20150410_145051_0358fb1c-94f2-4156-8c1a-61467582f9a2_f23ade73-df71-4a88-a7dc-1a9c6bb96421.telemetry
+      value: AVOW_1_Diarmid_PostNewLevels_20150415_155439_0358fb1c-94f2-4156-8c1a-61467582f9a2_a3441c22-e88e-4c4f-80ad-930f31acdbff.telemetry
       objectReference: {fileID: 0}
     - target: {fileID: 11449800, guid: 096d17ed368bd4830afcec287da33923, type: 2}
       propertyPath: enableTelemetry
@@ -9288,7 +9288,7 @@ Prefab:
       objectReference: {fileID: 1813380714}
     - target: {fileID: 22474278, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.y
-      value: -4.30342817
+      value: -4.47474194
       objectReference: {fileID: 0}
     - target: {fileID: 22436484, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_AnchorMax.x
@@ -9300,7 +9300,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22436484, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.x
-      value: -56.2572174
+      value: -68.5945129
       objectReference: {fileID: 0}
     - target: {fileID: 199004, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_Name
