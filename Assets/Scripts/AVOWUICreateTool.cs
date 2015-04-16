@@ -226,6 +226,8 @@ public class AVOWUICreateTool :  AVOWUITool{
 	
 	public override void GameUpdate () {
 		//		Debug.Log(Time.time + ": UICreateTool Update");
+		HandleMouseButtonInput();
+		
 		StateUpdate();
 		CalcNewHOrder();
 		CommandsUpdate();
@@ -561,13 +563,23 @@ public class AVOWUICreateTool :  AVOWUITool{
 		isInside = false;//(connection1 != null);
 		
 		// If we have a connection1, then the camera should preserve the vector from that object to here
-		AVOWCamControl.singleton.mode = IsButtonDown() ? AVOWCamControl.Mode.kFixVector : AVOWCamControl.Mode.kFrameGame;
+		if (IsButtonDown()){
+			AVOWCamControl.singleton.mode = AVOWCamControl.Mode.kFixVector;
+		}
+		else{
+		//	Debug.Log("UITool setting FrameGame");
+			AVOWCamControl.singleton.mode = AVOWCamControl.Mode.kFrameGame;
+		}
 
 		if (connection1 != null){
-
-			AVOWSim.singleton.SetAnchor(connection1, connection1Pos);
-			
+			AVOWSim.singleton.SetAnchor(connection1, connection1Pos, mouseWorldPos);
 		}
+		else{
+	//		AVOWSim.singleton.anchorObj  = null;
+			//Debug.Log("StateUpdate - AVOWSim.singleton.anchorObj  = null");
+			AVOWSim.singleton.UpdateAnchor();
+		}
+		
 		if (!IsButtonDown()){
 			AVOWSim.singleton.anchorObj  = null;
 		}
@@ -971,7 +983,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 			
 			// Ned to force the sim to do an update (this would be better if all this logic was in a fixed update and it 
 			// was more tightly controlled
-			AVOWSim.singleton.GameUpdate();
+			AVOWSim.singleton.Recalc();
 		}
 		
 	}

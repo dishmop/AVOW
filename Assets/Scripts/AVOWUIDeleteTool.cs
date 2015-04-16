@@ -368,6 +368,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 	
 	public override void GameUpdate () {
 		//		Debug.Log(Time.time + ": UICreateTool Update");
+		HandleMouseButtonInput();
 		StateUpdate();
 		CommandsUpdate();
 		ResetButtonFlags();

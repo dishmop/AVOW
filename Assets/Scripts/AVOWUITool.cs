@@ -67,15 +67,17 @@ public class AVOWUITool{
 	
 	// Call this at the end of the fixed update function to ensure correct behaviour
 	protected void ResetButtonFlags(){
+	//	Debug.Log(AVOWUpdateManager.singleton.GetGameTime()+ ": ResetButtonFlags");
 		isMouseDown = false;
 		isMouseReleased = false;
 	}
 	
-	// Call from the render update
+	// Call from the render update and also from the GameUpdate -... perhaps needs looking at.
 	protected void HandleMouseButtonInput(){
 		/// Logic is a latch which ust be reset 
 		isMouseDown =   isMouseDown || (!AVOWConfig.singleton.tutDisableMouseButtton && Input.GetMouseButton(0));
 		isMouseReleased = isMouseReleased || (!AVOWConfig.singleton.tutDisableMouseButtton && !Input.GetMouseButton(0));
+	//	Debug.Log("HandleMouseButtonInput, isMouseDown =" +  isMouseDown);
 	}
 	
 	

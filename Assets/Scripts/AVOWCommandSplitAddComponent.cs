@@ -84,7 +84,7 @@ public class AVOWCommandSplitAddComponent : AVOWCommand{
 
 				AVOWComponent newComponent = newComponentGO.GetComponent<AVOWComponent>();
 				newComponent.resistanceAngle.Force(0);
-				newComponent.resistanceAngle.Set(isSplittingAtCell ? 7.12f : 26.56f);	// 8th : half size
+				newComponent.resistanceAngle.Set(isSplittingAtCell ? 7.12f : 7.12f);	// 0.125
 				newComponent.isInteractive = false;
 				
 				AVOWGraph.singleton.PlaceComponent(newComponentGO, newNodeGO, nodeGO);

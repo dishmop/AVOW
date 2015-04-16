@@ -22,6 +22,7 @@ public class AVOWUpdateManager : MonoBehaviour {
 	public GameObject telemetry;
 	public GameObject serverUpload;
 	public GameObject battery;
+	public GameObject pusher;
 	
 	public float playbackSpeed = 1;
 	
@@ -100,8 +101,7 @@ public class AVOWUpdateManager : MonoBehaviour {
 		backStory.GetComponent<AVOWBackStoryCutscene>().Initialise();
 		objectiveManager.GetComponent<AVOWObjectiveManager>().Initialise();
 		battery.GetComponent<AVOWBattery>().Initialise();
-		
-		
+	
 	}
 	
 	// Update is called once per frame
@@ -121,6 +121,7 @@ public class AVOWUpdateManager : MonoBehaviour {
 			tutorialText.GetComponent<AVOWTutorialText>().GameUpdate();
 			objectiveManager.GetComponent<AVOWObjectiveManager>().GameUpdate();
 			tutorialManager.GetComponent<AVOWTutorialManager>().GameUpdate();
+
 		}
 		if (telemetry.GetComponent<Telemetry>().isRecording){
 			AVOWTelemetry.singleton.WriteGameUpdateEvent();
@@ -150,7 +151,7 @@ public class AVOWUpdateManager : MonoBehaviour {
 		camController.GetComponent<AVOWCamControl>().RenderUpdate();
 		objectiveManager.GetComponent<AVOWObjectiveManager>().RenderUpdate();
 		battery.GetComponent<AVOWBattery>().RenderUpdate();
-		
+		pusher.GetComponent<AVOWPusher>().RenderUpdate();
 
 	}
 	

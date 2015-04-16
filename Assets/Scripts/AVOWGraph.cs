@@ -706,13 +706,25 @@ public class AVOWGraph : MonoBehaviour {
 		if (allComponents.Count == 0){
 			xMin = 0;
 			xMax = 0;
+		//	Debug.Log("allComponents.Count == 0");
+			
 		}
 		else{
 			xMin = 0;
-			xMax = Mathf.Abs (allComponents[0].GetComponent<AVOWComponent>().fwCurrent);
+			//Debug.Log("Component 0: " + allComponents[0].GetComponent<AVOWComponent>().type.ToString() + ", " + allComponents[0].GetComponent<AVOWComponent>().fwCurrent);
+			xMax = Mathf.Abs (GetBattery().GetComponent<AVOWComponent>().fwCurrent);
 		}
 		
 		TestIfValuesHaveChanged();
+	}
+	
+	GameObject GetBattery(){
+		foreach (GameObject go in allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			if (component.type == AVOWComponent.Type.kVoltageSource) return go;
+			
+		}
+		return null;
 	}
 	
 	

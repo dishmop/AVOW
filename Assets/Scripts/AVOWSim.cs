@@ -37,10 +37,11 @@ public class AVOWSim : MonoBehaviour {
 	
 	// Recording the anchored position
 	public Vector3 		anchorPos;
-	public GameObject		anchorObj;
-	float			anchorXProp = 0.5f;		// Proportion of width from left of game object
-	float			anchorYProp = 0.5f;		// Proportio of heightfrom bottom of game object
-		
+	public Vector3 		mousePos;	// The direction we are pulling
+	public GameObject	anchorObj;
+	float				anchorXProp = 0.5f;		// Proportion of width from left of game object
+	float				anchorYProp = 0.5f;		// Proportio of heightfrom bottom of game object
+	Vector3				newAnchorPos;	
 	
 	// Current solving	
 	double epsilon = 0.0001;
@@ -1074,9 +1075,15 @@ public class AVOWSim : MonoBehaviour {
 		}
 	}
 	
-	public void SetAnchor(GameObject obj, Vector3 pos){
-		anchorObj = obj;
-		anchorPos = pos;
+	public void SetAnchor(GameObject anchorObjArg, Vector3 anchorPosArg, Vector3 mousePosArg){
+		anchorObj = anchorObjArg;
+		anchorPos = anchorPosArg;
+		mousePos = mousePosArg;
+		RecordAnchorPos();
+	}
+	
+	public void UpdateAnchor(){
+		anchorPos = newAnchorPos;
 		RecordAnchorPos();
 	}
 	
@@ -1097,14 +1104,24 @@ public class AVOWSim : MonoBehaviour {
 				anchorXProp = (anchorPos.x - component.h0) / (component.hWidth);
 			}
 			else{
-				anchorXProp = 0;
+				if (component.h0 > mousePos.x){
+					anchorXProp = 0;
+				}
+				else{
+					anchorXProp = 1;
+				}
 			}
 			
 			if (!MathUtils.FP.Feq(voltageDiff, 0)){
 				anchorYProp = (anchorPos.y - minVoltage) / (voltageDiff);
 			}
 			else{
-				anchorYProp = 0;
+				if (minVoltage> mousePos.y){
+					anchorYProp = 0;
+				}
+				else{
+					anchorYProp = 1;
+				}
 			}
 		}
 		else if (node != null){
@@ -1112,7 +1129,12 @@ public class AVOWSim : MonoBehaviour {
 				anchorXProp = (anchorPos.x - node.h0) / (node.hWidth);
 			}
 			else{
-				anchorXProp = 0;
+				if (node.h0 > mousePos.x){
+					anchorXProp = 0;
+				}
+				else{
+					anchorXProp = 1;
+				}
 			}
 			anchorYProp = 0;
 		}
@@ -1120,6 +1142,20 @@ public class AVOWSim : MonoBehaviour {
 			Debug.LogError ("Error: RecordAnchorPos");
 			return;
 		}
+//		
+//		Debug.Log (AVOWUpdateManager.singleton.GetGameTime().ToString() + ": RecordAnchorPos");
+//		Debug.Log ("mousePos = " + mousePos.ToString("F6"));
+//		Debug.Log ("anchorPos = " + anchorPos.ToString("F6"));
+//		Debug.Log ("anchorXProp  = " + anchorXProp.ToString("F6"));
+//		Debug.Log ("anchorYProp  = " + anchorYProp.ToString("F6"));
+//		if (component != null){
+//			Debug.Log ("component.h0  = " + component.h0.ToString("F6"));
+//			Debug.Log ("component.hWidth  = " + component.hWidth.ToString("F6"));
+//		}
+//		else if (node != null){
+//			Debug.Log ("node.h0  = " + node.h0.ToString("F6"));
+//			Debug.Log ("node.hWidth  = " + node.hWidth.ToString("F6"));
+//		}
 		
 		
 	}
@@ -1133,15 +1169,13 @@ public class AVOWSim : MonoBehaviour {
 		AVOWComponent component = anchorObj.GetComponent<AVOWComponent>();
 		AVOWNode node = anchorObj.GetComponent<AVOWNode>();
 		
-		Vector3 newAnchorPos = Vector3.zero;
+		newAnchorPos = Vector3.zero;
 		
 		if (component != null){
 			float minVoltage = Mathf.Min (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
 			float voltageDiff = Mathf.Abs(component.node0GO.GetComponent<AVOWNode>().voltage - component.node1GO.GetComponent<AVOWNode>().voltage);
 			
 			newAnchorPos = new Vector3(component.h0 + anchorXProp * component.hWidth, minVoltage + anchorYProp * voltageDiff, 0);
-			
-
 		}
 		else if (node != null){
 			newAnchorPos = new Vector3(node.h0 + anchorXProp * node.hWidth, node.voltage, 0);
@@ -1157,8 +1191,24 @@ public class AVOWSim : MonoBehaviour {
 //		Vector3 newScreenPos = Camera.main.WorldToScreenPoint( newAnchorPos);
 //		oldScreenPos.z = 0;
 //		newScreenPos.z = 0;
+
+
 		
 		Vector3 offset = newAnchorPos - anchorPos;
+//		Debug.Log (AVOWUpdateManager.singleton.GetGameTime().ToString() + ": CalcAdjustedAnchor");
+//		Debug.Log ("offset = " + offset.ToString("F16"));
+//		Debug.Log ("newAnchorPos = " + newAnchorPos.ToString("F6"));
+//		Debug.Log ("anchorPos = " + anchorPos.ToString("F6"));
+//		Debug.Log ("anchorXProp  = " + anchorXProp.ToString("F6"));
+//		Debug.Log ("anchorYProp  = " + anchorYProp.ToString("F6"));
+//		if (component != null){
+//			Debug.Log ("component.h0  = " + component.h0.ToString("F6"));
+//			Debug.Log ("component.hWidth  = " + component.hWidth.ToString("F6"));
+//		}
+//		else if (node != null){
+//			Debug.Log ("node.h0  = " + node.h0.ToString("F6"));
+//			Debug.Log ("node.hWidth  = " + node.hWidth.ToString("F6"));
+//		}
 		AVOWCamControl.singleton.AddOffset(offset);
 		
 		
@@ -1181,7 +1231,7 @@ public class AVOWSim : MonoBehaviour {
 			
 		}
 		
-		GUI.Box (new Rect(50, 50, 500, 30), "Sim: Anchor = " + anchorString);
+	//	GUI.Box (new Rect(50, 50, 500, 30), "Sim: Anchor = " + anchorString);
 	}
 	
 }

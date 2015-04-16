@@ -52,6 +52,7 @@ public class AVOWCamControl : MonoBehaviour {
 		Vector3 mousePos = Input.mousePosition;
 		mousePos.z = transform.position.z - Camera.main.transform.position.z;
 		
+	//	Debug.Log("Cam: " + mode.ToString());
 		switch (mode){
 			case Mode.kFixVector:{
 //				Vector3 mouseOldWorldPos = camera.ScreenToWorldPoint( prevMousePos);
@@ -94,14 +95,23 @@ public class AVOWCamControl : MonoBehaviour {
 		}
 
 //		prevMousePos = mousePos;
-		
-		
 	}
 	
 	public void AddOffset(Vector3 offset){
-		if (float.IsNaN(offset.x)){
-			Debug.LogError ("NAN");
-		}
+		
+//		if (MathUtils.FP.Feq(offset.magnitude, 0)){
+//			return;
+//		
+//		}
+		//Debug.Log(AVOWUpdateManager.singleton.GetGameTime() + "*********AddOffset:" + offset.magnitude);
+//		if (float.IsNaN(offset.x)){
+//			Debug.LogError ("NAN");
+//		}
+//		
+//		if (!MathUtils.FP.Feq (offset.magnitude, 0)){
+//			Debug.Log ("NON ZERO OFFSET");
+//			Debug.Log (AVOWUpdateManager.singleton.GetGameTime().ToString() + ":Offset = " + offset.ToString("F6"));
+//		}
 		// Offset the camera so that the mouse is pointing at the same world position
 		Vector3 camPos = gameObject.transform.position;
 		camPos += offset;
