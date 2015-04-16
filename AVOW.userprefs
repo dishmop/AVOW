@@ -1,27 +1,28 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/QuitOnEsc.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWSim.cs">
     <Files>
-      <File FileName="Assets/Scripts/AVOWUI.cs" Line="341" Column="4" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWLevelEditor.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWGameModes.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWSideBar.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWSim.cs" Line="1075" Column="4" />
-      <File FileName="Assets/Scripts/AVOWUICreateTool.cs" Line="572" Column="27" />
-      <File FileName="Assets/Scripts/AVOWUITool.cs" Line="18" Column="23" />
-      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="102" Column="5" />
-      <File FileName="Assets/Scripts/AVOWTutorialManager.cs" Line="1018" Column="4" />
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="122" Column="40" />
-      <File FileName="Assets/Shaders/DC_Reflect-BumpSpec.shader" Line="3" Column="8" />
-      <File FileName="Assets/Scripts/QuitOnEsc.cs" Line="13" Column="5" />
-      <File FileName="Assets/Scripts/AVOWCommandAddComponent.cs" Line="70" Column="43" />
-      <File FileName="Assets/Scripts/AVOWCommandSplitAddComponent.cs" Line="88" Column="35" />
+      <File FileName="Assets/Scripts/AVOWUICreateTool.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUITool.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWTutorialManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="126" Column="3" />
+      <File FileName="Assets/Shaders/DC_Reflect-BumpSpec.shader" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/QuitOnEsc.cs" Line="10" Column="17" />
+      <File FileName="Assets/Scripts/AVOWCommandAddComponent.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWCommandSplitAddComponent.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ProjectorScript.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AVOWBattery.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWPusher.cs" Line="19" Column="61" />
-      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="715" Column="65" />
-      <File FileName="Assets/Scripts/AVOWTelemetry.cs" Line="96" Column="1" />
-      <File FileName="Assets/Scripts/AVOWUpdateManager.cs" Line="154" Column="1" />
+      <File FileName="Assets/Scripts/AVOWPusher.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWGraph.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWTelemetry.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUpdateManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUIDeleteTool.cs" Line="450" Column="24" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

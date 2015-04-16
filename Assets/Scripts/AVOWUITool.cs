@@ -8,7 +8,8 @@ using System.IO;
 public class AVOWUITool{
 	
 	protected float hysteresisFactor = 0.85f;
-	protected float maxLighteningDist = 0.1f;
+	protected float maxLighteningDist = 0.15f;
+	protected float maxLighteningDistLarge = 0.3f;
 	protected float 		uiZPos;
 	protected GameObject insideCube;
 	

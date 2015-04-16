@@ -812,8 +812,8 @@ MonoBehaviour:
   uiVisitedIndex: 0
   disable: 0
   fwCurrent: 0
-  col0: {r: 1, g: 0, b: 0, a: 1}
-  col1: {r: .98620677, g: 1, b: 0, a: 1}
+  col0: {r: 1, g: 1, b: 1, a: 1}
+  col1: {r: 1, g: 1, b: 1, a: 1}
   border: .100000001
   hOrder: 0
   hWidth: 0

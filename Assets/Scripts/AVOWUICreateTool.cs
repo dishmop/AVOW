@@ -465,7 +465,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 			GameObject closestObj = null;
 			Vector3 closestPos = Vector3.zero;
 			//			float minDist = FindClosestComponent(mouseWorldPos, connection0, maxLighteningDist, ref closestObj, ref closestPos);
-			float minDist = maxLighteningDist * 3;
+			float minDist = maxLighteningDistLarge;
 			FindClosestNode(mouseWorldPos, null, minDist, connection0, ref closestObj, ref closestPos);
 			connection0 = closestObj;
 			connection0Pos = closestPos;

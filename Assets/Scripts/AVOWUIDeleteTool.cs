@@ -403,9 +403,14 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		if (!heldConnection){
 			GameObject closestObj = null;
 			Vector3 closestPos = Vector3.zero;
-			FindClosestComponentCentre(mouseWorldPos, connectionGO, maxLighteningDist, ref closestObj, ref closestPos);
-			connectionGO = closestObj;
-			connectionPos = closestPos;
+			FindClosestComponentCentre(mouseWorldPos, connectionGO, maxLighteningDistLarge, ref closestObj, ref closestPos);
+			if (closestObj != null && closestObj.GetComponent<AVOWComponent>().IsDying()){
+				connectionGO = null;
+			}
+			else{
+				connectionGO = closestObj;
+				connectionPos = closestPos;
+			}
 			
 			if (IsButtonDown() && connectionGO != null){
 				heldConnection = true;
@@ -417,25 +422,14 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 			connectionPos = 0.5f * (component.GetConnectionPos0() + component.GetConnectionPos1());
 			connectionPos.z = uiZPos;
 			// If not inside the held gap, find the next closest thing - favouring whatever we have connected already
-			if (isOutside){
-				
-				if (IsButtonReleased()){
-					heldConnection = false;
-					heldGapCommand.ExecuteStep();
-					AVOWUI.singleton.commands.Push(heldGapCommand);
-					heldGapCommand = null;
-					connectionGO = null;
-					insideState = InsideGapState.kOnRemove;
-				}
+			if (IsButtonReleased()){
+				heldConnection = false;
+				heldGapCommand.ExecuteStep();
+				AVOWUI.singleton.commands.Push(heldGapCommand);
+				heldGapCommand = null;
+				connectionGO = null;
+				insideState = InsideGapState.kOnRemove;
 			}
-			else{
-				if (IsButtonReleased()){
-					heldConnection = false;
-					insideState = InsideGapState.kOnCancel;
-					
-				}
-			}
-			
 
 		}
 		
@@ -444,6 +438,11 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		if (connectionGO != null){
 			AVOWComponent component = connectionGO.GetComponent<AVOWComponent>();
 			isOutside = !component.IsPointInsideGap(mouseWorldPos);
+		}
+		isOutside = false;
+		if ((connectionPos - mouseWorldPos).magnitude >  maxLighteningDistLarge){
+			heldConnection = false;
+			insideState = InsideGapState.kOnCancel;
 		}
 		
 	}

@@ -121,8 +121,8 @@ public class AVOWComponent : MonoBehaviour {
 		transform.FindChild("Lightening0").gameObject.SetActive(false);
 		transform.FindChild("Lightening1").gameObject.SetActive(false);
 		
-		col0 = new Color(UnityEngine.Random.Range (0f, 1f), UnityEngine.Random.Range (0f, 1f), UnityEngine.Random.Range (0, 1f));
-		col1 = new Color(UnityEngine.Random.Range (0f, 1f), UnityEngine.Random.Range (0f, 1f), UnityEngine.Random.Range (0, 1f));
+//		col0 = new Color(UnityEngine.Random.Range (0f, 1f), UnityEngine.Random.Range (0f, 1f), UnityEngine.Random.Range (0, 1f));
+//		col1 = new Color(UnityEngine.Random.Range (0f, 1f), UnityEngine.Random.Range (0f, 1f), UnityEngine.Random.Range (0, 1f));
 	}
 	
 	public float GetResistance(){
