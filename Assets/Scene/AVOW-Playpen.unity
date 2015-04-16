@@ -2176,7 +2176,7 @@ MonoBehaviour:
   showIndividuals: 0
   showObjectives: 1
   objectivesAsText: 0
-  playbackEnable: 1
+  playbackEnable: 0
   modifiedNodeLengths: 1
   tutorialSpeed: 1
   sideBarPixels: 200
@@ -3304,7 +3304,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AspectMode: 0
-  m_AspectRatio: 1.91209602
+  m_AspectRatio: 1.63114834
 --- !u!114 &689694817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6413,11 +6413,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22436484, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.x
-      value: -67.3823013
+      value: -46.1635056
       objectReference: {fileID: 0}
     - target: {fileID: 22474278, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.y
-      value: -4.45791054
+      value: -4.26824188
       objectReference: {fileID: 0}
     - target: {fileID: 22491496, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_LocalPosition.x
@@ -9288,7 +9288,7 @@ Prefab:
       objectReference: {fileID: 1813380714}
     - target: {fileID: 22474278, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.y
-      value: -4.47474194
+      value: -4.2817955
       objectReference: {fileID: 0}
     - target: {fileID: 22436484, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_AnchorMax.x
@@ -9300,7 +9300,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22436484, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_SizeDelta.x
-      value: -68.5945129
+      value: -47.1388168
       objectReference: {fileID: 0}
     - target: {fileID: 199004, guid: f168338bdb75a4cc887b423b82395dcc, type: 2}
       propertyPath: m_Name
