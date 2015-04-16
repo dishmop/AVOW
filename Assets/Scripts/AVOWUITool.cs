@@ -8,7 +8,7 @@ using System.IO;
 public class AVOWUITool{
 	
 	protected float hysteresisFactor = 0.85f;
-	protected float maxLighteningDist = 0.3f;
+	protected float maxLighteningDist = 0.1f;
 	protected float 		uiZPos;
 	protected GameObject insideCube;
 	
@@ -139,61 +139,61 @@ public class AVOWUITool{
 		}
 		
 		
-		foreach (GameObject go in components){
-			AVOWComponent component = go.GetComponent<AVOWComponent>();
-			
-			
-			if (!component.isInteractive) continue;
-			
-			float thisDist = 0;
-			Vector3 thisPos = Vector3.zero;
-			int whichPoint = -1;
-			
-			// Check which of the two connectors to use
-			if (node == component.node0GO.GetComponent<AVOWNode>()){
-				thisPos = component.GetConfirmedConnectionPos0();
-				whichPoint = 0;
-			}
-			else if (node == component.node1GO.GetComponent<AVOWNode>()){
-				thisPos = component.GetConfirmedConnectionPos1();
-				whichPoint = 1;
-			}
-			// If it is neither - then check if etierh of the nodes are non-interactive, if so, then it is that one
-			else if (!component.node0GO.GetComponent<AVOWNode>().isInteractive){
-				thisPos = component.GetConfirmedConnectionPos0();
-				whichPoint = 0;
-			}
-			else if (!component.node1GO.GetComponent<AVOWNode>().isInteractive){
-				thisPos = component.GetConfirmedConnectionPos1();
-				whichPoint = 1;
-			}
-			else{
-				continue;
-			}
-			thisPos.z = uiZPos;
-			thisDist = (thisPos - pos).magnitude;
-			
-			// If this is the current Component, reduce the distance (for the purposes of hyserisis)
-			if (go == currentSelection){
-				thisDist *= hysteresisFactor;
-			}
-			
-			if (thisDist < minDist){
-				minDist = thisDist;
-				closestComponent = go;
-				whichPointRet = whichPoint;
-				if (whichPoint == 0){
-					closestPos = component.GetConnectionPos0();
-				}
-				else if (whichPoint == 1){
-					closestPos = component.GetConnectionPos1();
-				}
-				else{
-					Debug.LogError ("WhichPOint error");
-				}
-				
-			}
-		}
+//		foreach (GameObject go in components){
+//			AVOWComponent component = go.GetComponent<AVOWComponent>();
+//			
+//			
+//			if (!component.isInteractive) continue;
+//			
+//			float thisDist = 0;
+//			Vector3 thisPos = Vector3.zero;
+//			int whichPoint = -1;
+//			
+//			// Check which of the two connectors to use
+//			if (node == component.node0GO.GetComponent<AVOWNode>()){
+//				thisPos = component.GetConfirmedConnectionPos0();
+//				whichPoint = 0;
+//			}
+//			else if (node == component.node1GO.GetComponent<AVOWNode>()){
+//				thisPos = component.GetConfirmedConnectionPos1();
+//				whichPoint = 1;
+//			}
+//			// If it is neither - then check if etierh of the nodes are non-interactive, if so, then it is that one
+//			else if (!component.node0GO.GetComponent<AVOWNode>().isInteractive){
+//				thisPos = component.GetConfirmedConnectionPos0();
+//				whichPoint = 0;
+//			}
+//			else if (!component.node1GO.GetComponent<AVOWNode>().isInteractive){
+//				thisPos = component.GetConfirmedConnectionPos1();
+//				whichPoint = 1;
+//			}
+//			else{
+//				continue;
+//			}
+//			thisPos.z = uiZPos;
+//			thisDist = (thisPos - pos).magnitude;
+//			
+//			// If this is the current Component, reduce the distance (for the purposes of hyserisis)
+//			if (go == currentSelection){
+//				thisDist *= hysteresisFactor;
+//			}
+//			
+//			if (thisDist < minDist){
+//				minDist = thisDist;
+//				closestComponent = go;
+//				whichPointRet = whichPoint;
+//				if (whichPoint == 0){
+//					closestPos = component.GetConnectionPos0();
+//				}
+//				else if (whichPoint == 1){
+//					closestPos = component.GetConnectionPos1();
+//				}
+//				else{
+//					Debug.LogError ("WhichPOint error");
+//				}
+//				
+//			}
+//		}
 			
 		// Now do it again, but with the new (real) positions of the points
 		foreach (GameObject go in components){

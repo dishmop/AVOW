@@ -10,11 +10,19 @@ public class AVOWCamControl : MonoBehaviour {
 	public GameObject		topPanel;
 	public float 			zoomSpeed;
 	public bool				ignoreSide = false;
-	public float xFOV		= 1.7f;
-	public float yFOV		= 1.7f;
-	public float xOffset 	= 0;
-	public bool disableMovement = false;
-	Vector3					prevMousePos = new Vector3();
+	public float 			xFOV		= 1.7f;
+	public float 			yFOV		= 1.7f;
+	public float 			xOffset 	= 0;
+	public bool 			disableMovement = false;
+	public Vector3 			anchorPos = Vector3.zero;
+	
+	public enum Mode{
+		kFrameGame,
+		kFixVector
+	}
+	public Mode mode = Mode.kFrameGame;
+	
+//	Vector3					prevMousePos = new Vector3();
 	
 	
 	int delay = 0;
@@ -36,78 +44,64 @@ public class AVOWCamControl : MonoBehaviour {
 
 		if (disableMovement) return;
 		
-		Camera camera = gameObject.GetComponent<Camera>();
-		float wheelVal = 0;//Input.GetAxis("Mouse ScrollWheel");
+//		Camera camera = gameObject.GetComponent<Camera>();
+//		float wheelVal = 0;//Input.GetAxis("Mouse ScrollWheel");
 		
 		// We need to offset the camera so that the mouse pointer 
 		// remains in the same position - in which case, get its current position in world space
 		Vector3 mousePos = Input.mousePosition;
 		mousePos.z = transform.position.z - Camera.main.transform.position.z;
 		
-		
-		
-		if (wheelVal != 0){
-			mousePos.z = transform.position.z - Camera.main.transform.position.z;
-			Vector3 mouseOldWorldPos = camera.ScreenToWorldPoint( mousePos);
+		switch (mode){
+			case Mode.kFixVector:{
+//				Vector3 mouseOldWorldPos = camera.ScreenToWorldPoint( prevMousePos);
+//				Vector3 mouseNewWorldPos = camera.ScreenToWorldPoint( mousePos);
+//				
+//				// Offset the camera so that the mouse is pointing at the same world position
+//				Vector3 camPos = gameObject.transform.position;
+//				camPos += (mouseOldWorldPos - mouseNewWorldPos);
+//				gameObject.transform.position = camPos;
+				break;
+			}
+			case Mode.kFrameGame:{
+				float prop = 0.1f;
+				// the -0.5f si the battery
+				float gameBoardXMin = AVOWObjectiveManager.singleton.GetMinX();
+				float simMax = Mathf.Max (1, AVOWGraph.singleton.xMax);
+				Rect bounds = new Rect(gameBoardXMin, AVOWGraph.singleton.yMin, simMax  - gameBoardXMin , AVOWGraph.singleton.yMax - AVOWGraph.singleton.yMin);
+				
+				//	bounds.xMax = Mathf.Max(bounds.xMax, 1);
+				
+				
+				Vector2 centre = new Vector2((bounds.xMin + bounds.xMax) * 0.5f + xOffset, (bounds.yMin + bounds.yMax) * 0.5f);
+				Vector3 pos = gameObject.transform.position;
+				pos.x = Mathf.Lerp(pos.x, centre.x, prop);
+				pos.y = Mathf.Lerp(pos.y, centre.y, prop);
+				gameObject.transform.position = pos;
+				
+				Vector2 size = new Vector2( bounds.xMax - bounds.xMin, bounds.yMax - bounds.yMin);
+				
+				float vSize0 = size.y;
+				float vSize1 = size.x / Camera.main.aspect;
+				float useVSize =  Mathf.Max (yFOV *vSize0, xFOV *vSize1);
+				
+				float currentSize = transform.GetComponent<Camera>().orthographicSize;
+				float newSize = Mathf.Lerp (currentSize, useVSize * 0.5f, prop);
+				
+				transform.GetComponent<Camera>().orthographicSize = newSize;
+				break;
+			}
+		}
 
-			camera.orthographicSize *= Mathf.Pow (zoomSpeed, -wheelVal);
+//		prevMousePos = mousePos;
 		
-			Vector3 mouseNewWorldPos = camera.ScreenToWorldPoint( mousePos);
-			
-			// Offset the camera so that the mouse is pointing at the same world position
-			Vector3 camPos = gameObject.transform.position;
-			camPos += (mouseOldWorldPos - mouseNewWorldPos);
-			gameObject.transform.position = camPos;
-		}
-		
-		
-		if (Input.GetMouseButton(1) || (Input.GetMouseButton(0) && Input.GetKey (KeyCode.LeftControl))){
-			Vector3 mouseOldWorldPos = camera.ScreenToWorldPoint( prevMousePos);
-			Vector3 mouseNewWorldPos = camera.ScreenToWorldPoint( mousePos);
-			
-			// Offset the camera so that the mouse is pointing at the same world position
-			Vector3 camPos = gameObject.transform.position;
-			camPos += (mouseOldWorldPos - mouseNewWorldPos);
-			gameObject.transform.position = camPos;
-			
-		
-		}
-		prevMousePos = mousePos;
-		
-		// If mouse is not held down
-		float prop = 0.1f;
-		if (!Input.GetMouseButton(0)){
-			// the -0.5f si the battery
-			float gameBoardXMin = AVOWObjectiveManager.singleton.GetMinX();
-			float simMax = Mathf.Max (1, AVOWGraph.singleton.xMax);
-			Rect bounds = new Rect(gameBoardXMin, AVOWGraph.singleton.yMin, simMax  - gameBoardXMin , AVOWGraph.singleton.yMax - AVOWGraph.singleton.yMin);
-			
-		//	bounds.xMax = Mathf.Max(bounds.xMax, 1);
-			
-			
-			Vector2 centre = new Vector2((bounds.xMin + bounds.xMax) * 0.5f + xOffset, (bounds.yMin + bounds.yMax) * 0.5f);
-			Vector3 pos = gameObject.transform.position;
-			pos.x = Mathf.Lerp(pos.x, centre.x, prop);
-			pos.y = Mathf.Lerp(pos.y, centre.y, prop);
-			gameObject.transform.position = pos;
-			
-			Vector2 size = new Vector2( bounds.xMax - bounds.xMin, bounds.yMax - bounds.yMin);
-			
-			float vSize0 = size.y;
-			float vSize1 = size.x / Camera.main.aspect;
-			float useVSize =  Mathf.Max (yFOV *vSize0, xFOV *vSize1);
-			
-			float currentSize = transform.GetComponent<Camera>().orthographicSize;
-			float newSize = Mathf.Lerp (currentSize, useVSize * 0.5f, prop);
-			
-			transform.GetComponent<Camera>().orthographicSize = newSize;
-			
-		}
-			
 		
 	}
 	
 	public void AddOffset(Vector3 offset){
+		if (float.IsNaN(offset.x)){
+			Debug.LogError ("NAN");
+		}
 		// Offset the camera so that the mouse is pointing at the same world position
 		Vector3 camPos = gameObject.transform.position;
 		camPos += offset;

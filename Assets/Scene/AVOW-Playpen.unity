@@ -7396,6 +7396,10 @@ Prefab:
       propertyPath: enableTelemetry
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 11449800, guid: 096d17ed368bd4830afcec287da33923, type: 2}
+      propertyPath: gameVersion
+      value: 38
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 096d17ed368bd4830afcec287da33923, type: 2}
   m_IsPrefabParent: 0

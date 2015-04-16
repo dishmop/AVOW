@@ -120,6 +120,9 @@ public class AVOWComponent : MonoBehaviour {
 		lighteningZDepth = transform.position.z - 0.01f;
 		transform.FindChild("Lightening0").gameObject.SetActive(false);
 		transform.FindChild("Lightening1").gameObject.SetActive(false);
+		
+		col0 = new Color(UnityEngine.Random.Range (0f, 1f), UnityEngine.Random.Range (0f, 1f), UnityEngine.Random.Range (0, 1f));
+		col1 = new Color(UnityEngine.Random.Range (0f, 1f), UnityEngine.Random.Range (0f, 1f), UnityEngine.Random.Range (0, 1f));
 	}
 	
 	public float GetResistance(){
@@ -574,8 +577,7 @@ public class AVOWComponent : MonoBehaviour {
 			transform.FindChild("Resistance").gameObject.SetActive(isInteractive && showResistance);
 			transform.FindChild("BlackSquare").gameObject.SetActive(isInteractive && showResistance);
 			SetupUVs (transform.FindChild("Resistance").gameObject, Mathf.Abs (useV1-useV0));
-			transform.FindChild("Resistance").GetComponent<Renderer>().material.SetColor("_Color0", col0);
-			transform.FindChild("Resistance").GetComponent<Renderer>().material.SetColor("_Color1", col1);
+			transform.FindChild("Resistance").GetComponent<Renderer>().material.SetColor("_Color", col0);
 			transform.FindChild("Resistance").position = new Vector3(useH0  + squareGap, Mathf.Min (useV0, useV1) + squareGap, 0);
 			transform.FindChild("BlackSquare").position =  new Vector3(useH0, Mathf.Min (useV0, useV1), 0.01f);
 			

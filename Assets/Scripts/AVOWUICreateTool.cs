@@ -390,6 +390,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 		GameObject.Destroy(lightening0GO);
 		GameObject.Destroy(lightening1GO);
 		GameObject.Destroy(insideCube);
+		AVOWSim.singleton.anchorObj = null;
 	}
 	
 	public override bool IsHolding(){
@@ -462,7 +463,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 			GameObject closestObj = null;
 			Vector3 closestPos = Vector3.zero;
 			//			float minDist = FindClosestComponent(mouseWorldPos, connection0, maxLighteningDist, ref closestObj, ref closestPos);
-			float minDist = maxLighteningDist;
+			float minDist = maxLighteningDist * 3;
 			FindClosestNode(mouseWorldPos, null, minDist, connection0, ref closestObj, ref closestPos);
 			connection0 = closestObj;
 			connection0Pos = closestPos;
@@ -486,9 +487,9 @@ public class AVOWUICreateTool :  AVOWUITool{
 			// Update our connection posiiton on our node we are connected to
 			FindClosestPointOnNode(mouseWorldPos, connection0, ref connection0Pos);
 			
-			if (!AVOWGraph.singleton.HasUnconfirmedComponents()){
-				confirmedConnectionHeight = connection0Pos.y ;
-			}
+//			if (!AVOWGraph.singleton.HasUnconfirmedComponents()){
+//				confirmedConnectionHeight = connection0Pos.y ;
+//			}
 			
 			// If not inside the held gap, find the next closest thing - favouring whatever we have connected already
 			GameObject closestObj = null;
@@ -496,17 +497,17 @@ public class AVOWUICreateTool :  AVOWUITool{
 			
 			float minDist = maxLighteningDist;
 			// Only search for components if there is more than just a battery
-			ghostMousePos = mouseWorldPos + new Vector3(0, (mouseWorldPos.y - confirmedConnectionHeight) * 1.00f, 0);
+			ghostMousePos = (mouseWorldPos + connection0Pos) * 0.5f;
 			if (AVOWGraph.singleton.allComponents.Count > 1 && !AVOWConfig.singleton.tutDisable2ndComponentConnections){
-				minDist = FindClosestComponent(ghostMousePos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos, ref connection1WhichPoint);
+				minDist = FindClosestComponent(mouseWorldPos, connection0, connection1, maxLighteningDist, ref closestObj, ref closestPos, ref connection1WhichPoint);
 			}
 			if (!AVOWConfig.singleton.tutDisable2ndBarConnections){
-				minDist = FindClosestNode(ghostMousePos, connection0, minDist, connection1, ref closestObj, ref closestPos);			
+				minDist = FindClosestNode(mouseWorldPos, connection0, minDist, connection1, ref closestObj, ref closestPos);			
 			}
 			connection1 = closestObj;
 			connection1Pos = closestPos;	
 			if (IsButtonReleased()){
-				if (!isInside){
+				if (false){//(!isInside){
 					heldConnection = false;
 					connection1 = null;
 				}
@@ -522,7 +523,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 					if (connection1 != null && connection1.GetComponent<AVOWComponent>() != null && AVOWConfig.singleton.tutDisableComponentConstruction){
 						okToCreate = false;
 					}
-					if (okToCreate){
+					if (okToCreate && heldGapCommand != null){
 						heldConnection = false;
 						heldGapCommand.ExecuteStep();
 						AVOWUI.singleton.commands.Push(heldGapCommand);
@@ -552,11 +553,25 @@ public class AVOWUICreateTool :  AVOWUITool{
 			connection1.GetComponent<AVOWNode>().addConnPos = connection1Pos.x;
 		}		
 		// If we have a gap which we are holding open, check if our mous is inside the gap
-		isInside = false;
-		AVOWComponent component = GetHeldCommandComponent();
-		if (component != null){
-			isInside = component.IsPointInsideGap(mouseWorldPos);
+//		isInside = false;
+//		AVOWComponent component = GetHeldCommandComponent();
+//		if (component != null){
+//			isInside = component.IsPointInsideGap(mouseWorldPos);
+//		}
+		isInside = false;//(connection1 != null);
+		
+		// If we have a connection1, then the camera should preserve the vector from that object to here
+		AVOWCamControl.singleton.mode = IsButtonDown() ? AVOWCamControl.Mode.kFixVector : AVOWCamControl.Mode.kFrameGame;
+
+		if (connection1 != null){
+
+			AVOWSim.singleton.SetAnchor(connection1, connection1Pos);
+			
 		}
+		if (!IsButtonDown()){
+			AVOWSim.singleton.anchorObj  = null;
+		}
+		
 		
 
 		
@@ -814,17 +829,17 @@ public class AVOWUICreateTool :  AVOWUITool{
 		}
 		else{
 			if (!isInside && connection0 != null && heldConnection){
-				lightening1GO.SetActive(true);
+				lightening1GO.SetActive(false);
 				
-				Lightening lightening1 = lightening1GO.GetComponent<Lightening>();
-				lightening1.startPoint = lighteningConductorPos;
-				float dist = (ghostMousePos - lighteningConductorPos).magnitude;
-				lightening1.endPoint = ghostMousePos + new Vector3(UnityEngine.Random.Range (-0.25f * dist, 0.25f * dist), UnityEngine.Random.Range (-0.25f * dist, 0.25f * dist), 0);
-				
-				float len = (lightening1.startPoint  - lightening1.endPoint).magnitude;
-				lightening1.numStages = Mathf.Max ((int)(len * 10), 2);
-				lightening1.size = 0.1f;
-				lightening1.ConstructMesh();
+//				Lightening lightening1 = lightening1GO.GetComponent<Lightening>();
+//				lightening1.startPoint = lighteningConductorPos;
+//				float dist = (ghostMousePos - lighteningConductorPos).magnitude;
+//				lightening1.endPoint = ghostMousePos + new Vector3(UnityEngine.Random.Range (-0.25f * dist, 0.25f * dist), UnityEngine.Random.Range (-0.25f * dist, 0.25f * dist), 0);
+//				
+//				float len = (lightening1.startPoint  - lightening1.endPoint).magnitude;
+//				lightening1.numStages = Mathf.Max ((int)(len * 10), 2);
+//				lightening1.size = 0.1f;
+//				lightening1.ConstructMesh();
 			}
 			else{
 				lightening1GO.SetActive(false);

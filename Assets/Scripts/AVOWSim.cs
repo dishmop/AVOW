@@ -35,12 +35,12 @@ public class AVOWSim : MonoBehaviour {
 	// Set this if we want to force the mouse to pretend it is over a comonent when rejigging the camera
 	public GameObject		mouseOverComponentForce = null;
 	
-	// Recording the mouse posiiton
-	Vector3			mouseWorldPos;
-	AVOWComponent 	mouseOverComponent = null; 	// null if not over any compnent
-	float			mouseOverXProp = 0.5f;		// Proportion of width from left of component (or entire diagram if null)
-	float			mouseOverYProp = 0.5f;		// Proportio of height from bottom of component (or entire diagram if null)
-	
+	// Recording the anchored position
+	public Vector3 		anchorPos;
+	public GameObject		anchorObj;
+	float			anchorXProp = 0.5f;		// Proportion of width from left of game object
+	float			anchorYProp = 0.5f;		// Proportio of heightfrom bottom of game object
+		
 	
 	// Current solving	
 	double epsilon = 0.0001;
@@ -145,9 +145,9 @@ public class AVOWSim : MonoBehaviour {
 	public void GameUpdate(){
 //		Debug.Log("Sim Update");
 		
-		RecordMousePos();
+//		RecordAnchorPos();
 		Recalc();
-		CalcMouseOffset();
+		CalcAdjustedAnchor();
 //		
 //		Debug.Log ("Print out order of node 1");
 //		AVOWNode node0 = graph.allNodes[1].GetComponent<AVOWNode>();
@@ -1074,155 +1074,114 @@ public class AVOWSim : MonoBehaviour {
 		}
 	}
 	
+	public void SetAnchor(GameObject obj, Vector3 pos){
+		anchorObj = obj;
+		anchorPos = pos;
+		RecordAnchorPos();
+	}
+	
 	
 	// Records the position of the mouse as a local position in one of the components
-	void RecordMousePos(){
-		// Find mouse pos in screen space
-		Vector3 screenPos = Input.mousePosition;
-		screenPos.z = 0;
+	void RecordAnchorPos(){
+		anchorPos.z = 0;
 		
-		// Find mouse pos in world space
-		mouseWorldPos = Camera.main.ScreenToWorldPoint( screenPos);
-		mouseWorldPos.z = 0;
+		if (anchorObj == null) return;
 		
-		// check which component we are over
-		mouseOverComponent = null;
-
-		foreach(GameObject go in graph.allComponents){
-			AVOWComponent component = go.GetComponent<AVOWComponent>();
+		AVOWComponent component = anchorObj.GetComponent<AVOWComponent>();
+		AVOWNode node = anchorObj.GetComponent<AVOWNode>();
+		
+		if (component != null){
+			float minVoltage = Mathf.Min (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
+			float voltageDiff = Mathf.Abs(component.node0GO.GetComponent<AVOWNode>().voltage - component.node1GO.GetComponent<AVOWNode>().voltage);
+			if (!MathUtils.FP.Feq(component.hWidth, 0)){
+				anchorXProp = (anchorPos.x - component.h0) / (component.hWidth);
+			}
+			else{
+				anchorXProp = 0;
+			}
 			
-			
-			// If this component has never been layed out, then ignore
-			if (!component.hasBeenLayedOut) continue;
-			
-			float lowVoltage = Mathf.Min (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
-			float highVoltage = Mathf.Max (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
-			float lowCurrent = component.h0;
-			float highCurrent = component.h0 + component.hWidth;
-			
-
-	
-			// Only register if over a resistor
-			if (component.type == AVOWComponent.Type.kLoad &&
-				mouseWorldPos.x > lowCurrent && 
-			    mouseWorldPos.x < highCurrent && 
-			    mouseWorldPos.y > lowVoltage && 
-			    mouseWorldPos.y < highVoltage){
-			    
-			    if (mouseOverComponent != null){
-			    	Debug.Log ("Error1 - Our mouse is over two components");
-			    }
-				mouseOverComponent = component;
-				mouseOverXProp = (mouseWorldPos.x -  lowCurrent) / (highCurrent - lowCurrent);
-				mouseOverYProp = (mouseWorldPos.y -  lowVoltage) / (highVoltage - lowVoltage);
-					
+			if (!MathUtils.FP.Feq(voltageDiff, 0)){
+				anchorYProp = (anchorPos.y - minVoltage) / (voltageDiff);
+			}
+			else{
+				anchorYProp = 0;
 			}
 		}
-		if (mouseOverComponent == null){
-			mouseOverXProp = (mouseWorldPos.x -  xMin) / (xMax - xMin);
-			mouseOverYProp = (mouseWorldPos.y -  yMin) / (yMax - yMin);
+		else if (node != null){
+			if (!MathUtils.FP.Feq(node.hWidth, 0)){
+				anchorXProp = (anchorPos.x - node.h0) / (node.hWidth);
+			}
+			else{
+				anchorXProp = 0;
+			}
+			anchorYProp = 0;
 		}
+		else{
+			Debug.LogError ("Error: RecordAnchorPos");
+			return;
+		}
+		
 		
 	}
 	
+
 	
-	// Records the position of the mouse as a local position in the component we specify
-	bool RecordMousePosOverComponent(GameObject componentGO){
+	void CalcAdjustedAnchor(){
 	
-	
-		if (componentGO == null){
-			return false;
+		if (anchorObj == null) return;
+		
+		AVOWComponent component = anchorObj.GetComponent<AVOWComponent>();
+		AVOWNode node = anchorObj.GetComponent<AVOWNode>();
+		
+		Vector3 newAnchorPos = Vector3.zero;
+		
+		if (component != null){
+			float minVoltage = Mathf.Min (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
+			float voltageDiff = Mathf.Abs(component.node0GO.GetComponent<AVOWNode>().voltage - component.node1GO.GetComponent<AVOWNode>().voltage);
+			
+			newAnchorPos = new Vector3(component.h0 + anchorXProp * component.hWidth, minVoltage + anchorYProp * voltageDiff, 0);
+			
+
 		}
-	
-		AVOWComponent component = componentGO.GetComponent<AVOWComponent>();
-		
-		// If not a valid component - then do the normal method
-		if (component == null || !component.hasBeenLayedOut || component.type != AVOWComponent.Type.kLoad){
-
-			return false;
-		}
-	
-		// Find mouse pos in screen space
-		Vector3 screenPos = Input.mousePosition;
-		screenPos.z = 0;
-		
-		// Find mouse pos in world space
-		mouseWorldPos = Camera.main.ScreenToWorldPoint( screenPos);
-		mouseWorldPos.z = 0;
-		
-		
-		float lowVoltage = Mathf.Min (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
-		float highVoltage = Mathf.Max (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
-		float lowCurrent = component.h0;
-		float highCurrent = component.h0 + component.hWidth;
-		
-
-		mouseOverComponent = component;
-		mouseOverXProp = (mouseWorldPos.x -  lowCurrent) / (highCurrent - lowCurrent);
-		mouseOverYProp = (mouseWorldPos.y -  lowVoltage) / (highVoltage - lowVoltage);
-		
-		return true;
-	}
-
-	
-	void CalcMouseOffset(){
-		float xMinLocal = 100;
-		float yMinLocal = 100;
-		float xMaxLocal = -1;
-		float yMaxLocal = -1;
-		//Figure out world posiiton of the location in the diagram where the mouse was
-		if (mouseOverComponent != null){
-			xMinLocal = mouseOverComponent.h0;
-			xMaxLocal = mouseOverComponent.h0 + mouseOverComponent.hWidth;
-			yMinLocal = Mathf.Min (mouseOverComponent.node0GO.GetComponent<AVOWNode>().voltage, mouseOverComponent.node1GO.GetComponent<AVOWNode>().voltage);
-			yMaxLocal = Mathf.Max (mouseOverComponent.node0GO.GetComponent<AVOWNode>().voltage, mouseOverComponent.node1GO.GetComponent<AVOWNode>().voltage);
-			// If a voltage source then need to mirror it all
-//			if (mouseOverComponent.type == AVOWComponent.Type.kVoltageSource){
-//				float temp = xMin;
-//				xMin = -xMax;
-//				xMax = -temp;
-//			}		
+		else if (node != null){
+			newAnchorPos = new Vector3(node.h0 + anchorXProp * node.hWidth, node.voltage, 0);
 			
 		}
 		else{
-
-			foreach(GameObject go in graph.allComponents){
-				AVOWComponent component = go.GetComponent<AVOWComponent>();
-				
-				float lowVoltage = Mathf.Min (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
-				float highVoltage = Mathf.Max (component.node0GO.GetComponent<AVOWNode>().voltage, component.node1GO.GetComponent<AVOWNode>().voltage);
-				float lowCurrent = component.h0;
-				float highCurrent = component.h0 + component.hWidth;
-				
-					
-				
-				// Keep track of global bounds
-				xMinLocal = Mathf.Min (xMinLocal, lowCurrent);
-				yMinLocal = Mathf.Min (yMinLocal, lowVoltage);
-				xMaxLocal = Mathf.Max (xMaxLocal, highCurrent);
-				yMaxLocal = Mathf.Max (yMaxLocal, highVoltage);
-				
-			}
+			Debug.LogError ("Error: CalcAdjustedAnchor");
+			return;
 		}
 		
-		Vector3  worldPos = new Vector3(xMinLocal + mouseOverXProp * (xMaxLocal - xMinLocal), yMinLocal +mouseOverYProp * (yMaxLocal - yMinLocal), 0);
-		worldPos.z = 0;
-//		Vector3 screenPos = Camera.main.WorldToScreenPoint( worldPos);
-//		screenPos.z = 0;
-//		
-	//	Vector3 offset = worldPos - mouseWorldPos;
-		//Camera.main.gameObject.GetComponent<AVOWCamControl>().AddOffset(offset);
+		// Figure out screen space offset
+//		Vector3 oldScreenPos = Camera.main.WorldToScreenPoint( anchorPos);
+//		Vector3 newScreenPos = Camera.main.WorldToScreenPoint( newAnchorPos);
+//		oldScreenPos.z = 0;
+//		newScreenPos.z = 0;
 		
-//		if (offset.sqrMagnitude != 0){
-//			Debug.Log("***Moving****");
-//			Debug.Log("prop = " + mouseOverXProp + ", " + mouseOverYProp);
-//			Debug.Log ("yMin = " + yMin + " yMax = " + yMax);
-//			Debug.Log("worldPos = " + worldPos.x + ", " + worldPos.y);
-//			Debug.Log("mouseWorldPos = " + mouseWorldPos.x + ", " + mouseWorldPos.y);
-//			Debug.Log("offset = " + offset.x + ", " + offset.y);
-//		}
+		Vector3 offset = newAnchorPos - anchorPos;
+		AVOWCamControl.singleton.AddOffset(offset);
 		
 		
+		
+		
+	}
+	
+	void OnGUI(){
+		string anchorString = "";
+		
+		if (anchorObj != null){
+			AVOWComponent component = anchorObj.GetComponent<AVOWComponent>();
+			AVOWNode node = anchorObj.GetComponent<AVOWNode>();
+			if (component != null){
+				anchorString = component.GetID();
+			}
+			else if (node != null){
+				anchorString = node.GetID();
+			}
+			
+		}
+		
+		GUI.Box (new Rect(50, 50, 500, 30), "Sim: Anchor = " + anchorString);
 	}
 	
 }
