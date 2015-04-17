@@ -1217,19 +1217,19 @@ public class AVOWSim : MonoBehaviour {
 	}
 	
 	void OnGUI(){
-		string anchorString = "";
-		
-		if (anchorObj != null){
-			AVOWComponent component = anchorObj.GetComponent<AVOWComponent>();
-			AVOWNode node = anchorObj.GetComponent<AVOWNode>();
-			if (component != null){
-				anchorString = component.GetID();
-			}
-			else if (node != null){
-				anchorString = node.GetID();
-			}
-			
-		}
+//		string anchorString = "";
+//		
+//		if (anchorObj != null){
+//			AVOWComponent component = anchorObj.GetComponent<AVOWComponent>();
+//			AVOWNode node = anchorObj.GetComponent<AVOWNode>();
+//			if (component != null){
+//				anchorString = component.GetID();
+//			}
+//			else if (node != null){
+//				anchorString = node.GetID();
+//			}
+//			
+//		}
 		
 	//	GUI.Box (new Rect(50, 50, 500, 30), "Sim: Anchor = " + anchorString);
 	}

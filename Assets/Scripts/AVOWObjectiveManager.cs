@@ -45,7 +45,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	float boardDepthSpeed = 1f;
 	
 	int resistorLimit = -1;
-	int currentGoalIndex = -1;
+	public int currentGoalIndex = -1;
 	int currentLevel = -1;
 	
 	float[] optValues = new float[13];

@@ -341,6 +341,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		GameObject.Destroy(lightening0GO);
 		GameObject.Destroy(lightening1GO);
 		GameObject.Destroy(insideCube);
+		AVOWSim.singleton.anchorObj = null;
 	}
 	
 	
@@ -432,6 +433,9 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 			}
 
 		}
+		
+		AVOWCamControl.singleton.mode = IsButtonDown() ? AVOWCamControl.singleton.mode = AVOWCamControl.Mode.kFixVector : AVOWCamControl.singleton.mode = AVOWCamControl.Mode.kFrameGame;
+		
 		
 		// If we have a gap which we are holding open, check if our mous is inside the gap
 		isOutside = true;

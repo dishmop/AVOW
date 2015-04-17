@@ -18,6 +18,11 @@ public class AVOWPusher : MonoBehaviour {
 		if (!disableMovement){
 			transform.position = new Vector3(AVOWGraph.singleton.xMax, 0 ,0f);
 		}
+		else{
+			transform.position += new Vector3(0.04f, 0, 0);
+		
+		}
+
 		//transform.localScale = new Vector3(AVOWSim.singleton.xMax, AVOWSim.singleton.yMax,1);
 		
 	}

@@ -509,37 +509,31 @@ public class AVOWUICreateTool :  AVOWUITool{
 			connection1 = closestObj;
 			connection1Pos = closestPos;	
 			if (IsButtonReleased()){
-				if (false){//(!isInside){
+
+				bool okToCreate = true;
+				if (connection1 != null && connection1.GetComponent<AVOWNode>() != null && AVOWConfig.singleton.tutDisableBarConstruction){
+					okToCreate = false;
+				}
+				
+				// If  anode to component connection
+				if (connection1 != null && connection1.GetComponent<AVOWComponent>() != null && AVOWConfig.singleton.tutDisableComponentConstruction){
+					okToCreate = false;
+				}
+				if (okToCreate && heldGapCommand != null){
+					heldConnection = false;
+					heldGapCommand.ExecuteStep();
+					AVOWUI.singleton.commands.Push(heldGapCommand);
+					heldGapCommand = null;
+					heldGapConnection1 = null;
+					connection1 = null;
+					connection0 = null;
+					insideState = InsideGapState.kOnNewComponent;
+				}
+				else{
 					heldConnection = false;
 					connection1 = null;
 				}
-				else{
-					// do logic to see if the thing should be creared
-					// If a node to node connection
-					bool okToCreate = true;
-					if (connection1 != null && connection1.GetComponent<AVOWNode>() != null && AVOWConfig.singleton.tutDisableBarConstruction){
-						okToCreate = false;
-					}
-					
-					// If  anode to component connection
-					if (connection1 != null && connection1.GetComponent<AVOWComponent>() != null && AVOWConfig.singleton.tutDisableComponentConstruction){
-						okToCreate = false;
-					}
-					if (okToCreate && heldGapCommand != null){
-						heldConnection = false;
-						heldGapCommand.ExecuteStep();
-						AVOWUI.singleton.commands.Push(heldGapCommand);
-						heldGapCommand = null;
-						heldGapConnection1 = null;
-						connection1 = null;
-						connection0 = null;
-						insideState = InsideGapState.kOnNewComponent;
-					}
-					else{
-						heldConnection = false;
-						connection1 = null;
-					}
-				}
+
 			}
 			
 			
@@ -563,13 +557,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 		isInside = false;//(connection1 != null);
 		
 		// If we have a connection1, then the camera should preserve the vector from that object to here
-		if (IsButtonDown()){
-			AVOWCamControl.singleton.mode = AVOWCamControl.Mode.kFixVector;
-		}
-		else{
-		//	Debug.Log("UITool setting FrameGame");
-			AVOWCamControl.singleton.mode = AVOWCamControl.Mode.kFrameGame;
-		}
+		AVOWCamControl.singleton.mode = IsButtonDown() ? AVOWCamControl.singleton.mode = AVOWCamControl.Mode.kFixVector : AVOWCamControl.singleton.mode = AVOWCamControl.Mode.kFrameGame;
 
 		if (connection1 != null){
 			AVOWSim.singleton.SetAnchor(connection1, connection1Pos, mouseWorldPos);

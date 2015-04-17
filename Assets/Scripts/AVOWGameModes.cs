@@ -232,7 +232,7 @@ public class AVOWGameModes : MonoBehaviour {
 			triggerStartLevel = kBackStoryIndex-1;
 		
 		}
-		if (currentLevel > 0 && !hasShownHint && AVOWUpdateManager.singleton.GetGameTime() >  lastGoalTime + waitForTimedHintDuration){
+		if (currentLevel > 0 && !hasShownHint && AVOWUpdateManager.singleton.GetGameTime() >  lastGoalTime + waitForTimedHintDuration && AVOWObjectiveManager.singleton.currentGoalIndex < 4){
 			TriggerTimerHint();
 		}
 		
@@ -266,35 +266,35 @@ public class AVOWGameModes : MonoBehaviour {
 			}
 
 			case GameModeState.kStageComplete0:{
-			// Get rid of all our resistance squares
-			foreach (GameObject go in AVOWGraph.singleton.allComponents){
-				AVOWComponent component = go.GetComponent<AVOWComponent>();
-				if (component.type == AVOWComponent.Type.kLoad){
-					component.Kill (89);
+				// Get rid of all our resistance squares
+				foreach (GameObject go in AVOWGraph.singleton.allComponents){
+					AVOWComponent component = go.GetComponent<AVOWComponent>();
+					if (component.type == AVOWComponent.Type.kLoad){
+						component.Kill (89);
+					}
 				}
+				
+				AVOWConfig.singleton.DisplaySidePanel(false);
+				
+				
+				pusher.GetComponent<AVOWPusher>().disableMovement = true;
+				AVOWCamControl.singleton.disableMovement = true;
+				if (AVOWGraph.singleton.allComponents.Count == 1){
+					state = GameModeState.kStageComplete1;
+				}
+				AVOWConfig.singleton.tutDisableConnections = true;
+				break;	
 			}
-			
-			AVOWConfig.singleton.DisplaySidePanel(false);
-			
-			
-			pusher.GetComponent<AVOWPusher>().disableMovement = true;
-			AVOWCamControl.singleton.disableMovement = true;
-			if (AVOWGraph.singleton.allComponents.Count == 1){
-				state = GameModeState.kStageComplete1;
+			case GameModeState.kStageComplete4:{
+				break;	
 			}
-			AVOWConfig.singleton.tutDisableConnections = true;
-			break;	
-		}
-		case GameModeState.kStageComplete4:{
-			break;	
-		}
-		default:{
-//			AVOWUI.singleton.enableToolUpdate = true;
-//			greenBackground.GetComponent<AVOWGreenBackground>().MakeSmall();
-//			pusher.GetComponent<AVOWPusher>().disableMovement = false;
-//			AVOWCamControl.singleton.disableMovement = false;
-//			scenery.transform.localScale = new Vector3(1, 1, 1);
-			break;
+			default:{
+	//			AVOWUI.singleton.enableToolUpdate = true;
+	//			greenBackground.GetComponent<AVOWGreenBackground>().MakeSmall();
+	//			pusher.GetComponent<AVOWPusher>().disableMovement = false;
+	//			AVOWCamControl.singleton.disableMovement = false;
+	//			scenery.transform.localScale = new Vector3(1, 1, 1);
+				break;
 			}
 		}
 	}
