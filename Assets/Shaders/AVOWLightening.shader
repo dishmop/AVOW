@@ -48,6 +48,7 @@
 
 		        float4 frag(v2f i) : COLOR
 		        {
+		      //  return float4(0, 0, 0, 0);
 		        	float xx = i.uv[0] - 0.5;
 		        	float yy = i.uv[1] - 0.5;
 		        	

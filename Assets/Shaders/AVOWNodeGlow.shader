@@ -47,6 +47,7 @@
 
 		        float4 frag(v2f i) : COLOR
 		        {
+		        //  return float4(0, 0, 0, 0);
 		        	float xVal = abs(2 * (i.uv[0] - 0.5));
 		     //   	float xMul = cos(3.14159 * 3.5 * xVal* xVal * xVal);
 		     //		float xMul =4 *  xVal*xVal;
