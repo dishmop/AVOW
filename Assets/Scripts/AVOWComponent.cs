@@ -16,8 +16,7 @@ public class AVOWComponent : MonoBehaviour {
 	public float lighteningSize = 0.5f;
 	public bool isInteractive = true;	
 	public bool showResistance = true;
-	public AudioSource motorStart;
-	public AudioSource motorSustain;
+
 	
 	float thisXScale;
 	float lastXScale;
