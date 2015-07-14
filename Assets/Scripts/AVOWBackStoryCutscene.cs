@@ -356,7 +356,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 				BackStoryCamera.singleton.state = BackStoryCamera.State.kOrbitCube;
 				BrightenScene();
 
-				Debug.Log("Cube Intro animation");
+				//Debug.Log("Cube Intro animation");
 				AVOWTutorialText.singleton.AddPause(8);
 				AVOWTutorialText.singleton.AddText("I'm Cube.");
 				AVOWTutorialText.singleton.AddPause(2);	
@@ -840,7 +840,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 				danceFollow3Dist = 1.5f;
 				UpdateDanceFollow7();
 				babyCube.GetComponent<BabyBlueParent>().Land();
-				Debug.Log ("Ground = " + babyCube.transform.position.y);
+		//		Debug.Log ("Ground = " + babyCube.transform.position.y);
 				if (Time.fixedTime > electrify5Time){
 					state = State.kLand1;
 				}
@@ -998,18 +998,18 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	}
 	
 	void StartDanceThreesome(){
-		Debug.Log ("StartDanceThreesome:");
+	//	Debug.Log ("StartDanceThreesome:");
 		foreach (GameObject go in parentSpheres){
-			Debug.Log (go.name);
-			Debug.Log (go.transform.position.ToString());
-			Debug.Log (go.GetComponent<AVOWGreySphere>().vel.ToString());
-			Debug.Log  ("");
+		//	Debug.Log (go.name);
+		//	Debug.Log (go.transform.position.ToString());
+		//	Debug.Log (go.GetComponent<AVOWGreySphere>().vel.ToString());
+			//Debug.Log  ("");
 			
 		}
-		Debug.Log (babyCube.name);
-		Debug.Log (babyCube.transform.position.ToString());
-		Debug.Log (babyCube.GetComponent<DanceThreesome>().GetVelocity().ToString());
-		Debug.Log  ("");
+		//Debug.Log (babyCube.name);
+	//	Debug.Log (babyCube.transform.position.ToString());
+	//	Debug.Log (babyCube.GetComponent<DanceThreesome>().GetVelocity().ToString());
+	//	Debug.Log  ("");
 		
 		parentSpheres[0].GetComponent<DanceThreesome>().ForceVelocity(parentSpheres[0].GetComponent<AVOWGreySphere>().vel + new Vector3(0, 0, 1));
 		parentSpheres[1].GetComponent<DanceThreesome>().ForceVelocity(parentSpheres[1].GetComponent<AVOWGreySphere>().vel + new Vector3(0, 0, 1));
@@ -1056,10 +1056,10 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 		
 		Debug.Log ("ParentSpheres:");
 		foreach (GameObject go in parentSpheres){
-			Debug.Log (go.name);
-			Debug.Log (go.transform.position.ToString());
-			Debug.Log (go.GetComponent<AVOWGreySphere>().vel.ToString());
-			Debug.Log  ("");
+			//Debug.Log (go.name);
+		//	Debug.Log (go.transform.position.ToString());
+		//	Debug.Log (go.GetComponent<AVOWGreySphere>().vel.ToString());
+		//	Debug.Log  ("");
 			
 		}
 		

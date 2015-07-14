@@ -126,7 +126,7 @@ public class AVOWComponent : MonoBehaviour {
 	
 	public float GetResistance(){
 		if (type != Type.kLoad){
-			Debug.Log("Attempting to read resistance from a non-Load type");
+			//Debug.Log("Attempting to read resistance from a non-Load type");
 		}
 		return Mathf.Tan (Mathf.Deg2Rad * resistanceAngle.GetValue());
 	}

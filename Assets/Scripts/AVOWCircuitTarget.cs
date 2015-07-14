@@ -128,7 +128,7 @@ public class AVOWCircuitTarget{
 	
 	public AVOWCircuitTarget (AVOWGraph graph){
 		if (graph.HasHalfFinishedComponents()){
-			Debug.LogError ("Trying to make a target from half finished components");
+			//Debug.LogError ("Trying to make a target from half finished components");
 		}
 		totalCurrent = graph.GetTotalWidth();
 		componentDesc = new List<Vector3>();

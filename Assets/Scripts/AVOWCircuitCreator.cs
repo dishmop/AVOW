@@ -121,7 +121,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 
 		TextAsset asset = Resources.Load(BuildResourcePath ()) as TextAsset;
 		if (asset != null){
-			Debug.Log ("Loading asset");
+			//Debug.Log ("Loading asset");
 			Stream s = new MemoryStream(asset.bytes);
 			DeserializePerms(s);
 			Resources.UnloadAsset(asset);
@@ -336,7 +336,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 				text += ", ";
 			}
 		}
-		Debug.Log(text);
+		//Debug.Log(text);
 	}
 	
 	string CreateFracString(float val){
@@ -357,7 +357,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 				text += ", ";
 			}
 		}
-		Debug.Log(text);
+		//Debug.Log(text);
 	}
 	
 	IEnumerable<AVOWCircuitTarget> EnumerateAllOptions(int numResistors){
@@ -367,7 +367,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 		if (graph.allComponents.Count == numResistors+ 1){
 			AVOWSim.singleton.Recalc();
 			AVOWCircuitTarget item = new AVOWCircuitTarget(graph);
-			Debug.Log (count.ToString () + ".......Total current = " + graph.GetTotalWidth());
+			//Debug.Log (count.ToString () + ".......Total current = " + graph.GetTotalWidth());
 			count++;
 			yield return item;
 		}
@@ -378,7 +378,7 @@ public class AVOWCircuitCreator : MonoBehaviour {
 					AVOWSim.singleton.Recalc();
 					
 					AVOWCircuitTarget item = new AVOWCircuitTarget(graph);
-					Debug.Log (count.ToString () + ".......Total current = " + graph.GetTotalWidth());
+					//Debug.Log (count.ToString () + ".......Total current = " + graph.GetTotalWidth());
 					count++;
 					if (!AVOWSim.singleton.errorInBounds){
 						yield return item;
@@ -507,14 +507,14 @@ public class AVOWCircuitCreator : MonoBehaviour {
 			int[] second = null;
 			GetEnumerations( graph.allNodes.Count, out first, out second);
 			
-			Debug.Log ("i = " + i + " first.Length = " + first.Length + ", second.Length = " + second.Length + ", graph.allNodes.Count = " + graph.allNodes.Count);
-			Debug.Log ("first[i] = " + first[i] + ", second[i] = " + second[i]);
+		//	Debug.Log ("i = " + i + " first.Length = " + first.Length + ", second.Length = " + second.Length + ", graph.allNodes.Count = " + graph.allNodes.Count);
+		//	Debug.Log ("first[i] = " + first[i] + ", second[i] = " + second[i]);
 			command = new AVOWCommandAddComponent(graph.allNodes[first[i]], graph.allNodes[second[i]], AVOWUI.singleton.resistorPrefab);
 		}
 		else{
 			int index = i - totalNodeNode;
 			AVOWNode node = graph.allNodes[splitNodeCache[index].Item1].GetComponent<AVOWNode>();
-			Debug.Log ("index = " + index);
+			//Debug.Log ("index = " + index);
 			command = new AVOWCommandSplitAddComponent(graph.allNodes[splitNodeCache[index].Item1], node.components[splitNodeCache[index].Item2], AVOWUI.singleton.resistorPrefab, false);
 		
 		}

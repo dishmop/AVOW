@@ -44,7 +44,7 @@ public class AVOWCommandRemove : AVOWCommand{
 		removeComponentGO = componentGO;
 		gapType = DetermineType();
 	//	Debug.Log("Removal type = " + gapType.ToString());
-		Debug.Log("Removal type = " + (gapType == GapType.kOneOfMany ? "Thinny" : "Fatty"));
+		//Debug.Log("Removal type = " + (gapType == GapType.kOneOfMany ? "Thinny" : "Fatty"));
 	}
 	
 	
@@ -84,7 +84,7 @@ public class AVOWCommandRemove : AVOWCommand{
 			case ExecuteStepState.kMakeGap:{
 				AVOWComponent component = removeComponentGO.GetComponent<AVOWComponent>();
 				
-				Debug.Log ("Shriking component " + component.GetID() + " of type " + ((gapType == GapType.kOneOfMany) ? "One of many" : "Only one"));
+				//Debug.Log ("Shriking component " + component.GetID() + " of type " + ((gapType == GapType.kOneOfMany) ? "One of many" : "Only one"));
 				
 				component.resistanceAngle.Set((gapType == GapType.kOnlyOne) ? 36.86f : 53.13f);		//width of 0.75 : 1/0.75f	
 				undoStep = UndoStepState.kWidenGap;
@@ -216,7 +216,7 @@ public class AVOWCommandRemove : AVOWCommand{
 		switch (undoStep){
 			case UndoStepState.kWidenGap:{
 				removeComponentGO.GetComponent<AVOWComponent>().resistanceAngle.Set (45);
-				Debug.Log ("UndoStep");
+			//	Debug.Log ("UndoStep");
 				break;
 			}
 		

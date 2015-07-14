@@ -949,7 +949,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 					newID = connection1.GetComponent<AVOWComponent>() != null ? connection1.GetComponent<AVOWComponent>().GetID() : connection1.GetComponent<AVOWNode>().GetID();
 				if (heldGapConnection1)
 					oldID = heldGapConnection1.GetComponent<AVOWComponent>() != null ? heldGapConnection1.GetComponent<AVOWComponent>().GetID() : heldGapConnection1.GetComponent<AVOWNode>().GetID();
-				Debug.Log("Undo command. OldID = " + oldID + ", newID = " + newID + ", Time = " + Time.time);
+			//	Debug.Log("Undo command. OldID = " + oldID + ", newID = " + newID + ", Time = " + Time.time);
 			}
 		}
 		
@@ -959,11 +959,11 @@ public class AVOWUICreateTool :  AVOWUITool{
 			heldGapConnection1 = connection1;
 			if (connection1.GetComponent<AVOWComponent>()){
 				heldGapCommand = new AVOWCommandSplitAddComponent(connection0, connection1, AVOWUI.singleton.resistorPrefab, connection1.GetComponent<AVOWComponent>().type == AVOWComponent.Type.kVoltageSource && (connection0.GetComponent<AVOWNode>().inComponents.Count + connection0.GetComponent<AVOWNode>().outComponents.Count) > 2);
-				Debug.Log("new AVOWCommandSplitAddComponent " + Time.time);
+	//			Debug.Log("new AVOWCommandSplitAddComponent " + Time.time);
 			}
 			else{
 				heldGapCommand = new AVOWCommandAddComponent(connection0, connection1, AVOWUI.singleton.resistorPrefab);
-				Debug.Log("new AVOWCommandAddComponent from " + connection0.GetComponent<AVOWNode>().GetID() + " to " + connection1.GetComponent<AVOWNode>().GetID() + " time = " + Time.time);
+//				Debug.Log("new AVOWCommandAddComponent from " + connection0.GetComponent<AVOWNode>().GetID() + " to " + connection1.GetComponent<AVOWNode>().GetID() + " time = " + Time.time);
 				
 			}
 			heldGapCommand.ExecuteStep();
