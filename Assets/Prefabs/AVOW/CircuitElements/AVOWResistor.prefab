@@ -252,7 +252,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100004}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: .00411643414, y: 0, z: 0, w: .999991596}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -403,7 +403,6 @@ MeshRenderer:
   m_ReceiveShadows: 1
   m_Materials:
   - {fileID: 2100000, guid: fd4ab4fa2b34e4a418b4e0a19b8a16ed, type: 2}
-  - {fileID: 2100000, guid: 32840f782120f4c8d84d9ab9e9ef33ba, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -803,8 +802,6 @@ MonoBehaviour:
   lighteningSize: .5
   isInteractive: 1
   showResistance: 1
-  motorStart: {fileID: 0}
-  motorSustain: {fileID: 0}
   motorRunning: 0
   voltage: 1
   type: 1
@@ -812,8 +809,8 @@ MonoBehaviour:
   uiVisitedIndex: 0
   disable: 0
   fwCurrent: 0
-  col0: {r: 1, g: 1, b: 1, a: 1}
-  col1: {r: 1, g: 1, b: 1, a: 1}
+  col0: {r: 1, g: .827383399, b: .45588237, a: 1}
+  col1: {r: 1, g: .827383399, b: .45588237, a: 1}
   border: .100000001
   hOrder: 0
   hWidth: 0
@@ -872,6 +869,7 @@ MonoBehaviour:
   size: 1
   numStages: 5
   probOfChange: .5
+  disableWobble: 0
 --- !u!114 &11441936
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -891,6 +889,7 @@ MonoBehaviour:
   size: 1
   numStages: 5
   probOfChange: .5
+  disableWobble: 0
 --- !u!114 &11466414
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -910,6 +909,7 @@ MonoBehaviour:
   size: 1
   numStages: 5
   probOfChange: .5
+  disableWobble: 0
 --- !u!114 &11480920
 MonoBehaviour:
   m_ObjectHideFlags: 1

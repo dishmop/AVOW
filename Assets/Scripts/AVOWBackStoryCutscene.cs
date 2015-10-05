@@ -245,8 +245,8 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	// Use this for initialization
 	public void Initialise () {
 //		string name = backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[0].name;
-		reflectionColor = backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[0].GetColor ("_ReflectColor");
-		rustColor = backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[1].GetColor ("_TintColor");
+//		reflectionColor = backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[0].GetColor ("_ReflectColor");
+//		rustColor = backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[1].GetColor ("_TintColor");
 		
 		// Set up camera posiitons
 		cameraStartPositions[(int)State.kStartup] = new Vector3(0, 2.3f, 104.2f);

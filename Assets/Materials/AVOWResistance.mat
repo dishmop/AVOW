@@ -2,14 +2,16 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 3
+  serializedVersion: 6
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: AVOWResistance
   m_Shader: {fileID: 4800000, guid: 727c729de29ee4f49a4b8f3d2905dab5, type: 3}
-  m_ShaderKeywords: []
+  m_ShaderKeywords: 
+  m_LightmapFlags: 5
   m_CustomRenderQueue: -1
+  stringTagMap: {}
   m_SavedProperties:
     serializedVersion: 2
     m_TexEnvs:
@@ -32,9 +34,9 @@ Material:
         second: {r: 0, g: 0, b: 0, a: 1}
       data:
         first:
-          name: __Color1
-        second: {r: 0, g: .66896534, b: 1, a: 1}
+          name: _Color1
+        second: {r: 0, g: 1, b: .379310369, a: 1}
       data:
         first:
-          name: _Color1
-        second: {r: 1, g: 1, b: 1, a: 1}
+          name: __Color1
+        second: {r: 0, g: .66896534, b: 1, a: 1}
