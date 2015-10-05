@@ -24,7 +24,7 @@ public class AVOWButton : MonoBehaviour {
 	
 		// Each button should have its own copy of the material
 		Material newMat = UnityEngine.Object.Instantiate(transform.FindChild("SizedPanel").FindChild("Image").GetComponent<Image>().material);
-		transform.FindChild("SizedPanel").FindChild("Image").GetComponent<Image>().material = newMat;
+//		transform.FindChild("SizedPanel").FindChild("Image").GetComponent<Image>().material = newMat;
 		
 	
 	}
@@ -50,6 +50,10 @@ public class AVOWButton : MonoBehaviour {
 			state = State.kDisabled;
 			
 		}
+		else if (mode == AVOWUI.ToolMode.kDelete && AVOWGraph.singleton.GetNumConfirmedLoads() == 0){
+			state = State.kDisabled;
+			
+		}		
 		else{
 			state = State.kNormal;
 		}
@@ -75,10 +79,13 @@ public class AVOWButton : MonoBehaviour {
 
 		
 		
-
-		transform.FindChild("SizedPanel").FindChild("Image").GetComponent<Image>().material.SetColor ("_Color", color[(int)state]);
+//
+//		transform.FindChild("SizedPanel").FindChild("Image").GetComponent<Image>().material.SetColor ("_Color", color[(int)state]);
 		transform.FindChild("SizedPanel").FindChild("Label").GetComponent<Text>().color = color[(int)state] * 20;
-		transform.FindChild("SizedPanel").GetComponent<Image>().material = state == State.kSelected ? transform.FindChild("SizedPanel").FindChild("Image").GetComponent<Image>().material : null;
+		transform.FindChild("SizedPanel").GetComponent<Image>().enabled = (state == State.kSelected);
+		
+		transform.FindChild("SizedPanel").FindChild("Image").gameObject.SetActive(state != State.kDisabled);
+		transform.FindChild("SizedPanel").FindChild("ImageDisabled").gameObject.SetActive(state == State.kDisabled);
 	}
 	
 	

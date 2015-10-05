@@ -428,7 +428,7 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWConfig.singleton.DisplayBottomPanel(true);
 		AVOWConfig.singleton.DisplaySidePanel(false);
 		SelectCamera(CameraChoice.kBackStoryCam);
-		AVOWBackStoryCutscene.singleton.StartBackStory();
+//		AVOWBackStoryCutscene.singleton.StartBackStory();
 		backStory.SetActive(true);
 		
 		RestartFreePlayGame();
@@ -439,17 +439,17 @@ public class AVOWGameModes : MonoBehaviour {
 	void SelectCamera(CameraChoice cam){
 		currentCamSelect = cam;
 		// First set them all inactive
-		BackStoryCamera.singleton.gameObject.SetActive(false);
+	//	BackStoryCamera.singleton.gameObject.SetActive(false);
 		AVOWCamControl.singleton.gameObject.SetActive(false);
 		
-		BackStoryCamera.singleton.gameObject.SetActive(false);
+	//	BackStoryCamera.singleton.gameObject.SetActive(false);
 		switch (cam){
 		 	case CameraChoice.kGameCam:{
 				AVOWCamControl.singleton.gameObject.SetActive(true);
 				break;
 		 	}
 		 	case CameraChoice.kBackStoryCam:{
-				BackStoryCamera.singleton.gameObject.SetActive(true);
+			//	BackStoryCamera.singleton.gameObject.SetActive(true);
 				break;
 		 	}
 		}
@@ -630,7 +630,7 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWUI.singleton.PlayPing ();
 		backStory.SetActive(false);
 		AVOWLevelEditor.singleton.LoadAllForPlayback();
-		AVOWBackStoryCutscene.singleton.StopBackStory();
+//		AVOWBackStoryCutscene.singleton.StopBackStory();
 		AVOWTutorialManager.singleton.StopTutorial();
 		AVOWConfig.singleton.DisplayBottomPanel(false);
 		AVOWConfig.singleton.DisplaySidePanel(false);

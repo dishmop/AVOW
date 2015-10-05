@@ -124,6 +124,7 @@
      <Compile Include="Assets\Scripts\Telemetry.cs" />
      <Compile Include="Assets\Scripts\TelemtryListener.cs" />
      <Compile Include="Assets\Scripts\TextScaler.cs" />
+     <Compile Include="Assets\Scripts\TextureConstructor.cs" />
      <Compile Include="Assets\Scripts\Tuple.cs" />
      <Compile Include="Assets\Scripts\Tuple2.cs" />
      <Compile Include="Assets\Scripts\Tuple3.cs" />
@@ -246,6 +247,7 @@
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ContrastComposite.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\FXAAPreset3.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\FisheyeShader.shader" />
+     <None Include="Assets\Shaders\AVOWGlow.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\Contrast Stretch\Apply.shader" />
      <None Include="Assets\Shaders\noise-simplex_v02.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\frag_ao.cginc" />

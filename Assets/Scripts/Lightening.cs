@@ -13,6 +13,7 @@ public class Lightening : MonoBehaviour {
 	public float		size;
 	public int			numStages;
 	public float		probOfChange;
+	public bool 		disableWobble;
 	
 	
 	const int		kLoadSaveVersion = 1;	
@@ -163,6 +164,8 @@ public class Lightening : MonoBehaviour {
 	
 	// Pass in how far along the line we are (0 for start, 1 for end)
 	Vector3 CalcSD(float dist){
+		if (disableWobble) return Vector3.zero;
+		
 		if (dist < 0.5f){
 			return Vector3.Lerp (startSD, midSD, dist * 2f);
 		}
@@ -215,39 +218,39 @@ public class Lightening : MonoBehaviour {
 
 		// Tri 1
 		tris[triIndex++] = 0;
-		tris[triIndex++] = 3;
 		tris[triIndex++] = 1;
+		tris[triIndex++] = 3;
 		
 		// Tri 2
 		tris[triIndex++] = 0;
-		tris[triIndex++] = 2;
 		tris[triIndex++] = 3;
-
+		tris[triIndex++] = 2;
+		
 				
 		for (int i = 0; i < numStages; ++i){
 			int firstVertIndex = 4 + i * 2;
 			// Tri 1
 			tris[triIndex++] = firstVertIndex;
-			tris[triIndex++] = firstVertIndex + 3;
 			tris[triIndex++] = firstVertIndex + 1;
+			tris[triIndex++] = firstVertIndex + 3;
 			
 			// Tri 2
 			tris[triIndex++] = firstVertIndex;
-			tris[triIndex++] = firstVertIndex + 2;
 			tris[triIndex++] = firstVertIndex + 3;
+			tris[triIndex++] = firstVertIndex + 2;
 		}
 		int vertIndex = 4 + (numStages+1) * 2;
 		
 		// Tri 1
 		tris[triIndex++] = vertIndex;
-		tris[triIndex++] = vertIndex + 3;
 		tris[triIndex++] = vertIndex + 1;
+		tris[triIndex++] = vertIndex + 3;
 		
 		// Tri 2
 		tris[triIndex++] = vertIndex;
-		tris[triIndex++] = vertIndex + 2;
 		tris[triIndex++] = vertIndex + 3;	
-
+		tris[triIndex++] = vertIndex + 2;
+		
 	
 	}
 	

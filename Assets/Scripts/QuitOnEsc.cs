@@ -42,15 +42,7 @@ public class QuitOnEsc : MonoBehaviour {
 		}
 		else
 		{
-			if ( AVOWBackStoryCutscene.singleton.state != AVOWBackStoryCutscene.State.kOff){
-				Cursor.visible = (Time.time < mouseMoveTime + mouseMoveCursorTimeout);
-				
-			}
-			else{
-				//otherwise we are probably just playing the game, so want to use the game cursor - unless gamemode thinks otherwise
-				
-				Cursor.visible = AVOWGameModes.singleton.showPointer;
-			}
+			Cursor.visible = AVOWGameModes.singleton.showPointer;
 			
 		}
 		

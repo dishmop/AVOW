@@ -241,7 +241,7 @@ public class AVOWTutorialText : MonoBehaviour {
 			    break;
 			}
 			case kTriggerKey:{
-				AVOWBackStoryCutscene.singleton.Trigger();
+			//	AVOWBackStoryCutscene.singleton.Trigger();
 				AVOWTutorialManager.singleton.Trigger();
 				break;
 			}
@@ -280,7 +280,7 @@ public class AVOWTutorialText : MonoBehaviour {
 //					PlaceTextOnScreen();
 					if (highlightLetter != " " && highlightLetter != "\n"){
 						if (!GetComponent<AudioSource>().isPlaying) GetComponent<AudioSource>().Play();
-						AVOWBackStoryCutscene.singleton.TriggerLight();
+//						AVOWBackStoryCutscene.singleton.TriggerLight();
 						AVOWUI.singleton.TriggerLight();
 					}
 				}

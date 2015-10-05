@@ -1,10 +1,21 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWComponent.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Shaders/AVOWGlow.shader">
     <Files>
-      <File FileName="Assets/Scripts/AVOWCircuitCreator.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWComponent.cs" Line="8" Column="1" />
-      <File FileName="Assets/Scripts/AVOWSim.cs" Line="21" Column="18" />
+      <File FileName="Assets/Shaders/AVOWGlow.shader" Line="11" Column="28" />
+      <File FileName="Assets/Scripts/TextureConstructor.cs" Line="26" Column="36" />
+      <File FileName="Assets/Scripts/AVOWGameModes.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWObjectiveManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Lightening.cs" Line="225" Column="3" />
+      <File FileName="Assets/Scripts/QuitOnEsc.cs" Line="45" Column="57" />
+      <File FileName="Assets/Scripts/AVOWTutorialText.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWTutorialManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/BackStoryCamera.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWBackStoryCutscene.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AVOWUI.cs" Line="1" Column="1" />
+      <File FileName="Assets/Shaders/AVOWCursorCubeGreen.shader" Line="1" Column="1" />
+      <File FileName="Assets/Shaders/AVOWLightening.shader" Line="48" Column="1" />
+      <File FileName="Assets/Scripts/AVOWButton.cs" Line="53" Column="21" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
