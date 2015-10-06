@@ -19,8 +19,6 @@ public class AVOWUpdateManager : MonoBehaviour {
 	public GameObject tutorialText;
 	public GameObject camController;
 	public GameObject objectiveManager;
-	public GameObject telemetry;
-	public GameObject serverUpload;
 	public GameObject battery;
 	public GameObject pusher;
 	
@@ -45,10 +43,7 @@ public class AVOWUpdateManager : MonoBehaviour {
 	public long lastCount = 0;
 	
 	public long GetCountDelta(){
-		long thisCount = Telemetry.singleton.gZipOutStream.writeCount;
-		long thisDelta = thisCount - lastCount;
-		lastCount = thisCount;
-		return thisDelta;
+		return 0;
 		
 	}
 	
@@ -91,8 +86,6 @@ public class AVOWUpdateManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		config.GetComponent<AVOWConfig>().Initialise();
-		telemetry.GetComponent<Telemetry>().Initialise();
-		telemetry.GetComponent<AVOWTelemetry>().Initialise();
 		sim.GetComponent<AVOWSim>().Initialise();
 		gameModes.GetComponent<AVOWGameModes>().Initialise();
 		graph.GetComponent<AVOWGraph>().Initialise();
@@ -106,30 +99,39 @@ public class AVOWUpdateManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		gameTime += Time.fixedDeltaTime * (telemetry.GetComponent<Telemetry>().isPlaying ? playbackSpeed : 1);
-		if (!telemetry.GetComponent<Telemetry>().isPlaying){
-			graph.GetComponent<AVOWGraph>().ResetOptFlags();
-			objectiveManager.GetComponent<AVOWObjectiveManager>().ResetOptFlags();
-			ui.GetComponent<AVOWUI>().ResetOptFlags();
-			
-			ui.GetComponent<AVOWUI>().GameUpdate();
-			gameModes.GetComponent<AVOWGameModes>().GameUpdate();
-			circuitCreator.GetComponent<AVOWCircuitCreator>().GameUpdate();
-			graph.GetComponent<AVOWGraph>().GameUpdate();
-			sim.GetComponent<AVOWSim>().GameUpdate();
-			gameModes.GetComponent<AVOWGameModes>().GameUpdate();
-			tutorialText.GetComponent<AVOWTutorialText>().GameUpdate();
-			objectiveManager.GetComponent<AVOWObjectiveManager>().GameUpdate();
-			tutorialManager.GetComponent<AVOWTutorialManager>().GameUpdate();
-
-		}
-		if (telemetry.GetComponent<Telemetry>().isRecording){
-			AVOWTelemetry.singleton.WriteGameUpdateEvent();
-		}
-		telemetry.GetComponent<Telemetry>().GameUpdate();
-		serverUpload.GetComponent<ServerUpload>().SetIgnoreFilename(telemetry.GetComponent<Telemetry>().GetCurrentWriteFilename());
-		serverUpload.GetComponent<ServerUpload>().GameUpdate();
+		gameTime += Time.fixedDeltaTime;
+		graph.GetComponent<AVOWGraph>().ResetOptFlags();
+		objectiveManager.GetComponent<AVOWObjectiveManager>().ResetOptFlags();
+		ui.GetComponent<AVOWUI>().ResetOptFlags();
 		
+		ui.GetComponent<AVOWUI>().GameUpdate();
+		gameModes.GetComponent<AVOWGameModes>().GameUpdate();
+		circuitCreator.GetComponent<AVOWCircuitCreator>().GameUpdate();
+		graph.GetComponent<AVOWGraph>().GameUpdate();
+		sim.GetComponent<AVOWSim>().GameUpdate();
+		gameModes.GetComponent<AVOWGameModes>().GameUpdate();
+		tutorialText.GetComponent<AVOWTutorialText>().GameUpdate();
+		objectiveManager.GetComponent<AVOWObjectiveManager>().GameUpdate();
+		tutorialManager.GetComponent<AVOWTutorialManager>().GameUpdate();
+			
+		// this is a bit hacky - check for errors in the sumulation
+		if (sim.GetComponent<AVOWSim>().errorFlag){
+			graph.GetComponent<AVOWGraph>().ClearCircuit();
+			
+			// Simple start
+			GameObject node0GO = graph.GetComponent<AVOWGraph>().AddNode ();
+			GameObject node1GO = graph.GetComponent<AVOWGraph>().AddNode ();
+			
+			
+			graph.GetComponent<AVOWGraph>().PlaceComponent(GameObject.Instantiate(AVOWUI.singleton.cellPrefab) as GameObject, node0GO, node1GO);
+			
+			// For some reason, we can't just make a graph with nothing in it - we need to make a resisotr
+			// then remove it
+			graph.GetComponent<AVOWGraph>().PlaceComponent(GameObject.Instantiate(AVOWUI.singleton.resistorPrefab) as GameObject, node1GO, node0GO);
+			graph.GetComponent<AVOWGraph>().allComponents[1].GetComponent<AVOWComponent>().Kill(45);			
+			Debug.Log ("Detected erroronsous circuit - clearing the circuit");
+			sim.GetComponent<AVOWSim>().errorFlag = false;
+		}
 		
 	}
 	
@@ -139,9 +141,7 @@ public class AVOWUpdateManager : MonoBehaviour {
 		fps = 1/(thisFrameTime - lastFrameTime);
 		lastFrameTime = thisFrameTime;
 		
-		if (!telemetry.GetComponent<Telemetry>().isPlaying){
-			ui.GetComponent<AVOWUI>().RenderUpdate();
-		}
+		ui.GetComponent<AVOWUI>().RenderUpdate();
 
 		config.GetComponent<AVOWConfig>().RenderUpdate();
 		gameModes.GetComponent<AVOWGameModes>().RenderUpdate();

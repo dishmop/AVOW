@@ -127,7 +127,7 @@ public class AVOWGameModes : MonoBehaviour {
 		backStory.SetActive(false);
 		SelectCamera(CameraChoice.kGameCam);
 		tutorialText.SetActive(true);
-		if (!Telemetry.singleton.enableTelemetry && state == GameModeState.kSplashScreen){
+		if (state == GameModeState.kSplashScreen){
 			state = GameModeState.kPreMainMenu;
 		}
 		else{
@@ -138,9 +138,6 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	
 	void OnLeaveSplashScreen(){
-		string name = splashScreen.transform.FindChild("InputField").FindChild("Text").GetComponent<Text>().text;
-		string safeName = Regex.Replace(name, "[^A-Za-z0-9] ","-");	
-		PlayerPrefs.SetString(Telemetry.playerNameKey, safeName);
 		
 	}
 	
@@ -148,10 +145,6 @@ public class AVOWGameModes : MonoBehaviour {
 	
 		
 	void OnActivateSplash(){
-		if (PlayerPrefs.HasKey(Telemetry.playerNameKey)){
-			string name = PlayerPrefs.GetString(Telemetry.playerNameKey);
-			splashScreen.transform.FindChild("InputField").GetComponent<InputField>().text = name;
-		}
 //		if (splashScreen.transform.FindChild("InputField").FindChild("Text").GetComponent<Text>().text != ""){
 //			splashScreen.transform.FindChild("InputField").FindChild("Placeholder").GetComponent<Text>().enabled = false;
 //		}
@@ -508,7 +501,6 @@ public class AVOWGameModes : MonoBehaviour {
 			AVOWObjectiveManager.singleton.InitialiseLimitsOnly(7);
 			AVOWUpdateManager.singleton.ResetGameTime();
 			
-			Telemetry.singleton.StartPlayback();
 			return;
 		}
 		
@@ -520,15 +512,6 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWUpdateManager.singleton.ResetGameTime();
 
 		/// Sert up recording
-		if (Telemetry.singleton.enableTelemetry){
-			if (Telemetry.singleton.isRecording){
-				Telemetry.singleton.StopRecording(AVOWUpdateManager.singleton.GetGameTime());
-			}
-			if (currentLevel != kBackStoryIndex){
-				Telemetry.singleton.StartRecording();
-			}
-			if (Telemetry.singleton.isRecording) AVOWTelemetry.singleton.WriteStartLevelEvent(currentLevel);
-		}
 		
 		if (currentLevel > 0){
 			AVOWObjectiveManager.singleton.InitialiseLevel(levelNum);
@@ -638,12 +621,6 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWObjectiveManager.singleton.StopObjectives();
 		SelectCamera(CameraChoice.kGameCam);
 		ClearLevelStartMessage();
-		if (Telemetry.singleton.mode == Telemetry.Mode.kRecord && Telemetry.singleton.isRecording){
-			Telemetry.singleton.StopRecording(AVOWUpdateManager.singleton.GetGameTime());
-		}
-		if (Telemetry.singleton.mode == Telemetry.Mode.kPlayback && Telemetry.singleton.isPlaying){
-			Telemetry.singleton.StopPlayback();
-		}
 		if (state == GameModeState.kSplashScreen){
 			OnLeaveSplashScreen();
 		}

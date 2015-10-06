@@ -438,9 +438,13 @@ public class AVOWGraph : MonoBehaviour {
 	
 	// Merges all connections to node0
 	public void MergeNodes(GameObject node0GO, GameObject node1GO){
-		
+		if (node0GO == null || node1GO == null){
+			Debug.Log("Error - MergeNodes(GameObject node0GO, GameObject node1GO) null pointer");
+			return;
+		}
 		AVOWNode node0 = node0GO.GetComponent<AVOWNode>();
 		AVOWNode node1 = node1GO.GetComponent<AVOWNode>();
+		
 		
 		// Replace all the instances of node1 with node 0 in the components attached to node1
 		// Add add the components to node0's list of components

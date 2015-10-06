@@ -23,7 +23,7 @@ public class AVOWButton : MonoBehaviour {
 	void Start () {
 	
 		// Each button should have its own copy of the material
-		Material newMat = UnityEngine.Object.Instantiate(transform.FindChild("SizedPanel").FindChild("Image").GetComponent<Image>().material);
+//		Material newMat = UnityEngine.Object.Instantiate(transform.FindChild("SizedPanel").FindChild("Image").GetComponent<Image>().material);
 //		transform.FindChild("SizedPanel").FindChild("Image").GetComponent<Image>().material = newMat;
 		
 	

@@ -14,7 +14,7 @@ public class Lightening : MonoBehaviour {
 	public int			numStages;
 	public float		probOfChange;
 	public bool 		disableWobble;
-	
+
 	
 	const int		kLoadSaveVersion = 1;	
 

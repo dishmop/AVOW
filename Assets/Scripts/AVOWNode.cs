@@ -173,6 +173,8 @@ public class AVOWNode : MonoBehaviour {
 		// Hmm this seems to happen when ghe batery runs out
 		if (float.IsNaN(h0)){
 			Debug.Log ("Error in node h0");
+			
+			AVOWSim.singleton.errorFlag = true;
 			return;
 		}
 		

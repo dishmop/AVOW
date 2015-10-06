@@ -48,7 +48,7 @@ class AutoQualityChooser extends MonoBehaviour{
 	}
 	
 	private function aproxQuality(){ // simplified function from Bootcamp demo
-		var fillrate = SystemInfo.graphicsPixelFillrate;
+		var fillrate = -1;//SystemInfo.graphicsPixelFillrate;
 		var shaderLevel = SystemInfo.graphicsShaderLevel;
 		var videoMemory = SystemInfo.graphicsMemorySize;
 		var processors = SystemInfo.processorCount;

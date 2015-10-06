@@ -157,10 +157,7 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	SpringValue		lightIntensityIntro = new SpringValue(0, SpringValue.Mode.kLinear, 0.1f);
 	SpringValue		lightIntensityOutro = new SpringValue(0, SpringValue.Mode.kLinear, 0.1f);
 	SpringValue 	cubeBrightness = new SpringValue(0, SpringValue.Mode.kAsymptotic, 20);
-	Color			reflectionColor;
-	Color			rustColor;
 	
-	bool 			triggerOutroLighting = false;
 	
 	public void StartBackStory(){
 	
@@ -820,9 +817,6 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 					babyCube.transform.FindChild("BabyBlueCube").GetComponent<Renderer>().materials[1].SetFloat("_Intensity", intensity - 0.05f);
 				}
 				
-				if (babyCube.transform.position.y - 0.5f * babyCube.transform.localScale.x < -200){
-					triggerOutroLighting = true;
-				}
 				if (babyCube.transform.position.y - 0.5f * babyCube.transform.localScale.x < -250){
 					Vector3 newPos = babyCube.transform.position;
 					newPos.y = -250 + 0.5f * babyCube.transform.localScale.x ;
@@ -999,13 +993,13 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 	
 	void StartDanceThreesome(){
 	//	Debug.Log ("StartDanceThreesome:");
-		foreach (GameObject go in parentSpheres){
-		//	Debug.Log (go.name);
-		//	Debug.Log (go.transform.position.ToString());
-		//	Debug.Log (go.GetComponent<AVOWGreySphere>().vel.ToString());
-			//Debug.Log  ("");
-			
-		}
+//		foreach (GameObject go in parentSpheres){
+//		//	Debug.Log (go.name);
+//		//	Debug.Log (go.transform.position.ToString());
+//		//	Debug.Log (go.GetComponent<AVOWGreySphere>().vel.ToString());
+//			//Debug.Log  ("");
+//			
+//		}
 		//Debug.Log (babyCube.name);
 	//	Debug.Log (babyCube.transform.position.ToString());
 	//	Debug.Log (babyCube.GetComponent<DanceThreesome>().GetVelocity().ToString());
@@ -1055,13 +1049,13 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 		
 		
 		Debug.Log ("ParentSpheres:");
-		foreach (GameObject go in parentSpheres){
-			//Debug.Log (go.name);
-		//	Debug.Log (go.transform.position.ToString());
-		//	Debug.Log (go.GetComponent<AVOWGreySphere>().vel.ToString());
-		//	Debug.Log  ("");
-			
-		}
+//		foreach (GameObject go in parentSpheres){
+//			//Debug.Log (go.name);
+//		//	Debug.Log (go.transform.position.ToString());
+//		//	Debug.Log (go.GetComponent<AVOWGreySphere>().vel.ToString());
+//		//	Debug.Log  ("");
+//			
+//		}
 		
 	}
 	
@@ -1619,14 +1613,9 @@ public class AVOWBackStoryCutscene : MonoBehaviour {
 		lightIntensityOutro.Update();
 		cubeBrightness.Update ();
 		backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[2].SetFloat("_Intensity", cubeBrightness.GetValue());
-		backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[1].SetColor ("_TintColor", rustColor * lightIntensityIntro.GetValue());
-		backStory.transform.FindChild("Intro").FindChild("CursorBlueCube").GetComponent<Renderer>().materials[0].SetColor ("_ReflectColor", reflectionColor * lightIntensityIntro.GetValue());
 		
 		backStory.transform.FindChild("Intro").FindChild("Floor").FindChild("Point light").GetComponent<Light>().intensity = 3 * lightIntensityIntro.GetValue();
 		backStory.transform.FindChild("Outro").FindChild("Floor").FindChild("Point light").GetComponent<Light>().intensity = 3 * lightIntensityOutro.GetValue();
-		if (babyCube != null && babyCube.transform.FindChild("BabyBlueCube").GetComponent<Renderer>().materials.Length == 2 && triggerOutroLighting){
-			babyCube.transform.FindChild("BabyBlueCube").GetComponent<Renderer>().materials[0].SetColor ("_ReflectColor", reflectionColor * lightIntensityOutro.GetValue());
-		}
 		
 	}
 	

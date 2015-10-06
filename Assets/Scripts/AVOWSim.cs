@@ -31,6 +31,7 @@ public class AVOWSim : MonoBehaviour {
 	public float yMax;
 	// We shouldn't need this
 	public bool errorInBounds;
+	public bool errorFlag = false;
 	
 	// Set this if we want to force the mouse to pretend it is over a comonent when rejigging the camera
 	public GameObject		mouseOverComponentForce = null;
@@ -485,6 +486,11 @@ public class AVOWSim : MonoBehaviour {
 	
 	
 	void StoreCurrentsInComponents(){
+		// If there are some components in the circuit (apart from the battery), but the battery
+		// has a current of zero, then we have got ourselves in an error situation
+		
+		float cellCurrent = 0;
+		
 		foreach (GameObject componentGO in graph.allComponents){
 			AVOWComponent component = componentGO.GetComponent<AVOWComponent>();
 			float totalCurrent = 0;
@@ -492,6 +498,13 @@ public class AVOWSim : MonoBehaviour {
 				totalCurrent += loopCurrents[record.loopId] * (record.isForward ? 1 : -1);
 			}
 			component.fwCurrent = totalCurrent;
+			if (component.type == AVOWComponent.Type.kVoltageSource){
+				cellCurrent = totalCurrent;
+			}
+		}
+		if (graph.allComponents.Count() > 1 && MathUtils.FP.Feq(cellCurrent, 0)){
+			Debug.Log ("Circuit in error state");
+			errorFlag = true;
 		}
 	}
 	

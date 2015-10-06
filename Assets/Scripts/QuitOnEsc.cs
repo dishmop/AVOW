@@ -3,7 +3,6 @@ using System.Collections;
 
 public class QuitOnEsc : MonoBehaviour {
 	public float mouseMoveCursorTimeout = 5;
-	float mouseMoveTime;
 	
 
 	// Use this for initialization
@@ -17,16 +16,9 @@ public class QuitOnEsc : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		// if the back story is on, then do a timed cursor
-		Vector2 mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-		if (!MathUtils.FP.Feq (mouseDelta.magnitude, 0, 0.01f)){
-			mouseMoveTime = Time.time;
-		}
 		
 		// Test for exit
 		if (Input.GetKeyDown (KeyCode.Escape)) {
-			if (Telemetry.singleton.isRecording){
-				Telemetry.singleton.StopRecording(AVOWUpdateManager.singleton.GetGameTime());
-			}
 			AppHelper.Quit();
 		}
 		

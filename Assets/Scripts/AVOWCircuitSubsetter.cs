@@ -27,9 +27,9 @@ public class AVOWCircuitSubsetter : MonoBehaviour {
 		}
 		CalcSubsets();
 		SetupOrganisedLists();
-		WriteAllToLogFile();
-		WriteExtremeToLogFile();
-		WriteOrganisedToLogFile();
+//		WriteAllToLogFile();
+//		WriteExtremeToLogFile();
+//		WriteOrganisedToLogFile();
 	
 	}
 	

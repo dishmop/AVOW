@@ -16,7 +16,8 @@ public class AVOWComponent : MonoBehaviour {
 	public float lighteningSize = 0.5f;
 	public bool isInteractive = true;	
 	public bool showResistance = true;
-
+	float resistorHeight = 0.1f;
+	float resistorWidth = 0.05f;
 	
 	float thisXScale;
 	float lastXScale;
@@ -347,7 +348,12 @@ public class AVOWComponent : MonoBehaviour {
 		float node0VPos = node0GO.GetComponent<AVOWNode>().voltage;
 		float node1VPos = node1GO.GetComponent<AVOWNode>().voltage;
 		if (type == Type.kLoad){
-			return new Vector3(hMid, node0VPos + connectorProp * (node1VPos - node0VPos), transform.position.z);
+			if (node1VPos > node0VPos){
+				return new Vector3(hMid, node0VPos + connectorProp * (node1VPos - node0VPos) - resistorHeight * 0.5f, transform.position.z);
+			}
+			else{
+				return new Vector3(hMid, node0VPos + connectorProp * (node1VPos - node0VPos) + resistorHeight * 0.5f, transform.position.z);
+			}
 		}
 		else{
 			return new Vector3(hMid, node0VPos - connectorProp * (node1VPos - node0VPos), transform.position.z);
@@ -367,7 +373,12 @@ public class AVOWComponent : MonoBehaviour {
 		float node0VPos = node0GO.GetComponent<AVOWNode>().voltage;
 		float node1VPos = node1GO.GetComponent<AVOWNode>().voltage;
 		if (type == Type.kLoad){
-			return new Vector3(hMid, node1VPos + connectorProp * (node0VPos - node1VPos), transform.position.z);
+			if (node1VPos > node0VPos){
+				return new Vector3(hMid, node1VPos + connectorProp * (node0VPos - node1VPos) + resistorHeight * 0.5f, transform.position.z);
+			}
+			else{
+				return new Vector3(hMid, node1VPos + connectorProp * (node0VPos - node1VPos) - resistorHeight * 0.5f, transform.position.z);
+			}
 		}
 		else{
 			return new Vector3(hMid, node1VPos - connectorProp * (node0VPos - node1VPos), transform.position.z);
@@ -526,10 +537,6 @@ public class AVOWComponent : MonoBehaviour {
 		CheckForKillResistance();
 		motorRunning = (!MathUtils.FP.Feq (lastXScale, thisXScale));
 		lastXScale = thisXScale;
-		
-		
-		
-
 	}
 	
 
@@ -595,7 +602,7 @@ public class AVOWComponent : MonoBehaviour {
 			transform.FindChild("Lightening1").gameObject.SetActive(isInteractive && enableLightening1);
 			transform.FindChild("Lightening2").gameObject.SetActive(isInteractive);
 			
-			transform.FindChild("ConnectionSphere0").gameObject.SetActive(isInteractive);
+			transform.FindChild("ConnectionSphere0").gameObject.SetActive(false);
 			transform.FindChild("ConnectionSphere1").gameObject.SetActive(false);
 			
 		}
@@ -624,7 +631,6 @@ public class AVOWComponent : MonoBehaviour {
 		
 			Lightening lightening0 = transform.FindChild("Lightening0").GetComponent<Lightening>();
 			Lightening lightening1 = transform.FindChild("Lightening1").GetComponent<Lightening>();
-			Lightening lightening2 = transform.FindChild("Lightening2").GetComponent<Lightening>();
 			
 			float pdSize = Mathf.Abs (useV1-useV0);
 
@@ -636,22 +642,39 @@ public class AVOWComponent : MonoBehaviour {
 			lightening0.numStages = 2;
 			lightening0.ConstructMesh();
 
-
 							
 			// Connector1 to node1
 //				transform.FindChild("Lightening1").gameObject.SetActive(true);
+
 			lightening1.startPoint = new Vector3(connector1Pos.x, newNode1Pos.y, lighteningZDepth);
 			lightening1.endPoint = connector1Pos + new Vector3(0, 0, lighteningZDepth);
 			lightening1.size = lighteningSize * pdSize;
 			lightening1.numStages = 2;
-			lightening1.ConstructMesh();	
+			lightening1.ConstructMesh();
+			
+			
+			if (type == Type.kVoltageSource){
+				Lightening lightening2 = transform.FindChild("Lightening2").GetComponent<Lightening>();
+				lightening2.startPoint = connector0Pos + new Vector3(0f, 0f, lighteningZDepth);;
+				lightening2.endPoint = connector1Pos + new Vector3(0f, 0f, lighteningZDepth);;
+				lightening2.size =lighteningSize *  pdSize;
+				lightening2.ConstructMesh();					
+			}
+			else{
+				RectLightening lightening2 = transform.FindChild("Lightening2").GetComponent<RectLightening>();
+				float halfHeight = resistorHeight * 0.5f;
+				float halfWidth = resistorWidth * 0.5f;
+				
+				Vector3 midConnection = 0.5f * (connector0Pos + connector1Pos);
+				
+				lightening2.bottomLeft = midConnection + new Vector3(-halfWidth, -halfHeight, lighteningZDepth);;
+				lightening2.topRight = midConnection + new Vector3(halfWidth, halfHeight, lighteningZDepth);;
+				lightening2.size = 0.2f * lighteningSize *  pdSize;
+				lightening2.ConstructMesh();	
+			}
 			
 			// connector0 to connector1
 //				transform.FindChild("Lightening0").gameObject.SetActive(true);
-			lightening2.startPoint = connector0Pos + new Vector3(0, 0, lighteningZDepth);;
-			lightening2.endPoint = connector1Pos + new Vector3(0, 0, lighteningZDepth);;
-			lightening2.size =lighteningSize *  pdSize;
-			lightening2.ConstructMesh();					
 			
 			
 //			oldNode0Pos = newNode0Pos;
@@ -669,6 +692,12 @@ public class AVOWComponent : MonoBehaviour {
 		connectionSphere0.localScale = new Vector3(scale, scale, scale);
 		connectionSphere1.position = connector1Pos;
 		connectionSphere1.localScale = new Vector3(scale, scale, scale);
+		
+		if (transform.FindChild("WhiteQuad") != null){
+//			transform.FindChild("WhiteQuad").gameObject.SetActive(isInteractive);
+			transform.FindChild("WhiteQuad").position = 0.5f * (connector1Pos + connector0Pos);
+			transform.FindChild("WhiteQuad").localScale = new Vector3(resistorWidth , resistorHeight , 0);
+		}
 
 		HandleAudio();
 		

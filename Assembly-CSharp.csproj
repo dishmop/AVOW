@@ -1,347 +1,281 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-	<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-	<ProductVersion>10.0.20506</ProductVersion>
-	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{66E54D2B-D988-C29A-8631-122C139D2145}</ProjectGuid>
-	<OutputType>Library</OutputType>
-	<AppDesignerFolder>Properties</AppDesignerFolder>
-	<RootNamespace></RootNamespace>
-	<AssemblyName>Assembly-CSharp</AssemblyName>
-	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-	<FileAlignment>512</FileAlignment>
-	<BaseDirectory>Assets</BaseDirectory>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{66E54D2B-D988-C29A-8631-122C139D2145}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <BaseDirectory>Assets</BaseDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-	<DebugSymbols>true</DebugSymbols>
-	<DebugType>full</DebugType>
-	<Optimize>false</Optimize>
-	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_5_1_1;UNITY_5_1;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_2D_PHYSICS;ENABLE_4_6_FEATURES;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PHYSICS_PHYSX3;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_LICENSE;ENABLE_AUDIOMIXER_SUSPEND;ENABLE_EDITOR_METRICS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_LOCALIZATION;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_SUBSTANCE;ENABLE_TEXTUREID_MAP;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_OSX</DefineConstants>
-	<ErrorReport>prompt</ErrorReport>
-	<WarningLevel>4</WarningLevel>
-	<NoWarn>0169</NoWarn>
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>Temp\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;UNITY_5_1_1;UNITY_5_1;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_2D_PHYSICS;ENABLE_4_6_FEATURES;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PHYSICS_PHYSX3;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_LICENSE;ENABLE_AUDIOMIXER_SUSPEND;ENABLE_EDITOR_METRICS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_LOCALIZATION;UNITY_WEBPLAYER;ENABLE_SUBSTANCE;WEBPLUG;ENABLE_TEXTUREID_MAP;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_MONO;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_OSX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0169</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-	<DebugType>pdbonly</DebugType>
-	<Optimize>true</Optimize>
-	<OutputPath>Temp\bin\Release\</OutputPath>
-	<DefineConstants>TRACE</DefineConstants>
-	<ErrorReport>prompt</ErrorReport>
-	<WarningLevel>4</WarningLevel>
-	<NoWarn>0169</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>Temp\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0169</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-	<Reference Include="System" />
-    <Reference Include="System.XML" />
-	<Reference Include="System.Core" />
-	<Reference Include="System.Xml.Linq" />
-	<Reference Include="UnityEngine">
-	  <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
-	</Reference>
-	<Reference Include="UnityEditor">
-	  <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll</HintPath>
-	</Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\..\..\Applications\Unity\Unity.app\Contents\Frameworks\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>..\..\..\..\..\..\..\Applications\Unity\Unity.app\Contents\Frameworks\Managed\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\ASDAudioSource.cs" />
-     <Compile Include="Assets\Scripts\AVOWBackStoryCutscene.cs" />
-     <Compile Include="Assets\Scripts\AVOWBattery.cs" />
-     <Compile Include="Assets\Scripts\AVOWButton.cs" />
-     <Compile Include="Assets\Scripts\AVOWCamControl.cs" />
-     <Compile Include="Assets\Scripts\AVOWCircuitCreator.cs" />
-     <Compile Include="Assets\Scripts\AVOWCircuitSubsetter.cs" />
-     <Compile Include="Assets\Scripts\AVOWCircuitTarget.cs" />
-     <Compile Include="Assets\Scripts\AVOWCommand.cs" />
-     <Compile Include="Assets\Scripts\AVOWCommandAddComponent.cs" />
-     <Compile Include="Assets\Scripts\AVOWCommandRemove.cs" />
-     <Compile Include="Assets\Scripts\AVOWCommandSplitAddComponent.cs" />
-     <Compile Include="Assets\Scripts\AVOWComponent.cs" />
-     <Compile Include="Assets\Scripts\AVOWConfig.cs" />
-     <Compile Include="Assets\Scripts\AVOWEventType.cs" />
-     <Compile Include="Assets\Scripts\AVOWFlashingButton.cs" />
-     <Compile Include="Assets\Scripts\AVOWGameModes.cs" />
-     <Compile Include="Assets\Scripts\AVOWGraph.cs" />
-     <Compile Include="Assets\Scripts\AVOWGreenBackground.cs" />
-     <Compile Include="Assets\Scripts\AVOWGreySphere.cs" />
-     <Compile Include="Assets\Scripts\AVOWHighlightRect.cs" />
-     <Compile Include="Assets\Scripts\AVOWLevelEditor.cs" />
-     <Compile Include="Assets\Scripts\AVOWMainMenu.cs" />
-     <Compile Include="Assets\Scripts\AVOWMenuButton.cs" />
-     <Compile Include="Assets\Scripts\AVOWNode.cs" />
-     <Compile Include="Assets\Scripts\AVOWObjectiveBoard.cs" />
-     <Compile Include="Assets\Scripts\AVOWObjectiveGrid.cs" />
-     <Compile Include="Assets\Scripts\AVOWObjectiveManager.cs" />
-     <Compile Include="Assets\Scripts\AVOWObjectives.cs" />
-     <Compile Include="Assets\Scripts\AVOWPusher.cs" />
-     <Compile Include="Assets\Scripts\AVOWSceneConstructor.cs" />
-     <Compile Include="Assets\Scripts\AVOWSideBar.cs" />
-     <Compile Include="Assets\Scripts\AVOWSim.cs" />
-     <Compile Include="Assets\Scripts\AVOWTelemetry.cs" />
-     <Compile Include="Assets\Scripts\AVOWTutorialManager.cs" />
-     <Compile Include="Assets\Scripts\AVOWTutorialText.cs" />
-     <Compile Include="Assets\Scripts\AVOWUI.cs" />
-     <Compile Include="Assets\Scripts\AVOWUIButton.cs" />
-     <Compile Include="Assets\Scripts\AVOWUICounter.cs" />
-     <Compile Include="Assets\Scripts\AVOWUICreateTool.cs" />
-     <Compile Include="Assets\Scripts\AVOWUIDeleteTool.cs" />
-     <Compile Include="Assets\Scripts\AVOWUIDisabledTool.cs" />
-     <Compile Include="Assets\Scripts\AVOWUITool.cs" />
-     <Compile Include="Assets\Scripts\AVOWUpdateManager.cs" />
-     <Compile Include="Assets\Scripts\AVOWVizObjectives.cs" />
-     <Compile Include="Assets\Scripts\AVOWVizTotals.cs" />
-     <Compile Include="Assets\Scripts\AmmeterEffect.cs" />
-     <Compile Include="Assets\Scripts\AppHelper.cs" />
-     <Compile Include="Assets\Scripts\AudioTimeScalar.cs" />
-     <Compile Include="Assets\Scripts\BabyBlueCube.cs" />
-     <Compile Include="Assets\Scripts\BabyBlueParent.cs" />
-     <Compile Include="Assets\Scripts\BackStoryCamera.cs" />
-     <Compile Include="Assets\Scripts\CommentLog.cs" />
-     <Compile Include="Assets\Scripts\DanceThreesome.cs" />
-     <Compile Include="Assets\Scripts\DrawnLine.cs" />
-     <Compile Include="Assets\Scripts\EventFilterButton.cs" />
-     <Compile Include="Assets\Scripts\ExtensionMethods.cs" />
-     <Compile Include="Assets\Scripts\FlashingButton.cs" />
-     <Compile Include="Assets\Scripts\FractionCalc.cs" />
-     <Compile Include="Assets\Scripts\Interpolator.cs" />
-     <Compile Include="Assets\Scripts\Lightening.cs" />
-     <Compile Include="Assets\Scripts\LighteningAudio.cs" />
-     <Compile Include="Assets\Scripts\MathUtils.cs" />
-     <Compile Include="Assets\Scripts\MeasureDisplay.cs" />
-     <Compile Include="Assets\Scripts\PlaybackButton.cs" />
-     <Compile Include="Assets\Scripts\PlaybackTime.cs" />
-     <Compile Include="Assets\Scripts\ProgressPanel.cs" />
-     <Compile Include="Assets\Scripts\ProjectorScript.cs" />
-     <Compile Include="Assets\Scripts\QuitOnEsc.cs" />
-     <Compile Include="Assets\Scripts\SendButtonScript.cs" />
-     <Compile Include="Assets\Scripts\SerialisationFactory.cs" />
-     <Compile Include="Assets\Scripts\SerializationID.cs" />
-     <Compile Include="Assets\Scripts\SerializationUtils.cs" />
-     <Compile Include="Assets\Scripts\ServerUpload.cs" />
-     <Compile Include="Assets\Scripts\SpringValue.cs" />
-     <Compile Include="Assets\Scripts\Telemetry.cs" />
-     <Compile Include="Assets\Scripts\TelemtryListener.cs" />
-     <Compile Include="Assets\Scripts\TextScaler.cs" />
-     <Compile Include="Assets\Scripts\TextureConstructor.cs" />
-     <Compile Include="Assets\Scripts\Tuple.cs" />
-     <Compile Include="Assets\Scripts\Tuple2.cs" />
-     <Compile Include="Assets\Scripts\Tuple3.cs" />
-     <Compile Include="Assets\Scripts\Tuple4.cs" />
-     <Compile Include="Assets\Scripts\TutorialTextPanel.cs" />
-     <Compile Include="Assets\Scripts\alglib\src\alglibinternal.cs" />
-     <Compile Include="Assets\Scripts\alglib\src\alglibmisc.cs" />
-     <Compile Include="Assets\Scripts\alglib\src\ap.cs" />
-     <Compile Include="Assets\Scripts\alglib\src\dataanalysis.cs" />
-     <Compile Include="Assets\Scripts\alglib\src\diffequations.cs" />
-     <Compile Include="Assets\Scripts\alglib\src\fasttransforms.cs" />
-     <Compile Include="Assets\Scripts\alglib\src\integration.cs" />
-     <Compile Include="Assets\Scripts\alglib\src\interpolation.cs" />
-     <Compile Include="Assets\Scripts\alglib\src\linalg.cs" />
-     <Compile Include="Assets\Scripts\alglib\src\optimization.cs" />
-     <Compile Include="Assets\Scripts\alglib\src\solvers.cs" />
-     <Compile Include="Assets\Scripts\alglib\src\specialfunctions.cs" />
-     <Compile Include="Assets\Scripts\alglib\src\statistics.cs" />
-     <Compile Include="Assets\Scripts\src\AssemblyInfo.cs" />
-     <Compile Include="Assets\Scripts\src\BZip2\BZip2.cs" />
-     <Compile Include="Assets\Scripts\src\BZip2\BZip2Constants.cs" />
-     <Compile Include="Assets\Scripts\src\BZip2\BZip2Exception.cs" />
-     <Compile Include="Assets\Scripts\src\BZip2\BZip2InputStream.cs" />
-     <Compile Include="Assets\Scripts\src\BZip2\BZip2OutputStream.cs" />
-     <Compile Include="Assets\Scripts\src\Checksums\Adler32.cs" />
-     <Compile Include="Assets\Scripts\src\Checksums\CRC32.cs" />
-     <Compile Include="Assets\Scripts\src\Checksums\IChecksum.cs" />
-     <Compile Include="Assets\Scripts\src\Checksums\StrangeCRC.cs" />
-     <Compile Include="Assets\Scripts\src\Core\FileSystemScanner.cs" />
-     <Compile Include="Assets\Scripts\src\Core\INameTransform.cs" />
-     <Compile Include="Assets\Scripts\src\Core\IScanFilter.cs" />
-     <Compile Include="Assets\Scripts\src\Core\NameFilter.cs" />
-     <Compile Include="Assets\Scripts\src\Core\PathFilter.cs" />
-     <Compile Include="Assets\Scripts\src\Core\StreamUtils.cs" />
-     <Compile Include="Assets\Scripts\src\Core\WindowsPathUtils.cs" />
-     <Compile Include="Assets\Scripts\src\Encryption\PkzipClassic.cs" />
-     <Compile Include="Assets\Scripts\src\Encryption\ZipAESStream.cs" />
-     <Compile Include="Assets\Scripts\src\Encryption\ZipAESTransform.cs" />
-     <Compile Include="Assets\Scripts\src\GZip\GZIPConstants.cs" />
-     <Compile Include="Assets\Scripts\src\GZip\GZipException.cs" />
-     <Compile Include="Assets\Scripts\src\GZip\GzipInputStream.cs" />
-     <Compile Include="Assets\Scripts\src\GZip\GzipOutputStream.cs" />
-     <Compile Include="Assets\Scripts\src\Lzw\LzwConstants.cs" />
-     <Compile Include="Assets\Scripts\src\Lzw\LzwException.cs" />
-     <Compile Include="Assets\Scripts\src\Lzw\LzwInputStream.cs" />
-     <Compile Include="Assets\Scripts\src\Main.cs" />
-     <Compile Include="Assets\Scripts\src\SharpZipBaseException.cs" />
-     <Compile Include="Assets\Scripts\src\Tar\InvalidHeaderException.cs" />
-     <Compile Include="Assets\Scripts\src\Tar\TarArchive.cs" />
-     <Compile Include="Assets\Scripts\src\Tar\TarBuffer.cs" />
-     <Compile Include="Assets\Scripts\src\Tar\TarEntry.cs" />
-     <Compile Include="Assets\Scripts\src\Tar\TarException.cs" />
-     <Compile Include="Assets\Scripts\src\Tar\TarHeader.cs" />
-     <Compile Include="Assets\Scripts\src\Tar\TarInputStream.cs" />
-     <Compile Include="Assets\Scripts\src\Tar\TarOutputStream.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\Compression\Deflater.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\Compression\DeflaterConstants.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\Compression\DeflaterEngine.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\Compression\DeflaterHuffman.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\Compression\DeflaterPending.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\Compression\Inflater.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\Compression\InflaterDynHeader.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\Compression\InflaterHuffmanTree.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\Compression\PendingBuffer.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\Compression\Streams\DeflaterOutputStream.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\Compression\Streams\InflaterInputStream.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\Compression\Streams\OutputWindow.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\Compression\Streams\StreamManipulator.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\FastZip.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\IEntryFactory.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\WindowsNameTransform.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\ZipConstants.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\ZipEntry.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\ZipEntryFactory.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\ZipException.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\ZipExtraData.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\ZipFile.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\ZipHelperStream.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\ZipInputStream.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\ZipNameTransform.cs" />
-     <Compile Include="Assets\Scripts\src\Zip\ZipOutputStream.cs" />
-     <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />
-     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />
-     <None Include="Assets\Shaders\PlasmaBalls_new.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\NoiseEffectShaderRGB.shader" />
-     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasic.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\SeparableWeightedBlurDof34.shader" />
-     <None Include="Assets\Shaders\SolidColor.shader" />
-     <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Multiply.shader" />
-     <None Include="Assets\Shaders\Outline.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ShowAlphaChannel.shader" />
-     <None Include="Assets\Tutorial_1\Combiner.shader" />
-     <None Include="Assets\Shaders\noise-simplex_v04.shader" />
-     <None Include="Assets\Shaders\AVOWCursorCubeBlue.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\SunShaftsComposite.shader" />
-     <None Include="Assets\Scripts\alglib\gpl2.txt" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ColorCorrectionCurves.shader" />
-     <None Include="Assets\Tutorial_2\2_Lambert.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ScreenSpaceAmbientObscurance.shader" />
-     <None Include="Assets\Shaders\SolidColor_FG.shader" />
-     <None Include="Assets\Shaders\noise-simplex.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\NFAA.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\TiltShiftHdrLensBlur.shader" />
-     <None Include="Assets\Shaders\AVOWCursorCubeGreen.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\VignetteShader.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\DepthOfFieldScatter.shader" />
-     <None Include="Assets\Standard Assets\Effects\TessellationShaders\Shaders\BumpedSpecularSmooth.shader" />
-     <None Include="Assets\Standard Assets\Effects\Projectors\Guidelines.txt" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\MotionBlur.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\MobileBloom.shader" />
-     <None Include="Assets\Scripts\Fonts\scified.txt" />
-     <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\Contrast Stretch\MinMaxReduction.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\SSAA.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\RadialBlur.shader" />
-     <None Include="Assets\Shaders\AVOWLightening.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\DepthOfFieldDX11.shader" />
-     <None Include="Assets\Tutorial_1\Black.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ContrastComposite.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\FXAAPreset3.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\FisheyeShader.shader" />
-     <None Include="Assets\Shaders\AVOWGlow.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\Contrast Stretch\Apply.shader" />
-     <None Include="Assets\Shaders\noise-simplex_v02.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\frag_ao.cginc" />
-     <None Include="Assets\Shaders\AVOWNodeGlow.shader" />
-     <None Include="Assets\Shaders\DC_Reflect-BumpSpec2.shader" />
-     <None Include="Assets\Shaders\PlasmaBalls_old.shader" />
-     <None Include="Assets\Tutorial_2\1_FlatColour.shader" />
-     <None Include="Assets\Shaders\AVOWCursorCubeRGB.shader" />
-     <None Include="Assets\Shaders\AVOWGreenLightening.shader" />
-     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasicOutline.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\DepthOfField34.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\MobileBlur.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\SSAOShader.shader" />
-     <None Include="Assets\Scripts\Fonts\scifi2k2.txt" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ConvertDepth.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ColorCorrectionCurvesSimple.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\NoiseEffectShaderYUV.shader" />
-     <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Light.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\CreaseApply.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ChromaticAberrationShader.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\GlobalFog.shader" />
-     <None Include="Assets\Shaders\DC_Reflect-BumpSpec.shader" />
-     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLitOutline.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\Contrast Stretch\Luminance.shader" />
-     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLit.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ColorCorrectionSelective.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\Bokeh34.shader" />
-     <None Include="Assets\Shaders\UVAnim.shader" />
-     <None Include="Assets\Shaders\PlasmaBalls.shader" />
-     <None Include="Assets\Shaders\noise-simplex_v03.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\CameraMotionBlurDX11.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\SeparableBlurPlus.shader" />
-     <None Include="Assets\Tutorial_1\BlendGreyLightmap.shader" />
-     <None Include="Assets\Standard Assets\Effects\Projectors\Shaders\ProjectorLight.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\MultiPassHollywoodFlares.shader" />
-     <None Include="Assets\Shaders\DC_Reflect-Glass.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\CameraMotionBlur.shader" />
-     <None Include="Assets\Shaders\LitSign.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\DLAA.shader" />
-     <None Include="Assets\AutoQualityChooser\description.txt" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\NoiseAndGrainDX11.shader" />
-     <None Include="Assets\Shaders\noiseSimplex.cginc" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BrightPassFilter2.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\SeparableBlur.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\MotionBlurClear.shader" />
-     <None Include="Assets\Tutorial_1\VertexColorLerp.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ColorCorrectionEffect.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\GrayscaleEffect.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\SepiaToneEffect.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\TwirlEffect.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\VortexEffect.shader" />
-     <None Include="Assets\Shaders\noise-simplex_v05.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\Contrast Stretch\Adaptation.shader" />
-     <None Include="Assets\Shaders\AVOWTab.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\NoiseAndGrain.shader" />
-     <None Include="Assets\Standard Assets\Effects\Projectors\Shaders\ProjectorMultiply.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\VignettingShader.shader" />
-     <None Include="Assets\Shaders\AVOWCursorCubeBlueNoCull.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\Tonemapper.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BrightPassFilter.shader" />
-     <None Include="Assets\Scripts\alglib\gpl3.txt" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\FXAA2.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ColorCorrection3DLut.shader" />
-     <None Include="Assets\Shaders\AVOWResistance.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\LensFlareCreate.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\EdgeDetectNormals.shader" />
-     <None Include="Assets\Shaders\AVOWCursorCubeGrey.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\PrepareSunShaftsBlur.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\Blend.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\SimpleClear.shader" />
-     <None Include="Assets\Standard Assets\Effects\TessellationShaders\Shaders\BumpedSpecularDisplacement.shader" />
-     <None Include="Assets\Shaders\AVOWVoltageSource.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\FXAA3Console.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\FXAAPreset2.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlurAndFlares.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendForBloom.shader" />
- <Reference Include="UnityEngine.UI">
- <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Networking">
- <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Analytics">
- <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.iOS.Extensions.Xcode">
- <HintPath>/Applications/Unity/Unity.app/Contents/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
- </Reference>
+    <Compile Include="Assets\Scripts\ASDAudioSource.cs" />
+    <Compile Include="Assets\Scripts\AVOWBackStoryCutscene.cs" />
+    <Compile Include="Assets\Scripts\AVOWBattery.cs" />
+    <Compile Include="Assets\Scripts\AVOWButton.cs" />
+    <Compile Include="Assets\Scripts\AVOWCamControl.cs" />
+    <Compile Include="Assets\Scripts\AVOWCircuitCreator.cs" />
+    <Compile Include="Assets\Scripts\AVOWCircuitSubsetter.cs" />
+    <Compile Include="Assets\Scripts\AVOWCircuitTarget.cs" />
+    <Compile Include="Assets\Scripts\AVOWCommand.cs" />
+    <Compile Include="Assets\Scripts\AVOWCommandAddComponent.cs" />
+    <Compile Include="Assets\Scripts\AVOWCommandRemove.cs" />
+    <Compile Include="Assets\Scripts\AVOWCommandSplitAddComponent.cs" />
+    <Compile Include="Assets\Scripts\AVOWComponent.cs" />
+    <Compile Include="Assets\Scripts\AVOWConfig.cs" />
+    <Compile Include="Assets\Scripts\AVOWEventType.cs" />
+    <Compile Include="Assets\Scripts\AVOWFlashingButton.cs" />
+    <Compile Include="Assets\Scripts\AVOWGameModes.cs" />
+    <Compile Include="Assets\Scripts\AVOWGraph.cs" />
+    <Compile Include="Assets\Scripts\AVOWGreenBackground.cs" />
+    <Compile Include="Assets\Scripts\AVOWGreySphere.cs" />
+    <Compile Include="Assets\Scripts\AVOWHighlightRect.cs" />
+    <Compile Include="Assets\Scripts\AVOWLevelEditor.cs" />
+    <Compile Include="Assets\Scripts\AVOWMainMenu.cs" />
+    <Compile Include="Assets\Scripts\AVOWMenuButton.cs" />
+    <Compile Include="Assets\Scripts\AVOWNode.cs" />
+    <Compile Include="Assets\Scripts\AVOWObjectiveBoard.cs" />
+    <Compile Include="Assets\Scripts\AVOWObjectiveGrid.cs" />
+    <Compile Include="Assets\Scripts\AVOWObjectiveManager.cs" />
+    <Compile Include="Assets\Scripts\AVOWObjectives.cs" />
+    <Compile Include="Assets\Scripts\AVOWPusher.cs" />
+    <Compile Include="Assets\Scripts\AVOWSceneConstructor.cs" />
+    <Compile Include="Assets\Scripts\AVOWSideBar.cs" />
+    <Compile Include="Assets\Scripts\AVOWSim.cs" />
+    <Compile Include="Assets\Scripts\AVOWTutorialManager.cs" />
+    <Compile Include="Assets\Scripts\AVOWTutorialText.cs" />
+    <Compile Include="Assets\Scripts\AVOWUI.cs" />
+    <Compile Include="Assets\Scripts\AVOWUIButton.cs" />
+    <Compile Include="Assets\Scripts\AVOWUICounter.cs" />
+    <Compile Include="Assets\Scripts\AVOWUICreateTool.cs" />
+    <Compile Include="Assets\Scripts\AVOWUIDeleteTool.cs" />
+    <Compile Include="Assets\Scripts\AVOWUIDisabledTool.cs" />
+    <Compile Include="Assets\Scripts\AVOWUITool.cs" />
+    <Compile Include="Assets\Scripts\AVOWUpdateManager.cs" />
+    <Compile Include="Assets\Scripts\AVOWVizObjectives.cs" />
+    <Compile Include="Assets\Scripts\AVOWVizTotals.cs" />
+    <Compile Include="Assets\Scripts\AmmeterEffect.cs" />
+    <Compile Include="Assets\Scripts\AppHelper.cs" />
+    <Compile Include="Assets\Scripts\AudioTimeScalar.cs" />
+    <Compile Include="Assets\Scripts\BabyBlueCube.cs" />
+    <Compile Include="Assets\Scripts\BabyBlueParent.cs" />
+    <Compile Include="Assets\Scripts\BackStoryCamera.cs" />
+    <Compile Include="Assets\Scripts\DanceThreesome.cs" />
+    <Compile Include="Assets\Scripts\DrawnLine.cs" />
+    <Compile Include="Assets\Scripts\EventFilterButton.cs" />
+    <Compile Include="Assets\Scripts\ExtensionMethods.cs" />
+    <Compile Include="Assets\Scripts\FlashingButton.cs" />
+    <Compile Include="Assets\Scripts\FractionCalc.cs" />
+    <Compile Include="Assets\Scripts\Interpolator.cs" />
+    <Compile Include="Assets\Scripts\Lightening.cs" />
+    <Compile Include="Assets\Scripts\LighteningAudio.cs" />
+    <Compile Include="Assets\Scripts\MathUtils.cs" />
+    <Compile Include="Assets\Scripts\MeasureDisplay.cs" />
+    <Compile Include="Assets\Scripts\PlaybackButton.cs" />
+    <Compile Include="Assets\Scripts\PlaybackTime.cs" />
+    <Compile Include="Assets\Scripts\ProgressPanel.cs" />
+    <Compile Include="Assets\Scripts\ProjectorScript.cs" />
+    <Compile Include="Assets\Scripts\QuitOnEsc.cs" />
+    <Compile Include="Assets\Scripts\RectLightening.cs" />
+    <Compile Include="Assets\Scripts\SendButtonScript.cs" />
+    <Compile Include="Assets\Scripts\SerialisationFactory.cs" />
+    <Compile Include="Assets\Scripts\SerializationID.cs" />
+    <Compile Include="Assets\Scripts\SerializationUtils.cs" />
+    <Compile Include="Assets\Scripts\SpringValue.cs" />
+    <Compile Include="Assets\Scripts\TextScaler.cs" />
+    <Compile Include="Assets\Scripts\TextureConstructor.cs" />
+    <Compile Include="Assets\Scripts\Tuple.cs" />
+    <Compile Include="Assets\Scripts\Tuple2.cs" />
+    <Compile Include="Assets\Scripts\Tuple3.cs" />
+    <Compile Include="Assets\Scripts\Tuple4.cs" />
+    <Compile Include="Assets\Scripts\TutorialTextPanel.cs" />
+    <Compile Include="Assets\Scripts\alglib\src\alglibinternal.cs" />
+    <Compile Include="Assets\Scripts\alglib\src\alglibmisc.cs" />
+    <Compile Include="Assets\Scripts\alglib\src\ap.cs" />
+    <Compile Include="Assets\Scripts\alglib\src\dataanalysis.cs" />
+    <Compile Include="Assets\Scripts\alglib\src\diffequations.cs" />
+    <Compile Include="Assets\Scripts\alglib\src\fasttransforms.cs" />
+    <Compile Include="Assets\Scripts\alglib\src\integration.cs" />
+    <Compile Include="Assets\Scripts\alglib\src\interpolation.cs" />
+    <Compile Include="Assets\Scripts\alglib\src\linalg.cs" />
+    <Compile Include="Assets\Scripts\alglib\src\optimization.cs" />
+    <Compile Include="Assets\Scripts\alglib\src\solvers.cs" />
+    <Compile Include="Assets\Scripts\alglib\src\specialfunctions.cs" />
+    <Compile Include="Assets\Scripts\alglib\src\statistics.cs" />
+    <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />
+    <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />
+    <None Include="Assets\Shaders\PlasmaBalls_new.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\NoiseEffectShaderRGB.shader" />
+    <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasic.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\SeparableWeightedBlurDof34.shader" />
+    <None Include="Assets\Shaders\SolidColor.shader" />
+    <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Multiply.shader" />
+    <None Include="Assets\Shaders\Outline.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ShowAlphaChannel.shader" />
+    <None Include="Assets\Tutorial_1\Combiner.shader" />
+    <None Include="Assets\Shaders\noise-simplex_v04.shader" />
+    <None Include="Assets\Shaders\AVOWCursorCubeBlue.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\SunShaftsComposite.shader" />
+    <None Include="Assets\Scripts\alglib\gpl2.txt" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ColorCorrectionCurves.shader" />
+    <None Include="Assets\Tutorial_2\2_Lambert.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ScreenSpaceAmbientObscurance.shader" />
+    <None Include="Assets\Shaders\SolidColor_FG.shader" />
+    <None Include="Assets\Shaders\noise-simplex.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\NFAA.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\TiltShiftHdrLensBlur.shader" />
+    <None Include="Assets\Shaders\AVOWCursorCubeGreen.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\VignetteShader.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\DepthOfFieldScatter.shader" />
+    <None Include="Assets\Standard Assets\Effects\TessellationShaders\Shaders\BumpedSpecularSmooth.shader" />
+    <None Include="Assets\Standard Assets\Effects\Projectors\Guidelines.txt" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\MotionBlur.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\MobileBloom.shader" />
+    <None Include="Assets\Scripts\Fonts\scified.txt" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\Contrast Stretch\MinMaxReduction.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\SSAA.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\RadialBlur.shader" />
+    <None Include="Assets\Shaders\AVOWLightening.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\DepthOfFieldDX11.shader" />
+    <None Include="Assets\Tutorial_1\Black.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ContrastComposite.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\FXAAPreset3.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\FisheyeShader.shader" />
+    <None Include="Assets\Shaders\AVOWGlow.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\Contrast Stretch\Apply.shader" />
+    <None Include="Assets\Shaders\noise-simplex_v02.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\frag_ao.cginc" />
+    <None Include="Assets\Shaders\AVOWNodeGlow.shader" />
+    <None Include="Assets\Shaders\DC_Reflect-BumpSpec2.shader" />
+    <None Include="Assets\Shaders\PlasmaBalls_old.shader" />
+    <None Include="Assets\Tutorial_2\1_FlatColour.shader" />
+    <None Include="Assets\Shaders\AVOWCursorCubeRGB.shader" />
+    <None Include="Assets\Shaders\AVOWGreenLightening.shader" />
+    <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasicOutline.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\DepthOfField34.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\MobileBlur.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\SSAOShader.shader" />
+    <None Include="Assets\Scripts\Fonts\scifi2k2.txt" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ConvertDepth.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ColorCorrectionCurvesSimple.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\NoiseEffectShaderYUV.shader" />
+    <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Light.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\CreaseApply.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ChromaticAberrationShader.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\GlobalFog.shader" />
+    <None Include="Assets\Shaders\DC_Reflect-BumpSpec.shader" />
+    <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLitOutline.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\Contrast Stretch\Luminance.shader" />
+    <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLit.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ColorCorrectionSelective.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\Bokeh34.shader" />
+    <None Include="Assets\Shaders\UVAnim.shader" />
+    <None Include="Assets\Shaders\PlasmaBalls.shader" />
+    <None Include="Assets\Shaders\noise-simplex_v03.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\CameraMotionBlurDX11.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\SeparableBlurPlus.shader" />
+    <None Include="Assets\Tutorial_1\BlendGreyLightmap.shader" />
+    <None Include="Assets\Standard Assets\Effects\Projectors\Shaders\ProjectorLight.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\MultiPassHollywoodFlares.shader" />
+    <None Include="Assets\Shaders\DC_Reflect-Glass.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\CameraMotionBlur.shader" />
+    <None Include="Assets\Shaders\LitSign.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\DLAA.shader" />
+    <None Include="Assets\AutoQualityChooser\description.txt" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\NoiseAndGrainDX11.shader" />
+    <None Include="Assets\Shaders\noiseSimplex.cginc" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BrightPassFilter2.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\SeparableBlur.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\MotionBlurClear.shader" />
+    <None Include="Assets\Tutorial_1\VertexColorLerp.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ColorCorrectionEffect.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\GrayscaleEffect.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\SepiaToneEffect.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\TwirlEffect.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\VortexEffect.shader" />
+    <None Include="Assets\Shaders\noise-simplex_v05.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\Contrast Stretch\Adaptation.shader" />
+    <None Include="Assets\Shaders\AVOWTab.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\NoiseAndGrain.shader" />
+    <None Include="Assets\Standard Assets\Effects\Projectors\Shaders\ProjectorMultiply.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\VignettingShader.shader" />
+    <None Include="Assets\Shaders\AVOWCursorCubeBlueNoCull.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\Tonemapper.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BrightPassFilter.shader" />
+    <None Include="Assets\Scripts\alglib\gpl3.txt" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\FXAA2.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ColorCorrection3DLut.shader" />
+    <None Include="Assets\Shaders\AVOWResistance.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\LensFlareCreate.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\EdgeDetectNormals.shader" />
+    <None Include="Assets\Shaders\AVOWCursorCubeGrey.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\PrepareSunShaftsBlur.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\Blend.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\SimpleClear.shader" />
+    <None Include="Assets\Standard Assets\Effects\TessellationShaders\Shaders\BumpedSpecularDisplacement.shader" />
+    <None Include="Assets\Shaders\AVOWVoltageSource.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\FXAA3Console.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\FXAAPreset2.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlurAndFlares.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendForBloom.shader" />
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\..\..\..\..\..\Applications\Unity\Unity.app\Contents\UnityExtensions\Unity\GUISystem\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Networking">
+      <HintPath>..\..\..\..\..\..\..\Applications\Unity\Unity.app\Contents\UnityExtensions\Unity\Networking\UnityEngine.Networking.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Analytics">
+      <HintPath>..\..\..\..\..\..\..\Applications\Unity\Unity.app\Contents\UnityExtensions\Unity\UnityAnalytics\UnityEngine.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.iOS.Extensions.Xcode">
+      <HintPath>..\..\..\..\..\..\..\Applications\Unity\Unity.app\Contents\PlaybackEngines\iOSSupport\UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
+    </Reference>
+    <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend %28Queue +100%29.shader" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{8AA41582-7934-0952-4521-62FECEE5CB6B}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
+      <Project>{8AA41582-7934-0952-4521-62FECEE5CB6B}</Project>
+      <Name>Assembly-CSharp-firstpass</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -351,5 +285,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  
 </Project>

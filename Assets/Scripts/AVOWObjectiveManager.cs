@@ -668,7 +668,6 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				ForceBoardDepths();
 				//				AVOWBattery.singleton.ResetBattery();
 				
-				AVOWTelemetry.singleton.WriteStartGoalEvent(currentGoalIndex);
 				
 				state = State.kSwapBoards0;
 				boards[backIndex].GetComponent<AVOWObjectiveBoard>().TriggerWhoosh();

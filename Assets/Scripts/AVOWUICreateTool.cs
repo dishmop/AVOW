@@ -689,6 +689,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 			foreach(GameObject go in AVOWGraph.singleton.allComponents){
 				go.transform.FindChild("ConnectionSphere0").GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
 				go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
+				if (go.transform.FindChild("WhiteQuad")) go.transform.FindChild("WhiteQuad").gameObject.SetActive(false);
 				if (go.GetComponent<AVOWComponent>().type == AVOWComponent.Type.kVoltageSource){
 					go.transform.FindChild("ConnectionSphere1").GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
 					go.transform.FindChild("ConnectionSphere1").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
@@ -705,10 +706,14 @@ public class AVOWUICreateTool :  AVOWUITool{
 					if (spheres.Exists (obj => (obj == sphere0)) || spheres.Exists (obj => (obj == sphere1))){
 						sphere0.GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
 						go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
+						if (go.transform.FindChild("WhiteQuad")) go.transform.FindChild("WhiteQuad").gameObject.SetActive(true);
+						
 					}
 					else{
 						sphere0.GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 0.125f, 0));
 						go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(false);
+						if (go.transform.FindChild("WhiteQuad")) go.transform.FindChild("WhiteQuad").gameObject.SetActive(false);
+						
 					}
 				}
 				else{
@@ -719,19 +724,25 @@ public class AVOWUICreateTool :  AVOWUITool{
 					if (spheres.Exists (obj => (obj == sphere0))){
 						sphere0.GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
 						go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
+						if (go.transform.FindChild("WhiteQuad")) go.transform.FindChild("WhiteQuad").gameObject.SetActive(true);
+						
 					}
 					else{
 						sphere0.GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 0.125f, 0));
 						go.transform.FindChild("ConnectionSphere0").FindChild ("Blob Shadow Projector").gameObject.SetActive(false);
+						if (go.transform.FindChild("WhiteQuad")) go.transform.FindChild("WhiteQuad").gameObject.SetActive(false);
+						
 					}
 					if (spheres.Exists (obj => (obj == sphere1))){
 						sphere1.GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 214.0f/255.0f, 19.0f/255.0f));
 						go.transform.FindChild("ConnectionSphere1").FindChild ("Blob Shadow Projector").gameObject.SetActive(true);
+						if (go.transform.FindChild("WhiteQuad")) go.transform.FindChild("WhiteQuad").gameObject.SetActive(true);
 						
 					}
 					else{
 						sphere1.GetComponent<Renderer>().materials[1].SetColor("_Color", new Color(0, 0.125f, 0));
 						go.transform.FindChild("ConnectionSphere1").FindChild ("Blob Shadow Projector").gameObject.SetActive(false);
+						if (go.transform.FindChild("WhiteQuad")) go.transform.FindChild("WhiteQuad").gameObject.SetActive(false);
 					}
 				}
 			}
@@ -943,12 +954,6 @@ public class AVOWUICreateTool :  AVOWUITool{
 				heldGapCommand.UndoStep();
 				heldGapCommand = null;
 				
-				string newID = null;
-				string oldID = null;
-				if (connection1)
-					newID = connection1.GetComponent<AVOWComponent>() != null ? connection1.GetComponent<AVOWComponent>().GetID() : connection1.GetComponent<AVOWNode>().GetID();
-				if (heldGapConnection1)
-					oldID = heldGapConnection1.GetComponent<AVOWComponent>() != null ? heldGapConnection1.GetComponent<AVOWComponent>().GetID() : heldGapConnection1.GetComponent<AVOWNode>().GetID();
 			//	Debug.Log("Undo command. OldID = " + oldID + ", newID = " + newID + ", Time = " + Time.time);
 			}
 		}
