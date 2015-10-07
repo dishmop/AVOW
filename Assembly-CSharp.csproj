@@ -91,6 +91,7 @@
     <Compile Include="Assets\Scripts\AVOWVizObjectives.cs" />
     <Compile Include="Assets\Scripts\AVOWVizTotals.cs" />
     <Compile Include="Assets\Scripts\AmmeterEffect.cs" />
+    <Compile Include="Assets\Scripts\Annotation.cs" />
     <Compile Include="Assets\Scripts\AppHelper.cs" />
     <Compile Include="Assets\Scripts\AudioTimeScalar.cs" />
     <Compile Include="Assets\Scripts\BabyBlueCube.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="Assets\Scripts\DanceThreesome.cs" />
     <Compile Include="Assets\Scripts\DrawnLine.cs" />
     <Compile Include="Assets\Scripts\EventFilterButton.cs" />
+    <Compile Include="Assets\Scripts\Explanation.cs" />
     <Compile Include="Assets\Scripts\ExtensionMethods.cs" />
     <Compile Include="Assets\Scripts\FlashingButton.cs" />
     <Compile Include="Assets\Scripts\FractionCalc.cs" />
@@ -266,16 +268,13 @@
     <Reference Include="UnityEngine.Analytics">
       <HintPath>..\..\..\..\..\..\..\Applications\Unity\Unity.app\Contents\UnityExtensions\Unity\UnityAnalytics\UnityEngine.Analytics.dll</HintPath>
     </Reference>
+    <Reference Include="Vectrosity">
+      <HintPath>Assets\Plugins\Vectrosity.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
       <HintPath>..\..\..\..\..\..\..\Applications\Unity\Unity.app\Contents\PlaybackEngines\iOSSupport\UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
     </Reference>
     <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend %28Queue +100%29.shader" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{8AA41582-7934-0952-4521-62FECEE5CB6B}</Project>
-      <Name>Assembly-CSharp-firstpass</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

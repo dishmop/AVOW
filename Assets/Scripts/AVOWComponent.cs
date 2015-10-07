@@ -587,7 +587,7 @@ public class AVOWComponent : MonoBehaviour {
 		Vector3 connector1Pos = GetConnectionPos1();
 		
 		if (type == Type.kLoad){
-			transform.FindChild("Resistance").gameObject.SetActive(isInteractive && showResistance);
+			transform.FindChild("Resistance").gameObject.SetActive(isInteractive && showResistance && AVOWConfig.singleton.showMetal);
 			transform.FindChild("BlackSquare").gameObject.SetActive(isInteractive && showResistance);
 			SetupUVs (transform.FindChild("Resistance").gameObject, Mathf.Abs (useV1-useV0));
 			transform.FindChild("Resistance").GetComponent<Renderer>().material.SetColor("_Color", col0);
@@ -618,8 +618,8 @@ public class AVOWComponent : MonoBehaviour {
 			transform.FindChild("Lightening1").gameObject.SetActive(isInteractive && enableLightening1);
 			transform.FindChild("Lightening2").gameObject.SetActive(false);
 			
-			transform.FindChild("ConnectionSphere0").gameObject.SetActive(isInteractive);
-			transform.FindChild("ConnectionSphere1").gameObject.SetActive(isInteractive);
+			transform.FindChild("ConnectionSphere0").gameObject.SetActive(isInteractive && AVOWConfig.singleton.showMetal);
+			transform.FindChild("ConnectionSphere1").gameObject.SetActive(isInteractive && AVOWConfig.singleton.showMetal);
 			
 		}
 

@@ -1,6 +1,7 @@
 ﻿Shader "Custom/AVOWGlow" {
 	Properties {
 		 _Intensity ("Intensity", Float) = 1
+		 _Scale ("Scale", Float) = 1
 		 _Texture ("Texture", 2D) = "defaulttexture" {}
 
 	}
@@ -20,6 +21,7 @@
 		        
 		
 		        uniform float  _Intensity;	
+		        uniform float  _Scale;	
 		       	uniform sampler2D _Texture;     		   
 
 		    
@@ -34,7 +36,7 @@
 		        {
 		            v2f o;
 		            o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
-		            o.uv = v.texcoord;
+		            o.uv = v.texcoord;// * _Scale;
 		            return o;
 		        }
 		        

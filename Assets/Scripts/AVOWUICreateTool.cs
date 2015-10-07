@@ -869,7 +869,7 @@ public class AVOWUICreateTool :  AVOWUITool{
 		
 		// If we are connected to something then rotate the cube a bit
 		if (connection0 != null){
-			cursorCube.transform.Rotate (new Vector3(1, 2, 4));
+			cursorCube.transform.Rotate (new Vector3(1, 2, 4) * Time.deltaTime * 60f);
 		}
 		
 		if (connection0 != null){

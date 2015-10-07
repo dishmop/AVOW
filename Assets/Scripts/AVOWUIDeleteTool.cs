@@ -685,7 +685,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		
 		// If we are connected to something then rotate the cube a bit
 		if (connectionGO != null){
-			cursorCube.transform.Rotate (new Vector3(1, 2, 4));
+			cursorCube.transform.Rotate (new Vector3(1, 2, 4) * Time.deltaTime * 60f);
 		}
 		
 	}
