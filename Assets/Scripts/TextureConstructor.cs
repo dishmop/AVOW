@@ -25,6 +25,7 @@ public class TextureConstructor : MonoBehaviour {
 		ConstructTexture(blueSquare, CalcSquareColor, CalcBlueCol);
 		ConstructTexture(greenSquare, CalcSquareColor, CalcGreenCol);
 		ConstructTexture(blueSquare, CalcSquareColor, CalcBlueCol);
+		ConstructTexture(greySquare, CalcSquareColor, CalcGreyCol);
 		ConstructTexture(blueSquareX5, CalcSquareColorX5, CalcBlueCol);
 		
 		

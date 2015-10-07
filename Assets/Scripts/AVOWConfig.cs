@@ -39,6 +39,8 @@ public class AVOWConfig : MonoBehaviour {
 	public bool tutDisable2ndBarConnections = false;
 	public bool tutDisableComponentConstruction = false;
 	
+	public float minComponentWidth = 1;
+	
 	const int		kLoadSaveVersion = 1;	
 	
 	SpringValue bottomPanelUseFrac = new SpringValue(0, SpringValue.Mode.kLinear);
@@ -116,6 +118,16 @@ public class AVOWConfig : MonoBehaviour {
 			cubeToCursor.Set (1);
 		}
 		cubeToCursor.Update ();
+		
+		// Work out the smallest object we have
+		minComponentWidth = 1;
+		foreach (GameObject go in AVOWGraph.singleton.allComponents){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			if (component.type == AVOWComponent.Type.kLoad && component.hWidth > 0.01f && MathUtils.FP.Feq (component.resistanceAngle.GetValue(), 45)){
+				minComponentWidth = Mathf.Min (minComponentWidth, component.hWidth);
+			}
+		}
+		
 		
 	}
 	

@@ -418,6 +418,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 			}
 		}
 		else{
+			if (connectionGO == null) return;
 			AVOWComponent component = connectionGO.GetComponent<AVOWComponent>();
 			
 			connectionPos = 0.5f * (component.GetConnectionPos0() + component.GetConnectionPos1());

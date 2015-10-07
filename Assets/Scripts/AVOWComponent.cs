@@ -16,8 +16,7 @@ public class AVOWComponent : MonoBehaviour {
 	public float lighteningSize = 0.5f;
 	public bool isInteractive = true;	
 	public bool showResistance = true;
-	float resistorHeight = 0.1f;
-	float resistorWidth = 0.05f;
+
 	
 	float thisXScale;
 	float lastXScale;
@@ -113,6 +112,12 @@ public class AVOWComponent : MonoBehaviour {
 	
 	public bool IsDying(){
 		return removeOnTarget;
+	}
+	
+	Vector2 GetResistorDims(){
+		float useWidth = Mathf.Max (AVOWConfig.singleton.minComponentWidth, 0.2f);
+		useWidth = 0.2f;
+		return new Vector2(useWidth * 0.2f, useWidth * 0.4f);
 	}
 	
 	void Start(){
@@ -348,6 +353,7 @@ public class AVOWComponent : MonoBehaviour {
 		float node0VPos = node0GO.GetComponent<AVOWNode>().voltage;
 		float node1VPos = node1GO.GetComponent<AVOWNode>().voltage;
 		if (type == Type.kLoad){
+			float resistorHeight = GetResistorDims().y;
 			if (node1VPos > node0VPos){
 				return new Vector3(hMid, node0VPos + connectorProp * (node1VPos - node0VPos) - resistorHeight * 0.5f, transform.position.z);
 			}
@@ -373,6 +379,7 @@ public class AVOWComponent : MonoBehaviour {
 		float node0VPos = node0GO.GetComponent<AVOWNode>().voltage;
 		float node1VPos = node1GO.GetComponent<AVOWNode>().voltage;
 		if (type == Type.kLoad){
+			float resistorHeight = GetResistorDims().y;
 			if (node1VPos > node0VPos){
 				return new Vector3(hMid, node1VPos + connectorProp * (node0VPos - node1VPos) + resistorHeight * 0.5f, transform.position.z);
 			}
@@ -662,8 +669,8 @@ public class AVOWComponent : MonoBehaviour {
 			}
 			else{
 				RectLightening lightening2 = transform.FindChild("Lightening2").GetComponent<RectLightening>();
-				float halfHeight = resistorHeight * 0.5f;
-				float halfWidth = resistorWidth * 0.5f;
+				float halfHeight = GetResistorDims().y * 0.5f;
+				float halfWidth = GetResistorDims().x * 0.5f;
 				
 				Vector3 midConnection = 0.5f * (connector0Pos + connector1Pos);
 				
@@ -696,7 +703,7 @@ public class AVOWComponent : MonoBehaviour {
 		if (transform.FindChild("WhiteQuad") != null){
 //			transform.FindChild("WhiteQuad").gameObject.SetActive(isInteractive);
 			transform.FindChild("WhiteQuad").position = 0.5f * (connector1Pos + connector0Pos);
-			transform.FindChild("WhiteQuad").localScale = new Vector3(resistorWidth , resistorHeight , 0);
+			transform.FindChild("WhiteQuad").localScale = GetResistorDims();
 		}
 
 		HandleAudio();
