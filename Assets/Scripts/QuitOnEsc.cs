@@ -28,7 +28,8 @@ public class QuitOnEsc : MonoBehaviour {
 		    AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kMainMenu || 
 		    AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kStageComplete3 ||
 		    AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kStageComplete4 ||
-		    AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kGameOver ){
+		    AVOWGameModes.singleton.state == AVOWGameModes.GameModeState.kGameOver || 
+		    (mousePos.y < Screen.height * AVOWConfig.singleton.GetBottomPanelFrac() && Explanation.singleton.state != Explanation.State.kOff)){
 			Cursor.visible = true;
 			
 		}

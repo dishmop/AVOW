@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.Events;
 
 public class FlashingButton : MonoBehaviour {
 
 	public bool isPointerInside;
-
-
+		
 	public void OnPointeEnter(){
 		isPointerInside = true;
 	}
@@ -14,6 +14,7 @@ public class FlashingButton : MonoBehaviour {
 	public void OnPointerExit(){
 		isPointerInside = false;
 	}
+	
 
 	// Use this for initialization
 	void Start () {

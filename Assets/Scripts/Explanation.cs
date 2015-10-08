@@ -20,6 +20,12 @@ public class Explanation : MonoBehaviour {
 	public Texture2D arrowFrontBackTex;
 	public Texture2D arrowBackTex;
 	
+	bool externalTextTrigger;
+	bool hasTextTriggered;
+	
+	bool externalButtonTrigger;
+	bool hasButtonTriggered;
+	
 	List<GameObject> annotations = new List<GameObject>();
 	
 
@@ -32,25 +38,36 @@ public class Explanation : MonoBehaviour {
 
 	public AnnotationState annotationState = AnnotationState.kNone;
 	
-	public enum State{
+	public enum VizState{
 		kError,
 		kNormal,
 		kCircuitOnly,
-		kCircuitAndMetalOnly
+		kCircuitAndBatteryOnly,
+		kCircuitAndBatteryAndMetalOnly
 	}
 	
-	public State state = State.kNormal;
+	public VizState vizState = VizState.kNormal;
 	
-	State lastState = State.kError;
+	public bool showAmps = false;
+	
+	VizState lastVizState = VizState.kError;
+	
+	public enum State{
+		kOff,
+		kIntro,
+		kRemovingTheWorld,
+	}
+	
+	public State state = State.kOff;
+	State lastState = State.kOff;
 
 
-	
-	// Update is called once per frame
-	void FixedUpdate () {
+	void HandleVizState(){
+		
 		// On change
-		if (state != lastState){
-			switch (state){
-				case State.kNormal:{
+		if (vizState != lastVizState){
+			switch (vizState){
+				case VizState.kNormal:{
 					sceneConstructor.SetActive(true);
 					quarterColumn.SetActive(true);
 					pusher.transform.FindChild("Wall").gameObject.SetActive(true);
@@ -62,7 +79,7 @@ public class Explanation : MonoBehaviour {
 					AVOWConfig.singleton.showMetal = true;
 					break;
 				}
-				case State.kCircuitOnly:{
+				case VizState.kCircuitOnly:{
 					sceneConstructor.SetActive(false);
 					quarterColumn.SetActive(false);
 					pusher.transform.FindChild("Wall").gameObject.SetActive(false);
@@ -74,7 +91,19 @@ public class Explanation : MonoBehaviour {
 					AVOWConfig.singleton.showMetal = false;
 					break;
 				}
-				case State.kCircuitAndMetalOnly:{
+				case VizState.kCircuitAndBatteryOnly:{
+					sceneConstructor.SetActive(false);
+					quarterColumn.SetActive(false);
+					pusher.transform.FindChild("Wall").gameObject.SetActive(false);
+					pusher.transform.FindChild("Battery").FindChild("Charge").gameObject.SetActive(false);
+					pusher.transform.FindChild("Battery").FindChild("Cylinder").gameObject.SetActive(true);
+					pusher.transform.FindChild("Battery").FindChild("Sphere1").gameObject.SetActive(false);
+					pusher.transform.FindChild("Battery").FindChild("Sphere2").gameObject.SetActive(false);
+					objectiveBoard.SetActive(false);	
+					AVOWConfig.singleton.showMetal = false;
+					break;
+				}				
+				case VizState.kCircuitAndBatteryAndMetalOnly:{
 					sceneConstructor.SetActive(false);
 					quarterColumn.SetActive(false);
 					pusher.transform.FindChild("Wall").gameObject.SetActive(false);
@@ -87,10 +116,13 @@ public class Explanation : MonoBehaviour {
 					break;
 				}				
 			}
-			lastState = state;
+			lastVizState = vizState;
 		}
 		
-		
+	}
+	
+	
+	void HandleAnnotationState(){
 		switch (annotationState){
 			case AnnotationState.kNone:{
 				foreach(GameObject go in annotations){
@@ -141,10 +173,10 @@ public class Explanation : MonoBehaviour {
 							
 							// Set up the volt annotation position
 							if (bottom){
-								thisAnnotation.ampState = Annotation.State.kRightBottom;
+								thisAnnotation.ampState = showAmps ? Annotation.State.kRightBottom : Annotation.State.kDisabled;
 							}
 							else if (top){
-								thisAnnotation.ampState = Annotation.State.kLeftTop;
+								thisAnnotation.ampState = showAmps ? Annotation.State.kLeftTop : Annotation.State.kDisabled;
 							}
 							else{
 								thisAnnotation.ampState = Annotation.State.kDisabled;
@@ -195,26 +227,32 @@ public class Explanation : MonoBehaviour {
 						thisAnnotation.ampState = Annotation.State.kDisabled;
 					}
 				}
-									
+				
 				break;
 			}
 			case AnnotationState.kWholeCircuit:{
-				if (annotations.Count() != 1){
+				if (annotations.Count() != 2){
 					foreach (GameObject go in annotations){
 						GameObject.Destroy(go);
 					}
 					annotations.Clear();
-					GameObject newAnnotation = GameObject.Instantiate(annotationPrefab) as GameObject;
-					newAnnotation.transform.SetParent(transform);
-					annotations.Add(newAnnotation);
+					for (int i = 0; i < 2; ++i){
+						GameObject newAnnotation = GameObject.Instantiate(annotationPrefab) as GameObject;
+						newAnnotation.transform.SetParent(transform);
+						annotations.Add(newAnnotation);
+					}
 				}
 				Annotation thisAnnotation = annotations[0].GetComponent<Annotation>();
+				GameObject cell = null;
 				if (thisAnnotation.componentGOs.Count() != AVOWGraph.singleton.allComponents.Count() -1){
 					thisAnnotation.componentGOs.Clear();
 					foreach (GameObject go in  AVOWGraph.singleton.allComponents){
 						AVOWComponent component = go.GetComponent<AVOWComponent>();
 						if (component.type == AVOWComponent.Type.kLoad){
 							thisAnnotation.componentGOs.Add (go);
+						}
+						else{
+							cell = go;
 						}
 					}
 				}
@@ -225,13 +263,109 @@ public class Explanation : MonoBehaviour {
 						if (component.type == AVOWComponent.Type.kLoad){
 							thisAnnotation.componentGOs[count++] = go;
 						}
+						else{
+							cell = go;
+						}
 					}		
 				}
 				thisAnnotation.voltState = Annotation.State.kLeftTop;
-				thisAnnotation.ampState = Annotation.State.kRightBottom;
+				thisAnnotation.ampState = showAmps ? Annotation.State.kRightBottom : Annotation.State.kDisabled;;
+				
+				Annotation cellAnnotation = annotations[1].GetComponent<Annotation>();
+				if (cellAnnotation.componentGOs.Count() != 1){
+					cellAnnotation.componentGOs.Clear ();
+					cellAnnotation.componentGOs.Add (cell);
+				}
+				else{
+					cellAnnotation.componentGOs[0] = cell;
+				}
+				cellAnnotation.voltState = Annotation.State.kRightBottom;
+				cellAnnotation.ampState = Annotation.State.kDisabled;
 				break;
 			}
 		}
+		
+	}
+	
+	void SetupOffState(){
+		vizState = VizState.kNormal;
+		annotationState = AnnotationState.kNone;
+		showAmps = false;
+	}
+	
+	void SetButtonTrigger(){
+		hasButtonTriggered = false;
+		externalButtonTrigger = false;
+		AVOWTutorialText.singleton.AddButton();
+	}
+	
+	// Set bypass to true if we don't actually want to wait for the text
+	void SetTextTrigger(){
+		hasTextTriggered = false;
+		externalTextTrigger = false;
+		AVOWTutorialText.singleton.AddTrigger();
+	}
+	
+	public void Trigger(){
+		externalTextTrigger = true;
+	}
+	public void ButtonTrigger(){
+		externalButtonTrigger = true;
+	}	
+	
+	void HandleExplanationState(){
+		// on entering state
+		bool onEnterState = (state != lastState);
+		lastState = state;
+		
+		// Text trigger
+		bool onTextTrigger = (!hasTextTriggered && externalTextTrigger);
+		hasTextTriggered = hasTextTriggered || onTextTrigger;
+		
+		bool onButtonTrigger = (!hasButtonTriggered && externalButtonTrigger);
+		hasButtonTriggered = hasButtonTriggered || onButtonTrigger;
+		
+		
+		switch (state){
+			case State.kOff:{
+				SetupOffState();
+				break;
+			}
+			case State.kIntro:{
+				if (onEnterState){
+					SetupOffState();
+					AVOWConfig.singleton.DisplayBottomPanel(true);
+					AVOWTutorialText.singleton.AddPause(3);
+					AVOWTutorialText.singleton.AddText("What is this game really about?");
+					AVOWTutorialText.singleton.AddPause(1);
+					AVOWTutorialText.singleton.AddText("It is about how voltages and currents are distributed around electrical circuits.");
+					AVOWTutorialText.singleton.AddText("It is best to watch this explanation after playing the game a bit.");
+					AVOWTutorialText.singleton.AddText("Press the Continue button in the bottom right corner.");
+					SetButtonTrigger();
+				}	
+				if (onButtonTrigger){
+					state = State.kRemovingTheWorld;
+				}
+				break;
+			}
+			case State.kRemovingTheWorld:{
+				if (onEnterState){
+					vizState = VizState.kCircuitOnly;
+					annotationState = AnnotationState.kNone;
+					showAmps = false;
+				}
+				break;
+			}
+		}
+	}
+	
+	
+	// Update is called once per frame
+	void FixedUpdate () {
+	
+		HandleVizState();
+		HandleAnnotationState();
+		HandleExplanationState();
 
 
 	

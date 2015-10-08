@@ -9,7 +9,7 @@ using System;
 public class AVOWTutorialText : MonoBehaviour {
 	public static AVOWTutorialText singleton = null;
 	
-
+	public GameObject 	continueButtonGO;
 	public bool			activated = false;
 	public float		defaultLettersPerSecond = 5;
 	public float 		forceCompleteSpeed = 1000;
@@ -20,6 +20,12 @@ public class AVOWTutorialText : MonoBehaviour {
 	public Color		highlightColor;
 	
 	const int			kLoadSaveVersion = 1;	
+	
+	bool continueHasBeenClicked;
+	
+	SpringValue buttonIntensity = new SpringValue(1, SpringValue.Mode.kAsymptotic, 20);
+	
+	
 	
 	float				lettersPerSecond = 0;
 	float 				lastNonForcedSpeed = 0;
@@ -37,6 +43,7 @@ public class AVOWTutorialText : MonoBehaviour {
 	const string 		kPauseKey = "PAUSE";	
 	const string 		kSpeedKey = "SPEED";	
 	const string		kTriggerKey = "TRIGGER";
+	const string		kButtonKey = "BUTTON";
 	
 	const int 			kMaxNumCharacters = 500;
 	
@@ -120,6 +127,17 @@ public class AVOWTutorialText : MonoBehaviour {
 		queuedString.Insert(index+1, "["+kTriggerKey+"=" + "0]");
 	}
 	
+	public void AddButton(){
+		// We should insert this before any new line characters which are at the end of the queue
+		string thisString = queuedString.ToString();
+		int index = thisString.Length-1;
+		while (index >= 0){
+			if (thisString[index] != '\n') break;
+			index--;
+		}
+		queuedString.Insert(index+1, "["+kButtonKey+"=" + "0]");
+	}	
+	
 	public void AddPause(float seconds){
 		queuedString.Append ("["+kPauseKey+"=" + seconds.ToString() +"]");
 	}
@@ -160,6 +178,7 @@ public class AVOWTutorialText : MonoBehaviour {
 		lettersPerSecond = defaultLettersPerSecond;
 		ClearDisplayString();
 		textBox.GetComponent<Text>().lineSpacing = 1.5f;
+		continueButtonGO.SetActive(false);
 	
 	}
 	
@@ -194,6 +213,12 @@ public class AVOWTutorialText : MonoBehaviour {
 	
 	public void RenderUpdate(){
 		PlaceTextOnScreen();
+		continueButtonGO.GetComponent<Image>().material.SetFloat ("_Intensity", buttonIntensity.GetValue());
+		buttonIntensity.Update();
+		if (buttonIntensity.IsAtTarget() && continueHasBeenClicked){
+			continueButtonGO.SetActive(false);
+		}
+		
 	}
 	
 	bool HandleSpecials(){
@@ -243,6 +268,13 @@ public class AVOWTutorialText : MonoBehaviour {
 			case kTriggerKey:{
 			//	AVOWBackStoryCutscene.singleton.Trigger();
 				AVOWTutorialManager.singleton.Trigger();
+				Explanation.singleton.Trigger();
+				break;
+			}
+			case kButtonKey:{
+				//	AVOWBackStoryCutscene.singleton.Trigger();
+				continueButtonGO.SetActive(true);
+				continueHasBeenClicked = false;
 				break;
 			}
 		}
@@ -250,6 +282,14 @@ public class AVOWTutorialText : MonoBehaviour {
 		
 	}
 	
+	public void OnContinueClicked(){
+		Explanation.singleton.ButtonTrigger();
+		buttonIntensity.Force(5);
+		buttonIntensity.Set (1);
+		AVOWUI.singleton.PlayPing();
+		continueHasBeenClicked = true;
+		
+	}
 	
 	void PlaceTextOnScreen(){
 		string useString = displayedString.ToString ();

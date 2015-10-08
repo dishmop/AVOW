@@ -97,6 +97,10 @@ Material:
         second: 10
       data:
         first:
+          name: _Scale
+        second: 1
+      data:
+        first:
           name: _Cutoff
         second: .5
       data:
