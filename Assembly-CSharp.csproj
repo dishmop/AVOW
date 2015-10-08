@@ -114,6 +114,7 @@
     <Compile Include="Assets\Scripts\ProgressPanel.cs" />
     <Compile Include="Assets\Scripts\ProjectorScript.cs" />
     <Compile Include="Assets\Scripts\QuitOnEsc.cs" />
+    <Compile Include="Assets\Scripts\RationalDisplay.cs" />
     <Compile Include="Assets\Scripts\RectLightening.cs" />
     <Compile Include="Assets\Scripts\SendButtonScript.cs" />
     <Compile Include="Assets\Scripts\SerialisationFactory.cs" />

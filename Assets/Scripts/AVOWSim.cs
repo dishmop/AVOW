@@ -9,6 +9,7 @@ public class AVOWSim : MonoBehaviour {
 	public static AVOWSim singleton = null;
 	
 	public GameObject graphGO;
+	public float cellCurrent = 0;
 	
 	AVOWGraph graph;
 	
@@ -489,7 +490,7 @@ public class AVOWSim : MonoBehaviour {
 		// If there are some components in the circuit (apart from the battery), but the battery
 		// has a current of zero, then we have got ourselves in an error situation
 		
-		float cellCurrent = 0;
+		cellCurrent = 0;
 		
 		foreach (GameObject componentGO in graph.allComponents){
 			AVOWComponent component = componentGO.GetComponent<AVOWComponent>();

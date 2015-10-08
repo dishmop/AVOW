@@ -16,9 +16,15 @@ public class Annotation : MonoBehaviour {
 	
 	float lineWidth = 10;
 	
-	State voltState = State.kLeftTop;
+	public State voltState = State.kLeftTop;
+	public State ampState = State.kLeftTop;
 	
 	VectorLine voltArrow;
+	VectorLine ampArrow;
+	
+	GameObject ampDisplay;
+	GameObject voltDisplay;
+	
 
 	// Use this for initialization
 	void Start () {
@@ -26,6 +32,11 @@ public class Annotation : MonoBehaviour {
 		voltArrow = new VectorLine("Voltage annotation", dummyPoints3, Explanation.singleton.arrowMaterial, lineWidth);
 		voltArrow.endCap = "rounded_2Xarrow";
 	
+		ampArrow = new VectorLine("Amp annotation", dummyPoints3, Explanation.singleton.arrowMaterial, lineWidth);
+		ampArrow.endCap = "rounded_2Xarrow";
+		
+		voltDisplay = transform.FindChild("VoltDisplay").gameObject;
+		ampDisplay = transform.FindChild("AmpDisplay").gameObject;
 	}
 	
 	// Update is called once per frame
@@ -35,10 +46,13 @@ public class Annotation : MonoBehaviour {
 		float arrowOffset = CalcOffsetFromSize(0.5f * lineWidth);
 		float boxOffset = arrowOffset * 2;
 		
+		// Voltage
 		float voltMin = 100;
 		float voltMax = -100;
 		float hLeft = 100;
 		float hRight = -100;
+		bool hasVoltageSource = false;
+		
 		foreach (GameObject go in componentGOs){
 			AVOWComponent component = go.GetComponent<AVOWComponent>();
 
@@ -48,21 +62,105 @@ public class Annotation : MonoBehaviour {
 			voltMax = Mathf.Max (voltMax, thisVoltMax);
 			
 			hLeft = Mathf.Min (component.h0, hLeft);
-			hRight = Mathf.Max (component.h0, hRight);
+			hRight = Mathf.Max (component.h0 + component.hWidth, hRight);
+			if (component.type == AVOWComponent.Type.kVoltageSource){
+				hasVoltageSource = true;
+			}
 		}
+		if (hasVoltageSource) hRight += 0.35f;
+		
+		
+		voltDisplay.GetComponent<RationalDisplay>().value = voltMax - voltMin;
+		
+		// Ampage
+		float ampMin = 100;
+		float ampMax = -100;
+		float vTop = 1;
+		float vBottom = 0;
+		
+		foreach (GameObject go in componentGOs){
+			AVOWComponent component = go.GetComponent<AVOWComponent>();
+			
+			ampMin = Mathf.Min (ampMin, component.h0);
+			ampMax = Mathf.Max (ampMax, component.h0 + component.hWidth);
+		}
+		
+		ampDisplay.GetComponent<RationalDisplay>().value = ampMax - ampMin;
+		
+		
+		
 		
 		switch (voltState){
 			case State.kLeftTop:{
-			
-				voltArrow.points3[0] = new Vector3(voltMin - boxOffset, voltMax - arrowOffset, transform.position.z);
-				voltArrow.points3[1] = new Vector3(voltMin- boxOffset, voltMin + arrowOffset, transform.position.z);
-				voltArrow.Draw3D();			
-			//	Debug.DrawLine(new Vector3(voltArrow.points2[0].x-0.1f, voltArrow.points2[0].x, -0.1f) , new Vector3(voltArrow.points2[1].x-0.1f, voltArrow.points2[1].y, -0.1f), Color.red);
+				voltArrow.active = true;
+				voltArrow.points3[0] = new Vector3(hLeft - boxOffset, voltMax - arrowOffset, transform.position.z);
+				voltArrow.points3[1] = new Vector3(hLeft- boxOffset, voltMin + arrowOffset, transform.position.z);
+				voltArrow.Draw3D();	
+				
+				voltDisplay.SetActive(!AVOWGraph.singleton.HasHalfFinishedComponents());
+				voltDisplay.transform.position = 0.5f * (voltArrow.points3[0] + voltArrow.points3[1]) - new Vector3(0.13f, 0, 0);
 			
 				break;
 			}
+			case State.kRightBottom:{
+				voltArrow.active = true;
+				voltArrow.points3[0] = new Vector3(hRight + boxOffset, voltMax - arrowOffset, transform.position.z);
+				voltArrow.points3[1] = new Vector3(hRight + boxOffset, voltMin + arrowOffset, transform.position.z);
+				voltArrow.Draw3D();			
+				
+			
+				voltDisplay.SetActive(!AVOWGraph.singleton.HasHalfFinishedComponents());
+				voltDisplay.transform.position = 0.5f * (voltArrow.points3[0] + voltArrow.points3[1]) + new Vector3(0.05f, 0, 0);
+				break;
+			}	
+			case State.kDisabled:{
+				voltArrow.active = false;
+				voltDisplay.SetActive(false);
+				break;
+			}		
+			
+		}
+		
+		// If we are positioned right in the middle of the battery current, then move to the right so
+		// we are not covered up by the  battery spark
+		float batteryOffset = 0;
+		if (MathUtils.FP.Feq (0.5f * (ampMax + ampMin), AVOWSim.singleton.cellCurrent * 0.5f)){
+			batteryOffset = 0.05f;
 		}
 	
+		switch (ampState){
+			case State.kLeftTop:{
+				ampArrow.active = true;
+				ampArrow.points3[0] = new Vector3(ampMin + arrowOffset, vTop + boxOffset, transform.position.z);
+				ampArrow.points3[1] = new Vector3(ampMax - arrowOffset, vTop + boxOffset, transform.position.z);
+				ampArrow.Draw3D();		
+				
+				ampDisplay.SetActive(!AVOWGraph.singleton.HasHalfFinishedComponents());
+				ampDisplay.transform.position = 0.5f * (ampArrow.points3[0] + ampArrow.points3[1]) + new Vector3(batteryOffset, 0.075f, 0);
+				break;
+			}
+			case State.kRightBottom:{
+				ampArrow.active = true;
+				ampArrow.points3[0] = new Vector3(ampMin + arrowOffset, vBottom - boxOffset, transform.position.z);
+				ampArrow.points3[1] = new Vector3(ampMax - arrowOffset, vBottom - boxOffset, transform.position.z);
+				ampArrow.Draw3D();			
+				
+				ampDisplay.SetActive(!AVOWGraph.singleton.HasHalfFinishedComponents());
+				ampDisplay.transform.position = 0.5f * (ampArrow.points3[0] + ampArrow.points3[1]) + new Vector3(batteryOffset, -0.075f, 0);
+				break;
+			}	
+			case State.kDisabled:{
+				ampArrow.active = false;
+				ampDisplay.SetActive(false);
+				break;
+			}		
+				
+		}
+	}
+	
+	void OnDestroy(){
+		VectorLine.Destroy(ref voltArrow);
+		VectorLine.Destroy(ref ampArrow);
 	}
 	
 	float CalcOffsetFromSize(float size){
