@@ -56,6 +56,10 @@ public class Explanation : MonoBehaviour {
 		kOff,
 		kIntro,
 		kRemovingTheWorld,
+		kTradCircuit,
+		kVisualiseQuantities1,
+		kVisualiseQuantities2,
+		kVisualiseBoxes1,
 	}
 	
 	public State state = State.kOff;
@@ -291,6 +295,7 @@ public class Explanation : MonoBehaviour {
 		vizState = VizState.kNormal;
 		annotationState = AnnotationState.kNone;
 		showAmps = false;
+		
 	}
 	
 	void SetButtonTrigger(){
@@ -334,13 +339,16 @@ public class Explanation : MonoBehaviour {
 			case State.kIntro:{
 				if (onEnterState){
 					SetupOffState();
+					AVOWConfig.singleton.tutDisableCreateUIButton = false;
+					AVOWConfig.singleton.tutDisableDestroyUIButton = false;
+					
 					AVOWConfig.singleton.DisplayBottomPanel(true);
 					AVOWTutorialText.singleton.AddPause(3);
 					AVOWTutorialText.singleton.AddText("What is this game really about?");
-					AVOWTutorialText.singleton.AddPause(1);
+					AVOWTutorialText.singleton.AddPause(3);
 					AVOWTutorialText.singleton.AddText("It is about how voltages and currents are distributed around electrical circuits.");
 					AVOWTutorialText.singleton.AddText("It is best to watch this explanation after playing the game a bit.");
-					AVOWTutorialText.singleton.AddText("Press the Continue button in the bottom right corner.");
+					AVOWTutorialText.singleton.AddText("Press the CONTINUE button in the bottom right corner.");
 					SetButtonTrigger();
 				}	
 				if (onButtonTrigger){
@@ -350,12 +358,61 @@ public class Explanation : MonoBehaviour {
 			}
 			case State.kRemovingTheWorld:{
 				if (onEnterState){
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("For this explanation, I've removed everything from the game apart from the electrical sparks.");
+					AVOWTutorialText.singleton.AddText("Try constructing a circuit with three resistors in it.");
+				
 					vizState = VizState.kCircuitOnly;
 					annotationState = AnnotationState.kNone;
 					showAmps = false;
+					AVOWConfig.singleton.tutDisableCreateUIButton = true;
+					AVOWConfig.singleton.tutDisableDestroyUIButton = true;
+				}
+				if (AVOWGraph.singleton.GetNumConfirmedLoads() == 3){
+					state = State.kTradCircuit;	
 				}
 				break;
 			}
+			case State.kTradCircuit:{
+				if (onEnterState){	
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("Good! You may recognise this as a traditional circuit diagram");
+					AVOWTutorialText.singleton.AddText("There is a cell (battery) on the right and three resistors on the left");
+					AVOWTutorialText.singleton.AddText("Suppose the cell was 1 volt and the resistors were all 1 ohm. What would be the currents and voltages in the circuit?");
+					SetButtonTrigger();
+				}
+				if (onButtonTrigger){
+					state = State.kVisualiseQuantities1;
+				}				
+				break;
+			}
+			case State.kVisualiseQuantities1:{
+				if (onEnterState){	
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("This is a hard problem to solve.");
+					AVOWTutorialText.singleton.AddText("This game visualises the currents and voltages to help you understand how they behave.");
+					AVOWTutorialText.singleton.AddText("Voltage is represented by height.");
+					SetButtonTrigger();
+				}
+				if (onButtonTrigger){
+					state = State.kVisualiseQuantities2;
+				}				
+				break;
+			}	
+			case State.kVisualiseQuantities2:{
+				if (onEnterState){	
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("I've displayed the battery now - this is 1 volt");
+					vizState = VizState.kCircuitAndBatteryOnly;
+					annotationState = AnnotationState.kBattery;
+					SetButtonTrigger();
+				}
+				if (onButtonTrigger){
+					state = State.kVisualiseBoxes1;
+				}				
+				break;
+			}					
+			
 		}
 	}
 	
