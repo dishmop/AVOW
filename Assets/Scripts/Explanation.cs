@@ -620,9 +620,9 @@ public class Explanation : MonoBehaviour {
 				if (onEnterState){	
 					AVOWConfig.singleton.DisplayBottomPanel(true);
 					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("Since all our resistors are 1 ohm, we can see from Ohm's Law, that the current flowing through a resistor will always be equal to the voltage accross it (Voltage = 1 × Current)");
+					AVOWTutorialText.singleton.AddText("Since all our resistors are 1 ohm, we can see from Ohm's Law, that the current flowing through a resistor will always be equal to the voltage across it (Voltage = 1 × Current).");
 					AVOWTutorialText.singleton.AddPause(2);
-					AVOWTutorialText.singleton.AddText("This is why, even though our metal boxes may change size, they are ALWAYS square (Height = 1 × Width)");
+					AVOWTutorialText.singleton.AddText("This is why, even though our metal boxes may change size, they are ALWAYS square.");
 					
 					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
 					annotationState = AnnotationState.kIndividual;
@@ -678,6 +678,7 @@ public class Explanation : MonoBehaviour {
 					
 					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
 					annotationState = AnnotationState.kIndividual;
+					showOhms = false;
 					SetButtonTrigger();
 				}
 				if (onButtonTrigger){
@@ -687,7 +688,7 @@ public class Explanation : MonoBehaviour {
 			}	
 			case State.kKirchoffsLawsBoxes:{
 				if (onEnterState){	
-					transform.FindChild("Kirchoffs law").gameObject.SetActive(true);
+					transform.FindChild("Kirchoffs laws").gameObject.SetActive(true);
 					AVOWConfig.singleton.DisplayBottomPanel(true);
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("These are perhaps better unstood in terms of how they affect our metal boxes.");
@@ -705,9 +706,9 @@ public class Explanation : MonoBehaviour {
 			}	
 			case State.kBoxRewrite:{
 				if (onEnterState){	
-					transform.FindChild("Kirchoffs law").gameObject.SetActive(false);
+					transform.FindChild("Kirchoffs laws").gameObject.SetActive(false);
 					transform.FindChild("Ohms law").gameObject.SetActive(false);
-					transform.FindChild("Kirchoffs law boxes").gameObject.SetActive(true);
+					transform.FindChild("Kirchoffs laws boxes").gameObject.SetActive(true);
 					transform.FindChild("Ohms law boxes").gameObject.SetActive(true);
 					AVOWConfig.singleton.DisplayBottomPanel(true);
 					AVOWTutorialText.singleton.AddText("");

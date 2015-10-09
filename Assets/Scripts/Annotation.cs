@@ -14,7 +14,7 @@ public class Annotation : MonoBehaviour {
 		kRightBottom
 	}
 	
-	float lineWidth = 10;
+	float lineWidth = 12;
 	
 	public State voltState = State.kLeftTop;
 	public State ampState = State.kLeftTop;

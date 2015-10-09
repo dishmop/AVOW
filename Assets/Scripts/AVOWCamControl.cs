@@ -69,7 +69,7 @@ public class AVOWCamControl : MonoBehaviour {
 				// the -0.5f si the battery
 				float gameBoardXMin = AVOWObjectiveManager.singleton.GetMinX();
 				float simMax = Mathf.Max (1, AVOWGraph.singleton.xMax);
-				Rect bounds = new Rect(gameBoardXMin, AVOWGraph.singleton.yMin, simMax  - gameBoardXMin , AVOWGraph.singleton.yMax - AVOWGraph.singleton.yMin);
+				Rect bounds = new Rect(gameBoardXMin, AVOWGraph.singleton.yMin, simMax  - gameBoardXMin + 0.1f , AVOWGraph.singleton.yMax - AVOWGraph.singleton.yMin);
 				
 				//	bounds.xMax = Mathf.Max(bounds.xMax, 1);
 				
