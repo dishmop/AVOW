@@ -43,7 +43,8 @@ public class Explanation : MonoBehaviour {
 		kNormal,
 		kCircuitOnly,
 		kCircuitAndBatteryOnly,
-		kCircuitAndBatteryAndMetalOnly
+		kCircuitAndBatteryAndMetalOnly,
+		kCircuitAndBatteryAndMetalAndObjectivesOnly,
 	}
 	
 	public VizState vizState = VizState.kNormal;
@@ -77,6 +78,9 @@ public class Explanation : MonoBehaviour {
 		kKirchoffsLaws,
 		kKirchoffsLawsBoxes,
 		kBoxRewrite,
+		kChallenge1,
+		kChallenge2,
+		kChallengesComplete,
 	}
 	
 	public State state = State.kOff;
@@ -135,7 +139,19 @@ public class Explanation : MonoBehaviour {
 					objectiveBoard.SetActive(false);	
 					AVOWConfig.singleton.showMetal = true;
 					break;
-				}				
+				}		
+				case VizState.kCircuitAndBatteryAndMetalAndObjectivesOnly:{
+					sceneConstructor.SetActive(true);
+					quarterColumn.SetActive(false);
+					pusher.transform.FindChild("Wall").gameObject.SetActive(false);
+					pusher.transform.FindChild("Battery").FindChild("Charge").gameObject.SetActive(false);
+					pusher.transform.FindChild("Battery").FindChild("Cylinder").gameObject.SetActive(true);
+					pusher.transform.FindChild("Battery").FindChild("Sphere1").gameObject.SetActive(false);
+					pusher.transform.FindChild("Battery").FindChild("Sphere2").gameObject.SetActive(false);
+					objectiveBoard.SetActive(false);	
+					AVOWConfig.singleton.showMetal = true;
+					break;
+				}		
 			}
 			lastVizState = vizState;
 		}
@@ -722,8 +738,74 @@ public class Explanation : MonoBehaviour {
 					state = State.kLotsCurrent;
 				}				
 				break;
+			}
+			case State.kChallenge1:{
+				if (onEnterState){	
+					transform.FindChild("Kirchoffs laws").gameObject.SetActive(false);
+					transform.FindChild("Ohms law").gameObject.SetActive(false);
+					transform.FindChild("Kirchoffs laws boxes").gameObject.SetActive(true);
+					transform.FindChild("Ohms law boxes").gameObject.SetActive(true);
+					AVOWConfig.singleton.DisplayBottomPanel(true);
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("Try and construct a circuit using four resistors where each has a current of ¼ of an amp flowing through it.");
+					showAmps = true;
+					showOhms = false;
+					showArrowsOnBattery = true;
+					showArrowsOnLoads = true;
+					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
+					annotationState = AnnotationState.kIndividual;
+				}
+				if (MathUtils.FP.Feq(AVOWSim.singleton.cellCurrent, 1f/4f) && AVOWGraph.singleton.GetNumConfirmedLoads() == 4 && !AVOWGraph.singleton.HasHalfFinishedComponents()){
+					state = State.kChallenge2;
+				}				
+				break;
+			}	
+			case State.kChallenge2:{
+				if (onEnterState){	
+					AVOWConfig.singleton.DisplayBottomPanel(true);
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("Good!");
+				AVOWTutorialText.singleton.AddText("Now try and make a circuit with ⅓ of an amp flowing through one resistor and ⅔ flowing through another one. You may need more than two resistors to accomplish this.");
+					showAmps = true;
+					showOhms = false;
+					showArrowsOnBattery = true;
+					showArrowsOnLoads = true;
+					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
+					annotationState = AnnotationState.kIndividual;
+				}
+				bool hasOneThird = false;
+				bool hasTwoThirds = false;
+				foreach (GameObject go in AVOWGraph.singleton.allComponents){
+					if (go == null) continue;
+					AVOWComponent component = go.GetComponent<AVOWComponent>();
+					if (component.type == AVOWComponent.Type.kLoad){
+						if (MathUtils.FP.Feq(component.hWidth, 1f/3f)){
+							hasOneThird = true;
+						}
+						if (MathUtils.FP.Feq(component.hWidth, 2f/3f)){
+							hasTwoThirds = true;
+						}
+					}
+				}
+				if (hasOneThird && hasTwoThirds){
+					state = State.kChallengesComplete;
+				}
+				break;
 			}				
-	
+			case State.kChallengesComplete:{
+				if (onEnterState){	
+					AVOWConfig.singleton.DisplayBottomPanel(true);
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("These are clearly electrical problems which you can now solve. Furthermore, the \"resistors\" we are using could easily be replaced with motors, laps, heaters etc, which all have a resistance and behave much like our resistors.");
+					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
+					annotationState = AnnotationState.kIndividual;
+					SetButtonTrigger();
+				}
+				if (onButtonTrigger){
+					state = State.kChallengesComplete;
+				}				
+				break;
+			}				
 			
 		}
 	}
