@@ -18,13 +18,15 @@ public class Annotation : MonoBehaviour {
 	
 	public State voltState = State.kLeftTop;
 	public State ampState = State.kLeftTop;
+	public State ohmState = State.kLeftTop;
+	public bool showArrows = true;
 	
 	VectorLine voltArrow;
 	VectorLine ampArrow;
 	
 	GameObject ampDisplay;
 	GameObject voltDisplay;
-	
+	GameObject ohmDisplay;	
 
 	// Use this for initialization
 	void Start () {
@@ -37,11 +39,20 @@ public class Annotation : MonoBehaviour {
 		
 		voltDisplay = transform.FindChild("VoltDisplay").gameObject;
 		ampDisplay = transform.FindChild("AmpDisplay").gameObject;
+		ohmDisplay = transform.FindChild("OhmDisplay").gameObject;
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		if (componentGOs.Count() == 0) return;
+		if (componentGOs.Count() == 0){
+			voltArrow.active = false;
+			voltDisplay.SetActive(false);
+			ampArrow.active = false;
+			ampDisplay.SetActive(false);
+			ohmDisplay.SetActive(false);
+			return;
+			
+		}
 		
 		float arrowOffset = CalcOffsetFromSize(0.5f * lineWidth);
 		float boxOffset = arrowOffset * 2;
@@ -92,7 +103,7 @@ public class Annotation : MonoBehaviour {
 		
 		switch (voltState){
 			case State.kLeftTop:{
-				voltArrow.active = true;
+				voltArrow.active = showArrows;
 				voltArrow.points3[0] = new Vector3(hLeft - boxOffset, voltMax - arrowOffset, transform.position.z);
 				voltArrow.points3[1] = new Vector3(hLeft- boxOffset, voltMin + arrowOffset, transform.position.z);
 				voltArrow.Draw3D();	
@@ -103,7 +114,7 @@ public class Annotation : MonoBehaviour {
 				break;
 			}
 			case State.kRightBottom:{
-				voltArrow.active = true;
+				voltArrow.active = showArrows;
 				voltArrow.points3[0] = new Vector3(hRight + boxOffset, voltMax - arrowOffset, transform.position.z);
 				voltArrow.points3[1] = new Vector3(hRight + boxOffset, voltMin + arrowOffset, transform.position.z);
 				voltArrow.Draw3D();			
@@ -130,7 +141,7 @@ public class Annotation : MonoBehaviour {
 	
 		switch (ampState){
 			case State.kLeftTop:{
-				ampArrow.active = true;
+				ampArrow.active = showArrows;
 				ampArrow.points3[0] = new Vector3(ampMin + arrowOffset, vTop + boxOffset, transform.position.z);
 				ampArrow.points3[1] = new Vector3(ampMax - arrowOffset, vTop + boxOffset, transform.position.z);
 				ampArrow.Draw3D();		
@@ -140,7 +151,7 @@ public class Annotation : MonoBehaviour {
 				break;
 			}
 			case State.kRightBottom:{
-				ampArrow.active = true;
+				ampArrow.active = showArrows;
 				ampArrow.points3[0] = new Vector3(ampMin + arrowOffset, vBottom - boxOffset, transform.position.z);
 				ampArrow.points3[1] = new Vector3(ampMax - arrowOffset, vBottom - boxOffset, transform.position.z);
 				ampArrow.Draw3D();			
@@ -156,6 +167,17 @@ public class Annotation : MonoBehaviour {
 			}		
 				
 		}
+		
+		float resistance = (voltMax - voltMin) / (ampMax - ampMin);
+		if (ohmState != State.kDisabled && !MathUtils.FP.Feq(ampMax - ampMin, 0) && !hasVoltageSource){
+			ohmDisplay.SetActive(!AVOWGraph.singleton.HasHalfFinishedComponents());
+			ohmDisplay.GetComponent<RationalDisplay>().value =resistance;
+			ohmDisplay.transform.position = new Vector3(0.5f * (ampMax + ampMin) + 0.05f, 0.5f * (voltMax + voltMin), transform.position.z);
+		}
+		else{
+			ohmDisplay.SetActive(false);
+		}
+		
 	}
 	
 	void OnDestroy(){
