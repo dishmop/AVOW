@@ -28,6 +28,22 @@ public class Explanation : MonoBehaviour {
 	
 	List<GameObject> annotations = new List<GameObject>();
 	
+	float timerStart;
+	
+	bool challengeContinueDone = false;
+	GameObject challengeNode0GO;
+	GameObject challengeNode1GO;
+	GameObject challengeCell;
+	GameObject[] challengeResistors = new GameObject[5];
+	
+	
+	enum ChallengeMode{
+		kNoMode,
+		kClearGraph,
+		kMakeGraph,
+	}
+	
+	ChallengeMode challengeMode = ChallengeMode.kNoMode;
 
 	public enum AnnotationState{
 		kNone,
@@ -79,7 +95,9 @@ public class Explanation : MonoBehaviour {
 		kKirchoffsLawsBoxes,
 		kBoxRewrite,
 		kChallenge1,
+		kChallenge1Solution,
 		kChallenge2,
+		kChallenge2Solution,		
 		kChallengesComplete,
 	}
 	
@@ -754,18 +772,91 @@ public class Explanation : MonoBehaviour {
 					showArrowsOnLoads = true;
 					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
 					annotationState = AnnotationState.kIndividual;
+					challengeContinueDone = false;
+					timerStart = Time.fixedTime;
 				}
 				if (MathUtils.FP.Feq(AVOWSim.singleton.cellCurrent, 1f/4f) && AVOWGraph.singleton.GetNumConfirmedLoads() == 4 && !AVOWGraph.singleton.HasHalfFinishedComponents()){
-					state = State.kChallenge2;
-				}				
-				break;
-			}	
-			case State.kChallenge2:{
-				if (onEnterState){	
-					AVOWConfig.singleton.DisplayBottomPanel(true);
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("Good!");
-				AVOWTutorialText.singleton.AddText("Now try and make a circuit with ⅓ of an amp flowing through one resistor and ⅔ flowing through another one. You may need more than two resistors to accomplish this.");
+					if (challengeContinueDone){
+						AVOWTutorialText.singleton.ClearContinueButton();
+					}
+				
+					state = State.kChallenge2;
+				}
+				// If time out
+				if (!challengeContinueDone && Time.fixedTime > timerStart + 25){
+					AVOWTutorialText.singleton.AddText("Press CONTINUE if you want to see how to do it.");
+					challengeContinueDone = true;
+					SetButtonTrigger();
+				
+				}	
+				if (onButtonTrigger){
+					state = State.kChallenge1Solution;
+				}			
+				break;
+			}	
+			case State.kChallenge1Solution:{
+				if (onEnterState){
+					DisableUI(true);
+					AVOWTutorialText.singleton.AddText("Showing the solution.");
+					challengeMode = ChallengeMode.kNoMode;
+					SetTextTrigger();
+				}
+				if (onTextTrigger){
+					challengeMode = ChallengeMode.kClearGraph;
+				}
+				
+				if (challengeMode == ChallengeMode.kClearGraph && !AVOWGraph.singleton.HasHalfFinishedComponents()){
+					// Find a resistor
+					GameObject resistor = null;
+					foreach (GameObject go in AVOWGraph.singleton.allComponents){
+						AVOWComponent component = go.GetComponent<AVOWComponent>();
+						if (component.type == AVOWComponent.Type.kLoad){
+							resistor = go;
+						}
+					}
+					if (resistor != null){
+						AVOWCommandRemove removeCommand = new AVOWCommandRemove(resistor);
+						removeCommand.ExecuteStep();
+						removeCommand.ExecuteStep();
+					}
+					else{
+						challengeMode = ChallengeMode.kMakeGraph;
+						challengeNode0GO = AVOWGraph.singleton.allNodes[0];
+						challengeNode1GO = AVOWGraph.singleton.allNodes[1];
+						challengeCell = AVOWGraph.singleton.allComponents[0];
+					}
+				}
+				else if (challengeMode == ChallengeMode.kMakeGraph && !AVOWGraph.singleton.HasHalfFinishedComponents()){
+					// If wwe only have a cell, then construct a resistor
+					if (AVOWGraph.singleton.allComponents.Count() == 1){
+						AVOWCommandAddComponent addCommand = new AVOWCommandAddComponent(challengeNode0GO, challengeNode1GO, AVOWUI.singleton.resistorPrefab);
+						addCommand.ExecuteStep();
+						addCommand.ExecuteStep();
+						challengeResistors[0] = addCommand.GetNewComponent();
+					}
+					else if (AVOWGraph.singleton.allComponents.Count() < 5){
+						AVOWCommandSplitAddComponent addCommand = new AVOWCommandSplitAddComponent(challengeCell.GetComponent<AVOWComponent>().node0GO, challengeCell, AVOWUI.singleton.resistorPrefab, true);
+						addCommand.ExecuteStep();
+						addCommand.ExecuteStep();
+					}
+					else{
+						challengeMode = ChallengeMode.kNoMode;
+						state = State.kChallenge2;
+					}
+					
+				}
+					
+				break;
+			}
+		
+			case State.kChallenge2:{
+				if (onEnterState){	
+					DisableUI(false);
+					AVOWConfig.singleton.DisplayBottomPanel(true);
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("Now try and make a circuit with ⅓ of an amp flowing through one resistor and ⅔ flowing through another one. You may need more than two resistors to accomplish this.");
 					showAmps = true;
 					showOhms = false;
 					showArrowsOnBattery = true;

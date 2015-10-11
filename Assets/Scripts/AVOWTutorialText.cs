@@ -25,7 +25,7 @@ public class AVOWTutorialText : MonoBehaviour {
 	
 	SpringValue buttonIntensity = new SpringValue(1, SpringValue.Mode.kAsymptotic, 20);
 	
-	
+	int clearButtonCount = 0;
 	
 	float				lettersPerSecond = 0;
 	float 				lastNonForcedSpeed = 0;
@@ -273,13 +273,33 @@ public class AVOWTutorialText : MonoBehaviour {
 			}
 			case kButtonKey:{
 				//	AVOWBackStoryCutscene.singleton.Trigger();
-				continueButtonGO.SetActive(true);
-				continueHasBeenClicked = false;
+				if (clearButtonCount == 0){
+					continueButtonGO.SetActive(true);
+					continueHasBeenClicked = false;
+				}
+				else{
+					clearButtonCount--;
+				
+				}
 				break;
 			}
 		}
 		return true;
 		
+	}
+	
+	public void ResetClearButtonCounter(){
+		clearButtonCount = 0;
+	}
+	
+	
+	public void ClearContinueButton(){
+		if (continueButtonGO.activeSelf){
+			continueButtonGO.SetActive(false);
+		}
+		else{
+			clearButtonCount++;
+		}
 	}
 	
 	public void OnContinueClicked(){

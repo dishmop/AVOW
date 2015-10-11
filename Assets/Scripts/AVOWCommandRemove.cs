@@ -40,7 +40,7 @@ public class AVOWCommandRemove : AVOWCommand{
 
 	}
 	
-	public AVOWCommandRemove(GameObject componentGO, Vector3 pos){
+	public AVOWCommandRemove(GameObject componentGO){
 		removeComponentGO = componentGO;
 		gapType = DetermineType();
 	//	Debug.Log("Removal type = " + gapType.ToString());

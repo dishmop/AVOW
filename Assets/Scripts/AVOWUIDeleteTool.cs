@@ -704,7 +704,7 @@ public class AVOWUIDeleteTool :  AVOWUITool{
 		if (heldGapCommand == null && connectionGO != null && heldConnection){
 			heldGapConnection = connectionGO;
 			
-			heldGapCommand = new AVOWCommandRemove(heldGapConnection, mouseWorldPos);
+			heldGapCommand = new AVOWCommandRemove(heldGapConnection);
 //			Debug.Log("new AVOWCommandRemove " + Time.time);
 			
 			heldGapCommand.ExecuteStep();
