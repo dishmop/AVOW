@@ -49,7 +49,8 @@ public class Explanation : MonoBehaviour {
 		kNone,
 		kIndividual,
 		kBattery,
-		kWholeCircuit
+		kWholeCircuit,
+		kObjectiveGrid,
 	};
 
 	public AnnotationState annotationState = AnnotationState.kNone;
@@ -99,6 +100,10 @@ public class Explanation : MonoBehaviour {
 		kChallenge2,
 		kChallenge2Solution,		
 		kChallengesComplete,
+		kChallengesExplained,
+		kObjectiveBoard,
+		kObjectiveHeight,
+		kObjectiveSquares,
 	}
 	
 	public State state = State.kOff;
@@ -159,14 +164,14 @@ public class Explanation : MonoBehaviour {
 					break;
 				}		
 				case VizState.kCircuitAndBatteryAndMetalAndObjectivesOnly:{
-					sceneConstructor.SetActive(true);
+					sceneConstructor.SetActive(false);
 					quarterColumn.SetActive(false);
 					pusher.transform.FindChild("Wall").gameObject.SetActive(false);
 					pusher.transform.FindChild("Battery").FindChild("Charge").gameObject.SetActive(false);
 					pusher.transform.FindChild("Battery").FindChild("Cylinder").gameObject.SetActive(true);
 					pusher.transform.FindChild("Battery").FindChild("Sphere1").gameObject.SetActive(false);
 					pusher.transform.FindChild("Battery").FindChild("Sphere2").gameObject.SetActive(false);
-					objectiveBoard.SetActive(false);	
+					objectiveBoard.SetActive(true);	
 					AVOWConfig.singleton.showMetal = true;
 					break;
 				}		
@@ -363,6 +368,7 @@ public class Explanation : MonoBehaviour {
 		transform.FindChild("Kirchoffs law").gameObject.SetActive(false);
 		transform.FindChild("Ohms law boxes").gameObject.SetActive(false);
 		transform.FindChild("Kirchoffs laws boxes").gameObject.SetActive(false);
+		transform.FindChild("ObjectiveArrows").gameObject.SetActive(false);
 		
 		
 	}
@@ -799,7 +805,7 @@ public class Explanation : MonoBehaviour {
 			case State.kChallenge1Solution:{
 				if (onEnterState){
 					DisableUI(true);
-					AVOWTutorialText.singleton.AddText("Showing the solution.");
+//					AVOWTutorialText.singleton.AddText("Showing the solution.");
 					challengeMode = ChallengeMode.kNoMode;
 					SetTextTrigger();
 				}
@@ -829,7 +835,7 @@ public class Explanation : MonoBehaviour {
 					}
 				}
 				else if (challengeMode == ChallengeMode.kMakeGraph && !AVOWGraph.singleton.HasHalfFinishedComponents()){
-					// If wwe only have a cell, then construct a resistor
+					// If we only have a cell, then construct a resistor
 					if (AVOWGraph.singleton.allComponents.Count() == 1){
 						AVOWCommandAddComponent addCommand = new AVOWCommandAddComponent(challengeNode0GO, challengeNode1GO, AVOWUI.singleton.resistorPrefab);
 						addCommand.ExecuteStep();
@@ -845,7 +851,6 @@ public class Explanation : MonoBehaviour {
 						challengeMode = ChallengeMode.kNoMode;
 						state = State.kChallenge2;
 					}
-					
 				}
 					
 				break;
@@ -863,6 +868,9 @@ public class Explanation : MonoBehaviour {
 					showArrowsOnLoads = true;
 					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
 					annotationState = AnnotationState.kIndividual;
+					challengeContinueDone = false;
+					timerStart = Time.fixedTime;
+					
 				}
 				bool hasOneThird = false;
 				bool hasTwoThirds = false;
@@ -879,24 +887,186 @@ public class Explanation : MonoBehaviour {
 					}
 				}
 				if (hasOneThird && hasTwoThirds){
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("Good!");
+					if (challengeContinueDone){
+						AVOWTutorialText.singleton.ClearContinueButton();
+					}
 					state = State.kChallengesComplete;
 				}
+				// If time out
+				if (!challengeContinueDone && Time.fixedTime > timerStart + 25){
+					AVOWTutorialText.singleton.AddText("Press CONTINUE if you want to see how to do it.");
+					challengeContinueDone = true;
+					SetButtonTrigger();
+					
+				}	
+				if (onButtonTrigger){
+					state = State.kChallenge2Solution;
+				}					
 				break;
-			}				
+			}		
+			case State.kChallenge2Solution:{
+				if (onEnterState){
+					DisableUI(true);
+//					AVOWTutorialText.singleton.AddText("Showing the solution.");
+					challengeMode = ChallengeMode.kNoMode;
+					SetTextTrigger();
+				}
+				if (onTextTrigger){
+					challengeMode = ChallengeMode.kClearGraph;
+				}
+				
+				if (challengeMode == ChallengeMode.kClearGraph && !AVOWGraph.singleton.HasHalfFinishedComponents()){
+					// Find a resistor
+					GameObject resistor = null;
+					foreach (GameObject go in AVOWGraph.singleton.allComponents){
+						AVOWComponent component = go.GetComponent<AVOWComponent>();
+						if (component.type == AVOWComponent.Type.kLoad){
+							resistor = go;
+						}
+					}
+					if (resistor != null ){
+						AVOWCommandRemove removeCommand = new AVOWCommandRemove(resistor);
+						removeCommand.ExecuteStep();
+						removeCommand.ExecuteStep();
+					}
+					else{
+						challengeMode = ChallengeMode.kMakeGraph;
+						challengeNode0GO = AVOWGraph.singleton.allNodes[0];
+						challengeNode1GO = AVOWGraph.singleton.allNodes[1];
+						challengeCell = AVOWGraph.singleton.allComponents[0];
+					}
+				}
+				else if (challengeMode == ChallengeMode.kMakeGraph && !AVOWGraph.singleton.HasHalfFinishedComponents()){
+					// If we only 0 or 1 resistor then make a resistor
+					if (AVOWGraph.singleton.allComponents.Count() < 3){
+						AVOWCommandAddComponent addCommand = new AVOWCommandAddComponent(challengeNode0GO, challengeNode1GO, AVOWUI.singleton.resistorPrefab);
+						addCommand.ExecuteStep();
+						addCommand.ExecuteStep();
+						challengeResistors[0] = addCommand.GetNewComponent();
+					}
+					else if (AVOWGraph.singleton.allComponents.Count() < 4){
+						AVOWCommandSplitAddComponent addCommand = new AVOWCommandSplitAddComponent(challengeCell.GetComponent<AVOWComponent>().node0GO, challengeCell, AVOWUI.singleton.resistorPrefab, true);
+						addCommand.ExecuteStep();
+						addCommand.ExecuteStep();
+					}
+					else{
+						challengeMode = ChallengeMode.kNoMode;
+						state = State.kChallengesComplete;
+					}
+				}
+				
+				break;
+			}
+				
 			case State.kChallengesComplete:{
 				if (onEnterState){	
 					AVOWConfig.singleton.DisplayBottomPanel(true);
 					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("These are clearly electrical problems which you can now solve. Furthermore, the \"resistors\" we are using could easily be replaced with motors, laps, heaters etc, which all have a resistance and behave much like our resistors.");
+					AVOWTutorialText.singleton.AddText("The \"resistors\" we are using could easily be replaced with motors, lamps, heaters etc. These behave much like our resistors.");
+					AVOWTutorialText.singleton.AddText("Usually lamps and motors need to have a specific current flowing through them to work efficiently and this must be acheived using additional resistors in the circuit.");
 					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
 					annotationState = AnnotationState.kIndividual;
 					SetButtonTrigger();
 				}
 				if (onButtonTrigger){
-					state = State.kChallengesComplete;
+					state = State.kChallengesExplained;
 				}				
 				break;
-			}				
+			}	
+			case State.kChallengesExplained:{
+				if (onEnterState){	
+					AVOWConfig.singleton.DisplayBottomPanel(true);
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("So, the challenges you just did have a real electrical meaning.");
+					AVOWTutorialText.singleton.AddText("These are also exactly the same challenges that are presented in the game - but instead of asking for currents using numbers (say, ⅓ Amp), we present the challenges visually.");
+					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
+					annotationState = AnnotationState.kIndividual;
+					SetButtonTrigger();
+				}
+				if (onButtonTrigger){
+					state = State.kObjectiveBoard;
+				}				
+				break;
+			}
+			case State.kObjectiveBoard:{
+				if (onEnterState){	
+					AVOWConfig.singleton.DisplayBottomPanel(true);
+					AVOWTutorialText.singleton.AddPause(2);
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("This is the challenge board.");
+					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
+					annotationState = AnnotationState.kNone;
+					SetTextTrigger();
+					SetButtonTrigger();
+					challengeMode = ChallengeMode.kClearGraph;
+				}
+				if (challengeMode == ChallengeMode.kClearGraph && !AVOWGraph.singleton.HasHalfFinishedComponents()){
+					// Find a resistor
+					GameObject resistor = null;
+					foreach (GameObject go in AVOWGraph.singleton.allComponents){
+						AVOWComponent component = go.GetComponent<AVOWComponent>();
+						if (component.type == AVOWComponent.Type.kLoad){
+							resistor = go;
+						}
+					}
+					if (resistor != null){
+						AVOWCommandRemove removeCommand = new AVOWCommandRemove(resistor);
+						removeCommand.ExecuteStep();
+						removeCommand.ExecuteStep();
+					}
+					else{
+						challengeMode = ChallengeMode.kNoMode;
+						challengeNode0GO = null;
+						challengeNode1GO = null;
+						challengeCell = null;
+					}
+				}		
+				if (onTextTrigger){
+					transform.FindChild("ObjectiveArrows").gameObject.SetActive(true);
+					vizState = VizState.kCircuitAndBatteryAndMetalAndObjectivesOnly;
+				
+				}		
+				if (onButtonTrigger){
+				state = State.kObjectiveHeight;
+				}				
+				break;
+			}
+			case State.kObjectiveHeight:{
+				if (onEnterState){	
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("It is 1 volt high.");
+					DisableUI(false);
+					SetTextTrigger();
+					SetButtonTrigger();
+				}
+				if (onButtonTrigger){
+					state = State.kObjectiveSquares;
+				}
+				if (onTextTrigger){
+					transform.FindChild("ObjectiveArrows").gameObject.SetActive(false);
+					annotationState = AnnotationState.kObjectiveGrid;
+				}
+				AVOWCircuitTarget displayTarget = objectiveBoard.GetComponent<AVOWObjectiveManager>().GetCurrentTarget();
+				break;
+			}
+			case State.kObjectiveSquares:{
+				if (onEnterState){	
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("Blah blah!");
+					objectiveBoard.GetComponent<AVOWObjectiveManager>().TriggerSwap();
+					SetButtonTrigger();
+				}
+				if (onButtonTrigger){
+					state = State.kObjectiveSquares;
+				}
+				if (onTextTrigger){
+					annotationState = AnnotationState.kObjectiveGrid;
+				}
+				AVOWCircuitTarget displayTarget = objectiveBoard.GetComponent<AVOWObjectiveManager>().GetCurrentTarget();
+				break;
+			}			
 			
 		}
 	}

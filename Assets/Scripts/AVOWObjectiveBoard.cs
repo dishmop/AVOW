@@ -77,6 +77,10 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	float[] coverOptValues = new float[5000];
 	float[] somethingOptValues = new float[100];
 	
+	public AVOWCircuitTarget GetDisplayTarget(){
+		return displayTarget;
+	}
+	
 	void ResetTransform(Transform thisTransform, float[] values, int index0){
 		int i = index0;
 		values[i++] = thisTransform.localPosition[0];

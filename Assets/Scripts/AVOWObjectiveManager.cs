@@ -217,6 +217,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		resistorLimit = limit;
 		initialisedLimitsOnly = true;
 	}
+	
+	public void TriggerSwap(){
+		
+	}
 		
 
 	// Levels start at level1 and go up to this number not inclusive
@@ -327,74 +331,74 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		
 	}
 	
-	public void InitialiseLevelOld(int level){
-		dontComplete = false;
-		
-		currentLevel = level;
-		initialisedLimitsOnly = false;
-		numBoardsToUnstack = 0;
-		currentGoalIndex = -1;
-		
-		switch (level){
-			case 1:{
-				layoutMode = AVOWObjectiveBoard.LayoutMode.kStack;
-				resistorLimit = 2;
-				break;
-			}
-			case 2:{
-				layoutMode = AVOWObjectiveBoard.LayoutMode.kStack;
-				resistorLimit = 3;
-				break;
-			}
-			case 3:{
-				layoutMode = AVOWObjectiveBoard.LayoutMode.kStack;
-				resistorLimit = 4;
-				break;
-			}
-			case 4:{
-				layoutMode = AVOWObjectiveBoard.LayoutMode.kRow;
-				numBoardsToUnstack = 4;
-				resistorLimit = 4;
-				break;
-			}
-			case 5:{
-				layoutMode = AVOWObjectiveBoard.LayoutMode.kRow;
-				resistorLimit = 5;
-				break;
-			}
-			case 6:{
-				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
-				numBoardsToUnstack = 3;
-				resistorLimit = 3;
-				break;
-			}
-			case 7:{
-				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
-				numBoardsToUnstack = 3;
-				resistorLimit = 4;
-				break;
-			}
-			case 8:{
-				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
-				resistorLimit = 5;
-				break;
-			}
-		}
-		
-		InitialiseBlankBoard();
-		if (layoutMode !=  AVOWObjectiveBoard.LayoutMode.kGappedRow){
-			AVOWCircuitCreator.singleton.Initialise(resistorLimit);
-		}
-		else{
-			AVOWCircuitSubsetter.singleton.Initialise(resistorLimit);
-		}
-		
-		state = State.kPauseOnLevelStart;
-		waitTime = Time.time + levelStartPauseDuration;
-		
-	
-
-	}
+//	public void InitialiseLevelOld(int level){
+//		dontComplete = false;
+//		
+//		currentLevel = level;
+//		initialisedLimitsOnly = false;
+//		numBoardsToUnstack = 0;
+//		currentGoalIndex = -1;
+//		
+//		switch (level){
+//			case 1:{
+//				layoutMode = AVOWObjectiveBoard.LayoutMode.kStack;
+//				resistorLimit = 2;
+//				break;
+//			}
+//			case 2:{
+//				layoutMode = AVOWObjectiveBoard.LayoutMode.kStack;
+//				resistorLimit = 3;
+//				break;
+//			}
+//			case 3:{
+//				layoutMode = AVOWObjectiveBoard.LayoutMode.kStack;
+//				resistorLimit = 4;
+//				break;
+//			}
+//			case 4:{
+//				layoutMode = AVOWObjectiveBoard.LayoutMode.kRow;
+//				numBoardsToUnstack = 4;
+//				resistorLimit = 4;
+//				break;
+//			}
+//			case 5:{
+//				layoutMode = AVOWObjectiveBoard.LayoutMode.kRow;
+//				resistorLimit = 5;
+//				break;
+//			}
+//			case 6:{
+//				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
+//				numBoardsToUnstack = 3;
+//				resistorLimit = 3;
+//				break;
+//			}
+//			case 7:{
+//				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
+//				numBoardsToUnstack = 3;
+//				resistorLimit = 4;
+//				break;
+//			}
+//			case 8:{
+//				layoutMode = AVOWObjectiveBoard.LayoutMode.kGappedRow;
+//				resistorLimit = 5;
+//				break;
+//			}
+//		}
+//		
+//		InitialiseBlankBoard();
+//		if (layoutMode !=  AVOWObjectiveBoard.LayoutMode.kGappedRow){
+//			AVOWCircuitCreator.singleton.Initialise(resistorLimit);
+//		}
+//		else{
+//			AVOWCircuitSubsetter.singleton.Initialise(resistorLimit);
+//		}
+//		
+//		state = State.kPauseOnLevelStart;
+//		waitTime = Time.time + levelStartPauseDuration;
+//		
+//	
+//
+//	}
 	
 	public void InitialiseBlankBoard(){
 		boards[frontIndex].GetComponent<AVOWObjectiveBoard>().ConstructBlankBoard();
@@ -781,6 +785,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		
 		TestIfValuesHaveChanged();
 		
+	}
+	
+	public AVOWCircuitTarget GetCurrentTarget(){
+		return boards[frontIndex].GetComponent<AVOWObjectiveBoard>().GetDisplayTarget();
 	}
 
 	
