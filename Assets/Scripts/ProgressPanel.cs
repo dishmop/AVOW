@@ -29,6 +29,9 @@ public class ProgressPanel : MonoBehaviour {
 	
 	public void IncCompleteGoals(){
 		numCompleteGoals++;
+		if (numCompleteGoals > totalGoals){
+			numCompleteGoals = totalGoals;
+		}
 	}
 	
 	

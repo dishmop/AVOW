@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System;
+using System.Linq;
 
 
 public class AVOWObjectiveBoard : MonoBehaviour {
@@ -712,7 +713,8 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	
 	public int InsideTargetTest(Vector3 pos){
 	
-	
+		if (currentCovers == null) return -1;
+		
 		for (int i = 0; i < currentCovers.Length; ++i){
 		
 			Rect testRect = new Rect(
@@ -939,6 +941,9 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public void TriggerWhoosh(){
+		if (displayToCoversMapping == null || displayToCoversMapping.Count() == 0){
+			return;
+		}
 		AudioSource audioSource = gameObject.AddComponent<AudioSource>();
 		audioSource.clip = whoosh;
 		audioSource.Play();
@@ -947,6 +952,9 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	public void TrigggerHighlight(){
+		if (displayToCoversMapping == null || displayToCoversMapping.Count() == 0){
+			return;
+		}
 		Vector3 bottomLeft = transform.position + GamePosToTransformPos(new Vector3(0, 0, 0), currentTarget.totalCurrent, currentTarget.totalCurrent);
 		Vector3 topRight = transform.position + GamePosToTransformPos(new Vector3(currentTarget.totalCurrent, 1, 0), currentTarget.totalCurrent, currentTarget.totalCurrent);
 		
@@ -1158,6 +1166,9 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 
 	bool UpdateMoveToComplete(){
 		float deltaDist = coverMoveSpeed * Time.deltaTime;
+		if (displayToCoversMapping.Count() == 0){
+			return true;
+		}
 		
 		//Vector3 coverPos = TransformPosToGamePos (currentCovers[displayToCoversMapping[0]].transform.localPosition, currentCovers[displayToCoversMapping[0]].transform.localScale.x, displayTarget.totalCurrent);
 		Vector3 coverPos = currentCovers[displayToCoversMapping[0]].transform.localPosition;
@@ -1182,6 +1193,9 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 	}
 	
 	bool DroppingOff(){
+		if (currentCovers.Count () == 0){
+			return true;
+		}
 		float deltaDist = coverMoveSpeed * Time.deltaTime;
 		float minHeight = 1;
 		foreach (GameObject go in currentCovers){

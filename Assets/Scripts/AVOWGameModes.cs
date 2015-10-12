@@ -52,7 +52,7 @@ public class AVOWGameModes : MonoBehaviour {
 	int currentLevel = -1;
 
 	
-	const int kBackStoryIndex = -2;
+//	const int kBackStoryIndex = -2;
 	const int kTutorialIndex = -1;
 	const int kFreePlayIndex = 0;
 	// then level 1, 2.... etc.
@@ -73,7 +73,7 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	
 	// Set by buttons - and the level only ACTUALLY started from the gameupdate
-	int triggerStartLevel = kBackStoryIndex - 1;
+	int triggerStartLevel = kTutorialIndex - 1;
 	
 	public void TriggerStartLevel(int levelNum){
 		triggerStartLevel = levelNum;
@@ -151,11 +151,11 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 	
 	public int GetNumMainMenuButtons(){
-		return 	AVOWLevelEditor.singleton.GetNumPlaybackLevels() + 3;
+		return 	AVOWLevelEditor.singleton.GetNumPlaybackLevels() + 2;
 	}
 	
 	public int GetMinMainMenuButton(){
-		return -2;
+		return -1;
 	}
 	
 	// Use this for initialization
@@ -220,12 +220,12 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 	
 	public void GameUpdate(){
-		if (triggerStartLevel >= kBackStoryIndex){
+		if (triggerStartLevel >= kTutorialIndex){
 			StartLevel(triggerStartLevel);
-			triggerStartLevel = kBackStoryIndex-1;
+			triggerStartLevel = kTutorialIndex-1;
 		
 		}
-		if (currentLevel > 0 && !hasShownHint && AVOWUpdateManager.singleton.GetGameTime() >  lastGoalTime + waitForTimedHintDuration && AVOWObjectiveManager.singleton.currentGoalIndex < 4){
+		if (currentLevel > 0 && currentLevel != 4 && !hasShownHint && AVOWUpdateManager.singleton.GetGameTime() >  lastGoalTime + waitForTimedHintDuration && AVOWObjectiveManager.singleton.currentGoalIndex < 4){
 			TriggerTimerHint();
 		}
 		
@@ -296,8 +296,8 @@ public class AVOWGameModes : MonoBehaviour {
 	public void RenderUpdate () {
 	
 		// Hints
-		hintButton.SetActive(currentLevel > 0 && state == GameModeState.kPlayStage);
-		if (currentLevel > 0 && state == GameModeState.kPlayStage){
+		hintButton.SetActive(currentLevel > 0 && currentLevel !=4 && state == GameModeState.kPlayStage);
+		if (currentLevel > 0 && state == GameModeState.kPlayStage && currentLevel != 4){
 			AVOWConfig.singleton.DisplayBottomPanel(showHint);
 		}
 		
@@ -486,23 +486,13 @@ public class AVOWGameModes : MonoBehaviour {
 
 
 	
-	public bool IsTelemPlaybackLevel(int index){
-		return (index == GetNumMainMenuButtons() + GetMinMainMenuButton() - 1) && AVOWConfig.singleton.playbackEnable;
-	}
+
 	
 
 
 	
 	void StartLevel(int levelNum){
 		ResetScenery();
-		
-		if (IsTelemPlaybackLevel(levelNum)){
-			RestartNormalGame();
-			AVOWObjectiveManager.singleton.InitialiseLimitsOnly(7);
-			AVOWUpdateManager.singleton.ResetGameTime();
-			
-			return;
-		}
 		
 		currentLevel = levelNum;
 		hasShownHint = false;
@@ -516,16 +506,19 @@ public class AVOWGameModes : MonoBehaviour {
 		if (currentLevel > 0){
 			AVOWObjectiveManager.singleton.InitialiseLevel(levelNum);
 			AVOWGameModes.singleton.TriggerLevelStartMessage();
+
 			
 			SelectCamera(CameraChoice.kGameCam);
 			RestartNormalGame();
+			if (currentLevel == 4){
+				AVOWObjectiveManager.singleton.EnableManualTrigger(true);
+				AVOWConfig.singleton.DisplayBottomPanel(true);
+				Explanation.singleton.state = Explanation.State.kObjectiveBoard;
+			}
 		}
 		else{
 			switch (currentLevel){
-				case kBackStoryIndex:{
-					PlayBackStory();
-					break;
-				}
+
 				case kTutorialIndex:{
 					PlayTutorial();
 					break;
@@ -624,6 +617,7 @@ public class AVOWGameModes : MonoBehaviour {
 		if (state == GameModeState.kSplashScreen){
 			OnLeaveSplashScreen();
 		}
+		AVOWObjectiveManager.singleton.EnableManualTrigger(false);
 		state = GameModeState.kPreMainMenu;
 	}
 	
@@ -638,15 +632,13 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	public string GetLevelName(int index, bool withLineBreak){
 		// Check if it is the last one
-		if (IsTelemPlaybackLevel(index)){
-			return "Playback telemetry";
-		}
-		if (index > 0 && index <=AVOWLevelEditor.singleton.GetNumPlaybackLevels()){
+
+		if (index > 0 && index <= AVOWLevelEditor.singleton.GetNumPlaybackLevels()){
 			if (!withLineBreak){
-				return "Level " + index.ToString() + ": " + AVOWLevelEditor.singleton.GetPlaybackLevelName(index-1);
+				return ((index < 4) ? ("Level " + index.ToString() + ": ") : "") + AVOWLevelEditor.singleton.GetPlaybackLevelName(index-1);
 			}
 			else{
-				return "Level " + index.ToString() + ":\n" + AVOWLevelEditor.singleton.GetPlaybackLevelName(index-1);
+				return ((index < 4) ? ("Level " + index.ToString() + ":\n") : "") + AVOWLevelEditor.singleton.GetPlaybackLevelName(index-1);
 			}
 			
 		}
@@ -655,9 +647,7 @@ public class AVOWGameModes : MonoBehaviour {
 			case kFreePlayIndex:{
 				return "Free play";
 			}
-			case kBackStoryIndex:{
-				return "Back story";
-			}
+
 			case kTutorialIndex:{
 				return "Tutorial";
 			}

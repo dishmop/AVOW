@@ -19,6 +19,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	
 	
 	public string filename = "ExcludedGoals";
+	bool manualTriggerEnabled = false;
+	
+	bool manualTriggerDoTrigger = false;
+	
 	bool[][]	excludedGoals;
 	
 	bool firstUpdate = true;
@@ -71,6 +75,18 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	};
 	
 	State state = State.kNone;
+	
+	public bool IsWaitingOnManualTrigger(){
+		return (state == State.kPlay || state == State.kPauseOnLevelStart) && manualTriggerEnabled && !manualTriggerDoTrigger;
+	}
+	
+	public void EnableManualTrigger(bool enable){
+		manualTriggerEnabled = enable;
+	}
+	
+	public void ManualTrigger(){
+		manualTriggerDoTrigger = true;
+	}
 	
 	// This must be reset at the beginning of each GameUpdate frame
 	public void ResetOptFlags(){
@@ -218,9 +234,6 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		initialisedLimitsOnly = true;
 	}
 	
-	public void TriggerSwap(){
-		
-	}
 		
 
 	// Levels start at level1 and go up to this number not inclusive
@@ -623,9 +636,15 @@ public class AVOWObjectiveManager : MonoBehaviour {
 							++count;
 						}
 					}
-					ProgressPanel.singleton.SetGoals(count, 0);
+					if (!manualTriggerEnabled){
+						ProgressPanel.singleton.SetGoals(count, 0);
+					}
+					else{
+						ProgressPanel.singleton.SetGoals(0, 0);
+					}
 				}
-				if (Time.time > waitTime){
+				if ((Time.time > waitTime && !manualTriggerEnabled) || (manualTriggerEnabled && manualTriggerDoTrigger)) {
+					manualTriggerDoTrigger = false;
 					currentGoalIndex = FindNextValidGoal(currentGoalIndex);
 					state = State.kWaitForCircuitCreator;
 				}
@@ -718,7 +737,8 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				}
 				
 				if (dontComplete) break;
-				if (!AVOWGraph.singleton.HasHalfFinishedComponents()){
+				if (!AVOWGraph.singleton.HasHalfFinishedComponents() && (!manualTriggerEnabled || manualTriggerDoTrigger)){
+					manualTriggerDoTrigger = false;
 					AVOWCircuitTarget currentGraphAsTarget = new AVOWCircuitTarget(AVOWGraph.singleton);
 					if (layoutMode != AVOWObjectiveBoard.LayoutMode.kGappedRow){
 						if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().TestWidthsMatchWithGaps(currentGraphAsTarget)){
