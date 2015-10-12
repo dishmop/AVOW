@@ -613,7 +613,6 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	}
 	
 	
-	
 	public void GameUpdate(){
 		// We need to do this because when we stop playback we can be in some kind of state which we no longer want to be in
 		if (initialisedLimitsOnly){
@@ -693,7 +692,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				
 				
 				state = State.kSwapBoards0;
-				boards[backIndex].GetComponent<AVOWObjectiveBoard>().TriggerWhoosh();
+				boards[backIndex].GetComponent<AVOWObjectiveBoard>().TriggerWhoosh(true);
 				break;
 			}
 			case State.kSwapBoards0:{

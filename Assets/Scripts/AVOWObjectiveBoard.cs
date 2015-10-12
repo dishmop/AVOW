@@ -940,6 +940,18 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		UpdateShadedSquare();
 	}
 	
+	public void TriggerWhoosh(bool force){
+		if (force){
+			AudioSource audioSource = gameObject.AddComponent<AudioSource>();
+			audioSource.clip = whoosh;
+			audioSource.Play();
+			audioSource.volume = 0.25f;
+		}
+		else{
+			TriggerWhoosh();
+		}
+	}
+	
 	public void TriggerWhoosh(){
 		if (displayToCoversMapping == null || displayToCoversMapping.Count() == 0){
 			return;

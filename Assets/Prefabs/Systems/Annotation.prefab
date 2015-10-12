@@ -526,7 +526,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 191534}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: .101999998, y: -.0989999995, z: .100000001}
+  m_LocalPosition: {x: 0, y: 0, z: -.100000001}
   m_LocalScale: {x: .0399999991, y: .0399999991, z: .0399999991}
   m_Children:
   - {fileID: 419572}
@@ -556,7 +556,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 110508}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: .101999998, y: -.0989999995, z: .200000003}
+  m_LocalPosition: {x: 0, y: 0, z: -.100000001}
   m_LocalScale: {x: .0399999991, y: .0399999991, z: .0399999991}
   m_Children:
   - {fileID: 460800}
@@ -585,7 +585,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 140516}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: .101989746, y: -.0989990234, z: .100000001}
+  m_LocalPosition: {x: 0, y: 0, z: -.100000001}
   m_LocalScale: {x: .0399999991, y: .0399999991, z: .0399999991}
   m_Children:
   - {fileID: 419402}
@@ -600,7 +600,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 190916}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 898.410645, y: -77.7070084, z: -.100000001}
+  m_LocalPosition: {x: 0, y: 0, z: -.100000001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 405248}
@@ -1699,6 +1699,9 @@ MonoBehaviour:
   ampState: 1
   ohmState: 1
   showArrows: 1
+  manualVoltage: -1
+  manualAmpage: -1
+  hasManualValues: 0
 --- !u!114 &11461592
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1755,7 +1758,19 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalPosition.z
+      value: -.100000001
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 190916}

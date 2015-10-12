@@ -51,9 +51,11 @@ public class Explanation : MonoBehaviour {
 		kBattery,
 		kWholeCircuit,
 		kObjectiveGrid,
+		kObjectiveFrames,
 	};
 
 	public AnnotationState annotationState = AnnotationState.kNone;
+	AnnotationState lastAnnotationState = AnnotationState.kNone;
 	
 	public enum VizState{
 		kError,
@@ -104,7 +106,8 @@ public class Explanation : MonoBehaviour {
 		kObjectiveBoard,
 		kObjectiveHeight,
 		kObjectiveSquares,
-		kObjectiveSquaresExplanation,
+		kObjectiveSquaresExplanation0,
+		kObjectiveSquaresExplanation1,
 	}
 	
 	public State state = State.kOff;
@@ -265,6 +268,7 @@ public class Explanation : MonoBehaviour {
 						}
 						++count;				
 					}
+					
 				}		
 				// If we have got more annotations that we haven't got to yet, then remove them.
 				for (int i = count; i < annotations.Count(); ++i){
@@ -360,7 +364,80 @@ public class Explanation : MonoBehaviour {
 				cellAnnotation.ampState = Annotation.State.kDisabled;
 				break;
 			}
+			case AnnotationState.kObjectiveGrid:{
+				int divNumber = 1;
+				AVOWCircuitTarget target = AVOWObjectiveManager.singleton.GetCurrentTarget();
+				if (target != null){
+					divNumber = target.lcm;
+				}
+				int numAnnotation = (target == null) ? 1 : 2 * divNumber ;
+				if (AVOWObjectiveManager.singleton.IsWaitingOnManualTrigger()){
+					if (annotations.Count() != numAnnotation || lastAnnotationState != annotationState){
+						foreach (GameObject go in annotations){
+							GameObject.Destroy(go);
+						}
+						annotations.Clear();
+						for (int i = 0; i < divNumber; ++i){
+							GameObject newAnnotation = GameObject.Instantiate(annotationPrefab) as GameObject;
+							newAnnotation.transform.SetParent(transform);
+							float heightPos = 0.5f * ((float)i/(float)divNumber + (float)(i+1)/(float)divNumber);
+							newAnnotation.transform.position = new Vector3(-0.1f, heightPos, transform.position.z);
+							newAnnotation.GetComponent<Annotation>().SetVoltage(1f / divNumber);
+							newAnnotation.GetComponent<Annotation>().voltState = Annotation.State.kLeftTop;
+							newAnnotation.GetComponent<Annotation>().showArrows = true;
+							newAnnotation.GetComponent<Annotation>().ampState = Annotation.State.kDisabled;
+							newAnnotation.GetComponent<Annotation>().ohmState = Annotation.State.kDisabled;
+							annotations.Add(newAnnotation);
+						}
+						for (int i = 0; i < divNumber && target != null; ++i){
+							GameObject newAnnotation = GameObject.Instantiate(annotationPrefab) as GameObject;
+							newAnnotation.transform.SetParent(transform);
+							float horizontalPos = 0.5f * ((float)i/(float)divNumber + (float)(i+1)/(float)divNumber);
+							//float horizontalPos = (float)i/(float)divNumber;
+							newAnnotation.transform.position = new Vector3(-0.25f - horizontalPos, -0.15f, transform.position.z);
+							newAnnotation.GetComponent<Annotation>().SetCurrent(1f / divNumber);
+							newAnnotation.GetComponent<Annotation>().ampState = Annotation.State.kLeftTop;
+							newAnnotation.GetComponent<Annotation>().showArrows = true;
+							newAnnotation.GetComponent<Annotation>().voltState = Annotation.State.kDisabled;
+							newAnnotation.GetComponent<Annotation>().ohmState = Annotation.State.kDisabled;
+							annotations.Add(newAnnotation);
+						}						
+					}
+				}
+				//Debug.Log ("divNumber = " + divNumber);
+				break;
+			}
+			case AnnotationState.kObjectiveFrames:{
+				AVOWCircuitTarget target = AVOWObjectiveManager.singleton.GetCurrentTarget();
+				int numAnnotation = target.componentDesc.Count();
+				
+				if (AVOWObjectiveManager.singleton.IsWaitingOnManualTrigger()){
+					if (annotations.Count() != numAnnotation || lastAnnotationState != annotationState){
+						foreach (GameObject go in annotations){
+							GameObject.Destroy(go);
+						}
+						annotations.Clear();
+						int divNumber = 4;
+						for (int i = 0; i < 4 && target != null; ++i){
+							GameObject newAnnotation = GameObject.Instantiate(annotationPrefab) as GameObject;
+							newAnnotation.transform.SetParent(transform);
+							float horizontalPos = 0.5f * ((float)i/(float)divNumber + (float)(i+1)/(float)divNumber);
+							//float horizontalPos = (float)i/(float)divNumber;
+							newAnnotation.transform.position = new Vector3(-0.25f - horizontalPos, -0.15f, transform.position.z);
+							newAnnotation.GetComponent<Annotation>().SetCurrent(1f / divNumber);
+							newAnnotation.GetComponent<Annotation>().ampState = Annotation.State.kLeftTop;
+							newAnnotation.GetComponent<Annotation>().showArrows = true;
+							newAnnotation.GetComponent<Annotation>().voltState = Annotation.State.kDisabled;
+							newAnnotation.GetComponent<Annotation>().ohmState = Annotation.State.kDisabled;
+							annotations.Add(newAnnotation);
+						}						
+					}
+				}
+				//Debug.Log ("divNumber = " + divNumber);
+				break;
+			}			
 		}
+		lastAnnotationState = annotationState;
 		
 	}
 	
@@ -1055,16 +1132,34 @@ public class Explanation : MonoBehaviour {
 					gridState = GridState.kWait;
 				}
 				if (gridState == GridState.kWait && Time.fixedTime > gridStartTime + 3){
-					if (AVOWObjectiveManager.singleton.currentGoalIndex < 5){
+					if (AVOWObjectiveManager.singleton.currentGoalIndex < 3){
 						gridState = GridState.kDoGridCycle;
 					}
 					else{
 						gridState = GridState.kNone;
-						state = State.kObjectiveSquaresExplanation;
+						AVOWTutorialText.singleton.AddText("Click CONTINUE to move on.");
+					
+						SetButtonTrigger();
 					}
 				}
+				if (onButtonTrigger){
+					state = State.kObjectiveSquaresExplanation0;
+				}
 			    break;
-			}			
+			}		
+			case State.kObjectiveSquaresExplanation0:{
+				if (onEnterState){
+					AVOWTutorialText.singleton.AddText("");
+					AVOWTutorialText.singleton.AddText("On top of this grid, we present metal frames.");
+					annotationState = AnnotationState.kObjectiveFrames;
+				
+					SetButtonTrigger();
+				}
+				if (onButtonTrigger){
+					state = State.kObjectiveSquaresExplanation1;
+				}
+				break;
+		}					
 			
 		}
 	}

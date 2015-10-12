@@ -21,13 +21,31 @@ public class Annotation : MonoBehaviour {
 	public State ohmState = State.kLeftTop;
 	public bool showArrows = true;
 	
+	public float manualVoltage = -1;
+	public float manualAmpage = -1;
+	public bool hasManualValues = false;
+	
 	VectorLine voltArrow;
 	VectorLine ampArrow;
 	
 	GameObject ampDisplay;
 	GameObject voltDisplay;
 	GameObject ohmDisplay;	
-
+	
+	public void SetVoltage(float voltage){
+		manualVoltage = voltage;
+		hasManualValues = true;
+	}
+	
+	public void SetCurrent(float ampage){
+		manualAmpage = ampage;
+		hasManualValues = true;
+	}
+	
+	public void ClearManualFlag(){
+		hasManualValues = false;
+	}
+	
 	// Use this for initialization
 	void Start () {
 		Vector3[] dummyPoints3 = new Vector3[2];
@@ -44,17 +62,41 @@ public class Annotation : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+		float arrowOffset = CalcOffsetFromSize(0.5f * lineWidth);
+		
 		if (componentGOs.Count() == 0){
-			voltArrow.active = false;
-			voltDisplay.SetActive(false);
-			ampArrow.active = false;
-			ampDisplay.SetActive(false);
-			ohmDisplay.SetActive(false);
+			if (hasManualValues){
+				voltDisplay.SetActive(voltState != State.kDisabled);
+				voltDisplay.GetComponent<RationalDisplay>().value = manualVoltage;
+
+				voltArrow.active = showArrows && (voltState != State.kDisabled);
+				Vector3 halfArrowUp = new Vector3(0, 0.5f * manualVoltage - arrowOffset, 0);
+				voltArrow.points3[0] = transform.position + halfArrowUp - new Vector3(0.05f + arrowOffset * 2, 0, 0);
+				voltArrow.points3[1] = transform.position - halfArrowUp - new Vector3(0.05f + arrowOffset * 2, 0, 0);
+				voltArrow.Draw3D();	
+				 
+				ampArrow.active = showArrows && (ampState != State.kDisabled);
+				Vector3 halfArrowRight = new Vector3(0.5f * manualAmpage - arrowOffset, 0, 0);
+				ampArrow.points3[0] = transform.position + halfArrowRight + new Vector3(0, 0.05f + arrowOffset * 2, 0);
+				ampArrow.points3[1] = transform.position - halfArrowRight + new Vector3(0, 0.05f + arrowOffset * 2, 0);
+				ampArrow.Draw3D();		
+				
+				
+				ampDisplay.SetActive(ampState != State.kDisabled);
+				ampDisplay.GetComponent<RationalDisplay>().value = manualAmpage;
+				ohmDisplay.SetActive(ohmState != State.kDisabled);
+			}
+			else{
+				voltArrow.active = false;
+				voltDisplay.SetActive(false);
+				ampArrow.active = false;
+				ampDisplay.SetActive(false);
+				ohmDisplay.SetActive(false);
+			}
 			return;
 			
 		}
 		
-		float arrowOffset = CalcOffsetFromSize(0.5f * lineWidth);
 		float boxOffset = arrowOffset * 2;
 		
 		// Voltage
