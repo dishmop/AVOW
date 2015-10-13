@@ -4,9 +4,8 @@ using System.Collections;
 //C#
 public static class AppHelper
 {
-	#if UNITY_WEBPLAYER
-	public static string webplayerQuitURL = "http://google.com";
-	#endif
+	public static string webplayerQuitURL = "http://i-want-to-study-engineering.org/game/rating/peculiar_cubes/";
+	
 	public static void Quit()
 	{
 		#if UNITY_EDITOR
@@ -14,6 +13,7 @@ public static class AppHelper
 		#elif UNITY_WEBPLAYER
 		Application.OpenURL(webplayerQuitURL);
 		#else
+		Application.OpenURL(webplayerQuitURL);
 		Application.Quit();
 		#endif
 	}

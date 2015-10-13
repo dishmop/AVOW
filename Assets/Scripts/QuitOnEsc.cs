@@ -19,7 +19,12 @@ public class QuitOnEsc : MonoBehaviour {
 		
 		// Test for exit
 		if (Input.GetKeyDown (KeyCode.Escape)) {
-			AppHelper.Quit();
+			if (AVOWGameModes.singleton.IsInMainMenu()){
+				AppHelper.Quit();
+			}
+			else{
+				AVOWGameModes.singleton.GoToMain();
+			}
 		}
 		
 		Vector3 mousePos = Input.mousePosition;

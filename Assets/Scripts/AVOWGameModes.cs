@@ -37,7 +37,9 @@ public class AVOWGameModes : MonoBehaviour {
 	public GameObject greenBackground;
 	public GameObject scenery;
 	public GameObject pusher;
-	
+	public GameObject credits;
+	public bool enableClearPlayerPrefs = false;
+		
 	public float levelStartMsgDuration;
 	public float levelStartFadeInDuration;
 	public float levelStartFadeOutDuration;
@@ -76,13 +78,25 @@ public class AVOWGameModes : MonoBehaviour {
 	int triggerStartLevel = kTutorialIndex - 1;
 	
 	public void TriggerStartLevel(int levelNum){
-		triggerStartLevel = levelNum;
+		// If the credits
+		if (levelNum == 5){
+			credits.SetActive(true);
+		}
+		// Clear player prefs
+		else if (levelNum == 6){
+			PlayerPrefs.DeleteAll();
+		}
+		else{
+			triggerStartLevel = levelNum;
+		}
 	}
 	
 	
 	
 	
-	
+	public bool IsInMainMenu(){
+		return (state == GameModeState.kMainMenu && !credits.activeSelf);
+	}
 	
 	public void Serialise(BinaryWriter bw){
 		bw.Write (kLoadSaveVersion);
@@ -362,7 +376,8 @@ public class AVOWGameModes : MonoBehaviour {
 				if (col.a >= 1){
 					state = GameModeState.kStageComplete3;
 				}
-				
+				PlayerPrefs.SetInt(GetLevelName(currentLevel), 42);
+			                   
 				//levelCompleteDlg.
 				break;	
 			}
@@ -609,6 +624,7 @@ public class AVOWGameModes : MonoBehaviour {
 		AVOWTutorialManager.singleton.StopTutorial();
 		AVOWConfig.singleton.DisplayBottomPanel(false);
 		AVOWConfig.singleton.DisplaySidePanel(false);
+		credits.SetActive(false);
 		AVOWCircuitCreator.singleton.Deinitialise();
 		AVOWObjectiveManager.singleton.StopObjectives();
 		SelectCamera(CameraChoice.kGameCam);

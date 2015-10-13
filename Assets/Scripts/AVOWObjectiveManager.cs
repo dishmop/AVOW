@@ -446,7 +446,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	}
 	
 	public bool IsOnLastLevel(){
-		return currentLevel == GetMaxLevelNum();
+		return currentLevel == GetMaxLevelNum()-1;
 	}
 	
 	void ConstructBoards(){
