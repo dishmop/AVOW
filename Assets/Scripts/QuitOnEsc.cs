@@ -38,7 +38,7 @@ public class QuitOnEsc : MonoBehaviour {
 			Cursor.visible = AVOWGameModes.singleton.showPointer;
 			
 		}
-		
+
 		Cursor.lockState = CursorLockMode.Confined;
 		
 

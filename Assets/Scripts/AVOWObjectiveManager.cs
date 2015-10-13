@@ -80,6 +80,10 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		return (state == State.kPlay || state == State.kPauseOnLevelStart) && manualTriggerEnabled && !manualTriggerDoTrigger;
 	}
 	
+	public bool IsCompletingGoal(){
+		return state == State.kGoalComplete0 || state == State.kGoalComplete1;
+	}	
+	
 	public void EnableManualTrigger(bool enable){
 		manualTriggerEnabled = enable;
 	}

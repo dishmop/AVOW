@@ -216,7 +216,9 @@ public class AVOWGameModes : MonoBehaviour {
 		showHint = false;
 		showTimeHint = false;
 		lastGoalTime = AVOWUpdateManager.singleton.GetGameTime();
-		AVOWTutorialText.singleton.ClearText();
+		if (currentLevel != 4){
+			AVOWTutorialText.singleton.ClearText();
+		}
 	}
 	
 	public void GameUpdate(){
@@ -485,10 +487,6 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 
 
-	
-
-	
-
 
 	
 	void StartLevel(int levelNum){
@@ -513,7 +511,7 @@ public class AVOWGameModes : MonoBehaviour {
 			if (currentLevel == 4){
 				AVOWObjectiveManager.singleton.EnableManualTrigger(true);
 				AVOWConfig.singleton.DisplayBottomPanel(true);
-				Explanation.singleton.state = Explanation.State.kObjectiveBoard;
+				Explanation.singleton.state = Explanation.State.kIntro;
 			}
 		}
 		else{
@@ -603,6 +601,7 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	
 	public void GoToMain(){
+		Explanation.singleton.OnLeave();
 		AVOWUI.singleton.PlayPing ();
 		backStory.SetActive(false);
 		AVOWLevelEditor.singleton.LoadAllForPlayback();

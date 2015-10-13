@@ -194,12 +194,12 @@ public class Annotation : MonoBehaviour {
 			}
 			case State.kRightBottom:{
 				ampArrow.active = showArrows;
-				ampArrow.points3[0] = new Vector3(ampMin + arrowOffset, vBottom - boxOffset, transform.position.z);
-				ampArrow.points3[1] = new Vector3(ampMax - arrowOffset, vBottom - boxOffset, transform.position.z);
+				ampArrow.points3[0] = new Vector3(ampMin + arrowOffset, vBottom - boxOffset + 0.01f, transform.position.z);
+				ampArrow.points3[1] = new Vector3(ampMax - arrowOffset, vBottom - boxOffset + 0.01f	, transform.position.z);
 				ampArrow.Draw3D();			
 				
 				ampDisplay.SetActive(!AVOWGraph.singleton.HasHalfFinishedComponents());
-				ampDisplay.transform.position = 0.5f * (ampArrow.points3[0] + ampArrow.points3[1]) + new Vector3(batteryOffset, -0.075f, 0);
+				ampDisplay.transform.position = 0.5f * (ampArrow.points3[0] + ampArrow.points3[1]) + new Vector3(batteryOffset, -0.1f, 0);
 				break;
 			}	
 			case State.kDisabled:{
