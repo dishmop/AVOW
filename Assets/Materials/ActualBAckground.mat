@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: ActualBackground
+  m_Name: ActualBAckground
   m_Shader: {fileID: 4800000, guid: 530c0990caff645f98167b7a6ea21b09, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5

@@ -10,7 +10,7 @@ labels:
 - architecture
 - parquet
 - floor
-timeCreated: 1444769170
+timeCreated: 1444803754
 licenseType: Free
 SubstanceImporter:
   serializedVersion: 5
@@ -357,7 +357,7 @@ SubstanceImporter:
       textureWidth: 512
       textureHeight: 512
       textureFormat: 0
-      loadingBehavior: 3
+      loadingBehavior: 2
   - serializedVersion: 16
     name: wood000_Acajou_1
     prototypeName: wood000_Acajou
@@ -723,7 +723,7 @@ SubstanceImporter:
       textureWidth: 512
       textureHeight: 512
       textureFormat: 0
-      loadingBehavior: 3
+      loadingBehavior: 2
   - serializedVersion: 16
     name: wood000_Acajou_2
     prototypeName: wood000_Acajou
@@ -1081,7 +1081,7 @@ SubstanceImporter:
       textureWidth: 512
       textureHeight: 512
       textureFormat: 0
-      loadingBehavior: 3
+      loadingBehavior: 2
   - serializedVersion: 16
     name: wood000_Acajou_3
     prototypeName: wood000_Acajou
@@ -1439,7 +1439,7 @@ SubstanceImporter:
       textureWidth: 512
       textureHeight: 512
       textureFormat: 0
-      loadingBehavior: 3
+      loadingBehavior: 2
   - serializedVersion: 16
     name: wood000_Acajou_4
     prototypeName: wood000_Acajou
@@ -1797,7 +1797,7 @@ SubstanceImporter:
       textureWidth: 512
       textureHeight: 512
       textureFormat: 0
-      loadingBehavior: 3
+      loadingBehavior: 2
   - serializedVersion: 16
     name: wood000_Acajou_5
     prototypeName: wood000_Acajou
@@ -2155,7 +2155,7 @@ SubstanceImporter:
       textureWidth: 512
       textureHeight: 512
       textureFormat: 0
-      loadingBehavior: 3
+      loadingBehavior: 2
   - serializedVersion: 16
     name: wood000_Acajou_6
     prototypeName: wood000_Acajou
@@ -2513,7 +2513,7 @@ SubstanceImporter:
       textureWidth: 512
       textureHeight: 512
       textureFormat: 0
-      loadingBehavior: 3
+      loadingBehavior: 2
   - serializedVersion: 16
     name: wood000_Acajou_7
     prototypeName: wood000_Acajou
@@ -2871,7 +2871,7 @@ SubstanceImporter:
       textureWidth: 512
       textureHeight: 512
       textureFormat: 0
-      loadingBehavior: 3
+      loadingBehavior: 2
   - serializedVersion: 16
     name: wood000_Acajou_8
     prototypeName: wood000_Acajou
@@ -3229,7 +3229,7 @@ SubstanceImporter:
       textureWidth: 512
       textureHeight: 512
       textureFormat: 0
-      loadingBehavior: 3
+      loadingBehavior: 2
   deletedPrototypes: []
   userData: 
   assetBundleName: 
