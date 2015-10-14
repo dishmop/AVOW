@@ -443,7 +443,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kCreateSeriesSquare0:{
 				if (onEnterState){
-					AVOWTutorialText.singleton.AddText("As well as placing squares between two connectors, you can also place them between a connector and a green sphere.");
+					AVOWTutorialText.singleton.AddText("As well as placing squares between two connectors, you can also place them between a connector and the small sparky rectangle in the centre of an existing square.");
 					SetTextTrigger(hasDoneCreatedSeriesSquare0);
 				}
 				if (onTextTrigger){
@@ -454,7 +454,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kCreateSeriesSquare1:{
 				if (onEnterState){
-					AVOWTutorialText.singleton.AddText("Go near a connector, press and hold the mouse button - then go near to a green sphere and release.");
+					AVOWTutorialText.singleton.AddText("Go near a connector, press and hold the mouse button - then go near to the centre of an existing square and release.");
 					AVOWConfig.singleton.tutDisable2ndComponentConnections = false;
 					AVOWConfig.singleton.tutDisableComponentConstruction = false;
 					SetTextTrigger(hasDoneCreatedSeriesSquare1);
@@ -487,7 +487,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}	
 			case State.kCreateSeriesSquare3_NodeNode:{
 				if (onEnterState){
-					AVOWTutorialText.singleton.InterruptText("You tried to placed a square between two connectors - For the tutorial, you need to create one between a connector and a green sphere.");
+					AVOWTutorialText.singleton.InterruptText("You tried to placed a square between two connectors - For the tutorial, you need to create one between a connector and a sparky rectangle in the centre of a resistance square.");
 					SetTextTrigger();
 				}
 				if (onTextTrigger){
