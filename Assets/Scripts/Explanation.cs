@@ -124,6 +124,16 @@ public class Explanation : MonoBehaviour {
 	}
 	float gridStartTime = 0;
 	GridState gridState = GridState.kNone;
+	
+	public Bounds GetBounds(){
+		Bounds retBounds = new Bounds();
+		foreach (Transform child in transform){
+			if (child.gameObject.activeSelf && child.GetComponent<Renderer>() != null){
+				retBounds.Encapsulate(child.GetComponent<Renderer>().bounds);
+			}
+		}
+		return retBounds;
+	}
 
 
 	void HandleVizState(){
@@ -801,7 +811,7 @@ public class Explanation : MonoBehaviour {
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("In addition to Ohm's law there are also Kirchoff's laws.");
 					AVOWTutorialText.singleton.AddText("Kichoff's Voltage Law:");
-					AVOWTutorialText.singleton.AddText(" - The sum of all the voltage differences around any closed loop in a circuit is alwaus zero.");
+					AVOWTutorialText.singleton.AddText(" - The sum of all the voltage differences around any closed loop in a circuit is always zero.");
 					AVOWTutorialText.singleton.AddText("Kichoff's Current Law:");
 					AVOWTutorialText.singleton.AddText(" - At a junction of resistors, the total current flowing in equals the total current flowing out");
 

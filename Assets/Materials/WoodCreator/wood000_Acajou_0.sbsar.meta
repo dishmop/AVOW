@@ -10,7 +10,7 @@ labels:
 - architecture
 - parquet
 - floor
-timeCreated: 1444803754
+timeCreated: 1444818342
 licenseType: Free
 SubstanceImporter:
   serializedVersion: 5
@@ -39,7 +39,7 @@ SubstanceImporter:
         texture: {instanceID: 0}
     - name: $randomseed
       value:
-        scalar[0]: 0
+        scalar[0]: 8799
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -53,7 +53,7 @@ SubstanceImporter:
         texture: {instanceID: 0}
     - name: Battens
       value:
-        scalar[0]: 0
+        scalar[0]: 1
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -67,7 +67,7 @@ SubstanceImporter:
         texture: {instanceID: 0}
     - name: Battens_Amount_Y
       value:
-        scalar[0]: 10
+        scalar[0]: 1
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -196,7 +196,7 @@ SubstanceImporter:
       offset: {x: 0, y: 0}
       scale: {x: 1, y: 1}
       generateMipmaps: 1
-      generateAllOutputs: 0
+      generateAllOutputs: 1
       animationUpdateRate: 0
     materialProperties:
       serializedVersion: 2
@@ -338,6 +338,21 @@ SubstanceImporter:
       filterMode: 1
       aniso: 1
       wrapMode: 0
+    - name: wood000_Acajou_Specular
+      alphaSource: 7
+      filterMode: 1
+      aniso: 1
+      wrapMode: 0
+    - name: wood000_Acajou_Bump
+      alphaSource: 0
+      filterMode: 1
+      aniso: 1
+      wrapMode: 0
+    - name: wood000_Acajou_Displacement
+      alphaSource: 0
+      filterMode: 1
+      aniso: 1
+      wrapMode: 0
     textureAssignments:
     - shaderProp:
         name: _MainTex
@@ -396,7 +411,7 @@ SubstanceImporter:
         texture: {instanceID: 0}
     - name: Battens
       value:
-        scalar[0]: 0
+        scalar[0]: 1
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -473,9 +488,9 @@ SubstanceImporter:
         texture: {instanceID: 0}
     - name: Wood_Color
       value:
-        scalar[0]: .220588207
-        scalar[1]: .0998944193
-        scalar[2]: .0340614207
+        scalar[0]: .20588237
+        scalar[1]: .067499496
+        scalar[2]: .0378460251
         scalar[3]: 0
         texture: {instanceID: 0}
     - name: Depth

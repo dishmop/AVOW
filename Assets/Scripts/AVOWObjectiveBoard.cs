@@ -471,7 +471,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 		currentTarget = target;
 		switch (layoutMode){
 			case LayoutMode.kRow:{
-			ConstructGrid(CreateRowTarget(currentTarget, true));
+				ConstructGrid(CreateRowTarget(currentTarget, true));
 				CreateCovers(CreateRowTarget(currentTarget, true));
 				break;
 			}
@@ -531,6 +531,7 @@ public class AVOWObjectiveBoard : MonoBehaviour {
 			}
 			currentCovers = null;
 		}
+		displayTarget = null;
 		
 		transform.localPosition = Vector3.zero;
 		state = State.kReady;
