@@ -8,6 +8,9 @@ public class SetupResolution : MonoBehaviour {
 	
 	
 	void Awake () {
+		#if UNITY_WEBPLAYER
+		firstTime  = false;
+		#endif
 		if (firstTime){
 			Screen.SetResolution (1024, 768, false);
 		}
