@@ -195,7 +195,7 @@
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="Vectrosity">
- <HintPath>/Users/dac70/ownCloud/CUED_IWTSE/GamePrototyping/BuildServer/Code/AVOW/Assets/Plugins/Vectrosity.dll</HintPath>
+ <HintPath>/Users/dac70/ownCloud/CUED_IWTSE/GamePrototyping/ProtoRelease/AVOW/Assets/Plugins/Vectrosity.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.Graphs">
  <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.Graphs.dll</HintPath>
