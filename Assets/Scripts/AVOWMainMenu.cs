@@ -11,6 +11,8 @@ public class AVOWMainMenu : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 	
+
+	
 		int numButtons = AVOWGameModes.singleton.GetNumMainMenuButtons() + 1;
 		int minButtonIndex = AVOWGameModes.singleton.GetMinMainMenuButton();
 		

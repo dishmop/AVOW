@@ -557,7 +557,7 @@ public class Explanation : MonoBehaviour {
 					AVOWTutorialText.singleton.AddPause(3);
 					AVOWTutorialText.singleton.AddText("It is about voltages and currents in electrical circuits.");
 					AVOWTutorialText.singleton.AddText("It is best to watch this explanation after playing the game a bit.");
-					AVOWTutorialText.singleton.AddText("Add a single resistance cube between the connection points to move on.");
+					AVOWTutorialText.singleton.AddText("Add a single resistance square between the connection points to move on.");
 					SetTextTrigger();
 				}	
 				if (onTextTrigger){
@@ -585,7 +585,7 @@ public class Explanation : MonoBehaviour {
 				if (onEnterState){
 					DisableUI(false);
 					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("Try adding another two resistance cubes - making a total of three.");
+					AVOWTutorialText.singleton.AddText("Try adding another two resistance square - making a total of three.");
 					
 					vizState = VizState.kCircuitOnly;
 					annotationState = AnnotationState.kNone;
@@ -601,8 +601,16 @@ public class Explanation : MonoBehaviour {
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("Good! You may recognise this as a traditional circuit diagram.");
 					AVOWTutorialText.singleton.AddText("There is a cell (battery) on the right and three resistors on the left.");
-					AVOWTutorialText.singleton.AddText("Suppose the cell was 1 volt and the resistors were all 1 ohm.");
+					AVOWTutorialText.singleton.AddText("Suppose the cell was 1 volt and the resistors were all 1 ohm. What are the voltages and currents in the circuit?");
 					SetButtonTrigger();
+					SetTextTrigger();
+				}
+				if (onTextTrigger){
+					annotationState = AnnotationState.kIndividual;
+					showOhms = true;
+					showArrowsOnBattery = false;
+					showLoadVoltages = false;	
+					
 				}
 				if (onButtonTrigger){
 					state = State.kQuantities1;
@@ -612,13 +620,8 @@ public class Explanation : MonoBehaviour {
 			case State.kQuantities1:{
 				if (onEnterState){	
 					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("What are the currents and voltages in the circuit?");
 					AVOWTutorialText.singleton.AddText("This game visualises them to help you understand how they behave.");
 					AVOWTutorialText.singleton.AddText("The voltage difference across a component is represented by its height.");
-					annotationState = AnnotationState.kIndividual;
-					showOhms = true;
-					showArrowsOnBattery = false;
-					showLoadVoltages = false;	
 					SetButtonTrigger();
 				}
 				if (onButtonTrigger){
@@ -712,7 +715,7 @@ public class Explanation : MonoBehaviour {
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("You have a circuit with one resistor.");
 					AVOWTutorialText.singleton.AddText("We can use Ohm's Law to calculate the current flowing through it.");
-					AVOWTutorialText.singleton.AddText("Ohm's law states: Voltage = Resistance × Current");
+					AVOWTutorialText.singleton.AddText("Ohm's law states: Voltage = Resistance * Current");
 					AVOWTutorialText.singleton.AddText("Our resistor is 1 ohm, the voltage across it is 1 volt, so the current must be 1 amp.");
 					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
 					DisableUI(true);
@@ -763,7 +766,7 @@ public class Explanation : MonoBehaviour {
 			case State.kBoxesAreSquare:{
 				if (onEnterState){	
 					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("Since all our resistors are 1 ohm, we can see from Ohm's Law, that the current flowing through a resistor will always be equal to the voltage across it (Voltage = 1 × Current).");
+					AVOWTutorialText.singleton.AddText("Since all our resistors are 1 ohm, we can see from Ohm's Law, that the current through a resistor will always equal the voltage across it (Voltage = 1 * Current).");
 					AVOWTutorialText.singleton.AddPause(2);
 					AVOWTutorialText.singleton.AddText("This is why, even though our metal boxes may change size, they are ALWAYS square.");
 					
@@ -809,66 +812,60 @@ public class Explanation : MonoBehaviour {
 			case State.kKirchoffsLaws:{
 				if (onEnterState){	
 					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("In addition to Ohm's law there are also Kirchoff's laws.");
-					AVOWTutorialText.singleton.AddText("Kichoff's Voltage Law:");
-					AVOWTutorialText.singleton.AddText(" - The sum of all the voltage differences around any closed loop in a circuit is always zero.");
-					AVOWTutorialText.singleton.AddText("Kichoff's Current Law:");
-					AVOWTutorialText.singleton.AddText(" - At a junction of resistors, the total current flowing in equals the total current flowing out");
-
-					
-					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
-					annotationState = AnnotationState.kIndividual;
-					showOhms = false;
-					SetButtonTrigger();
-				}
-				if (onButtonTrigger){
-					state = State.kKirchoffsLawsBoxes;
-				}				
-				break;
-			}	
-			case State.kKirchoffsLawsBoxes:{
-				if (onEnterState){	
-					transform.FindChild("Kirchoffs laws").gameObject.SetActive(true);
+					AVOWTutorialText.singleton.AddText("Also, note that the pattern of boxes always forms a rectangle, with no gaps, whose hieght is the voltage of the cell.");
 					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("These are perhaps better unstood in terms of how they affect our metal boxes.");
-					AVOWTutorialText.singleton.AddText(" - The boxes in a circuit must fit together to form a rectangle with no gaps inside it.");
-					AVOWTutorialText.singleton.AddText(" - The height of this rectangle must be the same as the voltage of the battery driving it.");
+					AVOWTutorialText.singleton.AddText("This is due to something called \"Kirchoff's Laws\".");
 					
-					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
-					annotationState = AnnotationState.kIndividual;
-					SetButtonTrigger();
-				}
-				if (onButtonTrigger){
-					state = State.kBoxRewrite;
-				}				
-				break;
-			}	
-			case State.kBoxRewrite:{
-				if (onEnterState){	
-					transform.FindChild("Kirchoffs laws").gameObject.SetActive(false);
-					transform.FindChild("Ohms law").gameObject.SetActive(false);
-					transform.FindChild("Kirchoffs laws boxes").gameObject.SetActive(true);
-					transform.FindChild("Ohms law boxes").gameObject.SetActive(true);
-					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("I've rewriten the electrical laws above in terms of our metal boxes.");
-					
-					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
-					annotationState = AnnotationState.kIndividual;
 					SetButtonTrigger();
 				}
 				if (onButtonTrigger){
 					state = State.kChallenge1;
 				}				
 				break;
-			}
+			}	
+//			case State.kKirchoffsLawsBoxes:{
+//				if (onEnterState){	
+//					transform.FindChild("Kirchoffs laws").gameObject.SetActive(true);
+//					AVOWTutorialText.singleton.AddText("");
+//					AVOWTutorialText.singleton.AddText("These are perhaps better unstood in terms of how they affect our metal boxes.");
+//					AVOWTutorialText.singleton.AddText(" - The boxes in a circuit must fit together to form a rectangle with no gaps inside it.");
+//					AVOWTutorialText.singleton.AddText(" - The height of this rectangle must be the same as the voltage of the battery driving it.");
+//					
+//					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
+//					annotationState = AnnotationState.kIndividual;
+//					SetButtonTrigger();
+//				}
+//				if (onButtonTrigger){
+//					state = State.kBoxRewrite;
+//				}				
+//				break;
+//			}	
+//			case State.kBoxRewrite:{
+//				if (onEnterState){	
+//					transform.FindChild("Kirchoffs laws").gameObject.SetActive(false);
+//					transform.FindChild("Ohms law").gameObject.SetActive(false);
+//					transform.FindChild("Kirchoffs laws boxes").gameObject.SetActive(true);
+//					transform.FindChild("Ohms law boxes").gameObject.SetActive(true);
+//					AVOWTutorialText.singleton.AddText("");
+//					AVOWTutorialText.singleton.AddText("I've rewriten the electrical laws above in terms of our metal boxes.");
+//					
+//					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
+//					annotationState = AnnotationState.kIndividual;
+//					SetButtonTrigger();
+//				}
+//				if (onButtonTrigger){
+//					state = State.kChallenge1;
+//				}				
+//				break;
+//			}
 			case State.kChallenge1:{
 				if (onEnterState){	
 					transform.FindChild("Kirchoffs laws").gameObject.SetActive(false);
-					transform.FindChild("Ohms law").gameObject.SetActive(false);
-					transform.FindChild("Kirchoffs laws boxes").gameObject.SetActive(true);
-					transform.FindChild("Ohms law boxes").gameObject.SetActive(true);
+					transform.FindChild("Ohms law").gameObject.SetActive(true);
+					transform.FindChild("Kirchoffs laws boxes").gameObject.SetActive(false);
+					transform.FindChild("Ohms law boxes").gameObject.SetActive(false);
 					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("Try to construct a circuit using four resistors where each has a current of ¼ of an amp flowing through it.");
+				AVOWTutorialText.singleton.AddText("Try to construct a circuit using four resistors where each has a current of # of an amp flowing through it.");
 					showAmps = true;
 					showOhms = false;
 					showArrowsOnBattery = true;
@@ -957,7 +954,7 @@ public class Explanation : MonoBehaviour {
 				if (onEnterState){	
 					DisableUI(false);
 					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("Now try and make a circuit with ⅓ of an amp flowing through one resistor and ⅔ flowing through another one. You may need more than two resistors to accomplish this.");
+				AVOWTutorialText.singleton.AddText("Now try and make a circuit with $ of an amp flowing through one resistor and % flowing through another one. You may need more than two resistors to accomplish this.");
 					showAmps = true;
 					showOhms = false;
 					showArrowsOnBattery = true;
@@ -1059,7 +1056,7 @@ public class Explanation : MonoBehaviour {
 			case State.kChallengesComplete:{
 				if (onEnterState){	
 					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("The \"resistors\" we are using could easily be replaced with motors, lamps, heaters etc. which, in terms of voltage and current, behave much like our resistors.");
+					AVOWTutorialText.singleton.AddText("The \"resistors\" we are using could easily be replaced with motors, lamps, heaters etc. which behave much like our resistors.");
 					AVOWTutorialText.singleton.AddText("Usually lamps and motors need to have a specific current flowing through them to work efficiently and this must be achieved using additional resistors in the circuit.");
 					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
 					annotationState = AnnotationState.kIndividual;
@@ -1074,7 +1071,7 @@ public class Explanation : MonoBehaviour {
 				if (onEnterState){	
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("So, the challenges you just did have real electrical meaning.");
-					AVOWTutorialText.singleton.AddText("These are also exactly the same challenges that are presented in the game - but instead of asking for currents using numbers (say, ⅓ Amp), we present the challenges visually.");
+					AVOWTutorialText.singleton.AddText("These are also exactly the same challenges that are presented in the game - but instead of asking for currents using numbers (say, $ Amp), we present the challenges visually.");
 					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
 					annotationState = AnnotationState.kIndividual;
 					SetButtonTrigger();
@@ -1151,7 +1148,7 @@ public class Explanation : MonoBehaviour {
 			case State.kObjectiveSquares:{
 				if (onEnterState){
 					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("It can be divide into smaller squares, each representating a smaller voltage and current.");
+					AVOWTutorialText.singleton.AddText("It can be divide into smaller squares, each representing a smaller voltage and current.");
 					SetTextTrigger();
 				}
 				if (onButtonTrigger){
@@ -1200,7 +1197,7 @@ public class Explanation : MonoBehaviour {
 			case State.kChallenge3:{
 				if (onEnterState){
 					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("These frames are asking you to construct a circuit with ¼ Amp through one resistor and ¾ Amp through another.");
+				AVOWTutorialText.singleton.AddText("These frames are asking you to construct a circuit with # Amp through one resistor and & Amp through another.");
 					AVOWTutorialText.singleton.AddText("Try and do it. Imagine stacking the frames up into a rectangle - then fill in the gaps.");
 					DisableUI(false);
 				

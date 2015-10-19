@@ -236,6 +236,10 @@ public class AVOWGameModes : MonoBehaviour {
 	}
 	
 	public void GameUpdate(){
+		if (Input.GetKeyDown(KeyCode.C) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))){
+			PlayerPrefs.DeleteAll();
+		}	
+
 		if (triggerStartLevel >= kTutorialIndex){
 			StartLevel(triggerStartLevel);
 			triggerStartLevel = kTutorialIndex-1;
@@ -307,6 +311,8 @@ public class AVOWGameModes : MonoBehaviour {
 			}
 		}
 	}
+	
+
 	
 	// Update is called once per frame
 	public void RenderUpdate () {
@@ -545,6 +551,8 @@ public class AVOWGameModes : MonoBehaviour {
 		
 		
 	}
+	
+
 	
 //	void StartNextLevel(){
 //		currentLevel++;
