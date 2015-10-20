@@ -71,7 +71,7 @@ public class AVOWCamControl : MonoBehaviour {
 				float simMax = Mathf.Max (1, AVOWGraph.singleton.xMax);
 				Rect bounds = new Rect(gameBoardXMin, AVOWGraph.singleton.yMin, simMax  - gameBoardXMin + 0.1f , AVOWGraph.singleton.yMax - AVOWGraph.singleton.yMin);
 				
-				Bounds explanationBounds = Explanation.singleton.GetBounds();
+				Bounds explanationBounds = new Bounds();//Explanation.singleton.GetBounds();
 				bounds.xMin = Mathf.Min(bounds.xMin, explanationBounds.min.x);
 				bounds.yMin = Mathf.Min(bounds.yMin, explanationBounds.min.y);
 				bounds.xMax = Mathf.Max(bounds.xMax, explanationBounds.max.x);

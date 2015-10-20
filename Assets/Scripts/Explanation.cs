@@ -363,9 +363,11 @@ public class Explanation : MonoBehaviour {
 					}		
 				}
 				thisAnnotation.voltState = Annotation.State.kLeftTop;
-				thisAnnotation.ampState = showAmps ? Annotation.State.kRightBottom : Annotation.State.kDisabled;;
-				
-				Annotation cellAnnotation = annotations[1].GetComponent<Annotation>();
+				thisAnnotation.ampState = showAmps ? Annotation.State.kRightBottom : Annotation.State.kDisabled;
+				thisAnnotation.ohmState = showOhms ? Annotation.State.kLeftTop : Annotation.State.kDisabled;
+			
+			
+			Annotation cellAnnotation = annotations[1].GetComponent<Annotation>();
 				if (cellAnnotation.componentGOs.Count() != 1){
 					cellAnnotation.componentGOs.Clear ();
 					cellAnnotation.componentGOs.Add (cell);
@@ -585,7 +587,7 @@ public class Explanation : MonoBehaviour {
 				if (onEnterState){
 					DisableUI(false);
 					AVOWTutorialText.singleton.AddText("");
-					AVOWTutorialText.singleton.AddText("Try adding another two resistance square - making a total of three.");
+					AVOWTutorialText.singleton.AddText("Try adding another two resistance squares - making a total of three.");
 					
 					vizState = VizState.kCircuitOnly;
 					annotationState = AnnotationState.kNone;
