@@ -1,37 +1,21 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AVOWCamControl.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/SubstanceBaker.cs">
     <Files>
-      <File FileName="Assets/Scripts/Explanation.cs" Line="1074" Column="174" />
-      <File FileName="Assets/Scripts/SetupResolution.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/TextureConstructor.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWGameModes.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWMainMenu.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWTutorialText.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AVOWCamControl.cs" Line="74" Column="47" />
+      <File FileName="../Railsailer/Assets/Scripts/PlayerOverlay.cs" Line="254" Column="33" />
+      <File FileName="../Railsailer/Assets/Scripts/Player.cs" Line="563" Column="3" />
+      <File FileName="../Railsailer/Assets/Scripts/FronEndUI.cs" Line="1" Column="1" />
+      <File FileName="../Railsailer/Assets/Scripts/GameMode.cs" Line="1" Column="1" />
+      <File FileName="../Railsailer/Assets/Scripts/StartUpBanner.cs" Line="1" Column="1" />
+      <File FileName="../Railsailer/Assets/Scripts/Continue.cs" Line="1" Column="1" />
+      <File FileName="../Railsailer/Assets/Scripts/Tutorial.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/SubstanceBaker.cs" Line="22" Column="35" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="Assembly-CSharp" expanded="True">
-            <Node name="Scripts" expanded="True">
-              <Node name="AVOWCamControl.cs" selected="True" />
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State>
-          <Value>value</Value>
-          <Value>bounds</Value>
-          <Value>renderer.bounds</Value>
-          <Value>sailAngle - jibAngle</Value>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/GamePrototyping/ProtoRelease/Railsailer/Assets/Scripts/Player.cs" line="563" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

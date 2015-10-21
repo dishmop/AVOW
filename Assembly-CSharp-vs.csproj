@@ -123,6 +123,7 @@
      <Compile Include="Assets\Scripts\SerializationUtils.cs" />
      <Compile Include="Assets\Scripts\SetupResolution.cs" />
      <Compile Include="Assets\Scripts\SpringValue.cs" />
+     <Compile Include="Assets\Scripts\SubstanceBaker.cs" />
      <Compile Include="Assets\Scripts\TextScaler.cs" />
      <Compile Include="Assets\Scripts\TextureConstructor.cs" />
      <Compile Include="Assets\Scripts\Tuple.cs" />
