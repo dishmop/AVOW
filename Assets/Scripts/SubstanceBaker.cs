@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.IO;
-using System.Linq;
-using UnityEditor;
 
+using System.Linq;
+#if !UNITY_STANDALONE && !UNITY_WEBPLAYER
+using UnityEditor;
+#endif
 public class SubstanceBaker : MonoBehaviour {
 	public ProceduralMaterial[] materials;
 	ProceduralMaterial currentMat;
@@ -62,7 +64,9 @@ public class SubstanceBaker : MonoBehaviour {
 				
 			}
 			case State.kRefreshResources:{
+			#if !UNITY_STANDALONE && !UNITY_WEBPLAYER
 				AssetDatabase.Refresh();
+			#endif
 				state = State.kFinish;
 				break;
 				
@@ -89,8 +93,9 @@ public class SubstanceBaker : MonoBehaviour {
 		
 		newTexture.SetPixels(newPixel);
 		byte[] bytes = newTexture.EncodeToPNG();
-		
+		#if !UNITY_STANDALONE && !UNITY_WEBPLAYER
 		File.WriteAllBytes(Application.dataPath + "/Resources/SubstanceBakes/" + name + ".png", bytes);
+		#endif
 		Object.Destroy(newTexture);
 		
 	}

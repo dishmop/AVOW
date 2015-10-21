@@ -3,13 +3,13 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/SubstanceBaker.cs">
     <Files>
       <File FileName="../Railsailer/Assets/Scripts/PlayerOverlay.cs" Line="254" Column="33" />
-      <File FileName="../Railsailer/Assets/Scripts/Player.cs" Line="563" Column="3" />
+      <File FileName="../Railsailer/Assets/Scripts/Player.cs" Line="1" Column="1" />
       <File FileName="../Railsailer/Assets/Scripts/FronEndUI.cs" Line="1" Column="1" />
       <File FileName="../Railsailer/Assets/Scripts/GameMode.cs" Line="1" Column="1" />
       <File FileName="../Railsailer/Assets/Scripts/StartUpBanner.cs" Line="1" Column="1" />
       <File FileName="../Railsailer/Assets/Scripts/Continue.cs" Line="1" Column="1" />
       <File FileName="../Railsailer/Assets/Scripts/Tutorial.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/SubstanceBaker.cs" Line="22" Column="35" />
+      <File FileName="Assets/Scripts/SubstanceBaker.cs" Line="3" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
