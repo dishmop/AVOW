@@ -190,7 +190,7 @@ public class AVOWLevelEditor : MonoBehaviour {
 		
 		TextAsset asset = Resources.Load(BuildResourcePath ()) as TextAsset;
 		if (asset != null){
-			Debug.Log ("Loading asset");
+//			Debug.Log ("Loading asset");
 			Stream s = new MemoryStream(asset.bytes);
 			Deserialise(new BinaryReader(s));
 			Resources.UnloadAsset(asset);
@@ -279,7 +279,7 @@ public class AVOWLevelEditor : MonoBehaviour {
 			
 			
 			int targetSquareIndex = AVOWObjectiveManager.singleton.InsideTargetTest(mouseWorldPos);
-			Debug.Log ("targetSquareIndex = " + targetSquareIndex.ToString());
+		//	Debug.Log ("targetSquareIndex = " + targetSquareIndex.ToString());
 			if (targetSquareIndex >= 0){
 				targets[currentGoal].HideComponent(targetSquareIndex);
 				DisplayGoal();

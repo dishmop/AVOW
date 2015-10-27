@@ -106,7 +106,7 @@ public class AVOWTutorialText : MonoBehaviour {
 			ForceTextCompletion();
 			AddText (text);
 		}
-		Debug.Log("InterruptText: text = " + queuedString.ToString());
+//		Debug.Log("InterruptText: text = " + queuedString.ToString());
 		
 		
 	}
@@ -262,7 +262,7 @@ public class AVOWTutorialText : MonoBehaviour {
 			case kSpeedKey:{
 				lettersPerSecond = float.Parse (data);
 				if (lettersPerSecond < 0) lettersPerSecond = defaultLettersPerSecond;
-				Debug.Log("ParseCommand(kSpeedKey): " + lettersPerSecond.ToString());
+//				Debug.Log("ParseCommand(kSpeedKey): " + lettersPerSecond.ToString());
 			    break;
 			}
 			case kTriggerKey:{

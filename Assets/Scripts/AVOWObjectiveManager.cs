@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System;
+using UnityEngine.Analytics;
+
 
 public class AVOWObjectiveManager : MonoBehaviour {
 
@@ -14,6 +16,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 	public float levelStartPauseDuration;
 	
 	public bool useLevelEditor;
+	float lastGoalTime;
 	
 	const int		kLoadSaveVersion = 1;	
 	
@@ -345,6 +348,7 @@ public class AVOWObjectiveManager : MonoBehaviour {
 		
 		state = State.kPauseOnLevelStart;
 		waitTime = Time.time + levelStartPauseDuration;
+		lastGoalTime = 0;
 		
 	}
 	
@@ -771,12 +775,30 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			case State.kGoalComplete1:{
 				if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().IsReady()){
 					currentGoalIndex = FindNextValidGoal(currentGoalIndex);
+//					Debug.Log("goalComplete - levelNum: " + currentLevel.ToString() + ", goalNum: " + currentGoalIndex.ToString() + ", levelTime: " + AVOWUpdateManager.singleton.GetGameTime() + ", goalTime :" + (AVOWUpdateManager.singleton.GetGameTime() - lastGoalTime));
+					Analytics.CustomEvent("goalComplete", new Dictionary<string, object>
+					{
+						{ "levelNum", currentLevel.ToString()},
+						{ "goalNum", currentGoalIndex.ToString()},
+						{ "levelTime", AVOWUpdateManager.singleton.GetGameTime()},
+						{ "goalTime", (AVOWUpdateManager.singleton.GetGameTime() - lastGoalTime)},
+					});
+										
+					lastGoalTime = AVOWUpdateManager.singleton.GetGameTime();
+					
 					
 					if (currentGoalIndex < GetGoalTargets().Count){
 						state = State.kBuildBackBoard;
 					}
 					else{
 						state = State.kLevelComplete0;
+//						Debug.Log("levelComplete - levelNum: " + currentLevel.ToString() + ", levelTime: " + AVOWUpdateManager.singleton.GetGameTime());
+						Analytics.CustomEvent("levelComplete", new Dictionary<string, object>
+						                      {
+							{ "levelNum", currentLevel.ToString()},
+							{ "levelTime", AVOWUpdateManager.singleton.GetGameTime()},
+						});						
+						
 					}
 				}
 				break;

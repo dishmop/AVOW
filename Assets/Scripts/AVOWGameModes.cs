@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using UnityEngine.Analytics;
 
 public class AVOWGameModes : MonoBehaviour {
 	public static AVOWGameModes singleton = null;
@@ -506,6 +508,7 @@ public class AVOWGameModes : MonoBehaviour {
 		
 		state = GameModeState.kPlayStage;
 	}
+	
 
 
 
@@ -624,6 +627,14 @@ public class AVOWGameModes : MonoBehaviour {
 	
 	
 	public void GoToMain(){
+//		Debug.Log("quiGame - levelNum: " + currentLevel.ToString() + ", levelTime: " + AVOWUpdateManager.singleton.GetGameTime());
+		
+		Analytics.CustomEvent("quitGame", new Dictionary<string, object>
+		{
+			{ "levelNum", currentLevel.ToString() },
+			{ "levelTime", AVOWUpdateManager.singleton.GetGameTime()},
+		});
+		
 		Explanation.singleton.OnLeave();
 		AVOWUI.singleton.PlayPing ();
 		backStory.SetActive(false);

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Analytics;
 
 using Vectrosity;
 
@@ -553,6 +554,9 @@ public class Explanation : MonoBehaviour {
 			}
 			case State.kIntro:{
 				if (onEnterState){
+//					Debug.Log ("expl01kIntro -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("expl01kIntro", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });	
+				
 					DisableUI(true);
 					AVOWTutorialText.singleton.AddPause(3);
 					AVOWTutorialText.singleton.AddText("What is this game really about?");
@@ -572,6 +576,9 @@ public class Explanation : MonoBehaviour {
 			}
 			case State.kRemovingTheWorld:{
 				if (onEnterState){
+//					Debug.Log ("expl02kRemovingTheWorld -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("expl02kRemovingTheWorld", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });	
+										
 					DisableUI(true);
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("Good - now, I will remove everything from the game apart from the electrical sparks.");
@@ -600,6 +607,9 @@ public class Explanation : MonoBehaviour {
 			}			
 			case State.kTradCircuit:{
 				if (onEnterState){	
+//					Debug.Log ("expl03kTradCircuit -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("expl03kTradCircuit", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+						
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("Good! You may recognise this as a traditional circuit diagram.");
 					AVOWTutorialText.singleton.AddText("There is a cell (battery) on the right and three resistors on the left.");
@@ -678,6 +688,9 @@ public class Explanation : MonoBehaviour {
 			}	
 			case State.kBoxesTotal:{
 				if (onEnterState){	
+//					Debug.Log ("expl04kBoxesTotal -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("expl04kBoxesTotal", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+				
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("Of course, the total voltage across the circuit is always 1 volt because the cell driving it is 1 volt.");
 					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
@@ -713,6 +726,10 @@ public class Explanation : MonoBehaviour {
 			}
 			case State.kBoxesSetupOne2:{
 				if (onEnterState){	
+//					Debug.Log ("expl05kBoxesSetupOne2 -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("expl05kBoxesSetupOne2", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+				
+					
 					MakeUnitCircuit();
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("You have a circuit with one resistor.");
@@ -754,6 +771,10 @@ public class Explanation : MonoBehaviour {
 			}			
 			case State.kLotsCurrent:{
 				if (onEnterState){	
+//					Debug.Log ("expl06kLotsCurrent -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("expl06kLotsCurrent", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+				
+					
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("Press CONTINUE when you are ready to move on.");
 					vizState = VizState.kCircuitAndBatteryAndMetalOnly;
@@ -862,12 +883,16 @@ public class Explanation : MonoBehaviour {
 //			}
 			case State.kChallenge1:{
 				if (onEnterState){	
+//					Debug.Log ("expl07kChallenge1 -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("expl07kChallenge1", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+				
+					
 					transform.FindChild("Kirchoffs laws").gameObject.SetActive(false);
 					transform.FindChild("Ohms law").gameObject.SetActive(true);
 					transform.FindChild("Kirchoffs laws boxes").gameObject.SetActive(false);
 					transform.FindChild("Ohms law boxes").gameObject.SetActive(false);
 					AVOWTutorialText.singleton.AddText("");
-				AVOWTutorialText.singleton.AddText("Try to construct a circuit using four resistors where each has a current of # of an amp flowing through it.");
+					AVOWTutorialText.singleton.AddText("Try to construct a circuit using four resistors where each has a current of # of an amp flowing through it.");
 					showAmps = true;
 					showOhms = false;
 					showArrowsOnBattery = true;
@@ -954,9 +979,13 @@ public class Explanation : MonoBehaviour {
 		
 			case State.kChallenge2:{
 				if (onEnterState){	
+//					Debug.Log ("expl08kChallenge2 -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("expl08kChallenge2", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+				
+					
 					DisableUI(false);
 					AVOWTutorialText.singleton.AddText("");
-				AVOWTutorialText.singleton.AddText("Now try and make a circuit with $ of an amp flowing through one resistor and % flowing through another one. You may need more than two resistors to accomplish this.");
+					AVOWTutorialText.singleton.AddText("Now try and make a circuit with $ of an amp flowing through one resistor and % flowing through another one. You may need more than two resistors to accomplish this.");
 					showAmps = true;
 					showOhms = false;
 					showArrowsOnBattery = true;
@@ -1182,6 +1211,10 @@ public class Explanation : MonoBehaviour {
 			    break;
 			}		
 			case State.kObjectiveSquaresExplanation:{
+//				Debug.Log ("expl09kObjectiveSquaresExplanation -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+				Analytics.CustomEvent("expl09kObjectiveSquaresExplanation", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+			
+				
 				if (onEnterState){
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("On top of this grid, we place metal frames.");
@@ -1299,6 +1332,9 @@ public class Explanation : MonoBehaviour {
 			}				
 			case State.kFinish1:{
 				if (onEnterState){
+//					Debug.Log ("expl10kFinish1 -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("expl10kFinish1", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+				
 					DisableUI(false);
 					SetupOffState();
 					AVOWTutorialText.singleton.AddText("");

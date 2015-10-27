@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.Analytics;
 
 public class AVOWTutorialManager : MonoBehaviour {
 
@@ -230,6 +232,12 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}
 			case State.kIntro0:{
 				if (onEnterState){
+//					Debug.Log ("tut01kIntro0 - levelTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("tut01kIntro0", new Dictionary<string, object>
+					{
+						{ "levelTime", AVOWUpdateManager.singleton.GetGameTime()},
+					});
+					
 					SetupInitialTutFlags();
 					AVOWTutorialText.singleton.AddPause(3);
 					AVOWTutorialText.singleton.AddText("I am cube.");
@@ -322,6 +330,11 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}	
 			case State.kFindTheConnection2:{
 				if (onEnterState){
+//					Debug.Log ("tut02kFindTheConnection2 - gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("tut02kFindTheConnection2", new Dictionary<string, object>
+					{
+						{ "levelTime", AVOWUpdateManager.singleton.GetGameTime()},
+					});				
 					AVOWTutorialText.singleton.InterruptText("You found them both.");
 					SetTextTrigger();
 				}
@@ -400,6 +413,12 @@ public class AVOWTutorialManager : MonoBehaviour {
 
 			case State.kConstructed:{
 				if (onEnterState){
+//					Debug.Log ("tut03kConstructed- gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("tut03kConstructed", new Dictionary<string, object>
+					{
+						{ "levelTime", AVOWUpdateManager.singleton.GetGameTime()},
+					});						
+				
 					AVOWTutorialText.singleton.InterruptText("You have made your first resistance square.");
 					AVOWConfig.singleton.tutDisableBarConstruction = true;
 					SetTextTrigger();
@@ -501,6 +520,12 @@ public class AVOWTutorialManager : MonoBehaviour {
 				
 			case State.kConstructedSeries:{
 				if (onEnterState){
+//					Debug.Log ("tut04kConstructedSeries - gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("tut04kConstructedSeries", new Dictionary<string, object>
+					                      {
+						{ "levelTime", AVOWUpdateManager.singleton.GetGameTime()},
+					});						
+					
 					AVOWTutorialText.singleton.InterruptText("You have made your third resistance square.");
 					AVOWTutorialText.singleton.AddText("In doing so, a new connector has been created.");
 					AVOWConfig.singleton.tutDisable2ndComponentConnections = true;
@@ -589,6 +614,13 @@ public class AVOWTutorialManager : MonoBehaviour {
 			}		
 			case State.kFourthDone:{	
 				if (onEnterState){
+//					Debug.Log ("tut05kFourthDone - gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("tut05kFourthDone", new Dictionary<string, object>
+					{
+						{ "levelTime", AVOWUpdateManager.singleton.GetGameTime()},
+					});						
+					
+				
 					AVOWConfig.singleton.tutDisableBarConstruction = true;
 					AVOWConfig.singleton.tutDisableComponentConstruction = true;
 					AVOWTutorialText.singleton.InterruptText("You have made your fourth resistance square.");
@@ -639,7 +671,7 @@ public class AVOWTutorialManager : MonoBehaviour {
 					AVOWTutorialText.singleton.AddText ("On the left, there is a green button labelled 'Destroy'. Click this to activate the Destruction tool.");
 				}	
 				if (AVOWUI.singleton.GetUIMode() == AVOWUI.ToolMode.kDelete){
-				state = State.kDestroySquare;
+					state = State.kDestroySquare;
 				}
 				break;
 			}	
@@ -664,6 +696,13 @@ public class AVOWTutorialManager : MonoBehaviour {
 
 			case State.kDestroySuccessful:{	
 				if (onEnterState){
+//					Debug.Log ("tut06kDestroySuccessful- gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
+					Analytics.CustomEvent("tut06kDestroySuccessful", new Dictionary<string, object>
+					{
+						{ "levelTime", AVOWUpdateManager.singleton.GetGameTime()},
+					});						
+					
+				
 					AVOWTutorialText.singleton.InterruptText ("You have succesfully destroyed a resistance square.");
 					AVOWTutorialText.singleton.AddText ("You can continue to destroy, or if you want to make more squares, click the blue Create button on the left.");
 					AVOWTutorialText.singleton.AddText ("This is the end of the tutorial. When you are finished click the Main Menu button. You can always play around more by selecting the Free Play option from the main menu.");
