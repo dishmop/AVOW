@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Analytics;
+//using UnityEngine.Analytics;
 
 using Vectrosity;
 
@@ -554,8 +554,11 @@ public class Explanation : MonoBehaviour {
 			}
 			case State.kIntro:{
 				if (onEnterState){
-//					Debug.Log ("expl01kIntro -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
-					Analytics.CustomEvent("expl01kIntro", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });	
+//					Debug.Log ("expl01kIntro -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());	GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "tut06kDestroySuccessful", "", AVOWUpdateManager.singleton.GetGameTime());
+					GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "expl01kIntro", "", AVOWUpdateManager.singleton.GetGameTime());
+					GoogleAnalytics.Client.SendScreenHit("expl01kIntro");
+					
+//					Analytics.CustomEvent("expl01kIntro", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });	
 				
 					DisableUI(true);
 					AVOWTutorialText.singleton.AddPause(3);
@@ -577,7 +580,9 @@ public class Explanation : MonoBehaviour {
 			case State.kRemovingTheWorld:{
 				if (onEnterState){
 //					Debug.Log ("expl02kRemovingTheWorld -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
-					Analytics.CustomEvent("expl02kRemovingTheWorld", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });	
+					GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "expl02kRemovingTheWorld", "", AVOWUpdateManager.singleton.GetGameTime());
+					GoogleAnalytics.Client.SendScreenHit("expl02kRemovingTheWorld");
+//					Analytics.CustomEvent("expl02kRemovingTheWorld", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });	
 										
 					DisableUI(true);
 					AVOWTutorialText.singleton.AddText("");
@@ -608,7 +613,9 @@ public class Explanation : MonoBehaviour {
 			case State.kTradCircuit:{
 				if (onEnterState){	
 //					Debug.Log ("expl03kTradCircuit -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
-					Analytics.CustomEvent("expl03kTradCircuit", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+					GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "expl03kTradCircuit", "", AVOWUpdateManager.singleton.GetGameTime());
+					GoogleAnalytics.Client.SendScreenHit("expl03kTradCircuit");
+//					Analytics.CustomEvent("expl03kTradCircuit", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
 						
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("Good! You may recognise this as a traditional circuit diagram.");
@@ -689,7 +696,9 @@ public class Explanation : MonoBehaviour {
 			case State.kBoxesTotal:{
 				if (onEnterState){	
 //					Debug.Log ("expl04kBoxesTotal -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
-					Analytics.CustomEvent("expl04kBoxesTotal", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+					GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "expl04kBoxesTotal", "", AVOWUpdateManager.singleton.GetGameTime());
+					GoogleAnalytics.Client.SendScreenHit("expl04kBoxesTotal");
+//					Analytics.CustomEvent("expl04kBoxesTotal", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
 				
 					AVOWTutorialText.singleton.AddText("");
 					AVOWTutorialText.singleton.AddText("Of course, the total voltage across the circuit is always 1 volt because the cell driving it is 1 volt.");
@@ -727,7 +736,9 @@ public class Explanation : MonoBehaviour {
 			case State.kBoxesSetupOne2:{
 				if (onEnterState){	
 //					Debug.Log ("expl05kBoxesSetupOne2 -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
-					Analytics.CustomEvent("expl05kBoxesSetupOne2", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+					GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "expl05kBoxesSetupOne2", "", AVOWUpdateManager.singleton.GetGameTime());
+					GoogleAnalytics.Client.SendScreenHit("expl05kBoxesSetupOne2");
+//					Analytics.CustomEvent("expl05kBoxesSetupOne2", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
 				
 					
 					MakeUnitCircuit();
@@ -772,7 +783,9 @@ public class Explanation : MonoBehaviour {
 			case State.kLotsCurrent:{
 				if (onEnterState){	
 //					Debug.Log ("expl06kLotsCurrent -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
-					Analytics.CustomEvent("expl06kLotsCurrent", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+					GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "expl06kLotsCurrent", "", AVOWUpdateManager.singleton.GetGameTime());
+					GoogleAnalytics.Client.SendScreenHit("expl06kLotsCurrent");
+//					Analytics.CustomEvent("expl06kLotsCurrent", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
 				
 					
 					AVOWTutorialText.singleton.AddText("");
@@ -884,7 +897,9 @@ public class Explanation : MonoBehaviour {
 			case State.kChallenge1:{
 				if (onEnterState){	
 //					Debug.Log ("expl07kChallenge1 -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
-					Analytics.CustomEvent("expl07kChallenge1", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+					GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "expl07kChallenge1", "", AVOWUpdateManager.singleton.GetGameTime());
+					GoogleAnalytics.Client.SendScreenHit("expl07kChallenge1");
+//					Analytics.CustomEvent("expl07kChallenge1", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
 				
 					
 					transform.FindChild("Kirchoffs laws").gameObject.SetActive(false);
@@ -980,7 +995,9 @@ public class Explanation : MonoBehaviour {
 			case State.kChallenge2:{
 				if (onEnterState){	
 //					Debug.Log ("expl08kChallenge2 -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
-					Analytics.CustomEvent("expl08kChallenge2", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+					GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "expl08kChallenge2", "", AVOWUpdateManager.singleton.GetGameTime());
+					GoogleAnalytics.Client.SendScreenHit("expl08kChallenge2");
+//					Analytics.CustomEvent("expl08kChallenge2", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
 				
 					
 					DisableUI(false);
@@ -1212,7 +1229,9 @@ public class Explanation : MonoBehaviour {
 			}		
 			case State.kObjectiveSquaresExplanation:{
 //				Debug.Log ("expl09kObjectiveSquaresExplanation -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
-				Analytics.CustomEvent("expl09kObjectiveSquaresExplanation", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+				GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "expl09kObjectiveSquaresExplanation", "", AVOWUpdateManager.singleton.GetGameTime());
+				GoogleAnalytics.Client.SendScreenHit("expl09kObjectiveSquaresExplanation");
+//				Analytics.CustomEvent("expl09kObjectiveSquaresExplanation", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
 			
 				
 				if (onEnterState){
@@ -1333,7 +1352,9 @@ public class Explanation : MonoBehaviour {
 			case State.kFinish1:{
 				if (onEnterState){
 //					Debug.Log ("expl10kFinish1 -  gameTime: " + AVOWUpdateManager.singleton.GetGameTime());
-					Analytics.CustomEvent("expl10kFinish1", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
+					GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "expl10kFinish1", "", AVOWUpdateManager.singleton.GetGameTime());
+					GoogleAnalytics.Client.SendScreenHit("expl10kFinish1");
+//					Analytics.CustomEvent("expl10kFinish1", new Dictionary<string, object>{ { "levelTime", AVOWUpdateManager.singleton.GetGameTime()} });
 				
 					DisableUI(false);
 					SetupOffState();

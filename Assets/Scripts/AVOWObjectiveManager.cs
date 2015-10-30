@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System;
-using UnityEngine.Analytics;
+//using UnityEngine.Analytics;
 
 
 public class AVOWObjectiveManager : MonoBehaviour {
@@ -775,14 +775,16 @@ public class AVOWObjectiveManager : MonoBehaviour {
 			case State.kGoalComplete1:{
 				if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().IsReady()){
 					currentGoalIndex = FindNextValidGoal(currentGoalIndex);
-//					Debug.Log("goalComplete - levelNum: " + currentLevel.ToString() + ", goalNum: " + currentGoalIndex.ToString() + ", levelTime: " + AVOWUpdateManager.singleton.GetGameTime() + ", goalTime :" + (AVOWUpdateManager.singleton.GetGameTime() - lastGoalTime));
-					Analytics.CustomEvent("goalComplete", new Dictionary<string, object>
-					{
-						{ "levelNum", currentLevel.ToString()},
-						{ "goalNum", currentGoalIndex.ToString()},
-						{ "levelTime", AVOWUpdateManager.singleton.GetGameTime()},
-						{ "goalTime", (AVOWUpdateManager.singleton.GetGameTime() - lastGoalTime)},
-					});
+//						Debug.Log("goalComplete - levelNum: " + currentLevel.ToString() + ", goalNum: " + currentGoalIndex.ToString() + ", levelTime: " + AVOWUpdateManager.singleton.GetGameTime() + ", goalTime :" + (AVOWUpdateManager.singleton.GetGameTime() - lastGoalTime));
+					GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "goalComplete", AVOWGameModes.singleton.GetCurrentLevelName() + "_" + currentGoalIndex.ToString(), (AVOWUpdateManager.singleton.GetGameTime() - lastGoalTime));
+					GoogleAnalytics.Client.SendScreenHit("goalComplete_" + AVOWGameModes.singleton.GetCurrentLevelName() + "_" + currentGoalIndex.ToString());
+//					Analytics.CustomEvent("goalComplete", new Dictionary<string, object>
+//					{
+//						{ "levelNum", currentLevel.ToString()},
+//						{ "goalNum", currentGoalIndex.ToString()},
+//						{ "levelTime", AVOWUpdateManager.singleton.GetGameTime()},
+//						{ "goalTime", (AVOWUpdateManager.singleton.GetGameTime() - lastGoalTime)},
+//					});
 										
 					lastGoalTime = AVOWUpdateManager.singleton.GetGameTime();
 					
@@ -793,11 +795,13 @@ public class AVOWObjectiveManager : MonoBehaviour {
 					else{
 						state = State.kLevelComplete0;
 //						Debug.Log("levelComplete - levelNum: " + currentLevel.ToString() + ", levelTime: " + AVOWUpdateManager.singleton.GetGameTime());
-						Analytics.CustomEvent("levelComplete", new Dictionary<string, object>
-						                      {
-							{ "levelNum", currentLevel.ToString()},
-							{ "levelTime", AVOWUpdateManager.singleton.GetGameTime()},
-						});						
+						GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "levelComplete", AVOWGameModes.singleton.GetCurrentLevelName(), AVOWUpdateManager.singleton.GetGameTime());
+					
+//						Analytics.CustomEvent("levelComplete", new Dictionary<string, object>
+//						                      {
+//							{ "levelNum", currentLevel.ToString()},
+//							{ "levelTime", AVOWUpdateManager.singleton.GetGameTime()},
+//						});						
 						
 					}
 				}
