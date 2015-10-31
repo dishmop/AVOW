@@ -5,6 +5,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System;
 //using UnityEngine.Analytics;
+using System.Text.RegularExpressions;
 
 
 public class AVOWObjectiveManager : MonoBehaviour {
@@ -776,6 +777,9 @@ public class AVOWObjectiveManager : MonoBehaviour {
 				if (boards[frontIndex].GetComponent<AVOWObjectiveBoard>().IsReady()){
 					currentGoalIndex = FindNextValidGoal(currentGoalIndex);
 //						Debug.Log("goalComplete - levelNum: " + currentLevel.ToString() + ", goalNum: " + currentGoalIndex.ToString() + ", levelTime: " + AVOWUpdateManager.singleton.GetGameTime() + ", goalTime :" + (AVOWUpdateManager.singleton.GetGameTime() - lastGoalTime));
+//					Debug.Log (AVOWGameModes.singleton.GetCurrentLevelName() + "_" + currentGoalIndex.ToString());
+//					string s1= Regex.Replace(AVOWGameModes.singleton.GetCurrentLevelName() + "_" + currentGoalIndex.ToString(),"[^A-Za-z0-9_]","");
+//					Debug.Log (s1);
 					GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "goalComplete", AVOWGameModes.singleton.GetCurrentLevelName() + "_" + currentGoalIndex.ToString(), (AVOWUpdateManager.singleton.GetGameTime() - lastGoalTime));
 					GoogleAnalytics.Client.SendScreenHit("goalComplete_" + AVOWGameModes.singleton.GetCurrentLevelName() + "_" + currentGoalIndex.ToString());
 //					Analytics.CustomEvent("goalComplete", new Dictionary<string, object>
