@@ -237,10 +237,14 @@ public class AVOWGameModes : MonoBehaviour {
 		}
 	}
 	
+
+	
 	public void GameUpdate(){
 		if (Input.GetKeyDown(KeyCode.C) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))){
 			PlayerPrefs.DeleteAll();
 		}	
+
+		
 
 		if (triggerStartLevel >= kTutorialIndex){
 			StartLevel(triggerStartLevel);
@@ -317,8 +321,18 @@ public class AVOWGameModes : MonoBehaviour {
 
 	
 	// Update is called once per frame
+	bool dDown = false;
 	public void RenderUpdate () {
-	
+		
+		if (Input.GetKeyDown(KeyCode.D) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))){
+			Explanation.singleton.vizState = Explanation.VizState.kCircuitOnly;
+			dDown = true;
+		}
+		if (Input.GetKeyUp(KeyCode.D) && dDown){
+			Explanation.singleton.vizState = Explanation.VizState.kNormal;
+			dDown = false;
+			
+		}
 		// Hints
 		hintButton.SetActive(currentLevel > 0 && currentLevel !=4 && state == GameModeState.kPlayStage);
 		if (currentLevel > 0 && state == GameModeState.kPlayStage && currentLevel != 4){
